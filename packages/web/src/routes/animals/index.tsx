@@ -1,14 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
 import { getAnimals, type AnimalDTO } from '#/api/animals';
 
-const fetchAnimals = createServerFn({ method: 'GET' }).handler(async () => {
-  const { data } = await getAnimals();
-  return data ?? [];
-});
-
 export const Route = createFileRoute('/animals/')({
-  loader: () => fetchAnimals(),
+  loader: async () => {
+    const { data } = await getAnimals();
+    return data ?? [];
+  },
   component: Animals,
 });
 

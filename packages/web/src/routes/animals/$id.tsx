@@ -1,16 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
 import { getAnimalById, type AnimalDTO } from '#/api/animals';
 
-const fetchAnimalById = createServerFn({ method: 'GET' })
-  .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
-    const { data } = await getAnimalById(id);
-    return data as AnimalDTO;
-  });
-
 export const Route = createFileRoute('/animals/$id')({
-  loader: ({ params }) => fetchAnimalById({ data: Number(params.id) }),
+  loader: async ({ params }) => {
+    const { data } = await getAnimalById(Number(params.id));
+    return data as AnimalDTO;
+  },
   component: AnimalDetail,
 });
 
