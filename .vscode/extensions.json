@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "oxc.oxc-vscode",
+    "kamikillerto.vscode-colorize",
+    "mikestead.dotenv",
+    "yzhang.markdown-all-in-one",
+    "qwtel.sqlite-viewer",
+    "humao.rest-client",
+    "bradlc.vscode-tailwindcss",
+    "wayou.vscode-todo-highlight",
+    "ms-dotnettools.csdevkit"
+  ]
+}

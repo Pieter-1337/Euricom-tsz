@@ -1,0 +1,32 @@
+@api_HostAddress = http://localhost:5204
+
+### Get all animals
+GET {{api_HostAddress}}/api/animals/
+Accept: application/json
+
+### Get animal by id
+GET {{api_HostAddress}}/api/animals/1
+Accept: application/json
+
+### Create animal
+POST {{api_HostAddress}}/api/animals/
+Content-Type: application/json
+
+{
+  "name": "Rex",
+  "species": "Dog",
+  "age": 2
+}
+
+### Update animal
+PUT {{api_HostAddress}}/api/animals/1
+Content-Type: application/json
+
+{
+  "name": "Buddy",
+  "species": "Dog",
+  "age": 4
+}
+
+### Delete animal
+DELETE {{api_HostAddress}}/api/animals/1
