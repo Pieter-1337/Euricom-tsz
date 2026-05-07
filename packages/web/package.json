@@ -19,6 +19,7 @@
     "gen:api": "npx openapi-typescript http://localhost:5204/openapi/v1.json -o ./src/api/schema.ts"
   },
   "dependencies": {
+    "@tanstack/react-form": "^1.29.1",
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-start": "latest",

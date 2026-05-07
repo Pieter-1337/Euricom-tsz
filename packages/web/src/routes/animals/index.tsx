@@ -1,18 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { getAnimals, type AnimalDTO } from '#/api/animals';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '#/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 
 const fetchAnimals = createServerFn({ method: 'GET' }).handler(async () => {
-  const { data } = await getAnimals();
-  return data ?? [];
+  const animals = await getAnimals();
+  return animals ?? [];
 });
 
 export const Route = createFileRoute('/animals/')({
@@ -38,11 +31,7 @@ function Animals() {
           {animals.map((animal: AnimalDTO) => (
             <TableRow key={animal.id}>
               <TableCell>
-                <Link
-                  to="/animals/$id"
-                  params={{ id: String(animal.id) }}
-                  className="hover:underline"
-                >
+                <Link to="/animals/$id" params={{ id: String(animal.id) }} className="hover:underline">
                   {animal.name}
                 </Link>
               </TableCell>
