@@ -4,208 +4,208 @@
  */
 
 export interface paths {
-  '/': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AnonymousTypeOfstringAndstring"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['AnonymousTypeOfstringAndstring'];
-          };
+    "/api/animals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Animal"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateAnimalRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/animals': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/animals/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateAnimalRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Animal'][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['CreateAnimalRequest'];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/animals/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: number;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: number;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['UpdateAnimalRequest'];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: number;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    Animal: {
-      /** Format: int32 */
-      id?: number | string;
-      name?: string;
-      species?: string;
-      /** Format: int32 */
-      age?: number | string;
+    schemas: {
+        Animal: {
+            /** Format: int32 */
+            id?: number | string;
+            name?: string;
+            species?: string;
+            /** Format: int32 */
+            age?: number | string;
+        };
+        AnonymousTypeOfstringAndstring: {
+            name: null | string;
+            version: null | string;
+        };
+        CreateAnimalRequest: {
+            name: string;
+            species: string;
+            /** Format: int32 */
+            age?: number | string;
+        };
+        UpdateAnimalRequest: {
+            name: string;
+            species: string;
+            /** Format: int32 */
+            age?: number | string;
+        };
     };
-    AnonymousTypeOfstringAndstring: {
-      name: null | string;
-      version: null | string;
-    };
-    CreateAnimalRequest: {
-      name: string;
-      species: string;
-      /** Format: int32 */
-      age?: number | string;
-    };
-    UpdateAnimalRequest: {
-      name: string;
-      species: string;
-      /** Format: int32 */
-      age?: number | string;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;
