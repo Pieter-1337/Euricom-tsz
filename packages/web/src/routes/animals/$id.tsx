@@ -1,22 +1,31 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useState, type FormEvent } from 'react';
-import {
-  getAnimalById,
-  updateAnimal,
-  type AnimalDTO,
-  type UpdateAnimalRequestDTO,
-} from '#/api/animals';
+import { z } from 'zod';
+import { getAnimalById, updateAnimal, type AnimalDTO } from '#/api/animals';
+
+const animalIdSchema = z.number().int().positive();
+
+const updateAnimalSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  species: z.string().min(1, 'Species is required'),
+  age: z.number().int().nonnegative().optional(),
+});
+
+const saveAnimalInputSchema = z.object({
+  id: animalIdSchema,
+  animal: updateAnimalSchema,
+});
 
 const fetchAnimalById = createServerFn({ method: 'GET' })
-  .inputValidator((id: number) => id)
+  .inputValidator(animalIdSchema)
   .handler(async ({ data: id }) => {
     const { data } = await getAnimalById(id);
     return data as AnimalDTO;
   });
 
 const saveAnimal = createServerFn({ method: 'POST' })
-  .inputValidator((input: { id: number; animal: UpdateAnimalRequestDTO }) => input)
+  .inputValidator(saveAnimalInputSchema)
   .handler(async ({ data }) => {
     await updateAnimal(data.id, data.animal);
   });
