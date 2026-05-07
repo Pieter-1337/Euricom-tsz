@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/": {
+    '/': {
         parameters: {
             query?: never;
             header?: never;
@@ -26,7 +26,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AnonymousTypeOfstringAndstring"];
+                        'application/json': components['schemas']['AnonymousTypeOfstringAndstring'];
                     };
                 };
             };
@@ -39,7 +39,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/animals": {
+    '/api/animals': {
         parameters: {
             query?: never;
             header?: never;
@@ -61,7 +61,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Animal"][];
+                        'application/json': components['schemas']['Animal'][];
                     };
                 };
             };
@@ -76,7 +76,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CreateAnimalRequest"];
+                    'application/json': components['schemas']['CreateAnimalRequest'];
                 };
             };
             responses: {
@@ -95,7 +95,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/animals/{id}": {
+    '/api/animals/{id}': {
         parameters: {
             query?: never;
             header?: never;
@@ -133,7 +133,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["UpdateAnimalRequest"];
+                    'application/json': components['schemas']['UpdateAnimalRequest'];
                 };
             };
             responses: {
