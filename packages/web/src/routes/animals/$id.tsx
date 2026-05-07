@@ -3,6 +3,9 @@ import { createServerFn } from '@tanstack/react-start';
 import { useState, type FormEvent } from 'react';
 import { z } from 'zod';
 import { getAnimalById, updateAnimal, type AnimalDTO } from '#/api/animals';
+import { Button } from '#/components/ui/button';
+import { Input } from '#/components/ui/input';
+import { Label } from '#/components/ui/label';
 
 const animalIdSchema = z.number().int().positive();
 
@@ -32,10 +35,6 @@ const saveAnimal = createServerFn({ method: 'POST' })
 
 export const Route = createFileRoute('/animals/$id')({
   loader: ({ params }) => fetchAnimalById({ data: Number(params.id) }),
-  // loader: async ({ params }) => {
-  //   const { data } = await getAnimalById(Number(params.id));
-  //   return data as AnimalDTO;
-  // },
   component: AnimalDetail,
 });
 
@@ -68,61 +67,46 @@ function AnimalDetail() {
   return (
     <main>
       <h1 className="text-2xl font-bold">{animal.name}</h1>
-      <form
-        onSubmit={handleSubmit}
-        className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm"
-      >
-        <label className="font-semibold self-center" htmlFor="id">
-          ID
-        </label>
-        <input
-          id="id"
-          value={String(animal.id ?? '')}
-          disabled
-          className="rounded border px-2 py-1 bg-gray-100"
-        />
+      <form onSubmit={handleSubmit} className="mt-4 grid max-w-md gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="id">ID</Label>
+          <Input id="id" value={String(animal.id ?? '')} disabled />
+        </div>
 
-        <label className="font-semibold self-center" htmlFor="name">
-          Name
-        </label>
-        <input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="rounded border px-2 py-1"
-        />
+        <div className="grid gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
 
-        <label className="font-semibold self-center" htmlFor="species">
-          Species
-        </label>
-        <input
-          id="species"
-          value={species}
-          onChange={(e) => setSpecies(e.target.value)}
-          required
-          className="rounded border px-2 py-1"
-        />
+        <div className="grid gap-2">
+          <Label htmlFor="species">Species</Label>
+          <Input
+            id="species"
+            value={species}
+            onChange={(e) => setSpecies(e.target.value)}
+            required
+          />
+        </div>
 
-        <label className="font-semibold self-center" htmlFor="age">
-          Age
-        </label>
-        <input
-          id="age"
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          className="rounded border px-2 py-1"
-        />
+        <div className="grid gap-2">
+          <Label htmlFor="age">Age</Label>
+          <Input
+            id="age"
+            type="number"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+          />
+        </div>
 
-        <div className="col-span-2 mt-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-          >
+        <div>
+          <Button type="submit" disabled={saving}>
             {saving ? 'Saving…' : 'Save'}
-          </button>
+          </Button>
         </div>
       </form>
     </main>
