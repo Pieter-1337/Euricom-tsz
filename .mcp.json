@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "dbhub": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--dsn", "sqlite:///C:/Users/PieterBracke/git/tsz/packages/api/animals.db"]
+    }
+  }
+}
