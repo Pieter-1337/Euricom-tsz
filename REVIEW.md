@@ -1,0 +1,45 @@
+# REVIEW.md
+
+## 8 may
+
+- Je CLAUDE.md staat in je .claude folder, waardoor deze niet meegenomen wordt door Claude Code. Plaats deze in de root.
+- Maak naast de root CLAUDE.md meer gespecializeerde CLAUDE.md in je packages folders.
+- Hier eerste kleine verbetering:
+
+```
+# Important rules to follow
+
+- **Always use Bun for Node tooling.** Never use npm or pnpm unless strictly necessary and explicitly requested.
+- **Use Bash for scripts and shell commands.** This repo is developed on WSL; never use PowerShell or assume Windows-style paths.
+```
+
+- voor het age (number) field kan je beter volgende aanpassing doen.
+  instruct claude om dit volgende keer beter te doen.
+
+```js
+defaultValues: {
+    name: String(animal?.name ?? ''),
+    species: String(animal?.species ?? ''),
+    age: Number(animal?.age ?? 0),     // <-------
+},
+validators: {
+    onChange: z.object({
+    name: z.string().min(1, 'Name is required'),
+    species: z.string().min(1, 'Species is required'),
+    age: z.number().int().nonnegative(),    // <-------
+    }),
+}
+```
+
+en 
+
+```tsx
+<Input
+    id={field.name}
+    name={field.name}
+    type="number"
+    value={field.state.value}
+    onBlur={field.handleBlur}
+    onChange={(e) => field.handleChange(e.target.value === '' ? 0 : e.target.valueAsNumber)}  // <-------
+/>
+```
