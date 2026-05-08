@@ -1,43 +1,48 @@
 ---
 name: 'commit'
-description: 'How to commit changes in this repo  triggers: commit, push'
+description: 'How to commit changes in this repo  triggers: commit'
 ---
 
-# Describe how we commit changes in this repo follow the steps below sequentially.
+# How we commit in this repo
 
-## Status
+Follow these steps in order.
+
+## 1. Inspect
 
 ! `git status`
-
-## Diff
-
 ! `git diff`
 
-## Commit message formatting
+## 2. Decide on splitting
 
-Use commit conventions
+Bundle all pending changes into a single commit by default. If the changes clearly span unrelated concerns, ask the user whether to split before committing.
 
-Primary Commit Types
+## 3. Check for secrets
 
-feat: A new feature for the user. This type typically triggers a minor version bump in semantic versioning.
+Before staging, scan filenames and diff content for anything that looks like a secret (`.env`, `*credentials*`, API keys, tokens, private keys, etc.). If anything looks sensitive, stop and confirm with the user before staging it.
 
-fix: A bug fix for the user. This type typically triggers a patch version bump.
+## 4. Write the message
 
-Recommended Additional Types
-docs: Documentation only changes (e.g., README, comments).
+Use Conventional Commits with a flat type — no scope.
 
-style: Changes that do not affect the meaning of the code, such as white-space, formatting, or missing semi-colons.
+Subject line:
+- Imperative mood ("add", not "added" or "adds")
+- 72 characters or fewer
+- No trailing period
+- Format: `<type>: <subject>`
 
-refactor: A code change that neither fixes a bug nor adds a feature (improves structure/readability).
+Types:
+- `feat` — new user-facing feature
+- `fix` — bug fix
+- `docs` — documentation only
+- `style` — formatting / whitespace, no behavior change
+- `refactor` — restructure without changing behavior or fixing a bug
+- `perf` — performance improvement
+- `test` — adding or correcting tests
+- `build` — build system / dependencies
+- `ci` — CI configuration
+- `chore` — tooling, configs, anything outside src/test
+- `revert` — reverts a previous commit
 
-perf: A code change that improves performance.
+## 5. Do not push
 
-test: Adding missing tests or correcting existing tests.
-
-build: Changes that affect the build system or external dependencies (e.g., npm, webpack).
-
-ci: Changes to continuous integration configuration files and scripts (e.g., GitHub Actions).
-
-chore: Other changes that don't modify src or test files (e.g., updating dependencies, configs).
-
-revert: Reverts a previous commit.
+Do not run `git push` automatically. Push only when the user explicitly asks (e.g., "push", "commit and push").
