@@ -1,0 +1,98 @@
+{
+  "skill_name": "plan",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I have a TypeScript Express API with a users table. I want to add email notifications that fire 7 days before a user's subscription expires. Let's plan this out together before writing any code.",
+      "expected_output": "A PLAN.md file saved to disk containing: a clear Goal statement, specific file paths to create/modify, numbered actionable implementation steps, tests to write, edge cases, and assumptions.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "PLAN.md file exists at the output path"
+        },
+        {
+          "text": "Plan contains a '## Goal' section with a one-sentence goal statement"
+        },
+        {
+          "text": "Plan contains a '## Files' section listing specific file paths (not just vague module names)"
+        },
+        {
+          "text": "Plan contains at least 3 numbered implementation steps"
+        },
+        {
+          "text": "At least one step references a specific file name or function name"
+        },
+        {
+          "text": "Plan contains a '## Tests' section describing what to test"
+        },
+        {
+          "text": "Plan contains a '## Edge Cases' section"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Our /api/users endpoint returns all records with no pagination — it's getting slow. Help me plan how to add cursor-based pagination.",
+      "expected_output": "A PLAN.md file saved to disk containing: a clear Goal statement, specific file paths, numbered steps covering both backend query changes and API contract changes, tests, edge cases.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "PLAN.md file exists at the output path"
+        },
+        {
+          "text": "Plan contains a '## Goal' section with a one-sentence goal statement"
+        },
+        {
+          "text": "Plan contains a '## Files' section listing specific file paths"
+        },
+        {
+          "text": "Plan contains at least 3 numbered implementation steps"
+        },
+        {
+          "text": "At least one step references a specific file name or function name"
+        },
+        {
+          "text": "Plan mentions cursor-based pagination specifically (not just generic pagination)"
+        },
+        {
+          "text": "Plan contains a '## Tests' section"
+        },
+        {
+          "text": "Plan contains a '## Edge Cases' section"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to add dark mode to our React app. It uses Tailwind CSS and we want users to toggle between light and dark themes. Let's plan this.",
+      "expected_output": "A PLAN.md file saved to disk covering: Tailwind dark mode config, theme toggle component, state persistence strategy, specific file paths, numbered steps, and edge cases like SSR flash.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "PLAN.md file exists at the output path"
+        },
+        {
+          "text": "Plan contains a '## Goal' section with a one-sentence goal statement"
+        },
+        {
+          "text": "Plan contains a '## Files' section listing specific file paths"
+        },
+        {
+          "text": "Plan contains at least 3 numbered implementation steps"
+        },
+        {
+          "text": "Plan mentions Tailwind's darkMode config (e.g. 'class' strategy in tailwind.config)"
+        },
+        {
+          "text": "Plan addresses theme persistence (e.g. localStorage or similar)"
+        },
+        {
+          "text": "Plan contains a '## Tests' section"
+        },
+        {
+          "text": "Plan contains a '## Edge Cases' section"
+        }
+      ]
+    }
+  ]
+}

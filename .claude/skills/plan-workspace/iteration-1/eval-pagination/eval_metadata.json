@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-pagination",
+  "prompt": "Our /api/users endpoint returns all records with no pagination — it's getting slow. Help me plan how to add cursor-based pagination.",
+  "assertions": [
+    { "text": "PLAN.md file exists at the output path" },
+    { "text": "Plan contains a '## Goal' section with a one-sentence goal statement" },
+    { "text": "Plan contains a '## Files' section listing specific file paths" },
+    { "text": "Plan contains at least 3 numbered implementation steps" },
+    { "text": "At least one step references a specific file name or function name" },
+    { "text": "Plan mentions cursor-based pagination specifically (not just generic pagination)" },
+    { "text": "Plan contains a '## Tests' section" },
+    { "text": "Plan contains a '## Edge Cases' section" }
+  ]
+}

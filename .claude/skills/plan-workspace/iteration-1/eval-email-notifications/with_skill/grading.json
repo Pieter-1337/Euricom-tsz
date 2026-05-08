@@ -1,0 +1,44 @@
+{
+  "run_id": "eval-email-notifications-with_skill",
+  "eval_name": "eval-email-notifications",
+  "assertions": [
+    {
+      "text": "PLAN.md file exists at the output path",
+      "passed": true,
+      "evidence": "File present at with_skill/outputs/PLAN.md"
+    },
+    {
+      "text": "Plan contains a '## Goal' section with a one-sentence goal statement",
+      "passed": true,
+      "evidence": "## Goal: 'Add a background job that queries the users table daily for subscriptions expiring in exactly 7 days and sends each affected user a notification email.'"
+    },
+    {
+      "text": "Plan contains a '## Files' section listing specific file paths (not just vague module names)",
+      "passed": true,
+      "evidence": "## Files section lists 11 entries with full paths like src/modules/users/User.ts, src/jobs/subscriptionExpiryJob.ts, src/jobs/scheduler.ts, etc."
+    },
+    {
+      "text": "Plan contains at least 3 numbered implementation steps",
+      "passed": true,
+      "evidence": "12 numbered steps in ## Steps section"
+    },
+    {
+      "text": "At least one step references a specific file name or function name",
+      "passed": true,
+      "evidence": "Step 1: 'Add subscriptionExpiresAt: Date | null to src/modules/users/User.ts'; Step 3: 'Add findUsersExpiringOn(date: Date) to src/modules/users/userRepository.ts'"
+    },
+    {
+      "text": "Plan contains a '## Tests' section describing what to test",
+      "passed": true,
+      "evidence": "## Tests section with 6 distinct test scenarios including file names like userRepository.test.ts and subscriptionExpiryJob.test.ts"
+    },
+    {
+      "text": "Plan contains a '## Edge Cases' section",
+      "passed": true,
+      "evidence": "## Edge Cases section with 7 edge cases: null email, cancelled subscription, duplicate sends, timezone sensitivity, large volumes, SMTP failure, null data"
+    }
+  ],
+  "passed_count": 7,
+  "total_count": 7,
+  "pass_rate": 1.0
+}

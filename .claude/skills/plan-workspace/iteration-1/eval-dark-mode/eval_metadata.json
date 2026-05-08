@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-dark-mode",
+  "prompt": "I need to add dark mode to our React app. It uses Tailwind CSS and we want users to toggle between light and dark themes. Let's plan this.",
+  "assertions": [
+    { "text": "PLAN.md file exists at the output path" },
+    { "text": "Plan contains a '## Goal' section with a one-sentence goal statement" },
+    { "text": "Plan contains a '## Files' section listing specific file paths" },
+    { "text": "Plan contains at least 3 numbered implementation steps" },
+    { "text": "Plan mentions Tailwind's darkMode config (e.g. 'class' strategy in tailwind.config)" },
+    { "text": "Plan addresses theme persistence (e.g. localStorage or similar)" },
+    { "text": "Plan contains a '## Tests' section" },
+    { "text": "Plan contains a '## Edge Cases' section" }
+  ]
+}

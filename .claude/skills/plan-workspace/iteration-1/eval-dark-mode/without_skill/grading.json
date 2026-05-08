@@ -1,0 +1,49 @@
+{
+  "run_id": "eval-dark-mode-without_skill",
+  "eval_name": "eval-dark-mode",
+  "assertions": [
+    {
+      "text": "PLAN.md file exists at the output path",
+      "passed": true,
+      "evidence": "File present at without_skill/outputs/PLAN.md"
+    },
+    {
+      "text": "Plan contains a '## Goal' section with a one-sentence goal statement",
+      "passed": false,
+      "evidence": "No ## Goal section. Plan opens with ## Context then ## Gap Analysis (table) then ## Recommended Changes. The goal is implicit in the context but not stated as a standalone section."
+    },
+    {
+      "text": "Plan contains a '## Files' section listing specific file paths",
+      "passed": true,
+      "evidence": "## File Changelist table lists 3 entries: src/hooks/use-theme.ts (Create), src/components/theme-toggle.tsx (Edit), src/routes/index.tsx (Edit)"
+    },
+    {
+      "text": "Plan contains at least 3 numbered implementation steps",
+      "passed": true,
+      "evidence": "## Implementation Order has 4 numbered steps; ## Recommended Changes has 4 numbered subsections"
+    },
+    {
+      "text": "Plan mentions Tailwind's darkMode config (e.g. 'class' strategy in tailwind.config)",
+      "passed": true,
+      "evidence": "## Context: 'The Tailwind custom variant @custom-variant dark (&:is(.dark *)) is also already configured'; dark mode mechanism documented under ## What already exists"
+    },
+    {
+      "text": "Plan addresses theme persistence (e.g. localStorage or similar)",
+      "passed": true,
+      "evidence": "## Context: 'a ThemeToggle component that reads/writes localStorage'; ## Recommended Changes step 1 shows useTheme hook with localStorage.setItem"
+    },
+    {
+      "text": "Plan contains a '## Tests' section",
+      "passed": true,
+      "evidence": "## Testing Checklist section at end of plan with 5 bullet-point verification checks (though less detailed than a formal test spec)"
+    },
+    {
+      "text": "Plan contains a '## Edge Cases' section",
+      "passed": false,
+      "evidence": "No ## Edge Cases section. Edge cases like system preference changes and localStorage availability are not addressed anywhere in the plan."
+    }
+  ],
+  "passed_count": 6,
+  "total_count": 8,
+  "pass_rate": 0.75
+}
