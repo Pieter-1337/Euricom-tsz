@@ -33,6 +33,24 @@ validators: {
 
 en 
 
+```js
+onSubmit: async ({ value }) => {
+    await saveAnimal({
+        data: {
+            id: Number(animal?.id),
+            animal: {
+            name: value.name,
+            species: value.species,
+            age: value.age,                     // <-------
+            },
+        },
+    });
+    await router.invalidate();
+},
+```
+
+en 
+
 ```tsx
 <Input
     id={field.name}
