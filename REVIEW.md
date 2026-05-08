@@ -63,10 +63,31 @@ en
 ```
 
 - Enable more strict openapi specs, better for the TS types generation.
+  and make sure all field are not optional (default for C#)
 
 ```
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer((schema, _, _) =>
+    {
+        if (schema.Properties is { Count: > 0 })
+        {
+            schema.Required ??= new HashSet<string>();
+            foreach (var (name, property) in schema.Properties)
+            {
+                var isNullable = property.Type is { } t && (t & JsonSchemaType.Null) != 0;
+                if (!isNullable)
+                {
+                    schema.Required.Add(name);
+                }
+            }
+        }
+        return Task.CompletedTask;
+    });
 });
 ```
