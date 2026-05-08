@@ -61,3 +61,12 @@ en
     onChange={(e) => field.handleChange(e.target.value === '' ? 0 : e.target.valueAsNumber)}  // <-------
 />
 ```
+
+- Enable more strict openapi specs, better for the TS types generation.
+
+```
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
+```
