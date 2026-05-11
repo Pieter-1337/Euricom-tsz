@@ -12,7 +12,7 @@ const animalIdSchema = z.number().int().positive();
 const updateAnimalSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   species: z.string().min(1, 'Species is required'),
-  age: z.number().int().nonnegative().optional(),
+  age: z.number().int().nonnegative(),
 });
 
 const saveAnimalInputSchema = z.object({
@@ -47,7 +47,7 @@ function AnimalDetail() {
     defaultValues: {
       name: String(animal?.name ?? ''),
       species: String(animal?.species ?? ''),
-      age: (animal?.age === undefined || animal?.age === '' ? '' : Number(animal.age)) as AgeInput,
+      age: (animal?.age === undefined ? '' : Number(animal.age)) as AgeInput,
     },
     validators: {
       onChange: z.object({
@@ -63,7 +63,7 @@ function AnimalDetail() {
           animal: {
             name: value.name,
             species: value.species,
-            age: value.age === '' ? undefined : value.age,
+            age: value.age === '' ? 0 : value.age,
           },
         },
       });

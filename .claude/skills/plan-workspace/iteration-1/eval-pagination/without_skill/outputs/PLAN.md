@@ -99,6 +99,7 @@ private static int? DecodeCursor(string? cursor)
 ```
 
 Key implementation notes:
+
 - `AsNoTracking()` is appropriate because this is a read-only list query.
 - `OrderBy(a => a.Id)` must be explicit and stable — EF Core does not guarantee order without it.
 - The +1 trick avoids a second `COUNT` query.
@@ -149,10 +150,7 @@ Add a typed pagination function and keep the old `getAnimals` or remove it if no
 ```typescript
 export type PagedAnimalsDTO = components['schemas']['PagedResultOfAnimal'];
 
-export const getAnimalPage = async (
-  cursor?: string,
-  limit = 20
-): Promise<PagedAnimalsDTO | undefined> => {
+export const getAnimalPage = async (cursor?: string, limit = 20): Promise<PagedAnimalsDTO | undefined> => {
   const resp = await client.GET('/api/animals', {
     params: {
       query: { cursor, limit },
@@ -195,9 +193,7 @@ function Animals() {
   return (
     <main>
       <h1 className="text-2xl font-bold">Animals</h1>
-      <Table className="mt-4">
-        {/* ... existing header and rows ... */}
-      </Table>
+      <Table className="mt-4">{/* ... existing header and rows ... */}</Table>
       <div className="mt-4 flex gap-2">
         <Button
           variant="outline"
@@ -239,15 +235,15 @@ Accept: application/json
 
 ## File Change Summary
 
-| File | Change |
-|------|--------|
-| `packages/api/Modules/Animals/AnimalContracts.cs` | Add `GetAnimalsRequest` and `PagedResult<T>` |
-| `packages/api/Modules/Animals/AnimalService.cs` | Replace `GetAllAsync` with `GetPageAsync` + cursor helpers |
+| File                                              | Change                                                                      |
+| ------------------------------------------------- | --------------------------------------------------------------------------- |
+| `packages/api/Modules/Animals/AnimalContracts.cs` | Add `GetAnimalsRequest` and `PagedResult<T>`                                |
+| `packages/api/Modules/Animals/AnimalService.cs`   | Replace `GetAllAsync` with `GetPageAsync` + cursor helpers                  |
 | `packages/api/Modules/Animals/AnimalEndpoints.cs` | Update `GET /` to use `[AsParameters] GetAnimalsRequest` and `GetPageAsync` |
-| `packages/web/src/api/schema.ts` | Regenerate via `openapi-typescript` (do not edit manually) |
-| `packages/web/src/api/animals.ts` | Add `getAnimalPage`; update or remove `getAnimals` |
-| `packages/web/src/routes/animals/index.tsx` | Add search param validation, paginated loader, Next/First-page buttons |
-| `packages/api/api.http` | Add paginated example requests |
+| `packages/web/src/api/schema.ts`                  | Regenerate via `openapi-typescript` (do not edit manually)                  |
+| `packages/web/src/api/animals.ts`                 | Add `getAnimalPage`; update or remove `getAnimals`                          |
+| `packages/web/src/routes/animals/index.tsx`       | Add search param validation, paginated loader, Next/First-page buttons      |
+| `packages/api/api.http`                           | Add paginated example requests                                              |
 
 No EF Core migration is needed — no schema change is involved.
 

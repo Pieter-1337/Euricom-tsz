@@ -31,7 +31,7 @@ validators: {
 }
 ```
 
-en 
+en
 
 ```js
 onSubmit: async ({ value }) => {
@@ -49,16 +49,16 @@ onSubmit: async ({ value }) => {
 },
 ```
 
-en 
+en
 
 ```tsx
 <Input
-    id={field.name}
-    name={field.name}
-    type="number"
-    value={field.state.value}
-    onBlur={field.handleBlur}
-    onChange={(e) => field.handleChange(e.target.value === '' ? 0 : e.target.valueAsNumber)}  // <-------
+  id={field.name}
+  name={field.name}
+  type="number"
+  value={field.state.value}
+  onBlur={field.handleBlur}
+  onChange={(e) => field.handleChange(e.target.value === '' ? 0 : e.target.valueAsNumber)} // <-------
 />
 ```
 

@@ -30,6 +30,7 @@ If the user's request is already well-described, skip straight to research.
 Before drafting anything, explore the codebase to anchor the plan in reality. A plan based on wrong assumptions wastes implementation time.
 
 Do all of the following that are relevant:
+
 - Find the files most likely to be touched (Glob for paths, Grep for symbols)
 - Read enough of those files to understand current patterns and conventions
 - Identify the integration points — where new code hooks into existing code
@@ -52,6 +53,7 @@ Write a structured plan covering:
 ### 4. Review with the User
 
 Share the draft and invite feedback explicitly. Flag:
+
 - Any decision you made that the user might want to override
 - Any step that's still vague or where you're not sure of the approach
 - Any open question that needs their input
@@ -100,6 +102,7 @@ Write the final `PLAN.md` using this structure:
 ```
 
 The plan is ready when:
+
 - Every step is specific enough to execute without further clarification
 - All file paths are identified
 - No open decisions remain unresolved

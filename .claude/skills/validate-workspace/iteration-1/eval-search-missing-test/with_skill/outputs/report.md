@@ -38,6 +38,7 @@
 ### Verdict: NEEDS WORK
 
 **Before committing:**
+
 1. Create `packages/web/src/routes/animals/animals.spec.ts` with the three planned test cases.
 2. Run `bun run check` from repo root to confirm no TypeScript errors.
 3. Run `bun run test` to confirm all tests pass.

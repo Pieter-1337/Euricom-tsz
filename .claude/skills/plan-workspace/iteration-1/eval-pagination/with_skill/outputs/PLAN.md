@@ -1,9 +1,11 @@
 # Plan: Cursor-based pagination for GET /api/animals
 
 ## Goal
+
 Add cursor-based pagination to the `GET /api/animals` endpoint so the API returns a manageable page of results plus a cursor token the client can use to fetch the next page, replacing the current full-table scan.
 
 ## Context
+
 The API is a .NET 9 Minimal API backed by EF Core with a SQLite database (`animals.db`). The `Animal` entity has an integer auto-increment primary key `Id`. The `GET /api/animals` endpoint lives in `AnimalEndpoints.cs` and delegates to `AnimalService.GetAllAsync()`, which currently calls `_db.Animals.ToListAsync(ct)` with no filtering or ordering. Response contracts are in `AnimalContracts.cs`; there is currently no response envelope — the endpoint returns `Animal[]` directly.
 
 The frontend (`packages/web`) uses `openapi-fetch` with a code-generated `schema.ts`. After any API contract change the schema must be regenerated with `bun --filter web gen:api` (calls `openapi-typescript` against the live Scalar/OpenAPI endpoint). Unit tests use in-memory EF Core; integration tests use `WebApplicationFactory`.
@@ -11,6 +13,7 @@ The frontend (`packages/web`) uses `openapi-fetch` with a code-generated `schema
 For cursor-based pagination on an integer PK the cursor is simply the last `Id` seen. The next page is `WHERE Id > cursor ORDER BY Id ASC LIMIT pageSize`. This avoids offset drift and is O(log n) on the indexed PK.
 
 ## Files
+
 - `packages/api/Modules/Animals/AnimalContracts.cs` — modify: add `PagedAnimalsResponse` record (items + nextCursor)
 - `packages/api/Modules/Animals/AnimalService.cs` — modify: add `GetPagedAsync(int? afterId, int pageSize, CancellationToken)` method; keep `GetAllAsync` to avoid breaking other callers
 - `packages/api/Modules/Animals/AnimalEndpoints.cs` — modify: update `GET /` handler to accept `afterId` and `pageSize` query parameters and return the paged response
@@ -21,14 +24,17 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 - `packages/api.tests.integration/AnimalEndpointsTests.cs` — modify: add integration tests for paginated `GET /api/animals`
 
 ## Steps
+
 1. **Add `PagedAnimalsResponse` to `AnimalContracts.cs`.**
    Add a new record after the existing request classes:
+
    ```csharp
    public record PagedAnimalsResponse(List<Animal> Items, int? NextCursor);
    ```
 
 2. **Add `GetPagedAsync` to `AnimalService.cs`.**
    Insert after `GetAllAsync`:
+
    ```csharp
    public Task<PagedAnimalsResponse> GetPagedAsync(int? afterId, int pageSize, CancellationToken ct = default)
    {
@@ -59,11 +65,14 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 
 3. **Update the `GET /` handler in `AnimalEndpoints.cs`.**
    Replace:
+
    ```csharp
    group.MapGet("/", async (AnimalService service, CancellationToken ct) =>
        TypedResults.Ok(await service.GetAllAsync(ct)));
    ```
+
    With:
+
    ```csharp
    group.MapGet("/", async (
        [FromQuery] int? afterId,
@@ -77,13 +86,16 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
        return TypedResults.Ok(await service.GetPagedAsync(afterId, size, ct));
    });
    ```
+
    Add `using Microsoft.AspNetCore.Mvc;` at the top if not already present (needed for `[FromQuery]`).
 
 4. **Regenerate the OpenAPI TypeScript schema.**
    Start the API (`bun dev:api`) then run:
+
    ```
    bun --filter web gen:api
    ```
+
    This overwrites `packages/web/src/api/schema.ts` with the updated spec including `PagedAnimalsResponse`.
 
 5. **Update `packages/web/src/api/animals.ts`.**
@@ -92,7 +104,7 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
      ```ts
      export const getAnimals = async (
        afterId?: number,
-       pageSize?: number
+       pageSize?: number,
      ): Promise<PagedAnimalsResponseDTO | undefined> => {
        const resp = await client.GET('/api/animals', {
          params: { query: { afterId, pageSize } },
@@ -109,6 +121,7 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 
 7. **Update `packages/api/api.http`.**
    Add example requests for the paginated endpoint:
+
    ```
    ### Get first page of animals (20 per page)
    GET {{api_HostAddress}}/api/animals?pageSize=20
@@ -122,6 +135,7 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 ## Tests
 
 ### Unit tests — `packages/api.tests/AnimalServiceTests.cs`
+
 - `GetPaged_NoAfterCursor_ReturnsFirstPage`: seed 25 animals, call `GetPagedAsync(null, 20)`, assert 20 items returned and `NextCursor` equals the 20th animal's Id.
 - `GetPaged_WithAfterCursor_ReturnsNextPage`: seed 25 animals, call `GetPagedAsync(cursor, 20)`, assert remaining items returned and `NextCursor` is null.
 - `GetPaged_LastPage_ReturnsNullCursor`: seed 5 animals, call `GetPagedAsync(null, 20)`, assert all 5 items returned and `NextCursor` is null.
@@ -129,6 +143,7 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 - `GetPaged_PageSizeOne_ReturnsSingleItem`: seed 3 animals, call with `pageSize=1`, assert 1 item and a non-null cursor.
 
 ### Integration tests — `packages/api.tests.integration/AnimalEndpointsTests.cs`
+
 - `GetAnimals_Paginated_ReturnsOkWithPagedResponse`: GET `/api/animals?pageSize=5`, assert 200, `items.Count == 5`, `nextCursor` is not null.
 - `GetAnimals_Paginated_SecondPage_UsesCursor`: GET first page, then GET `/api/animals?afterId={nextCursor}&pageSize=5`, assert the first item's Id is greater than the cursor.
 - `GetAnimals_Paginated_DefaultPageSize_Returns20Items`: seed 25 animals, GET `/api/animals`, assert 20 items.
@@ -136,6 +151,7 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 - `GetAnimals_Paginated_InvalidAfterCursor_ReturnsEmpty`: GET `/api/animals?afterId=99999`, assert `items` is empty and `nextCursor` is null.
 
 ## Edge Cases
+
 - **`pageSize` of 0 or negative**: clamp to default (20) in the endpoint handler.
 - **`pageSize` larger than max**: clamp to 100 to prevent DoS.
 - **`afterId` referencing a deleted animal**: the `WHERE Id > afterId` query skips the gap gracefully; no error, no missed rows.
@@ -144,6 +160,7 @@ For cursor-based pagination on an integer PK the cursor is simply the last `Id` 
 - **OpenAPI schema regeneration**: `schema.ts` is auto-generated; never edit it manually. If `PagedAnimalsResponse` does not appear in the generated schema, ensure the API is running and that the response type is correctly inferred by the .NET OpenAPI source generator (may need an explicit `Produces<PagedAnimalsResponse>()` call on the endpoint).
 
 ## Assumptions
+
 - The existing `GetAllAsync` method is kept intact; nothing else in the codebase calls it from outside the module, but removing it now would be an unnecessary breaking change.
 - Default page size of 20 and max of 100 are reasonable defaults; adjust if the product owner specifies otherwise.
 - The frontend "Load more" pattern is preferred over full server-side pagination controls (no total-count or page-number UI needed at this stage).

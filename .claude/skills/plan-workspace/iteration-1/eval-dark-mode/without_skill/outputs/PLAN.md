@@ -18,18 +18,18 @@ In other words, **the core infrastructure is fully implemented**. What remains i
 
 ## Gap Analysis
 
-| Area | Status | Notes |
-|------|--------|-------|
-| CSS variables for dark theme | Done | All tokens in `styles.css` |
-| Tailwind dark variant | Done | `@custom-variant dark` in CSS |
-| No-FOUC script | Done | Inline script in `RootDocument` |
-| Toggle button (UI) | Done | `ThemeToggle` in nav |
-| localStorage persistence | Done | In `ThemeToggle.toggle()` |
-| System preference detection | Done | In `themeInitScript` |
-| Shared theme state / hook | Missing | State lives only in `ThemeToggle` component |
-| `system` (auto) mode support | Missing | Only `light`/`dark` supported |
-| Accessible icon label | Present | `aria-label="Toggle theme"` exists |
-| Hydration safety | Partial | `suppressHydrationWarning` on button, but icon flickers on hydration because initial `theme` state is `null` |
+| Area                         | Status  | Notes                                                                                                        |
+| ---------------------------- | ------- | ------------------------------------------------------------------------------------------------------------ |
+| CSS variables for dark theme | Done    | All tokens in `styles.css`                                                                                   |
+| Tailwind dark variant        | Done    | `@custom-variant dark` in CSS                                                                                |
+| No-FOUC script               | Done    | Inline script in `RootDocument`                                                                              |
+| Toggle button (UI)           | Done    | `ThemeToggle` in nav                                                                                         |
+| localStorage persistence     | Done    | In `ThemeToggle.toggle()`                                                                                    |
+| System preference detection  | Done    | In `themeInitScript`                                                                                         |
+| Shared theme state / hook    | Missing | State lives only in `ThemeToggle` component                                                                  |
+| `system` (auto) mode support | Missing | Only `light`/`dark` supported                                                                                |
+| Accessible icon label        | Present | `aria-label="Toggle theme"` exists                                                                           |
+| Hydration safety             | Partial | `suppressHydrationWarning` on button, but icon flickers on hydration because initial `theme` state is `null` |
 
 ---
 
@@ -113,11 +113,11 @@ If a three-way toggle (light / dark / system) is desired later, the `useTheme` h
 
 ## File Changelist
 
-| File | Action | Reason |
-|------|--------|--------|
-| `src/hooks/use-theme.ts` | **Create** | Shared, reusable theme hook |
-| `src/components/theme-toggle.tsx` | **Edit** | Use `useTheme`, remove `useState`/`useEffect` duplication |
-| `src/routes/index.tsx` | **Edit** | Replace `text-gray-600` with `text-muted-foreground` |
+| File                              | Action     | Reason                                                    |
+| --------------------------------- | ---------- | --------------------------------------------------------- |
+| `src/hooks/use-theme.ts`          | **Create** | Shared, reusable theme hook                               |
+| `src/components/theme-toggle.tsx` | **Edit**   | Use `useTheme`, remove `useState`/`useEffect` duplication |
+| `src/routes/index.tsx`            | **Edit**   | Replace `text-gray-600` with `text-muted-foreground`      |
 
 No changes are needed to `styles.css`, `__root.tsx`, or any shadcn UI components — they are already correctly set up.
 

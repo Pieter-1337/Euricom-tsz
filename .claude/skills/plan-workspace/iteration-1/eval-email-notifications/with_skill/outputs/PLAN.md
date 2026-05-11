@@ -1,9 +1,11 @@
 # Plan: Subscription Expiry Email Notifications
 
 ## Goal
+
 Add a background job that queries the users table daily for subscriptions expiring in exactly 7 days and sends each affected user a notification email.
 
 ## Context
+
 The codebase is a .NET 10 ASP.NET Core Minimal API (not TypeScript/Express — the task describes a hypothetical TypeScript Express project, so this plan is written for an equivalent TypeScript Express API that mirrors the patterns found here). Key patterns observed:
 
 - **Module-per-feature layout**: each feature lives under `src/modules/<Feature>/` with co-located model, service, repository/db context, contracts, and route registration files.

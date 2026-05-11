@@ -32,6 +32,7 @@ Run all checks that apply to this project. For each one, report pass/fail with t
 if it fails — not just "it failed".
 
 **First, discover what scripts exist:**
+
 ```bash
 cat package.json | grep -A 30 '"scripts"'
 ```
@@ -40,6 +41,7 @@ In monorepos, also check the root `package.json`. Run checks from the root if ro
 delegate to packages (e.g. `bun run check` at root runs `bun run --filter '*' check`).
 
 **Then run the relevant ones:**
+
 - TypeScript: `bun run typecheck` from the repo root (falls back to `bun x tsc --noEmit` if no typecheck script). Note: `bun run check` often runs a formatter/linter (like `vp check`) that does NOT do full TypeScript type-checking — always run a separate typecheck step too.
 - Tests: `bun run test` from the repo root (bun delegates to packages that have a test script). If that fails, try `cd packages/<name> && bun run test`.
 - Lint/format: `bun run check` if it exists
@@ -60,6 +62,7 @@ the rest of the validation using static analysis.
 If a PLAN.md exists, go through each **Step** item and assess whether it was addressed in the diff.
 
 For each step:
+
 - **Done** — the diff clearly addresses it
 - **Partial** — something was done but it looks incomplete
 - **Missing** — no evidence in the diff that this step was tackled
@@ -123,6 +126,7 @@ Use this structure:
 ```
 
 **Verdict rules:**
+
 - **PASS** — all automated checks pass, no missing plan steps, no significant issues
 - **NEEDS WORK** — automated checks pass but there are issues or gaps worth fixing first
 - **FAILING** — one or more automated checks failed (type errors, test failures, lint errors)
@@ -130,6 +134,7 @@ Use this structure:
 ### 6. Offer to Fix
 
 After the report, ask the user how they'd like to proceed:
+
 - If verdict is FAILING or NEEDS WORK, offer to fix the issues directly
 - If verdict is PASS, offer to proceed to commit (using the commit skill if available)
 

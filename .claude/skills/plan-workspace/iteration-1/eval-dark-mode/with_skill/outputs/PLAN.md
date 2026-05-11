@@ -1,9 +1,11 @@
 # Plan: Dark Mode Toggle
 
 ## Goal
+
 Complete the dark mode feature so users can toggle between light and dark themes, with correct initial state, no flash of wrong theme, and solid test coverage.
 
 ## Context
+
 Research revealed that the core infrastructure is already in place:
 
 - **Tailwind v4** (no `tailwind.config.ts`). Config lives in `src/styles.css` via `@import 'tailwindcss'`. The dark variant is `@custom-variant dark (&:is(.dark *))` — toggling is done by adding/removing the `dark` class on `<html>`.
@@ -15,6 +17,7 @@ Research revealed that the core infrastructure is already in place:
 - Stack: TanStack Start, React 19, Tailwind v4, shadcn/ui (new-york), lucide-react, Vitest + Testing Library.
 
 **What is missing / needs improvement:**
+
 1. A `useTheme` hook so any component can reactively read the current theme in React state (currently nothing exposes this — `ThemeToggle` manages its own local state).
 2. A `storage` event listener is absent — theme changes in another tab are not reflected.
 3. No tests exist for `ThemeToggle` or the theme init script logic.
@@ -69,6 +72,7 @@ Research revealed that the core infrastructure is already in place:
 - `packages/web/src/components/theme-toggle.spec.tsx` — verifies: correct icon rendered per theme; button is accessible; click triggers toggle.
 
 Run tests with:
+
 ```
 bun --filter web-tanstack-start test
 ```

@@ -3,6 +3,7 @@
 ## Context and Codebase Observations
 
 The existing API is a .NET 10 Minimal API using:
+
 - **EF Core + SQLite** for persistence (via `AnimalDbContext`)
 - **Vertical slice / module pattern**: each feature lives in `Modules/<Feature>/` with its own entity, DbContext, service, contracts, and endpoint registration
 - **xUnit** for unit tests (in-memory EF Core) and `WebApplicationFactory` for integration tests
@@ -25,6 +26,7 @@ Send an email notification to each user whose subscription expires exactly 7 day
 Create `Modules/Users/` following the Animals pattern:
 
 **`User.cs`** — entity
+
 ```
 Id, Email, Name, SubscriptionExpiresAt (DateTimeOffset)
 ```
@@ -36,6 +38,7 @@ Id, Email, Name, SubscriptionExpiresAt (DateTimeOffset)
 **`UserContracts.cs`** — request/response DTOs with `[Required]` / `[StringLength]` attributes
 
 **`UserService.cs`** — CRUD + a targeted query:
+
 ```csharp
 Task<List<User>> GetUsersExpiringInAsync(int days, CancellationToken ct)
 // WHERE DATE(SubscriptionExpiresAt) = DATE(NOW + days)
@@ -50,6 +53,7 @@ Task<List<User>> GetUsersExpiringInAsync(int days, CancellationToken ct)
 ### 2. Email Abstraction
 
 Create `Common/Email/IEmailSender.cs`:
+
 ```csharp
 public interface IEmailSender
 {
@@ -60,6 +64,7 @@ public interface IEmailSender
 Create `Common/Email/SmtpEmailSender.cs` — concrete implementation using `System.Net.Mail.SmtpClient` (or `MailKit` for a production-grade choice).
 
 Configuration in `appsettings.json`:
+
 ```json
 "Email": {
   "Host": "smtp.example.com",
@@ -73,6 +78,7 @@ Configuration in `appsettings.json`:
 For local development, a **MailHog** or **Papercut** SMTP sink can be configured in `appsettings.Development.json`.
 
 Register in `Program.cs`:
+
 ```csharp
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
@@ -83,6 +89,7 @@ builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 ### 3. Notification Service
 
 Create `Modules/Users/SubscriptionExpiryNotifier.cs`:
+
 ```csharp
 public class SubscriptionExpiryNotifier(UserService userService, IEmailSender emailSender, ILogger<SubscriptionExpiryNotifier> logger)
 {
@@ -139,6 +146,7 @@ public class SubscriptionExpiryJob(IServiceScopeFactory scopeFactory, ILogger<Su
 ```
 
 Register in `Program.cs`:
+
 ```csharp
 builder.Services.AddScoped<SubscriptionExpiryNotifier>();
 builder.Services.AddHostedService<SubscriptionExpiryJob>();
@@ -159,23 +167,23 @@ dotnet ef database update --project packages/api
 
 ## Files to Create / Modify
 
-| File | Action |
-|------|--------|
-| `packages/api/Modules/Users/User.cs` | Create |
-| `packages/api/Modules/Users/UserConfiguration.cs` | Create |
-| `packages/api/Modules/Users/UserContracts.cs` | Create |
-| `packages/api/Modules/Users/UserService.cs` | Create |
-| `packages/api/Modules/Users/UserEndpoints.cs` | Create |
-| `packages/api/Modules/Users/SubscriptionExpiryNotifier.cs` | Create |
-| `packages/api/Common/Email/IEmailSender.cs` | Create |
-| `packages/api/Common/Email/SmtpEmailSender.cs` | Create |
-| `packages/api/Common/Email/EmailOptions.cs` | Create |
-| `packages/api/Common/BackgroundJobs/SubscriptionExpiryJob.cs` | Create |
-| `packages/api/Migrations/` | New migration via EF CLI |
-| `packages/api/Program.cs` | Modify — register new services |
-| `packages/api/appsettings.json` | Modify — add Email section |
-| `packages/api/appsettings.Development.json` | Modify — local SMTP sink config |
-| `packages/api.csproj` | Modify — add MailKit (optional) |
+| File                                                          | Action                          |
+| ------------------------------------------------------------- | ------------------------------- |
+| `packages/api/Modules/Users/User.cs`                          | Create                          |
+| `packages/api/Modules/Users/UserConfiguration.cs`             | Create                          |
+| `packages/api/Modules/Users/UserContracts.cs`                 | Create                          |
+| `packages/api/Modules/Users/UserService.cs`                   | Create                          |
+| `packages/api/Modules/Users/UserEndpoints.cs`                 | Create                          |
+| `packages/api/Modules/Users/SubscriptionExpiryNotifier.cs`    | Create                          |
+| `packages/api/Common/Email/IEmailSender.cs`                   | Create                          |
+| `packages/api/Common/Email/SmtpEmailSender.cs`                | Create                          |
+| `packages/api/Common/Email/EmailOptions.cs`                   | Create                          |
+| `packages/api/Common/BackgroundJobs/SubscriptionExpiryJob.cs` | Create                          |
+| `packages/api/Migrations/`                                    | New migration via EF CLI        |
+| `packages/api/Program.cs`                                     | Modify — register new services  |
+| `packages/api/appsettings.json`                               | Modify — add Email section      |
+| `packages/api/appsettings.Development.json`                   | Modify — local SMTP sink config |
+| `packages/api.csproj`                                         | Modify — add MailKit (optional) |
 
 ---
 
@@ -184,24 +192,28 @@ dotnet ef database update --project packages/api
 ### Unit Tests (in `packages/api.tests/`)
 
 **`SubscriptionExpiryNotifierTests.cs`**
+
 - Mock `UserService` to return a list of users expiring in 7 days
 - Mock `IEmailSender`
 - Assert `SendAsync` is called once per user with correct `to` and `subject`
 - Assert no emails sent when the list is empty
 
 **`UserServiceTests.cs`**
+
 - `GetUsersExpiringInAsync` returns only users whose expiry date is exactly 7 days out
 - Uses in-memory EF Core (same pattern as `AnimalServiceTests`)
 
 ### Integration Tests (in `packages/api.tests.integration/`)
 
 **`UserEndpointsTests.cs`**
+
 - POST `/api/users` creates a user
 - GET `/api/users/{id}` returns the user
 - GET with non-existing id returns 404
 - POST with invalid payload returns 400
 
 **`SubscriptionExpiryJobTests.cs`** (optional, harder to test timing)
+
 - Verify `SubscriptionExpiryNotifier` is resolved from DI correctly in an integration host
 
 ---

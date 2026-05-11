@@ -19,6 +19,7 @@ You added a client-side search filter to the animals list page: a shadcn `Input`
 ### Issues Found
 
 None:
+
 - `AnimalDTO` has `name?: string` and `species?: string` (both optional). The filter correctly uses `(animal.name ?? '').toLowerCase()`.
 - No `console.log` or debug statements.
 - No dead imports or unused variables.

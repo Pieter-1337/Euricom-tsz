@@ -6,16 +6,16 @@ The search filter implementation is **mostly correct and complete**, with one no
 
 ## Plan vs Implementation Checklist
 
-| Plan requirement | Status | Notes |
-|---|---|---|
-| Import `useState` from React | PASS | Line 3 of `index.tsx` |
-| Import shadcn `Input` from `#/components/ui/input` | PASS | Line 6 of `index.tsx` |
-| `const [searchTerm, setSearchTerm] = useState('')` inside component | PASS | Line 20 of `index.tsx` |
-| `Input` above `<Table>` with placeholder "Search by name or species..." | PASS | Lines 30-35 of `index.tsx` |
-| Filter by `name` or `species`, case-insensitive | PASS | Lines 22-25 of `index.tsx` |
-| Test: empty search returns all animals | PASS | `animals.spec.ts` line 15 |
-| Test: name filter is case-insensitive | PASS | `animals.spec.ts` line 19 |
-| Test: species filter works | PASS | `animals.spec.ts` line 23 |
+| Plan requirement                                                        | Status | Notes                      |
+| ----------------------------------------------------------------------- | ------ | -------------------------- |
+| Import `useState` from React                                            | PASS   | Line 3 of `index.tsx`      |
+| Import shadcn `Input` from `#/components/ui/input`                      | PASS   | Line 6 of `index.tsx`      |
+| `const [searchTerm, setSearchTerm] = useState('')` inside component     | PASS   | Line 20 of `index.tsx`     |
+| `Input` above `<Table>` with placeholder "Search by name or species..." | PASS   | Lines 30-35 of `index.tsx` |
+| Filter by `name` or `species`, case-insensitive                         | PASS   | Lines 22-25 of `index.tsx` |
+| Test: empty search returns all animals                                  | PASS   | `animals.spec.ts` line 15  |
+| Test: name filter is case-insensitive                                   | PASS   | `animals.spec.ts` line 19  |
+| Test: species filter works                                              | PASS   | `animals.spec.ts` line 23  |
 
 ## Code Review: `index.tsx`
 
@@ -35,17 +35,18 @@ Also: test fixture objects don't include optional-field `undefined` cases — th
 
 ## Issues Found
 
-| Severity | Location | Issue |
-|---|---|---|
-| Medium | `animals.spec.ts` | Tests a copy of filter logic, not production code |
-| Low | `animals.spec.ts` | No test for undefined name/species (real schema possibility) |
-| Low | `index.tsx` | Redundant explicit `: AnimalDTO` annotations |
+| Severity | Location          | Issue                                                        |
+| -------- | ----------------- | ------------------------------------------------------------ |
+| Medium   | `animals.spec.ts` | Tests a copy of filter logic, not production code            |
+| Low      | `animals.spec.ts` | No test for undefined name/species (real schema possibility) |
+| Low      | `index.tsx`       | Redundant explicit `: AnimalDTO` annotations                 |
 
 ## Verdict: PASS with recommendations
 
 Implementation fulfils every plan requirement. The filter logic, edge cases, and nullable fields are handled correctly. The main weakness is tests exercising duplicate logic — not a blocker for merging but worth a follow-up.
 
 Commands to run before merging:
+
 ```bash
 bun run typecheck   # TypeScript
 bun run check       # Format + lint

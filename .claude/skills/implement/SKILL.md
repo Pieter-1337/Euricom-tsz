@@ -20,6 +20,7 @@ This skill executes a plan from a `PLAN.md` file — one step at a time, pausing
 Look for `PLAN.md` in the project root. If it doesn't exist, ask the user for the path — do not proceed without a plan file.
 
 Read the entire plan before starting. Make sure you understand:
+
 - The goal
 - All files that will be touched
 - Every step in order
@@ -61,6 +62,7 @@ Keep each step tight. If a step involves multiple small changes, do them togethe
 ### 4. Handle Blockers Immediately
 
 Stop the moment you hit any of these:
+
 - A test fails and you can't determine why
 - A step references a file or function that doesn't exist
 - An instruction is ambiguous enough that two reasonable interpretations would produce different code
@@ -68,6 +70,7 @@ Stop the moment you hit any of these:
 - Something in the codebase contradicts an assumption in the plan
 
 When you stop, explain:
+
 - What you were trying to do
 - What went wrong or what's unclear
 - What you need from the user to proceed
@@ -77,6 +80,7 @@ Do not skip the step and continue — the steps may depend on each other.
 ### 5. Run Tests
 
 After all steps are complete (or after any step that the plan marks as a checkpoint), run the full test suite if one exists. Report:
+
 - How many tests passed / failed
 - Which tests failed and what error they show
 - Whether this looks like a pre-existing failure or something introduced by this implementation
@@ -96,10 +100,10 @@ When all steps are done, save `IMPLEMENTATION.md` in the project root using this
 
 ## Steps
 
-| Step | Status | Notes |
-|------|--------|-------|
-| 1. <step title> | ✓ Done | |
-| 2. <step title> | ✓ Done | |
+| Step            | Status    | Notes    |
+| --------------- | --------- | -------- |
+| 1. <step title> | ✓ Done    |          |
+| 2. <step title> | ✓ Done    |          |
 | 3. <step title> | ✗ Skipped | <reason> |
 
 ## Files Changed

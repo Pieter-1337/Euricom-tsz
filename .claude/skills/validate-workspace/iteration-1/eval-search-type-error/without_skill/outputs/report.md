@@ -6,11 +6,11 @@ The implementation has **2 TypeScript type errors** that cause `bun run typechec
 
 ## Checks Run
 
-| Check | Command | Result |
-|---|---|---|
-| TypeScript type check | `bun run typecheck` | FAIL (2 errors) |
-| Format + lint | `bun run check` | PASS |
-| Tests | `bun run test` | PASS (2 tests, but not the required ones) |
+| Check                 | Command             | Result                                    |
+| --------------------- | ------------------- | ----------------------------------------- |
+| TypeScript type check | `bun run typecheck` | FAIL (2 errors)                           |
+| Format + lint         | `bun run check`     | PASS                                      |
+| Tests                 | `bun run test`      | PASS (2 tests, but not the required ones) |
 
 ## Issues Found
 
@@ -28,6 +28,7 @@ The state is typed as `number` but must be `string`. Two downstream TypeScript e
 **Error 2** (line 34): `Argument of type 'string' is not assignable to parameter of type 'SetStateAction<number>'`
 
 **Fix:**
+
 ```ts
 const [searchTerm, setSearchTerm] = useState<string>('');
 ```

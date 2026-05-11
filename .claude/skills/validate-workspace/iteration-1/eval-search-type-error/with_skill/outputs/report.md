@@ -28,5 +28,6 @@
 ### Verdict: FAILING
 
 **Before committing:**
+
 1. Fix `useState<number>(0)` → `useState<string>('')` on line 20 — resolves both TypeScript errors
 2. Create `packages/web/src/routes/animals/animals.spec.ts` with the three planned tests
