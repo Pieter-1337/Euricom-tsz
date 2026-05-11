@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-search-clean",
+  "prompt": "I just finished implementing the search filter feature. Can you validate my implementation?",
+  "assertions": [
+    { "text": "Report contains a '### Automated Checks' section" },
+    { "text": "Report contains a '### Plan Coverage' section" },
+    { "text": "Report shows PASS verdict (not NEEDS WORK or FAILING)" },
+    { "text": "All plan steps are marked as done (✓)" },
+    { "text": "TypeScript check is reported as passing" },
+    { "text": "Tests are reported as passing" }
+  ]
+}

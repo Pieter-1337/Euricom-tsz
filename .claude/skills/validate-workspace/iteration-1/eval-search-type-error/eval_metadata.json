@@ -1,0 +1,11 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-search-type-error",
+  "prompt": "I just finished implementing the search filter feature. Can you validate my implementation?",
+  "assertions": [
+    { "text": "Report contains a '### Automated Checks' section" },
+    { "text": "Report shows FAILING verdict (not PASS or NEEDS WORK)" },
+    { "text": "Report includes the actual TypeScript error output (not just 'it failed')" },
+    { "text": "Report identifies the file and approximate location of the type error" }
+  ]
+}

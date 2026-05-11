@@ -12,6 +12,7 @@
     "test": "vitest run",
     "check": "vp check",
     "check:fix": "vp check --fix",
+    "typecheck": "tsc --noEmit",
     "fallow:dead": "fallow dead-code",
     "fallow:dupes": "fallow dupes",
     "fallow:health": "fallow health",
@@ -48,7 +49,9 @@
     "jsdom": "^28.1.0",
     "typescript": "^5.7.2",
     "vite": "^7.3.1",
-    "vite-plus": "^0.1.14"
+    "vite-plus": "^0.1.14",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

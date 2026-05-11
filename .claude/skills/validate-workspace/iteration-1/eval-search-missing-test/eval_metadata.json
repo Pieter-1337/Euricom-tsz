@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-search-missing-test",
+  "prompt": "I just finished implementing the search filter feature. Can you validate my implementation?",
+  "assertions": [
+    { "text": "Report contains a '### Automated Checks' section" },
+    { "text": "Report contains a '### Plan Coverage' section" },
+    { "text": "Report shows NEEDS WORK verdict (not PASS or FAILING)" },
+    { "text": "Report specifically flags the missing test file / test step" },
+    { "text": "TypeScript check is reported as passing" }
+  ]
+}

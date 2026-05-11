@@ -1,0 +1,47 @@
+{
+  "skill_name": "validate",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "eval-search-clean",
+      "prompt": "I just finished implementing the search filter feature. Can you validate my implementation?",
+      "expected_output": "PASS verdict — all automated checks pass, all plan steps covered, no issues flagged",
+      "files": [],
+      "assertions": [
+        { "text": "Report contains a '### Automated Checks' section" },
+        { "text": "Report contains a '### Plan Coverage' section" },
+        { "text": "Report shows PASS verdict (not NEEDS WORK or FAILING)" },
+        { "text": "All plan steps are marked as done (✓)" },
+        { "text": "TypeScript check is reported as passing" },
+        { "text": "Tests are reported as passing" }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "eval-search-missing-test",
+      "prompt": "I just finished implementing the search filter feature. Can you validate my implementation?",
+      "expected_output": "NEEDS WORK verdict — automated checks pass but test step from plan is flagged as missing",
+      "files": [],
+      "assertions": [
+        { "text": "Report contains a '### Automated Checks' section" },
+        { "text": "Report contains a '### Plan Coverage' section" },
+        { "text": "Report shows NEEDS WORK verdict (not PASS or FAILING)" },
+        { "text": "Report specifically flags the missing test file / test step" },
+        { "text": "TypeScript check is reported as passing" }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "eval-search-type-error",
+      "prompt": "I just finished implementing the search filter feature. Can you validate my implementation?",
+      "expected_output": "FAILING verdict — TypeScript check fails due to type error, error output is quoted in the report",
+      "files": [],
+      "assertions": [
+        { "text": "Report contains a '### Automated Checks' section" },
+        { "text": "Report shows FAILING verdict (not PASS or NEEDS WORK)" },
+        { "text": "Report includes the actual TypeScript error output (not just 'it failed')" },
+        { "text": "Report identifies the file and approximate location of the type error" }
+      ]
+    }
+  ]
+}

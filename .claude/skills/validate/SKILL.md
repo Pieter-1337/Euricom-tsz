@@ -31,23 +31,29 @@ Summarize in one sentence: "You added X to Y and Z." Confirm with the user if it
 Run all checks that apply to this project. For each one, report pass/fail with the actual output
 if it fails — not just "it failed".
 
-**Always run:**
+**First, discover what scripts exist:**
 ```bash
-bun run typecheck   # or tsc --noEmit if no typecheck script
-bun run lint        # if a lint script exists
-bun test            # or bun run test
+cat package.json | grep -A 30 '"scripts"'
 ```
 
-**Discover available scripts first:**
-```bash
-cat package.json | grep -A 20 '"scripts"'
-```
+In monorepos, also check the root `package.json`. Run checks from the root if root scripts
+delegate to packages (e.g. `bun run check` at root runs `bun run --filter '*' check`).
+
+**Then run the relevant ones:**
+- TypeScript: `bun run typecheck` from the repo root (falls back to `bun x tsc --noEmit` if no typecheck script). Note: `bun run check` often runs a formatter/linter (like `vp check`) that does NOT do full TypeScript type-checking — always run a separate typecheck step too.
+- Tests: `bun run test` from the repo root (bun delegates to packages that have a test script). If that fails, try `cd packages/<name> && bun run test`.
+- Lint/format: `bun run check` if it exists
+- Run all three — don't stop at the first failure. Collect everything before reporting.
 
 Run checks in parallel where they're independent. Don't stop at the first failure — collect all
 failures before reporting.
 
 If a script doesn't exist, skip it and note it's not configured. Don't treat a missing script as
 a failure.
+
+If you can't run bun commands (permissions issue), note that automated checks couldn't be
+confirmed and recommend the user runs them manually before committing — but still proceed with
+the rest of the validation using static analysis.
 
 ### 3. Cross-Reference Plan vs Implementation
 
@@ -71,10 +77,16 @@ Look at the actual changed code and flag anything that would reasonably cause pr
 
 - Unhandled promise rejections or missing error handling **at system boundaries** (API calls,
   user input, file I/O) — not internal helpers where the caller is responsible
-- TypeScript `any` casts that look like they're hiding a real type problem
+- TypeScript `any` casts or property accesses on types that are optional/nullable — check the
+  actual type definition (in schema files, DTOs, generated types) not just what's inferred locally
 - Console.log / debug statements left in
 - Obvious missing edge cases the plan called out that aren't handled
 - Dead code introduced (imports, variables, functions that are never used)
+
+When code accesses `.property` on an external type (DTO, API response, generated schema), verify
+whether that property is actually required or optional in the type definition. Accessing an
+optional field without a null guard is a common source of runtime crashes that TypeScript strict
+mode will flag.
 
 Don't nitpick style or invent hypothetical edge cases. Focus on things that will actually matter.
 
