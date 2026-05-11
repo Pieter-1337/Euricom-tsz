@@ -17,7 +17,7 @@
     "fallow:dupes": "fallow dupes",
     "fallow:health": "fallow health",
     "cleanup": "rimraf .tanstack dist",
-    "gen:api": "npx openapi-typescript http://localhost:5204/openapi/v1.json -o ./src/api/schema.ts"
+    "gen:api": "bunx openapi-typescript http://localhost:5204/openapi/v1.json -o ./src/api/schema.ts"
   },
   "dependencies": {
     "@tanstack/react-form": "^1.29.1",
