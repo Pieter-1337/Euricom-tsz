@@ -9,86 +9,135 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AnimalsIndexRouteImport } from './routes/animals/index'
-import { Route as AnimalsIdRouteImport } from './routes/animals/$id'
+import { Route as ProtectedRouteImport } from './routes/_protected'
+import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
+import { Route as ProtectedAnimalsIndexRouteImport } from './routes/_protected/animals/index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedAnimalsIdRouteImport } from './routes/_protected/animals/$id'
 
-const IndexRoute = IndexRouteImport.update({
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => ProtectedRoute,
 } as any)
-const AnimalsIndexRoute = AnimalsIndexRouteImport.update({
+const ProtectedAnimalsIndexRoute = ProtectedAnimalsIndexRouteImport.update({
   id: '/animals/',
   path: '/animals/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AnimalsIdRoute = AnimalsIdRouteImport.update({
+const ProtectedAnimalsIdRoute = ProtectedAnimalsIdRouteImport.update({
   id: '/animals/$id',
   path: '/animals/$id',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => ProtectedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/animals/$id': typeof AnimalsIdRoute
-  '/animals/': typeof AnimalsIndexRoute
+  '/': typeof ProtectedIndexRoute
+  '/animals/$id': typeof ProtectedAnimalsIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/animals/': typeof ProtectedAnimalsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/animals/$id': typeof AnimalsIdRoute
-  '/animals': typeof AnimalsIndexRoute
+  '/': typeof ProtectedIndexRoute
+  '/animals/$id': typeof ProtectedAnimalsIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/animals': typeof ProtectedAnimalsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/animals/$id': typeof AnimalsIdRoute
-  '/animals/': typeof AnimalsIndexRoute
+  '/_protected': typeof ProtectedRouteWithChildren
+  '/_protected/': typeof ProtectedIndexRoute
+  '/_protected/animals/$id': typeof ProtectedAnimalsIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_protected/animals/': typeof ProtectedAnimalsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/animals/$id' | '/animals/'
+  fullPaths: '/' | '/animals/$id' | '/api/auth/$' | '/animals/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/animals/$id' | '/animals'
-  id: '__root__' | '/' | '/animals/$id' | '/animals/'
+  to: '/' | '/animals/$id' | '/api/auth/$' | '/animals'
+  id:
+    | '__root__'
+    | '/_protected'
+    | '/_protected/'
+    | '/_protected/animals/$id'
+    | '/api/auth/$'
+    | '/_protected/animals/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AnimalsIdRoute: typeof AnimalsIdRoute
-  AnimalsIndexRoute: typeof AnimalsIndexRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/': {
+      id: '/_protected/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRoute
     }
-    '/animals/': {
-      id: '/animals/'
+    '/_protected/animals/': {
+      id: '/_protected/animals/'
       path: '/animals'
       fullPath: '/animals/'
-      preLoaderRoute: typeof AnimalsIndexRouteImport
+      preLoaderRoute: typeof ProtectedAnimalsIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/animals/$id': {
-      id: '/animals/$id'
+    '/_protected/animals/$id': {
+      id: '/_protected/animals/$id'
       path: '/animals/$id'
       fullPath: '/animals/$id'
-      preLoaderRoute: typeof AnimalsIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof ProtectedAnimalsIdRouteImport
+      parentRoute: typeof ProtectedRoute
     }
   }
 }
 
+interface ProtectedRouteChildren {
+  ProtectedIndexRoute: typeof ProtectedIndexRoute
+  ProtectedAnimalsIdRoute: typeof ProtectedAnimalsIdRoute
+  ProtectedAnimalsIndexRoute: typeof ProtectedAnimalsIndexRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedIndexRoute: ProtectedIndexRoute,
+  ProtectedAnimalsIdRoute: ProtectedAnimalsIdRoute,
+  ProtectedAnimalsIndexRoute: ProtectedAnimalsIndexRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AnimalsIdRoute: AnimalsIdRoute,
-  AnimalsIndexRoute: AnimalsIndexRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

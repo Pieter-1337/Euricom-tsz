@@ -32,7 +32,7 @@ const saveAnimal = createServerFn({ method: 'POST' })
     await updateAnimal(data.id, data.animal);
   });
 
-export const Route = createFileRoute('/animals/$id')({
+export const Route = createFileRoute('/_protected/animals/$id')({
   loader: ({ params }) => fetchAnimalById({ data: Number(params.id) }),
   component: AnimalDetail,
 });

@@ -3,7 +3,10 @@ node_modules
 dist
 dist-ssr
 *.local
+# dotenv environment variable files
 .env
+.env.*
+!.env.example
 .nitro
 .tanstack
 .wrangler

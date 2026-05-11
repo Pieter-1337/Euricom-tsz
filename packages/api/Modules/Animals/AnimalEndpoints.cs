@@ -5,7 +5,7 @@ namespace Api.Modules.Animals;
 
 public static class AnimalEndpoints
 {
-    public static void Map(WebApplication app)
+    public static void Map(IEndpointRouteBuilder app)
     {
         var group = app.MapApiGroup("animals");
 

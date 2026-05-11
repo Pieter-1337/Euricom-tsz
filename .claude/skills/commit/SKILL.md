@@ -45,6 +45,10 @@ Types:
 - `chore` — tooling, configs, anything outside src/test
 - `revert` — reverts a previous commit
 
+Description:
+
+- Write a concise description of the change in the body, wrapped at 72 characters. Explain the motivation and context
+
 ## 5. Add to the change log
 
 Append the commit message (verbatim) to `CHANGELOG.md` under today's date heading. If today's date heading already exists, add it below the last entry for that date. If it does not exist yet, insert a new `## YYYY-MM-DD` heading at the top of the entries (below the `# Changelog` title) and add the commit message beneath it.

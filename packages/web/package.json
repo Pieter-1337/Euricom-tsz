@@ -20,6 +20,8 @@
     "gen:api": "bunx openapi-typescript http://localhost:5204/openapi/v1.json -o ./src/api/schema.ts"
   },
   "dependencies": {
+    "better-auth": "^1.6.10",
+    "h3-v2": "npm:h3@2.0.1-rc.20",
     "@tanstack/react-form": "^1.29.1",
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
@@ -34,7 +36,7 @@
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.18",
-    "zod": "^4.4.3"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",

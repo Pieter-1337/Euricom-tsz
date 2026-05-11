@@ -1,8 +1,11 @@
 import { HeadContent, Link, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 import appCss from '../styles.css?url';
 import { ErrorBoundary } from '#/components/error-boundary';
 import { ThemeToggle } from '#/components/theme-toggle';
+import { getSession } from '#/lib/auth.functions';
+import { authClient } from '#/lib/auth-client';
 
 const themeInitScript = `(() => {
   try {
@@ -23,6 +26,10 @@ export const Route = createRootRoute({
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
   }),
+  beforeLoad: async () => {
+    const session = await getSession();
+    return { session };
+  },
   component: RootLayout,
   shellComponent: RootDocument,
   errorComponent: ErrorBoundary,
@@ -50,6 +57,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 
 function RootLayout() {
+  const { session } = Route.useRouteContext();
+
+  useEffect(() => {
+    if (!session?.user) {
+      authClient.signIn.social({ provider: 'microsoft', callbackURL: '/' });
+    }
+  }, []);
+
+  if (!session?.user) return null;
+
   return (
     <div className="mx-auto max-w-3xl p-6">
       <nav className="mb-6 flex items-center gap-4 text-sm">
@@ -59,7 +76,16 @@ function RootLayout() {
         <Link to="/animals" className="[&.active]:font-bold">
           Animals
         </Link>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-muted-foreground">
+            {session.user.name} ·{' '}
+            <button
+              className="underline-offset-4 hover:underline"
+              onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })}
+            >
+              Sign out
+            </button>
+          </span>
           <ThemeToggle />
         </div>
       </nav>

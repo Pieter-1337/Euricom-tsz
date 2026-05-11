@@ -38,8 +38,7 @@ Browser ──cookie──► TanStack Start (BFF) ──Bearer (Entra access to
 - `src/lib/auth.functions.ts` — `getSession` and `ensureSession` server functions.
 - `src/lib/api.server.ts` — server-only `openapi-fetch` client. Middleware reads the session, calls `auth.api.getAccessToken({ providerId: 'microsoft' })`, attaches `Authorization: Bearer …`.
 - `src/routes/api/auth/$.ts` — mounts `auth.handler` for GET/POST (handles `/api/auth/callback/microsoft`, sign-in, sign-out, etc.).
-- `src/routes/login.tsx` — public route; shadcn `Button` "Sign in with Microsoft" → `authClient.signIn.social({ provider: 'microsoft', callbackURL: '/' })`.
-- `src/routes/_protected.tsx` — pathless layout route. `beforeLoad` calls `getSession`; redirects to `/login?redirect=…` when missing. Exposes `user` via route context.
+- `src/routes/_protected.tsx` — pathless layout route. `beforeLoad` calls `getSession`; redirects to `/` when missing. Exposes `user` via route context.
 - `.env.example` — committed template; documents all variables with placeholder values. See **Configuration & secrets** below.
 - `.env.local` — **gitignored**, real values for local dev.
 
@@ -49,7 +48,7 @@ Browser ──cookie──► TanStack Start (BFF) ──Bearer (Entra access to
 - `src/routes/animals/index.tsx` → `src/routes/_protected/animals/index.tsx`.
 - `src/routes/animals/$id.tsx` → `src/routes/_protected/animals/$id.tsx`.
 - `src/api/animals.ts` — convert from direct browser fetches to TanStack server functions that use `api.server.ts`. Route loaders call those server functions.
-- `src/routes/__root.tsx` — add "signed in as … · Sign out" affordance in the nav (only when session exists).
+- `src/routes/__root.tsx` — nav bar: when no session render a shadcn `Button` "Login" that calls `authClient.signIn.social({ provider: 'microsoft', callbackURL: currentPath })`; when session exists render "Signed in as {user.name} · Sign out".
 - `package.json` — add `better-auth`.
 - `src/api/client.ts` — keep schema types; stop exporting a browser-side client (or scope it to internal use from `api.server.ts`).
 
@@ -63,7 +62,7 @@ Browser ──cookie──► TanStack Start (BFF) ──Bearer (Entra access to
 
 ## Configuration & secrets
 
-> TenantId and ClientIds are **not secrets** per Microsoft — they're public identifiers. Only the Web client secret and `BETTER_AUTH_SECRET` are real secrets. Storage choices below reflect that.
+> TenantId and ClientIds are **not secrets** per Microsoft — they're public identifiers. Only the Web client secret and `BFF_AUTH_SECRET` are real secrets. Storage choices below reflect that.
 
 ### Web (`packages/web`) — `.env.local` (gitignored)
 
@@ -76,18 +75,18 @@ MICROSOFT_CLIENT_SECRET=<Web app reg client secret>   # real secret
 # Entra — API app registration (used only to build the requested scope)
 API_CLIENT_ID=<API app reg client ID>
 
-# betterAuth
-BETTER_AUTH_SECRET=<random 32+ byte string>            # real secret, used to sign cookies
-BETTER_AUTH_URL=http://localhost:3000
+# BFF
+BFF_AUTH_SECRET=<random 32+ byte string>               # real secret, used to sign cookies
+BFF_URL=http://localhost:3000
 
 # Downstream API
 API_URL=http://localhost:5204
 ```
 
 - `MICROSOFT_*` names match betterAuth's official Microsoft provider docs; they're our choice, read explicitly inside `src/lib/auth.ts`.
-- `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` are betterAuth's own conventions (auto-read if present).
+- `BFF_AUTH_SECRET` maps to betterAuth's `secret` config option; `BFF_URL` maps to `baseURL`. Pass them explicitly in `src/lib/auth.ts` — betterAuth's auto-read only applies to its own `BETTER_AUTH_*` names.
 - A committed `.env.example` mirrors this file with placeholder values.
-- Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
+- Generate `BFF_AUTH_SECRET` with `openssl rand -base64 32`.
 
 ### API (`packages/api`) — `dotnet user-secrets` (per-developer, outside the repo)
 
@@ -127,16 +126,15 @@ Out of scope for this plan. Document only: in deployed environments, the same va
    Capture tenant ID, Web clientId + secret, API clientId.
 2. **Populate secrets** (see **Configuration & secrets**): create `packages/web/.env.local` and `packages/web/.env.example`; run `dotnet user-secrets init` and `set` in `packages/api/`. Add `.env*` to `.gitignore`.
 3. Add `better-auth` to `packages/web` (`bun add better-auth -F web`).
-4. Create `src/lib/auth.ts` with Microsoft provider, single-tenant, stateless cookie session, `tanstackStartCookies()`. Scopes: `['openid', 'profile', 'email', 'offline_access', 'api://<api-client-id>/access']` — note the API app reg's clientId here so the issued access token's `aud` is the API.
+4. Create `src/lib/auth.ts` with Microsoft provider, single-tenant, stateless cookie session, `tanstackStartCookies()`. Pass `secret: process.env.BFF_AUTH_SECRET` and `baseURL: process.env.BFF_URL` explicitly. Scopes: `['openid', 'profile', 'email', 'offline_access', 'api://<api-client-id>/access']` — note the API app reg's clientId here so the issued access token's `aud` is the API.
 5. Create `src/lib/auth-client.ts`.
 6. Create `src/routes/api/auth/$.ts` mounting the handler.
 7. Create `src/lib/auth.functions.ts` with `getSession` / `ensureSession`.
 8. Build `src/lib/api.server.ts` — `openapi-fetch` client with a middleware that calls `auth.api.getAccessToken({ providerId: 'microsoft', headers })` and sets `Authorization` on the outgoing request.
-9. Create `src/routes/login.tsx` with shadcn `Button` triggering `authClient.signIn.social`. In `beforeLoad`: if a session already exists, redirect to `/` (or the validated `?redirect=` target). Read `?redirect=` and validate it (must start with `/`, must not start with `//`); pass as `callbackURL`. Anything else falls back to `/`.
-10. Create `src/routes/_protected.tsx`. `beforeLoad` → `getSession`, redirect to `/login` if missing.
+9. Create `src/routes/_protected.tsx`. `beforeLoad` → `getSession`, redirect to `/` if missing.
 11. Move existing routes (`index.tsx`, `animals/*`) under `_protected/`. Let `routeTree.gen.ts` regenerate (do not hand-edit).
 12. Convert `src/api/animals.ts` to TanStack server functions that call `api.server.ts`. Update the moved route components' loaders to use them.
-13. Add "Signed in as {user.name} · Sign out" in `__root.tsx` nav.
+13. Update `__root.tsx` nav: "Login" button when unauthenticated; "Signed in as {user.name} · Sign out" when session exists.
 14. C# API: add `Microsoft.Identity.Web` package, wire JwtBearer in `Program.cs`, add `AzureAd` config (TenantId, ClientId = API app reg), set a `FallbackPolicy` that requires authenticated user, and explicitly `.AllowAnonymous()` on `MapOpenApi`, `MapScalarApiReference`, and `MapGet("/")`. Refactor `AnimalEndpoints.Map` to take an `IEndpointRouteBuilder` group.
 15. Regenerate the OpenAPI client (`bun --filter web gen:api`) once the API requires auth — verify metadata endpoints stay anonymous and types are unchanged.
 16. Smoke test the golden path in a browser: visit `/` → redirected to `/login` → click Microsoft → consent → back to `/` → animals page loads via BFF with Bearer.
@@ -145,7 +143,7 @@ Out of scope for this plan. Document only: in deployed environments, the same va
 
 - **Stateless cookie budget (known risk).** No Phase 0 spike. We're committing to stateless mode and accepting that the Entra access + refresh + id token, encrypted, may not fit in browser cookie limits (~4KB/cookie). **Fallback if it breaks during implementation:** add a small SQLite file in `packages/web` and switch betterAuth to its SQLite adapter. The rest of the plan is unaffected.
 - **Token `aud` verification.** During implementation, inspect a real issued access token on jwt.io after login to confirm `aud` = API app reg client ID and `scp` includes `access`. If betterAuth's Microsoft provider doesn't pass our custom API scope through, we won't get an API-audience token and the C# API will 401. Fixable, but spot it early.
-- **Token refresh.** Entra access tokens are ~1h. We request `offline_access` and trust betterAuth's stateless refresh to renew + re-sign the cookie. **Fallback:** on any `401` from the C# API, the server client clears the session and the BFF redirects to `/login`.
+- **Token refresh.** Entra access tokens are ~1h. We request `offline_access` and trust betterAuth's stateless refresh to renew + re-sign the cookie. **Fallback:** on any `401` from the C# API, the server client clears the session and the BFF redirects to `/`.
 - **Identity anchor.** Key users on Entra `oid` (Object ID), not `email`. Entra often omits `email` for managed users, and email is tenant-mutable. Configure `mapProfileToUser` so betterAuth uses `profile.oid` as the user id and treats email as a display field.
 - **Logout = app-only.** `signOut()` clears the betterAuth cookie. We do **not** trigger Entra global sign-out — next sign-in is one click. (Shared-machine sign-out is not a v1 concern.)
 - **CORS.** Browser → BFF is same-origin (`localhost:3000`); BFF → C# API is server-to-server. No CORS config needed.

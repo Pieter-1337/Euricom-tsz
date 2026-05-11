@@ -10,7 +10,7 @@ const fetchAnimals = createServerFn({ method: 'GET' }).handler(async () => {
   return animals ?? [];
 });
 
-export const Route = createFileRoute('/animals/')({
+export const Route = createFileRoute('/_protected/animals/')({
   loader: () => fetchAnimals(),
   component: Animals,
 });

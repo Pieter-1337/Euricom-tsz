@@ -2,6 +2,17 @@
 
 ## 2026-05-11
 
+feat: add Microsoft Entra authentication via Better Auth
+
+Set up Better Auth with the Microsoft social provider for Entra
+ID SSO. Adds protected route layout, auth API handler, session
+management with tanstackStartCookies plugin, and initialises the
+in-memory adapter with the required model tables. Removes old
+unprotected routes and replaces the app entry point with a
+redirect to the protected section.
+
+## 2026-05-11
+
 docs: split product requirements into subfolders and add login plan
 
 chore: reformat changelog to date-based format and update commit skill

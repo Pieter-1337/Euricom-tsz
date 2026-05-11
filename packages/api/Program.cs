@@ -1,7 +1,9 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Api.Modules.Animals;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
@@ -10,6 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
+
+builder.Services.AddAuthentication()
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
 });
 
 builder.Services.AddOpenApi(options =>
@@ -56,19 +68,21 @@ using (var scope = app.Services.CreateScope())
         new AnimalSeeder(db).Seed();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 // app.UseHttpsRedirection();
-app.MapOpenApi("/openapi/{documentName}.json");
+app.MapOpenApi("/openapi/{documentName}.json").AllowAnonymous();
 app.MapScalarApiReference("/openapi", options =>
 {
     options.WithOpenApiRoutePattern("/openapi/{documentName}.json");
-});
+}).AllowAnonymous();
 
 app.MapGet("/", () => new
 {
     name = "Animal API",
     version = Assembly.GetExecutingAssembly().GetName().Version?.ToString()
-});
+}).AllowAnonymous();
 
 AnimalEndpoints.Map(app);
 

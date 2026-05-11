@@ -1,5 +1,5 @@
 import { type components } from './schema';
-import { client } from './client';
+import { apiClient as client } from '#/lib/api.server';
 
 export type AnimalDTO = components['schemas']['Animal'];
 export type CreateAnimalRequestDTO = components['schemas']['CreateAnimalRequest'];
