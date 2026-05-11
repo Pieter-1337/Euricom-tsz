@@ -1,3 +1,7 @@
+## Changed
+
+- Consolidated vitest config into vite.config.ts and added `@tests` path alias for cleaner test imports.
+
 ## Added
 
 - Added Ref and Exa MCP servers to project and VS Code MCP config for documentation lookup and web search support.
