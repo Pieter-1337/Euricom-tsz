@@ -16,9 +16,6 @@ const config = defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
-    // alias: {
-    //   '@tests': fileURLToPath(new URL('./tests', import.meta.url)),
-    // },
   },
   test: {
     environment: 'node',
