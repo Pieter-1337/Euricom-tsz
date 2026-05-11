@@ -1,5 +1,5 @@
 {
-  "mcpServers": {
+  "servers": {
     "dbhub": {
       "type": "stdio",
       "command": "npx",

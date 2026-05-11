@@ -25,12 +25,14 @@ Before staging, scan filenames and diff content for anything that looks like a s
 Use Conventional Commits with a flat type — no scope.
 
 Subject line:
+
 - Imperative mood ("add", not "added" or "adds")
 - 72 characters or fewer
 - No trailing period
 - Format: `<type>: <subject>`
 
 Types:
+
 - `feat` — new user-facing feature
 - `fix` — bug fix
 - `docs` — documentation only
@@ -43,6 +45,10 @@ Types:
 - `chore` — tooling, configs, anything outside src/test
 - `revert` — reverts a previous commit
 
-## 5. Do not push
+## 5. Add to the change log
+
+After writing the commit message, add a one-sentence summary of the change to `CHANGELOG.md` under the appropriate section (Added, Fixed, Changed, etc.). This should be a user-friendly description of the change that will be helpful in release notes.
+
+## 6. Do not push
 
 Do not run `git push` automatically. Push only when the user explicitly asks (e.g., "push", "commit and push").
