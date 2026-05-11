@@ -1,5 +1,6 @@
 ## Changed
 
+- Replaced explicit vite `@tests` alias with `baseUrl` in tsconfig so `tsconfigPaths` resolves all path aliases uniformly.
 - Consolidated vitest config into vite.config.ts and added `@tests` path alias for cleaner test imports.
 
 ## Added
