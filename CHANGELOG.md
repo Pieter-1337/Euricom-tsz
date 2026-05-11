@@ -2,6 +2,8 @@
 
 ## 2026-05-11
 
+docs: split product requirements into subfolders and add login plan
+
 chore: reformat changelog to date-based format and update commit skill
 
 style: remove commented-out alias block from vite config
