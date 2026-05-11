@@ -1,8 +1,10 @@
-this is a monorepo with typescript and C#
+This is a monorepo with TypeScript and C#
 
 # Important notes
 
-- The monorepo is powered by bun
+- The monorepo is powered by bun (no npm/pnpm)
+- Always use bash — WSL environment, do not use PowerShell
 - For C# conventions, see `docs/agents/conventions-c-sharp`
-- For typescripts conventions, see `docs/agents/conventions-typescript`
-- When reporting back to me be concise and sacrifice grammar for conciseness
+- For TypeScript conventions, see `docs/agents/conventions-typescript`
+- When changing backend API contracts or endpoints (packages/api), regenerate the frontend TypeScript schema: `bun --filter web gen:api`
+- When reporting back be concise and sacrifice grammar for conciseness
