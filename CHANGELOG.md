@@ -1,15 +1,42 @@
-## Changed
+# Changelog
 
-- Replaced explicit vite `@tests` alias with `baseUrl` in tsconfig so `tsconfigPaths` resolves all path aliases uniformly; removed leftover commented-out alias block.
-- Consolidated vitest config into vite.config.ts and added `@tests` path alias for cleaner test imports.
+## 2026-05-11
 
-## Added
+chore: reformat changelog to date-based format and update commit skill
 
-- Added product requirements, architecture overview, and agent convention docs (TypeScript, C#, domain, issue tracker, triage labels) under `docs/`.
-- Added Ref and Exa MCP servers to project and VS Code MCP config for documentation lookup and web search support.
-- Added changelog step to the commit skill so every commit includes a user-friendly summary in CHANGELOG.md.
-- Extracted shared `client.ts` with `ApiRequestError` and error middleware; added `animals.spec.ts` test suite and `tests/fetch-util` helpers.
+style: remove commented-out alias block from vite config
+chore: replace vite alias with tsconfig baseUrl for path resolution
+docs: add product requirements, architecture, and agent convention docs
+chore: consolidate vitest config into vite config and add @tests alias
+chore: update test to use new fetchutils
+feat: extract api client module, add animals api tests, and fix age type errors
+chore: add Ref and Exa MCP servers and commit skill changelog step
+test: add unit tests for ValidationFilter
+chore: add AGENTS.md with monorepo overview and conventions pointers
+feat: fix OpenAPI schema to emit strict number types and required fields
+feat: add validate skill, search filter feature, and test infrastructure
 
-## Fixed
+## 2026-05-08
 
-- Fixed TypeScript errors in the animal edit form: removed stale `age === ''` comparison and aligned the save schema with the required `age: number` DTO field.
+chore: add claude skills directory with implement, plan, validate, and skill-creator skills
+docs: rewrite commit skill with split, secret, push rules
+chore: move claude.md to repo root as CLAUDE.md
+chore: add dbhub MCP server config for animals.db
+chore: add commit slash command and skill
+Enhance REVIEW.md with strict OpenAPI specifications and required field handling for improved TypeScript type generation
+Update REVIEW.md to include strict OpenAPI specs for improved TypeScript type generation
+Add onSubmit handler to save animal data in REVIEW.md
+Add REVIEW.md for guidelines and improvements
+
+## 2026-05-07
+
+Retrofit animals routes with shadcn UI primitives
+Validate animal server fn inputs with zod
+Add edit form on animal detail and route fetches via Start server
+Revert animals loaders to direct fetch without createServerFn
+Ignore Visual Studio .vs folder
+Restructure animals routes and pin fetches to server
+Reformat OpenAPI schema with single quotes
+updated settings.json schema
+Add startup database seeding for animals
+Initial commit

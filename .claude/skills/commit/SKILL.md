@@ -47,7 +47,7 @@ Types:
 
 ## 5. Add to the change log
 
-After writing the commit message, add a one-sentence summary of the change to `CHANGELOG.md` under the appropriate section (Added, Fixed, Changed, etc.). This should be a user-friendly description of the change that will be helpful in release notes.
+Append the commit message (verbatim) to `CHANGELOG.md` under today's date heading. If today's date heading already exists, add it below the last entry for that date. If it does not exist yet, insert a new `## YYYY-MM-DD` heading at the top of the entries (below the `# Changelog` title) and add the commit message beneath it.
 
 ## 6. Do not push
 
