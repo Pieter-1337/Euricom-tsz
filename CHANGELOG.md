@@ -2,6 +2,20 @@
 
 ## 2026-05-12
 
+fix: persist sessions to bun:sqlite and relax cookie hardening for OAuth
+
+Switch Better Auth's database from memoryAdapter to a bun:sqlite-backed
+file (auth.db) so sessions survive SSR HMR restarts instead of being
+wiped on every reload. Add a Microsoft profile mapper so the BetterAuth
+user id is the Entra `oid` (falling back to `sub`). Comment out the
+`__Host-timesheetzone` cookie prefix and drop SameSite=Strict on
+session_token: the post-OAuth redirect chain (microsoft.com → /callback
+→ /) is cross-site per the SameSite spec, so a Strict cookie is dropped
+on the first / request and the route guard sees a null session. Lax
+(BA default) survives the redirect; __Host- is also incompatible with
+BA's path-scoped OAuth state cookies. Ship a bun:sqlite type shim so
+the Bun built-in module typechecks.
+
 feat: serve web and api over local HTTPS for OAuth dev
 
 Wire up mkcert-generated certs in Vite's dev server and switch

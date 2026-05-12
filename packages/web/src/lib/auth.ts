@@ -1,20 +1,16 @@
 import { betterAuth } from 'better-auth';
-import { memoryAdapter } from 'better-auth/adapters/memory';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
-
-const memoryDb: Record<string, any[]> = {
-  user: [],
-  session: [],
-  account: [],
-  verification: [],
-};
+import { Database } from 'bun:sqlite';
 
 console.log('[auth init] MICROSOFT_CLIENT_ID:', process.env.MICROSOFT_CLIENT_ID?.slice(0, 8) + '...');
 console.log('[auth init] MICROSOFT_CLIENT_SECRET length:', process.env.MICROSOFT_CLIENT_SECRET?.length ?? 'UNDEFINED');
 console.log('[auth init] BETTER_AUTH_URL:', process.env.BETTER_AUTH_URL);
 
+const sqlite = new Database('auth.db');
+sqlite.exec('PRAGMA journal_mode = WAL');
+
 export const auth = betterAuth({
-  database: memoryAdapter(memoryDb),
+  database: sqlite,
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.BETTER_AUTH_URL!,
   logger: { level: 'debug' },
@@ -30,25 +26,26 @@ export const auth = betterAuth({
       tenantId: process.env.MICROSOFT_TENANT_ID!,
       scopes: ['openid', 'profile', 'email', 'offline_access', 'api://5f7eb51a-66af-44e0-9ada-9354dbc0c19c/access'],
       prompt: 'login',
+      mapProfileToUser: (profile) => ({
+        id: profile.oid ?? profile.sub,
+        email: profile.email ?? profile.preferred_username,
+        name: profile.name,
+      }),
     },
   },
   advanced: {
     // __Host- prefix: locks cookies to exact origin, blocks subdomain injection (incl. OAuth state hijack)
     // secure + httpOnly: HTTPS-only transmission, no JS access — applies to all cookies incl. state/PKCE
-    cookiePrefix: '__Host-timesheetzone',
+    //cookiePrefix: '__Host-timesheetzone',
     defaultCookieAttributes: {
       secure: true,
       httpOnly: true,
       path: '/',
     },
-    cookies: {
-      // SameSite=Strict on session only — state/PKCE must stay Lax (BA default) to survive the OAuth redirect
-      session_token: {
-        attributes: {
-          sameSite: 'strict',
-        },
-      },
-    },
+    // SameSite stays on BA default (Lax) for session_token: the post-OAuth redirect chain
+    // (microsoft.com → /callback → /) keeps its origin as microsoft.com for the whole chain
+    // per the SameSite spec, so a Strict cookie is dropped on the first / request and the
+    // route guard sees a null session. Strict would only work if the IdP shared our eTLD+1.
   },
   session: {
     cookieCache: {
