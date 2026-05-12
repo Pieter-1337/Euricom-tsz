@@ -2,6 +2,12 @@
 
 ## 2026-05-12
 
+docs: inline AGENTS.md content into CLAUDE.md and stress subagents
+
+Previously CLAUDE.md was a single-line pointer to AGENTS.md. Inline
+the full agent guidance and add an `(important!)` emphasis on
+spawning subagents to keep context lean.
+
 docs: align login plan and ui-plan with current auth implementation
 
 Update plan.md and ui-plan.md to match the implementation that
