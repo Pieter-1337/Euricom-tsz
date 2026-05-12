@@ -32,6 +32,15 @@ export const auth = betterAuth({
       prompt: 'login',
     },
   },
+  advanced: {
+    cookiePrefix: '__Host-timesheetzone',
+    defaultCookieAttributes: {
+      sameSite: 'strict',
+      secure: true,
+      httpOnly: true,
+      path: '/',
+    },
+  },
   session: {
     cookieCache: {
       enabled: false,

@@ -33,7 +33,7 @@ Browser ──cookie──► TanStack Start (BFF) ──Bearer (Entra access to
 
 ### `packages/web` — new
 
-- `src/lib/auth.ts` — betterAuth instance: Microsoft social provider, single-tenant, stateless config (`cookieCache` + `account.storeAccountCookie`), `tanstackStartCookies()` plugin.
+- `src/lib/auth.ts` — betterAuth instance: Microsoft social provider, single-tenant, stateless config (`cookieCache` + `account.storeAccountCookie`), `tanstackStartCookies()` plugin. Cookie security: `__Host-` prefix, `SameSite=Strict`, `Secure`, `HttpOnly`, `Path=/`, no `Domain` (see **Cookie Security** below).
 - `src/lib/auth-client.ts` — `createAuthClient()` for browser-side `signIn.social({ provider: 'microsoft' })` and `signOut()`.
 - `src/lib/auth.functions.ts` — `getSession` and `ensureSession` server functions.
 - `src/lib/api.server.ts` — server-only `openapi-fetch` client. Middleware reads the session, calls `auth.api.getAccessToken({ providerId: 'microsoft' })`, attaches `Authorization: Bearer …`.
@@ -126,7 +126,7 @@ Out of scope for this plan. Document only: in deployed environments, the same va
    Capture tenant ID, Web clientId + secret, API clientId.
 2. **Populate secrets** (see **Configuration & secrets**): create `packages/web/.env.local` and `packages/web/.env.example`; run `dotnet user-secrets init` and `set` in `packages/api/`. Add `.env*` to `.gitignore`.
 3. Add `better-auth` to `packages/web` (`bun add better-auth -F web`).
-4. Create `src/lib/auth.ts` with Microsoft provider, single-tenant, stateless cookie session, `tanstackStartCookies()`. Pass `secret: process.env.BFF_AUTH_SECRET` and `baseURL: process.env.BFF_URL` explicitly. Scopes: `['openid', 'profile', 'email', 'offline_access', 'api://<api-client-id>/access']` — note the API app reg's clientId here so the issued access token's `aud` is the API.
+4. Create `src/lib/auth.ts` with Microsoft provider, single-tenant, stateless cookie session, `tanstackStartCookies()`. Pass `secret: process.env.BFF_AUTH_SECRET` and `baseURL: process.env.BFF_URL` explicitly. Scopes: `['openid', 'profile', 'email', 'offline_access', 'api://<api-client-id>/access']` — note the API app reg's clientId here so the issued access token's `aud` is the API. Apply the **Cookie Security** config in `advanced` (see below).
 5. Create `src/lib/auth-client.ts`.
 6. Create `src/routes/api/auth/$.ts` mounting the handler.
 7. Create `src/lib/auth.functions.ts` with `getSession` / `ensureSession`.
@@ -138,6 +138,36 @@ Out of scope for this plan. Document only: in deployed environments, the same va
 14. C# API: add `Microsoft.Identity.Web` package, wire JwtBearer in `Program.cs`, add `AzureAd` config (TenantId, ClientId = API app reg), set a `FallbackPolicy` that requires authenticated user, and explicitly `.AllowAnonymous()` on `MapOpenApi`, `MapScalarApiReference`, and `MapGet("/")`. Refactor `AnimalEndpoints.Map` to take an `IEndpointRouteBuilder` group.
 15. Regenerate the OpenAPI client (`bun --filter web gen:api`) once the API requires auth — verify metadata endpoints stay anonymous and types are unchanged.
 16. Smoke test the golden path in a browser: visit `/` → redirected to `/login` → click Microsoft → consent → back to `/` → animals page loads via BFF with Bearer.
+
+## Cookie Security
+
+All betterAuth session cookies must be hardened with the following attributes:
+
+| Attribute | Value | Reason |
+|-----------|-------|--------|
+| Name prefix | `__Host-` | Binds cookie to exact origin; prevents subdomain takeover and cookie injection |
+| `SameSite` | `Strict` | Blocks the cookie on all cross-site requests, including top-level navigations from external sites |
+| `HttpOnly` | `true` | Browser JS cannot read the cookie; mitigates XSS exfiltration |
+| `Secure` | `true` | Cookie only transmitted over HTTPS (required by `__Host-` prefix) |
+| `Path` | `/` | Required by `__Host-` prefix |
+| `Domain` | _(omit)_ | Required by `__Host-` prefix — must not be set |
+
+Configure in `src/lib/auth.ts` via the `advanced` option:
+
+```ts
+advanced: {
+  cookiePrefix: "__Host-timesheetzone",
+  defaultCookieAttributes: {
+    sameSite: "strict",
+    secure: true,
+    httpOnly: true,
+    path: "/",
+    // domain must not be set
+  },
+},
+```
+
+> **Local dev note:** Modern browsers honour `__Host-` on `http://localhost` even without HTTPS, so local development is unaffected. In production the `Secure` flag is mandatory.
 
 ## Edge Cases
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-05-12
+
+feat: harden session cookies with __Host- prefix and Strict SameSite
+
+Apply __Host-timesheetzone cookie prefix and SameSite=Strict, Secure,
+HttpOnly, Path=/ to all betterAuth session cookies. The __Host- prefix
+prevents subdomain cookie injection; Strict SameSite blocks cross-site
+request inclusion. Documents the requirements in the login plan.
+
 ## 2026-05-11
 
 feat: add Microsoft Entra authentication via Better Auth
