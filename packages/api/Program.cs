@@ -104,10 +104,7 @@ using (var scope = app.Services.CreateScope())
     if (!db.Animals.Any())
         new AnimalSeeder(db).Seed();
 }
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapOpenApi("/openapi/{documentName}.json").AllowAnonymous();

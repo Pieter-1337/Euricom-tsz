@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "bun run node node_modules/vite/bin/vite.js --port 3000",
+    "dev": "bun run node --use-system-ca node_modules/vite/bin/vite.js --port 3000",
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test",
