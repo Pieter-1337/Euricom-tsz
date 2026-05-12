@@ -2,6 +2,18 @@
 
 ## 2026-05-12
 
+docs: align login plan and ui-plan with current auth implementation
+
+Update plan.md and ui-plan.md to match the implementation that
+actually shipped: SQLite-backed sessions instead of stateless cookies,
+`BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` env var names, the rolled-back
+`__Host-` prefix and `SameSite=Strict` (now `Lax` defaults), the
+`scope` (singular) vs `scopes` field-name pitfall and
+`disableDefaultScope: true` requirement, the dev-only JwtBearer debug
+hooks on the API, and the auto-redirect from RootLayout instead of a
+manual Login button. Delete the obsolete login-database.plan.md — the
+migration it described is complete.
+
 fix: correct scope field name so entra returns api access token
 
 Better Auth's Microsoft social provider reads `scope` (singular), not
