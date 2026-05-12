@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Api.Modules.Animals;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -16,6 +17,42 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.Services.AddAuthentication()
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        var previousOnFailed = options.Events.OnAuthenticationFailed;
+        options.Events.OnAuthenticationFailed = async ctx =>
+        {
+            await previousOnFailed(ctx);
+            var logger = ctx.HttpContext.RequestServices
+                .GetRequiredService<ILoggerFactory>()
+                .CreateLogger("JwtDebug");
+
+            var auth = ctx.Request.Headers.Authorization.ToString();
+            var token = auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                ? auth["Bearer ".Length..]
+                : auth;
+
+            logger.LogWarning("JWT auth failed: {Exception}", ctx.Exception?.ToString());
+            logger.LogWarning("Raw token: {Token}", token);
+        };
+
+        var previousOnValidated = options.Events.OnTokenValidated;
+        options.Events.OnTokenValidated = async ctx =>
+        {
+            await previousOnValidated(ctx);
+            var logger = ctx.HttpContext.RequestServices
+                .GetRequiredService<ILoggerFactory>()
+                .CreateLogger("JwtDebug");
+            logger.LogInformation("JWT validated. iss={Iss} aud={Aud} tid={Tid}",
+                ctx.Principal?.FindFirst("iss")?.Value,
+                ctx.Principal?.FindFirst("aud")?.Value,
+                ctx.Principal?.FindFirst("tid")?.Value);
+        };
+    });
+}
 
 builder.Services.AddAuthorization(options =>
 {
@@ -67,8 +104,10 @@ using (var scope = app.Services.CreateScope())
     if (!db.Animals.Any())
         new AnimalSeeder(db).Seed();
 }
-
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapOpenApi("/openapi/{documentName}.json").AllowAnonymous();
@@ -84,5 +123,6 @@ app.MapGet("/", () => new
 }).AllowAnonymous();
 
 AnimalEndpoints.Map(app);
+
 
 app.Run();

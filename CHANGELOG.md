@@ -2,6 +2,21 @@
 
 ## 2026-05-12
 
+fix: correct scope field name so entra returns api access token
+
+Better Auth's Microsoft social provider reads `scope` (singular), not
+`scopes`. The misnamed field meant the configured
+`api://.../access` scope was silently dropped during sign-in, so
+Microsoft returned a Graph access token instead of one for the API
+and signature validation failed. Rename the field, disable the
+hardcoded `User.Read` default to keep the request scoped to a single
+resource, and source the API client id from `API_CLIENT_ID`.
+
+Add dev-only JwtBearer debug events on the API to surface inner
+exceptions and decoded claims when validation fails. Pre-fill the
+public Entra Instance URL in appsettings so only secrets stay in
+user-secrets.
+
 fix: persist sessions to bun:sqlite and relax cookie hardening for OAuth
 
 Switch Better Auth's database from memoryAdapter to a bun:sqlite-backed

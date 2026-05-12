@@ -24,13 +24,14 @@ export const auth = betterAuth({
       clientId: process.env.MICROSOFT_CLIENT_ID!,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
       tenantId: process.env.MICROSOFT_TENANT_ID!,
-      scopes: ['openid', 'profile', 'email', 'offline_access', 'api://5f7eb51a-66af-44e0-9ada-9354dbc0c19c/access'],
+      scope: ['openid', 'profile', 'email', 'offline_access', `api://${process.env.API_CLIENT_ID}/access`],
       prompt: 'login',
       mapProfileToUser: (profile) => ({
         id: profile.oid ?? profile.sub,
         email: profile.email ?? profile.preferred_username,
         name: profile.name,
       }),
+      disableDefaultScope: true,
     },
   },
   advanced: {
