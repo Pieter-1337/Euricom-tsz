@@ -25,7 +25,7 @@ export const auth = betterAuth({
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
       tenantId: process.env.MICROSOFT_TENANT_ID!,
       scope: ['openid', 'profile', 'email', 'offline_access', `api://${process.env.API_CLIENT_ID}/access`],
-      prompt: 'login',
+      prompt: 'select_account',
       mapProfileToUser: (profile) => ({
         id: profile.oid ?? profile.sub,
         email: profile.email ?? profile.preferred_username,
