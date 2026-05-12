@@ -6,7 +6,9 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite --port 3000",
+    "check:certs": "[ -f certs/local-key.pem ] || (echo 'Error: certs/local-key.pem not found. Run mkcert to generate certificates. See certs/README.md.' && exit 1)",
+    "dev": "bun run check:certs && node node_modules/vite/bin/vite.js --port 3000",
+    "dev:debug": "bun run dev --inspect",
     "build": "vp build",
     "preview": "vp preview",
     "test": "vp test",
@@ -17,18 +19,18 @@
     "fallow:dupes": "fallow dupes",
     "fallow:health": "fallow health",
     "cleanup": "rimraf .tanstack dist",
-    "gen:api": "bunx openapi-typescript http://localhost:5204/openapi/v1.json -o ./src/api/schema.ts"
+    "gen:api": "bunx openapi-typescript https://localhost:7215/openapi/v1.json -o ./src/api/schema.ts"
   },
   "dependencies": {
-    "better-auth": "^1.6.10",
-    "h3-v2": "npm:h3@2.0.1-rc.20",
     "@tanstack/react-form": "^1.29.1",
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-start": "latest",
     "@tanstack/router-plugin": "^1.132.0",
+    "better-auth": "^1.6.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "h3-v2": "npm:h3@2.0.1-rc.20",
     "lucide-react": "^0.577.0",
     "openapi-fetch": "^0.17.0",
     "radix-ui": "^1.4.3",

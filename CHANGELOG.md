@@ -2,6 +2,15 @@
 
 ## 2026-05-12
 
+feat: serve web and api over local HTTPS for OAuth dev
+
+Wire up mkcert-generated certs in Vite's dev server and switch
+BETTER_AUTH_URL and API_URL to https. Enable HttpsRedirection in the
+.NET API and run dotnet watch with the https launch profile. Add a
+check:certs preflight in the web dev script and ignore the cert files
+(keeping certs/README.md tracked). Includes WIP debug logs in
+getSession and __root to investigate a session-null-after-OAuth bug.
+
 fix: scope SameSite=Strict to session cookie only to resolve state_mismatch
 
 State and PKCE cookies need SameSite=Lax (Better Auth's default) to

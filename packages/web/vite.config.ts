@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { defineConfig } from 'vite-plus';
 import { devtools } from '@tanstack/devtools-vite';
 
@@ -7,6 +8,12 @@ import viteReact from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 const config = defineConfig({
+  server: {
+    https: {
+      key: fs.readFileSync('./certs/local-key.pem'),
+      cert: fs.readFileSync('./certs/local-cert.pem'),
+    },
+  },
   lint: {
     ignorePatterns: [],
   },

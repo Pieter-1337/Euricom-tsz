@@ -68,10 +68,9 @@ using (var scope = app.Services.CreateScope())
         new AnimalSeeder(db).Seed();
 }
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
-// app.UseHttpsRedirection();
 app.MapOpenApi("/openapi/{documentName}.json").AllowAnonymous();
 app.MapScalarApiReference("/openapi", options =>
 {

@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --filter 'web-tanstack-start' dev",
-    "dev:api": "dotnet watch run --project packages/api",
+    "dev:api": "dotnet watch run --project packages/api --launch-profile https",
     "check": "bun run --filter '*' check",
     "typecheck": "bun run --filter '*' typecheck",
     "fallow": "bun run --filter '*' fallow",

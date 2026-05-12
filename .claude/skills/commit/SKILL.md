@@ -1,6 +1,7 @@
 ---
 name: 'commit'
 description: 'How to commit changes in this repo  triggers: commit'
+model: 'haiku'
 ---
 
 # How we commit in this repo
