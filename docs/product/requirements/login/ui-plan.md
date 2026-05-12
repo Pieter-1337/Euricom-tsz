@@ -36,8 +36,12 @@ Browser                         BFF (TanStack Start)
 
 The session cookie is:
 - `HttpOnly` — browser JS never reads it
-- `SameSite=Lax` — included on navigations, blocked on cross-origin POSTs
+- `SameSite=Strict` — never sent on cross-site requests (safe because it is only needed after login, on same-site navigations)
+- `Secure` — HTTPS only
+- `__Host-timesheetzone` prefix — binds cookie to exact origin, prevents subdomain injection
 - Signed/encrypted by betterAuth using `BFF_AUTH_SECRET`
+
+OAuth state and PKCE cookies use `SameSite=Lax` (Better Auth's default) so they survive the cross-site redirect from Microsoft back to the callback route.
 
 ## Phase 1 — stateless (better-auth, no DB)
 

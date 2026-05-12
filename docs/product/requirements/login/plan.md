@@ -143,14 +143,18 @@ Out of scope for this plan. Document only: in deployed environments, the same va
 
 All betterAuth session cookies must be hardened with the following attributes:
 
-| Attribute | Value | Reason |
-|-----------|-------|--------|
-| Name prefix | `__Host-` | Binds cookie to exact origin; prevents subdomain takeover and cookie injection |
-| `SameSite` | `Strict` | Blocks the cookie on all cross-site requests, including top-level navigations from external sites |
-| `HttpOnly` | `true` | Browser JS cannot read the cookie; mitigates XSS exfiltration |
-| `Secure` | `true` | Cookie only transmitted over HTTPS (required by `__Host-` prefix) |
-| `Path` | `/` | Required by `__Host-` prefix |
-| `Domain` | _(omit)_ | Required by `__Host-` prefix — must not be set |
+All cookies share a hardened baseline: `__Host-` prefix locks them to the exact origin (blocks subdomain cookie injection, including OAuth state hijack); `Secure` + `HttpOnly` limit transmission to HTTPS and block JS access. The session token adds `SameSite=Strict`; state/PKCE cookies keep Better Auth's `Lax` default so they survive the cross-site redirect from Microsoft.
+
+All cookies share a common baseline; the session token gets an extra `SameSite=Strict` override:
+
+| Attribute | Session token | OAuth state / PKCE | Reason |
+|-----------|---------------|--------------------|--------|
+| Name prefix | `__Host-` | `__Host-` | Binds cookie to exact origin; prevents subdomain takeover and cookie injection |
+| `SameSite` | `Strict` | `Lax` (BA default) | State/PKCE cookies must be `Lax` so they survive the cross-site redirect from Microsoft back to `/api/auth/callback/microsoft`. `Strict` would strip them on that redirect and cause a `state_mismatch` error. The session cookie can safely be `Strict` because it is only read on same-site requests after login. |
+| `HttpOnly` | `true` | `true` | Browser JS cannot read the cookie; mitigates XSS exfiltration |
+| `Secure` | `true` | `true` | Cookie only transmitted over HTTPS (required by `__Host-` prefix) |
+| `Path` | `/` | `/` | Required by `__Host-` prefix |
+| `Domain` | _(omit)_ | _(omit)_ | Required by `__Host-` prefix — must not be set |
 
 Configure in `src/lib/auth.ts` via the `advanced` option:
 
@@ -158,11 +162,16 @@ Configure in `src/lib/auth.ts` via the `advanced` option:
 advanced: {
   cookiePrefix: "__Host-timesheetzone",
   defaultCookieAttributes: {
-    sameSite: "strict",
+    // sameSite omitted — Better Auth defaults to Lax, which OAuth state/PKCE cookies require
     secure: true,
     httpOnly: true,
     path: "/",
     // domain must not be set
+  },
+  cookies: {
+    session_token: {
+      attributes: { sameSite: "strict" }, // session cookie can be Strict
+    },
   },
 },
 ```

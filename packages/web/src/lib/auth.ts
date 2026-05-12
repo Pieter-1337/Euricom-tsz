@@ -33,12 +33,21 @@ export const auth = betterAuth({
     },
   },
   advanced: {
+    // __Host- prefix: locks cookies to exact origin, blocks subdomain injection (incl. OAuth state hijack)
+    // secure + httpOnly: HTTPS-only transmission, no JS access — applies to all cookies incl. state/PKCE
     cookiePrefix: '__Host-timesheetzone',
     defaultCookieAttributes: {
-      sameSite: 'strict',
       secure: true,
       httpOnly: true,
       path: '/',
+    },
+    cookies: {
+      // SameSite=Strict on session only — state/PKCE must stay Lax (BA default) to survive the OAuth redirect
+      session_token: {
+        attributes: {
+          sameSite: 'strict',
+        },
+      },
     },
   },
   session: {

@@ -2,6 +2,14 @@
 
 ## 2026-05-12
 
+fix: scope SameSite=Strict to session cookie only to resolve state_mismatch
+
+State and PKCE cookies need SameSite=Lax (Better Auth's default) to
+survive the cross-site redirect from Microsoft during OAuth. Applying
+Strict globally stripped those cookies on the redirect, causing a
+state_mismatch error. Add inline comments explaining the rationale and
+update plan and ui-plan docs accordingly.
+
 feat: harden session cookies with __Host- prefix and Strict SameSite
 
 Apply __Host-timesheetzone cookie prefix and SameSite=Strict, Secure,
