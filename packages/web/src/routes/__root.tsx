@@ -60,12 +60,8 @@ function RootLayout() {
   const { session } = Route.useRouteContext();
 
   useEffect(() => {
-    console.log('redirect check => [RootLayout] session:', session);
     if (!session?.user) {
-      console.log('No session found, redirecting to Microsoft sign-in...');
       authClient.signIn.social({ provider: 'microsoft', callbackURL: '/' });
-    } else {
-      console.log('Session found for user:', session.user);
     }
   }, []);
 

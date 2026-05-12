@@ -14,6 +14,3 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
-# SSL certificates (generated locally via mkcert)
-certs/*
-!certs/README.md

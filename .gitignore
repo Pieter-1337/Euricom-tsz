@@ -48,3 +48,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # all files marked local
 *.local.*
+
+# SSL certificates (generated locally via mkcert)
+certs/*
+!certs/README.md

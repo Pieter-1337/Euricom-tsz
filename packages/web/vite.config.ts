@@ -9,9 +9,10 @@ import tailwindcss from '@tailwindcss/vite';
 
 const config = defineConfig({
   server: {
+    host: true,
     https: {
-      key: fs.readFileSync('./certs/local-key.pem'),
-      cert: fs.readFileSync('./certs/local-cert.pem'),
+      key: fs.readFileSync('../../certs/local-key.pem'),
+      cert: fs.readFileSync('../../certs/local-cert.pem'),
     },
   },
   lint: {
