@@ -134,4 +134,13 @@ Add a link in the nav/sidebar. Ask the user where navigation lives if unsure.
 
 ## Step 6 — Verify
 
-Run `bun --filter web typecheck`. The route appears in `routeTree.gen.ts` automatically on next dev start. If the feature needs a form, invoke the `frontend-form` skill next.
+Run, in order:
+
+```
+bun --filter web check        # vite-plus: lint + format
+bun --filter web typecheck    # tsc --noEmit
+bun --filter web test         # vp test — if behavior was added
+bun --filter web build        # catches route-tree / vite plugin failures tsc misses
+```
+
+The route appears in `routeTree.gen.ts` automatically on next dev start. If `check` reports fixable issues, run `bun --filter web check:fix`. If the feature needs a form, invoke the `frontend-form` skill next.

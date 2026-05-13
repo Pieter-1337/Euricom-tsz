@@ -115,7 +115,20 @@ function <Feature>Form() {
 
 ## Step 5 — Verify
 
-Run `bun --filter web typecheck`. Check:
+If the target endpoint was added or changed on the backend in this session, first run `bun --filter web gen:api` so `./schema` is current.
+
+Then run, in order:
+
+```
+bun --filter web check        # vite-plus: lint + format
+bun --filter web typecheck    # tsc --noEmit
+bun --filter web test         # vp test — if behavior was added
+bun --filter web build        # catches route-tree / vite plugin failures tsc misses
+```
+
+If `check` reports fixable issues, run `bun --filter web check:fix`.
+
+Also check:
 - Zod schema fields match `defaultValues` shape exactly
 - Server function `inputValidator` schema matches what `onSubmit` passes as `data`
 - `router.invalidate()` is called after successful submission
