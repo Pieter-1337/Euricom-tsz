@@ -3,9 +3,16 @@ import { apiClient as client } from '#/lib/api.server';
 import { ApiRequestError } from '#/api/client';
 
 export type User = components['schemas']['UserDto'];
-export type UserRole = components['schemas']['UserRole'];
 export type CreateUserRequest = components['schemas']['CreateUserCommand'];
 export type UpdateUserRequest = components['schemas']['UpdateUserCommand'];
+
+export const UserRole = {
+  User: 'User',
+  Admin: 'Admin',
+  ClientManager: 'ClientManager',
+} as const satisfies Record<string, components['schemas']['UserRole']>;
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+export const USER_ROLES = [UserRole.User, UserRole.Admin, UserRole.ClientManager] as const;
 
 export const getCurrentUser = async (): Promise<User | null> => {
   try {

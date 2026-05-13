@@ -2,18 +2,16 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
-import { getUserById, removeUser, updateUser, type User, type UserRole } from '#/api/users';
+import { getUserById, removeUser, updateUser, USER_ROLES, UserRole, type User } from '#/api/users';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
-
-const ROLES: UserRole[] = ['User', 'Admin', 'ClientManager'];
 
 const userIdSchema = z.string().min(1);
 
 const updateUserSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  role: z.enum(['User', 'Admin', 'ClientManager']),
+  role: z.enum(USER_ROLES),
 });
 
 const saveUserInputSchema = z.object({
@@ -51,7 +49,7 @@ function EditUser() {
   const form = useForm({
     defaultValues: {
       name: user?.name ?? '',
-      role: (user?.role ?? 'User') as UserRole,
+      role: (user?.role ?? UserRole.User) as UserRole,
     },
     validators: { onChange: updateUserSchema },
     onSubmit: async ({ value }) => {
@@ -113,7 +111,7 @@ function EditUser() {
                 onChange={(e) => field.handleChange(e.target.value as UserRole)}
                 className="border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
               >
-                {ROLES.map((r) => (
+                {USER_ROLES.map((r) => (
                   <option key={r} value={r}>
                     {r}
                   </option>

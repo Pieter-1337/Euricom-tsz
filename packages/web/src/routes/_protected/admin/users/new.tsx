@@ -2,17 +2,15 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
-import { createUser, type UserRole } from '#/api/users';
+import { createUser, USER_ROLES, UserRole } from '#/api/users';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
 
-const ROLES: UserRole[] = ['User', 'Admin', 'ClientManager'];
-
 const createUserSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
-  role: z.enum(['User', 'Admin', 'ClientManager']),
+  role: z.enum(USER_ROLES),
 });
 
 const submitCreateUser = createServerFn({ method: 'POST' })
@@ -30,7 +28,7 @@ function NewUser() {
     defaultValues: {
       name: '',
       email: '',
-      role: 'User' as UserRole,
+      role: UserRole.User as UserRole,
     },
     validators: { onChange: createUserSchema },
     onSubmit: async ({ value }) => {
@@ -96,7 +94,7 @@ function NewUser() {
                 onChange={(e) => field.handleChange(e.target.value as UserRole)}
                 className="border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
               >
-                {ROLES.map((r) => (
+                {USER_ROLES.map((r) => (
                   <option key={r} value={r}>
                     {r}
                   </option>

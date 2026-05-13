@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
+import { UserRole } from '#/api/users';
 import { ThemeToggle } from '#/components/theme-toggle';
 import { authClient } from '#/lib/auth-client';
 import { getCurrentUser } from '#/lib/current-user';
@@ -18,7 +19,7 @@ export const Route = createFileRoute('/_protected')({
 function ProtectedLayout() {
   const ctx = Route.useRouteContext() as { user: SessionUser; currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>> };
   const { user, currentUser } = ctx;
-  const isAdmin = currentUser.role === 'Admin';
+  const isAdmin = currentUser.role === UserRole.Admin;
 
   return (
     <>
