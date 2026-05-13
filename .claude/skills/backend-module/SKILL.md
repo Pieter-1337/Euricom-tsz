@@ -124,7 +124,48 @@ builder.Services.AddInfrastructure<<Feature>DbContext>(); // only if new DbConte
 
 Handlers and validators are picked up automatically by `AddHandlersFromAssembly` and `AddValidatorsFromAssembly` already wired in `Program.cs` — no per-handler registration needed.
 
-## Step 7 — Generate the migration
+## Step 7 — Test builder
+
+Every entity gets a builder in `packages/api/tests/Tsz.Api.Tests/Builders/<Feature>Builder.cs`. The builder calls the static `Create(...)` factory (so invariants stay enforced), fills the rest with NBuilder randoms, and exposes one `WithXxx` extension per named mutator.
+
+```csharp
+using FizzWare.NBuilder;
+using FizzWare.NBuilder.Generators;
+using Tsz.Api.Modules.<Feature>;
+
+namespace Tsz.Api.Tests.Builders;
+
+public static class <Feature>Builder
+{
+    public static <Feature> Build()
+    {
+        var id = Guid.NewGuid();
+        var entity = <Feature>.Create(
+            name: "Name_" + id.ToString()[..8]
+            /* ... fill remaining required Create params with GetRandom.*/);
+        entity.Id = id;
+        return entity;
+    }
+
+    public static <Feature> WithId(this <Feature> entity, Guid id)
+    {
+        entity.Id = id;
+        return entity;
+    }
+
+    public static <Feature> WithName(this <Feature> entity, string name)
+    {
+        entity.Rename(name);
+        return entity;
+    }
+
+    // one WithXxx per named mutator on the entity
+}
+```
+
+`AnimalBuilder.cs` is the canonical example. Use `Pick<string>.RandomItemFrom(...)` for enum-like string fields and `GetRandom.Int(min, max)` / `GetRandom.Email()` / `GetRandom.AlphaString(n)` for primitives. Builders ship sensible defaults so test call sites only spell out the field they care about: `AnimalBuilder.Build().WithAge(0)` for an age-boundary test.
+
+## Step 8 — Generate the migration
 
 The new entity needs a schema. From the repo root:
 
@@ -149,6 +190,6 @@ dotnet ef migrations add Add<Feature> \
 
 And `Program.cs` needs a `Migrate()` call against the new context too.
 
-## Step 8 — Verify
+## Step 9 — Verify
 
 Run `bun run check`. Then add operations with `backend-slice`.

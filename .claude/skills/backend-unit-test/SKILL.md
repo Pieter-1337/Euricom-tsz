@@ -2,13 +2,14 @@
 name: 'backend-unit-test'
 description: >
   Add unit tests for a handler or validator in packages/api/tests/Tsz.Api.Tests.
-  Uses xUnit, Moq for IUnitOfWork and IRepository<T>, and Shouldly assertions.
+  Uses xUnit, Moq for IUnitOfWork and IRepository<T>, Shouldly assertions, and
+  per-entity builders (Builders/<Entity>Builder.cs) for fixture data.
   Tests in isolation - no HTTP, no real DB.
 ---
 
 # Backend Unit Test
 
-Tests a single handler or validator class in isolation using xUnit + Moq + Shouldly.
+Tests a single handler or validator class in isolation using xUnit + Moq + Shouldly + per-entity builders.
 
 ## Conventions
 - Test class mirrors the SUT: `CreateAnimalHandlerTests` tests `CreateAnimalHandler`
@@ -16,6 +17,8 @@ Tests a single handler or validator class in isolation using xUnit + Moq + Shoul
 - One `[Fact]` per meaningful scenario (happy path + key failure cases)
 - Use Shouldly for assertions (`result.ShouldBe(...)`, `task.ShouldThrowAsync<...>()`)
 - Use Moq for dependencies — `Mock<IRepository<T>>`, `Mock<IUnitOfWork>`
+- Use the per-entity builder under `tests/Tsz.Api.Tests/Builders/<Entity>Builder.cs` to construct entities — `AnimalBuilder.Build().WithName("Rex")`. The builder calls `Animal.Create(...)` and the named mutators, so invariants stay enforced. Each `Build()` produces unique randomized defaults via NBuilder so callers only spell out the fields that matter.
+- For DTO lists where values don't matter (mock returns), use NBuilder directly: `Builder<<Feature>Dto>.CreateListOfSize(3).Build()`. Positional records work via NBuilder's ctor-param synthesis.
 - Test project: `packages/api/tests/Tsz.Api.Tests`, namespace `Tsz.Api.Tests.Modules.<Feature>`
 
 ## Step 1 — Clarify scope
@@ -110,14 +113,20 @@ public class <Operation><Feature>ValidatorTests
 
 ## Step 5 — Query handler tests
 
-Reads typically mock `FirstOrDefaultAsDtoAsync<TDto>` / `GetAllAsDtosAsync<TDto>`:
+Reads typically mock `FirstOrDefaultAsDtoAsync<TDto>` / `GetAllAsDtosAsync<TDto>`. Use NBuilder to fabricate the DTOs the repo will return — positional records are fine here, NBuilder synthesizes ctor args:
 
 ```csharp
+using FizzWare.NBuilder;
+
+var dtos = Builder<<Feature>Dto>.CreateListOfSize(3).Build();
+
 repo.Setup(r => r.FirstOrDefaultAsDtoAsync<<Feature>Dto>(
         It.IsAny<System.Linq.Expressions.Expression<Func<<Feature>, bool>>>(),
         It.IsAny<CancellationToken>()))
-    .ReturnsAsync(dto);
+    .ReturnsAsync(dtos[0]);
 ```
+
+For *entities* (private setters, factory + named mutators), use the per-entity builder instead — NBuilder's `.With(x => x.Prop = ...)` won't compile against private setters.
 
 ## Step 6 — Run tests
 

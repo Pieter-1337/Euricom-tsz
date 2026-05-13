@@ -2,8 +2,9 @@
 name: 'backend-integration-test'
 description: >
   Add integration tests for an endpoint in packages/api/tests/Tsz.Api.Tests.Integration.
-  Uses xUnit + Shouldly, WebApplicationFactory with UseInMemoryDatabase per fixture,
-  TestAuthHandler bypass for [Authorize]. One test class per endpoint group.
+  Uses xUnit + Shouldly, NBuilder for fabricating POST bodies, WebApplicationFactory
+  with UseInMemoryDatabase per fixture, TestAuthHandler bypass for [Authorize]. One
+  test class per endpoint group.
 ---
 
 # Backend Integration Test
@@ -16,7 +17,7 @@ Each `IClassFixture<TestWebApplicationFactory>` gets a fresh in-memory DB named 
 - xUnit (`[Fact]`, `IClassFixture<T>`, `Assert.*`); Shouldly available but the existing suite uses xUnit asserts — match the style of the file you're in
 - `TestWebApplicationFactory` swaps `AnimalDbContext` to `UseInMemoryDatabase($"IntegrationTests_{Guid}")` and replaces auth with `TestAuthHandler`
 - One test class per endpoint group: `AnimalEndpointsTests`, `<Feature>EndpointsTests`
-- Seed data inside the test: `await SeedViaApi(...)` helpers, not external fixtures
+- Seed data inside the test: `await SeedViaApi(...)` helpers that POST to the API, not external fixtures. Commands are positional records, so NBuilder's `Builder<TCommand>.CreateNew().Build()` handles them — every seed gets unique auto-filled values. Override only the field the test cares about.
 
 ## Step 1 — Clarify scope
 
