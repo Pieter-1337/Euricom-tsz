@@ -2,79 +2,47 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
-import { getAnimalById, updateAnimal } from '#/api/animals';
+import { createUser, type UserRole } from '#/api/users';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
 
-const animalIdSchema = z.string().min(1);
+const ROLES: UserRole[] = ['User', 'Admin', 'ClientManager'];
 
-const updateAnimalSchema = z.object({
+const createUserSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  species: z.string().min(1, 'Species is required'),
-  age: z.number().int().nonnegative(),
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  role: z.enum(['User', 'Admin', 'ClientManager']),
 });
 
-const saveAnimalInputSchema = z.object({
-  id: animalIdSchema,
-  animal: updateAnimalSchema,
-});
-
-const fetchAnimalById = createServerFn({ method: 'GET' })
-  .inputValidator(animalIdSchema)
-  .handler(async ({ data: id }) => {
-    return await getAnimalById(id);
-  });
-
-const saveAnimal = createServerFn({ method: 'POST' })
-  .inputValidator(saveAnimalInputSchema)
+const submitCreateUser = createServerFn({ method: 'POST' })
+  .inputValidator(createUserSchema)
   .handler(async ({ data }) => {
-    await updateAnimal(data.id, { id: data.id, ...data.animal });
+    return await createUser(data);
   });
 
-export const Route = createFileRoute('/_protected/animals/$id')({
-  loader: ({ params }) => fetchAnimalById({ data: params.id }),
-  component: AnimalDetail,
-});
+export const Route = createFileRoute('/_protected/admin/users/new')({ component: NewUser });
 
-type AgeInput = number | '';
-
-function AnimalDetail() {
-  const animal = Route.useLoaderData();
+function NewUser() {
   const router = useRouter();
 
   const form = useForm({
     defaultValues: {
-      name: String(animal?.name ?? ''),
-      species: String(animal?.species ?? ''),
-      age: (animal?.age === undefined ? '' : Number(animal.age)) as AgeInput,
+      name: '',
+      email: '',
+      role: 'User' as UserRole,
     },
-    validators: {
-      onChange: z.object({
-        name: z.string().min(1, 'Name is required'),
-        species: z.string().min(1, 'Species is required'),
-        age: z.union([z.literal(''), z.number().int().nonnegative()]),
-      }),
-    },
+    validators: { onChange: createUserSchema },
     onSubmit: async ({ value }) => {
-      if (!animal?.id) return;
-      await saveAnimal({
-        data: {
-          id: animal.id,
-          animal: {
-            name: value.name,
-            species: value.species,
-            age: value.age === '' ? 0 : value.age,
-          },
-        },
-      });
+      await submitCreateUser({ data: value });
       await router.invalidate();
+      router.navigate({ to: '/admin/users' });
     },
   });
 
   return (
     <main>
-      <h1 className="text-2xl font-bold">{animal?.name}</h1>
+      <h1 className="text-2xl font-bold">New user</h1>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -83,11 +51,6 @@ function AnimalDetail() {
         }}
         className="mt-4 grid max-w-md gap-4"
       >
-        <div className="grid gap-2">
-          <Label htmlFor="id">ID</Label>
-          <Input id="id" value={String(animal?.id ?? '')} disabled />
-        </div>
-
         <form.Field name="name">
           {(field) => (
             <div className="grid gap-2">
@@ -104,13 +67,14 @@ function AnimalDetail() {
           )}
         </form.Field>
 
-        <form.Field name="species">
+        <form.Field name="email">
           {(field) => (
             <div className="grid gap-2">
-              <Label htmlFor={field.name}>Species</Label>
+              <Label htmlFor={field.name}>Email</Label>
               <Input
                 id={field.name}
                 name={field.name}
+                type="email"
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
@@ -120,18 +84,24 @@ function AnimalDetail() {
           )}
         </form.Field>
 
-        <form.Field name="age">
+        <form.Field name="role">
           {(field) => (
             <div className="grid gap-2">
-              <Label htmlFor={field.name}>Age</Label>
-              <Input
+              <Label htmlFor={field.name}>Role</Label>
+              <select
                 id={field.name}
                 name={field.name}
-                type="number"
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value === '' ? '' : e.target.valueAsNumber)}
-              />
+                onChange={(e) => field.handleChange(e.target.value as UserRole)}
+                className="border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
+              >
+                {ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
               <FieldError field={field} />
             </div>
           )}
@@ -141,7 +111,7 @@ function AnimalDetail() {
           {([canSubmit, isSubmitting]) => (
             <div>
               <Button type="submit" disabled={!canSubmit}>
-                {isSubmitting ? 'Saving…' : 'Save'}
+                {isSubmitting ? 'Creating…' : 'Create user'}
               </Button>
             </div>
           )}

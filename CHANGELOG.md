@@ -1,5 +1,64 @@
 # Changelog
 
+## 2026-05-13
+
+feat(web): finish entra access gate UI — /no-access, admin users CRUD
+
+Wire the access gate end-to-end on the BFF: _protected.beforeLoad now
+calls getCurrentUser() after the session check and redirects null
+results to a new public /no-access route. Pull the post-login nav out
+of __root.tsx and into _protected.tsx so the admin link can gate
+cleanly on the resolved currentUser.role (no extra fetch).
+
+Add the admin layout + Users CRUD pages (list / new / edit-with-delete)
+backed by createServerFn + TanStack Form + zod + shadcn primitives.
+Role uses a styled native <select> for now.
+
+Regen packages/web/src/api/schema.ts against the running dev API.
+Replace the hand-typed shapes in users.ts with the generated
+components['schemas']['UserDto'|'CreateUserCommand'|'UpdateUserCommand'|
+'UserRole']. The regen also surfaced the Animals rename
+(Animal→AnimalDto, *Request→*Command) plus the move to uuid ids —
+animals.ts, its spec, and the $id route are realigned.
+
+## 2026-05-13
+
+feat: add users module and entra access gate (api-side, partial web)
+
+Replace the per-module AnimalDbContext with a shared AppDbContext that
+ApplyConfigurationsFromAssembly-discovers entity configs. Add a Users
+module mirroring the Animals shape: DDD-ish entity with private
+setters and static Create, soft-delete via global query filter,
+filtered unique indexes on Email (per non-deleted) and EntraOid, role
+stored as string, leave-default columns seeded at creation.
+
+Introduce ICurrentUser + HttpContextCurrentUser in Tsz.Api/Common/Auth
+(not Tsz.Infrastructure — the interface returns User, so pushing it
+down would invert the project reference). The implementation is
+scoped, memoises a single per-request DB roundtrip, matches on the
+Entra oid claim with email-fallback and links EntraOid on first
+login. A RequireAdmin authorization policy delegates to this same
+abstraction so policy + handlers see one source of truth for role.
+DefaultMapInboundClaims is disabled so oid/sub/email arrive
+unmolested.
+
+Endpoints: GET /api/users/me (JWT only, 404 when unprovisioned) plus
+admin-gated CRUD on /api/users with soft delete. JsonStringEnumConverter
+makes role serialise as a string union over the wire. Initial EF
+migration creates both tables; a dev-only UserSeeder writes one Admin
+row idempotently.
+
+Tests: 39 unit (handlers, validators, UnitOfWork now on AppDbContext)
+and 23 integration (in-memory DB per fixture, IAsyncLifetime wipes
+users between tests, covers /me 404 + oid match + email→oid link,
+RequireAdmin 403 paths, dup-email 409, soft-delete hidden by query
+filter).
+
+Web side adds a hand-typed users.ts API wrapper and a current-user
+server fn — schema regen still pending (see
+docs/product/requirements/users/IMPLEMENTATION_STATUS.md for the
+handoff incl. route/UI work still to do).
+
 ## 2026-05-12
 
 docs: inline AGENTS.md content into CLAUDE.md and stress subagents

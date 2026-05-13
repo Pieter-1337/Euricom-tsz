@@ -1,4 +1,4 @@
-using Tsz.Api.Modules.Animals;
+using Tsz.Api.Common.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -21,14 +21,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         {
             var toRemove = services
                 .Where(d =>
-                    d.ServiceType == typeof(DbContextOptions<AnimalDbContext>) ||
-                    d.ServiceType == typeof(IDbContextOptionsConfiguration<AnimalDbContext>) ||
-                    d.ServiceType == typeof(AnimalDbContext))
+                    d.ServiceType == typeof(DbContextOptions<AppDbContext>) ||
+                    d.ServiceType == typeof(IDbContextOptionsConfiguration<AppDbContext>) ||
+                    d.ServiceType == typeof(AppDbContext))
                 .ToList();
             foreach (var d in toRemove)
                 services.Remove(d);
 
-            services.AddDbContext<AnimalDbContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseInMemoryDatabase(_dbName));
 
             services.AddAuthentication(TestAuthHandler.SchemeName)

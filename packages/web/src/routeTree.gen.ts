@@ -9,12 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as NoAccessRouteImport } from './routes/no-access'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
+import { Route as ProtectedAdminRouteImport } from './routes/_protected/admin'
 import { Route as ProtectedAnimalsIndexRouteImport } from './routes/_protected/animals/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedAnimalsIdRouteImport } from './routes/_protected/animals/$id'
+import { Route as ProtectedAdminUsersIndexRouteImport } from './routes/_protected/admin/users/index'
+import { Route as ProtectedAdminUsersNewRouteImport } from './routes/_protected/admin/users/new'
+import { Route as ProtectedAdminUsersIdRouteImport } from './routes/_protected/admin/users/$id'
 
+const NoAccessRoute = NoAccessRouteImport.update({
+  id: '/no-access',
+  path: '/no-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
@@ -22,6 +32,11 @@ const ProtectedRoute = ProtectedRouteImport.update({
 const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedAdminRoute = ProtectedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedAnimalsIndexRoute = ProtectedAnimalsIndexRouteImport.update({
@@ -39,48 +54,110 @@ const ProtectedAnimalsIdRoute = ProtectedAnimalsIdRouteImport.update({
   path: '/animals/$id',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedAdminUsersIndexRoute =
+  ProtectedAdminUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => ProtectedAdminRoute,
+  } as any)
+const ProtectedAdminUsersNewRoute = ProtectedAdminUsersNewRouteImport.update({
+  id: '/users/new',
+  path: '/users/new',
+  getParentRoute: () => ProtectedAdminRoute,
+} as any)
+const ProtectedAdminUsersIdRoute = ProtectedAdminUsersIdRouteImport.update({
+  id: '/users/$id',
+  path: '/users/$id',
+  getParentRoute: () => ProtectedAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
+  '/no-access': typeof NoAccessRoute
+  '/admin': typeof ProtectedAdminRouteWithChildren
   '/animals/$id': typeof ProtectedAnimalsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/animals/': typeof ProtectedAnimalsIndexRoute
+  '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
+  '/admin/users/new': typeof ProtectedAdminUsersNewRoute
+  '/admin/users/': typeof ProtectedAdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
+  '/no-access': typeof NoAccessRoute
+  '/admin': typeof ProtectedAdminRouteWithChildren
   '/': typeof ProtectedIndexRoute
   '/animals/$id': typeof ProtectedAnimalsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/animals': typeof ProtectedAnimalsIndexRoute
+  '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
+  '/admin/users/new': typeof ProtectedAdminUsersNewRoute
+  '/admin/users': typeof ProtectedAdminUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteWithChildren
+  '/no-access': typeof NoAccessRoute
+  '/_protected/admin': typeof ProtectedAdminRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
   '/_protected/animals/$id': typeof ProtectedAnimalsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_protected/animals/': typeof ProtectedAnimalsIndexRoute
+  '/_protected/admin/users/$id': typeof ProtectedAdminUsersIdRoute
+  '/_protected/admin/users/new': typeof ProtectedAdminUsersNewRoute
+  '/_protected/admin/users/': typeof ProtectedAdminUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/animals/$id' | '/api/auth/$' | '/animals/'
+  fullPaths:
+    | '/'
+    | '/no-access'
+    | '/admin'
+    | '/animals/$id'
+    | '/api/auth/$'
+    | '/animals/'
+    | '/admin/users/$id'
+    | '/admin/users/new'
+    | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/animals/$id' | '/api/auth/$' | '/animals'
+  to:
+    | '/no-access'
+    | '/admin'
+    | '/'
+    | '/animals/$id'
+    | '/api/auth/$'
+    | '/animals'
+    | '/admin/users/$id'
+    | '/admin/users/new'
+    | '/admin/users'
   id:
     | '__root__'
     | '/_protected'
+    | '/no-access'
+    | '/_protected/admin'
     | '/_protected/'
     | '/_protected/animals/$id'
     | '/api/auth/$'
     | '/_protected/animals/'
+    | '/_protected/admin/users/$id'
+    | '/_protected/admin/users/new'
+    | '/_protected/admin/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   ProtectedRoute: typeof ProtectedRouteWithChildren
+  NoAccessRoute: typeof NoAccessRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/no-access': {
+      id: '/no-access'
+      path: '/no-access'
+      fullPath: '/no-access'
+      preLoaderRoute: typeof NoAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -93,6 +170,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/admin': {
+      id: '/_protected/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof ProtectedAdminRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/animals/': {
@@ -116,16 +200,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAnimalsIdRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/admin/users/': {
+      id: '/_protected/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof ProtectedAdminUsersIndexRouteImport
+      parentRoute: typeof ProtectedAdminRoute
+    }
+    '/_protected/admin/users/new': {
+      id: '/_protected/admin/users/new'
+      path: '/users/new'
+      fullPath: '/admin/users/new'
+      preLoaderRoute: typeof ProtectedAdminUsersNewRouteImport
+      parentRoute: typeof ProtectedAdminRoute
+    }
+    '/_protected/admin/users/$id': {
+      id: '/_protected/admin/users/$id'
+      path: '/users/$id'
+      fullPath: '/admin/users/$id'
+      preLoaderRoute: typeof ProtectedAdminUsersIdRouteImport
+      parentRoute: typeof ProtectedAdminRoute
+    }
   }
 }
 
+interface ProtectedAdminRouteChildren {
+  ProtectedAdminUsersIdRoute: typeof ProtectedAdminUsersIdRoute
+  ProtectedAdminUsersNewRoute: typeof ProtectedAdminUsersNewRoute
+  ProtectedAdminUsersIndexRoute: typeof ProtectedAdminUsersIndexRoute
+}
+
+const ProtectedAdminRouteChildren: ProtectedAdminRouteChildren = {
+  ProtectedAdminUsersIdRoute: ProtectedAdminUsersIdRoute,
+  ProtectedAdminUsersNewRoute: ProtectedAdminUsersNewRoute,
+  ProtectedAdminUsersIndexRoute: ProtectedAdminUsersIndexRoute,
+}
+
+const ProtectedAdminRouteWithChildren = ProtectedAdminRoute._addFileChildren(
+  ProtectedAdminRouteChildren,
+)
+
 interface ProtectedRouteChildren {
+  ProtectedAdminRoute: typeof ProtectedAdminRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
   ProtectedAnimalsIdRoute: typeof ProtectedAnimalsIdRoute
   ProtectedAnimalsIndexRoute: typeof ProtectedAnimalsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedAdminRoute: ProtectedAdminRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
   ProtectedAnimalsIdRoute: ProtectedAnimalsIdRoute,
   ProtectedAnimalsIndexRoute: ProtectedAnimalsIndexRoute,
@@ -137,6 +260,7 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   ProtectedRoute: ProtectedRouteWithChildren,
+  NoAccessRoute: NoAccessRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

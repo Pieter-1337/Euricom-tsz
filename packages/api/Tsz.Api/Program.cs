@@ -1,6 +1,10 @@
-﻿using System.Reflection;
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Text.Json.Serialization;
+using Tsz.Api.Common.Auth;
+using Tsz.Api.Common.Persistence;
 using Tsz.Api.Modules.Animals;
+using Tsz.Api.Modules.Users;
 using Tsz.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,11 +14,14 @@ using Microsoft.Identity.Web;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
+JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.AddAuthentication()
@@ -24,6 +31,8 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
     {
+        options.MapInboundClaims = false;
+
         var previousOnFailed = options.Events.OnAuthenticationFailed;
         options.Events.OnAuthenticationFailed = async ctx =>
         {
@@ -55,12 +64,25 @@ if (builder.Environment.IsDevelopment())
         };
     });
 }
+else
+{
+    builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.MapInboundClaims = false;
+    });
+}
 
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
+
+    options.AddPolicy(AuthorizationPolicies.RequireAdmin, policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.Requirements.Add(new RequireAdminRequirement());
+    });
 });
 
 builder.Services.AddOpenApi(options =>
@@ -90,26 +112,34 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
-builder.Services.AddDbContext<AnimalDbContext>(options =>
+
+builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=animals.db");
+           ?? "Data Source=tsz.db");
 });
-builder.Services.AddInfrastructure<AnimalDbContext>();
+builder.Services.AddInfrastructure<AppDbContext>();
 builder.Services.AddHandlersFromAssembly(typeof(Program).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+builder.Services.AddScoped<IAuthorizationHandler, RequireAdminAuthorizationHandler>();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AnimalDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (db.Database.IsRelational())
         db.Database.Migrate();
     else
         db.Database.EnsureCreated();
     if (!db.Animals.Any())
         new AnimalSeeder(db).Seed();
+    if (app.Environment.IsDevelopment())
+        new UserSeeder(db).Seed();
 }
 app.UseHttpsRedirection();
 app.UseAuthentication();
@@ -122,11 +152,12 @@ app.MapScalarApiReference("/openapi", options =>
 
 app.MapGet("/", () => new
 {
-    name = "Animal API",
+    name = "Tsz API",
     version = Assembly.GetExecutingAssembly().GetName().Version?.ToString()
 }).AllowAnonymous();
 
 AnimalEndpoints.Map(app);
+UserEndpoints.Map(app);
 
 
 app.Run();

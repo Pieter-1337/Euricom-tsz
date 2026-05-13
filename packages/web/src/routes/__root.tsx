@@ -1,9 +1,8 @@
-import { HeadContent, Link, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import appCss from '../styles.css?url';
 import { ErrorBoundary } from '#/components/error-boundary';
-import { ThemeToggle } from '#/components/theme-toggle';
 import { getSession } from '#/lib/auth.functions';
 import { authClient } from '#/lib/auth-client';
 
@@ -69,26 +68,6 @@ function RootLayout() {
 
   return (
     <div className="mx-auto max-w-3xl p-6">
-      <nav className="mb-6 flex items-center gap-4 text-sm">
-        <Link to="/" className="[&.active]:font-bold">
-          Home
-        </Link>
-        <Link to="/animals" className="[&.active]:font-bold">
-          Animals
-        </Link>
-        <div className="ml-auto flex items-center gap-3">
-          <span className="text-muted-foreground">
-            {session.user.name} ·{' '}
-            <button
-              className="underline-offset-4 hover:underline"
-              onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })}
-            >
-              Sign out
-            </button>
-          </span>
-          <ThemeToggle />
-        </div>
-      </nav>
       <Outlet />
     </div>
   );
