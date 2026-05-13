@@ -37,11 +37,12 @@ describe('animals api', () => {
   });
 
   it('getAnimalById → GET /api/animals/{id} with path param', async () => {
-    const animal = { id: 7, name: 'Rex', species: 'dog', age: 3 };
+    const id = '00000000-0000-0000-0000-000000000007';
+    const animal = { id, name: 'Rex', species: 'dog', age: 3 };
     mockFetch.mockResolvedValue(jsonResponse(animal));
 
-    await expect(getAnimalById(7)).resolves.toEqual(animal);
-    expect(lastRequest().url).toBe(`${process.env.SERVER_URL}/api/animals/7`);
+    await expect(getAnimalById(id)).resolves.toEqual(animal);
+    expect(lastRequest().url).toBe(`${process.env.SERVER_URL}/api/animals/${id}`);
   });
 
   it('createAnimal → POST /api/animals with body', async () => {
@@ -57,22 +58,24 @@ describe('animals api', () => {
 
   it('updateAnimal → PUT /api/animals/{id} with path + body', async () => {
     mockFetch.mockResolvedValue(emptyResponse(204));
-    const body = { name: 'Rex', species: 'dog', age: 4 };
+    const id = '00000000-0000-0000-0000-000000000003';
+    const body = { id, name: 'Rex', species: 'dog', age: 4 };
 
-    await updateAnimal(3, body);
+    await updateAnimal(id, body);
     const req = lastRequest();
     expect(req.method).toBe('PUT');
-    expect(req.url).toBe(`${process.env.SERVER_URL}/api/animals/3`);
+    expect(req.url).toBe(`${process.env.SERVER_URL}/api/animals/${id}`);
     await expect(req.json()).resolves.toEqual(body);
   });
 
   it('removeAnimal → DELETE /api/animals/{id}', async () => {
     mockFetch.mockResolvedValue(emptyResponse(204));
+    const id = '00000000-0000-0000-0000-000000000009';
 
-    await removeAnimal(9);
+    await removeAnimal(id);
     const req = lastRequest();
     expect(req.method).toBe('DELETE');
-    expect(req.url).toBe(`${process.env.SERVER_URL}/api/animals/9`);
+    expect(req.url).toBe(`${process.env.SERVER_URL}/api/animals/${id}`);
   });
 });
 

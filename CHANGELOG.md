@@ -2,6 +2,27 @@
 
 ## 2026-05-13
 
+feat(web): finish entra access gate UI — /no-access, admin users CRUD
+
+Wire the access gate end-to-end on the BFF: _protected.beforeLoad now
+calls getCurrentUser() after the session check and redirects null
+results to a new public /no-access route. Pull the post-login nav out
+of __root.tsx and into _protected.tsx so the admin link can gate
+cleanly on the resolved currentUser.role (no extra fetch).
+
+Add the admin layout + Users CRUD pages (list / new / edit-with-delete)
+backed by createServerFn + TanStack Form + zod + shadcn primitives.
+Role uses a styled native <select> for now.
+
+Regen packages/web/src/api/schema.ts against the running dev API.
+Replace the hand-typed shapes in users.ts with the generated
+components['schemas']['UserDto'|'CreateUserCommand'|'UpdateUserCommand'|
+'UserRole']. The regen also surfaced the Animals rename
+(Animal→AnimalDto, *Request→*Command) plus the move to uuid ids —
+animals.ts, its spec, and the $id route are realigned.
+
+## 2026-05-13
+
 feat: add users module and entra access gate (api-side, partial web)
 
 Replace the per-module AnimalDbContext with a shared AppDbContext that

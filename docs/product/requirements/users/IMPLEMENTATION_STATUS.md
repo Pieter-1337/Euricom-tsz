@@ -45,27 +45,21 @@ Plan: `docs/product/requirements/users/plan.md`.
   - Covers `/me` (404, OID-match, email→OID link), admin gate (403 for non-admin, 403 for unprovisioned), create (incl. 409 dup), update (incl. route-id mismatch), delete (soft-delete verified via `IgnoreQueryFilters`).
   - Static `JsonSerializerOptions` with `JsonStringEnumConverter` for `ReadFromJsonAsync<UserDto>` (otherwise the string `role` fails to deserialise).
 
-### 7. Web — partial
-- `packages/web/src/api/users.ts` — hand-typed `User`, `CreateUserRequest`, `UpdateUserRequest` + wrappers (`getCurrentUser`, `getUsers`, `getUserById`, `createUser`, `updateUser`, `removeUser`). `getCurrentUser` / `getUserById` map 404 → `null`.
+### 7. Web — full
+- `packages/web/src/api/users.ts` — uses generated `components['schemas']['UserDto'|'CreateUserCommand'|'UpdateUserCommand'|'UserRole']` from `schema.ts`; wrappers `getCurrentUser`, `getUsers`, `getUserById`, `createUser`, `updateUser`, `removeUser`. `getCurrentUser` / `getUserById` map 404 → `null`.
 - `packages/web/src/lib/current-user.ts` — `getCurrentUser` server fn wraps the API call.
+- `packages/web/src/api/schema.ts` — regenerated against running dev API; also renames `Animal→AnimalDto`, `CreateAnimalRequest→CreateAnimalCommand`, `UpdateAnimalRequest→UpdateAnimalCommand`. `packages/web/src/api/animals.ts` + spec + `routes/_protected/animals/$id.tsx` updated for string (uuid) ids.
 
-> ⚠️ **TODO before merging**: run `bun --filter web gen:api` against the worktree's API to refresh `packages/web/src/api/schema.ts`, then replace the hand-typed shapes in `packages/web/src/api/users.ts` with `components['schemas']['UserDto'|'CreateUserCommand'|'UpdateUserCommand']` from the regenerated schema, and drop the `as any` / `as User` casts on the openapi-fetch client calls.
->
-> The regen attempt in this session failed: the API needs `ASPNETCORE_ENVIRONMENT=Development` to load user-secrets that have the Azure AD `TenantId`/`ClientId`. Setting the env var inline with `VAR=value cmd` doesn't work in PowerShell. Easiest path next session: in pwsh `$env:ASPNETCORE_ENVIRONMENT='Development'; dotnet run --project packages/api/Tsz.Api --urls 'https://localhost:7215'` (or just use the existing `dev:api` script: `bun run dev:api`), then in another shell `bun --filter web gen:api`.
+### 8. Web — `_protected` gate + `/no-access` (done)
+- `src/routes/_protected.tsx` — after the session check, calls `getCurrentUser()`. `null` → `throw redirect({ to: '/no-access' })`. Exposes `{ user, currentUser }` on route context. Renders the post-login nav (Home / Animals / Users [admin-only] + signed-in-as + sign-out + theme toggle).
+- `src/routes/no-access.tsx` — public route, "Your account isn't set up yet…" + sign-out button.
+- `src/routes/__root.tsx` — stripped to the SSR shell + sign-in redirect; nav moved into `_protected.tsx` so admin link gates cleanly on `currentUser.role`.
 
-## Remaining (from `plan.md`)
-
-### 8. Web: `_protected` gate + `/no-access`
-- `src/routes/_protected.tsx` — after the existing `getSession()` check passes, call `getCurrentUser()`. `null` → `throw redirect({ to: '/no-access' })`. On success expose `{ session, currentUser }` on route context.
-- `src/routes/no-access.tsx` — **public** route, no `_protected` parent. Static "Your account isn't set up yet. Ask an administrator." + sign-out button (use the `authClient.signOut` pattern from `__root.tsx`).
-- `src/routes/__root.tsx` — when current route is `/no-access`, suppress or minimise the nav block. Easiest: render a minimal header conditional on `useLocation().pathname === '/no-access'`.
-
-### 9. Web: admin layout + Users CRUD
-- `src/routes/_protected/admin.tsx` — pathless layout, `beforeLoad` re-reads `currentUser` from route context, `throw redirect({ to: '/' })` if `role !== 'Admin'`.
-- `src/routes/_protected/admin/users/index.tsx` — list with shadcn `Table`, link rows to `$id`.
-- `src/routes/_protected/admin/users/new.tsx` — create form (shadcn + TanStack Form + zod, see `_protected/animals/$id.tsx` for the pattern).
-- `src/routes/_protected/admin/users/$id.tsx` — edit form (Name + Role; Email read-only).
-- Add admin nav link in `__root.tsx` gated on `currentUser.role === 'Admin'`, reading from route context (no re-fetch).
+### 9. Web — admin layout + Users CRUD (done)
+- `src/routes/_protected/admin.tsx` — `beforeLoad` reads `currentUser` from route context, `throw redirect({ to: '/' })` if `role !== 'Admin'`.
+- `src/routes/_protected/admin/users/index.tsx` — list (shadcn `Table`) with "New user" button, rows link to `$id`.
+- `src/routes/_protected/admin/users/new.tsx` — create form (shadcn + TanStack Form + zod). Role is a styled native `<select>` (no shadcn Select component installed yet).
+- `src/routes/_protected/admin/users/$id.tsx` — edit form (Name + Role; Email read-only) + Delete button (soft delete via API).
 
 ### Smoke test plan (from the plan, do after #8 + #9)
 1. Log in as seeded admin (Pieter) → land on `/`, see `/admin/users` link, list shows self.
