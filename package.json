@@ -8,12 +8,12 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --filter 'web-tanstack-start' dev",
-    "dev:api": "dotnet watch run --project packages/api --launch-profile https",
+    "dev:api": "dotnet watch run --project packages/api/Tsz.Api --launch-profile https",
     "check": "bun run --filter '*' check",
     "typecheck": "bun run --filter '*' typecheck",
     "fallow": "bun run --filter '*' fallow",
-    "test:api": "dotnet test packages/api.tests",
-    "test:api:int": "dotnet test packages/api.tests.integration",
+    "test:api": "dotnet test packages/api/tests/Tsz.Api.Tests",
+    "test:api:int": "dotnet test packages/api/tests/Tsz.Api.Tests.Integration",
     "cleanup": "bun run --filter '*' cleanup",
     "test": "vp test"
   },
