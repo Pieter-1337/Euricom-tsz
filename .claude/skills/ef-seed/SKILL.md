@@ -5,6 +5,7 @@ description: >
   EF Core HasData() in IEntityTypeConfiguration (static reference data baked into a
   migration), or a runtime ISeeder run at startup (dynamic / demo data). Use after
   backend-module when the entity needs baseline rows.
+paths: packages/api/**
 ---
 
 # EF Seed

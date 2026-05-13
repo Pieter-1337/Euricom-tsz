@@ -4,6 +4,7 @@ description: >
   Add a form to an existing route in packages/web. Covers TanStack Form + Zod schema,
   createServerFn POST/PUT submission, field-level error display, and router invalidation.
   Use after frontend-feature, or standalone for any form need.
+paths: packages/web/**
 ---
 
 # Frontend Form

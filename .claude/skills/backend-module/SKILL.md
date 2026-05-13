@@ -5,6 +5,7 @@ description: >
   static Create factory, named mutators), EF IEntityTypeConfiguration, DbSet registration,
   endpoint file shell with Map(), and Program.cs wiring.
   Use once per new domain concept before adding slices with backend-slice.
+paths: packages/api/**
 ---
 
 # Backend Module

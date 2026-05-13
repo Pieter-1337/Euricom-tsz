@@ -5,6 +5,7 @@ description: >
   packages/api/Tsz.Api. Migrations are generated from the C# model via `dotnet ef`,
   applied automatically at API startup via `db.Database.Migrate()`, and committed to
   the repo (including the ModelSnapshot). Use whenever a schema change is needed.
+paths: packages/api/**
 ---
 
 # EF Migration

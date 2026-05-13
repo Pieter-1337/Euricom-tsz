@@ -5,6 +5,7 @@ description: >
   Uses xUnit, Moq for IUnitOfWork and IRepository<T>, Shouldly assertions, and
   per-entity builders (Builders/<Entity>Builder.cs) for fixture data.
   Tests in isolation - no HTTP, no real DB.
+paths: packages/api/**
 ---
 
 # Backend Unit Test

@@ -4,6 +4,7 @@ description: >
   Scaffold a complete new feature in packages/web: protected route file(s), loader via
   createServerFn, API client functions, and basic UI shell. Use when adding a new page
   or section. Assumes protected route unless the user specifies public.
+paths: packages/web/**
 ---
 
 # Frontend Feature

@@ -5,6 +5,7 @@ description: >
   Each slice gets its own file with command/query, response, handler implementing
   ICommandHandler / IQueryHandler, and FluentValidation validator for writes.
   Endpoint is registered in the module's endpoints file. Use after backend-module.
+paths: packages/api/**
 ---
 
 # Backend Slice

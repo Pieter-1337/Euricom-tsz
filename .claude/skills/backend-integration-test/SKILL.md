@@ -5,6 +5,7 @@ description: >
   Uses xUnit + Shouldly, NBuilder for fabricating POST bodies, WebApplicationFactory
   with UseInMemoryDatabase per fixture, TestAuthHandler bypass for [Authorize]. One
   test class per endpoint group.
+paths: packages/api/**
 ---
 
 # Backend Integration Test
