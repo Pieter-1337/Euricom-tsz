@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { getUsers, type User } from '#/api/users';
+import { getUsers } from '#/api/users.server';
+import type { User } from '#/api/users';
 import { Button } from '#/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 

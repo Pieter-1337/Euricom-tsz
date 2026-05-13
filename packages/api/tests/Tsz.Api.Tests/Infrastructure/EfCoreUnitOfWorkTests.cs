@@ -1,6 +1,4 @@
-using Tsz.Api.Common.Persistence;
-using Tsz.Api.Modules.Animals;
-using Tsz.Api.Tests.Builders;
+using Tsz.Api.Tests.Infrastructure.Fixtures;
 using Tsz.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -11,20 +9,20 @@ namespace Tsz.Api.Tests.Infrastructure;
 public class EfCoreUnitOfWorkTests : IDisposable
 {
     private readonly SqliteConnection _connection;
-    private readonly AppDbContext _ctx;
-    private readonly EfCoreUnitOfWork<AppDbContext> _uow;
+    private readonly TestDbContext _ctx;
+    private readonly EfCoreUnitOfWork<TestDbContext> _uow;
 
     public EfCoreUnitOfWorkTests()
     {
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
+        var options = new DbContextOptionsBuilder<TestDbContext>()
             .UseSqlite(_connection)
             .Options;
-        _ctx = new AppDbContext(options);
+        _ctx = new TestDbContext(options);
         _ctx.Database.EnsureCreated();
-        _uow = new EfCoreUnitOfWork<AppDbContext>(_ctx);
+        _uow = new EfCoreUnitOfWork<TestDbContext>(_ctx);
     }
 
     public void Dispose()
@@ -37,56 +35,56 @@ public class EfCoreUnitOfWorkTests : IDisposable
     public async Task SingleBeginCommit_PersistsChanges()
     {
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build());
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("a"));
         await _uow.SaveChangesAsync();
         await _uow.CloseTransactionAsync(null);
 
-        (await _ctx.Animals.CountAsync()).ShouldBe(1);
+        (await _ctx.TestEntities.CountAsync()).ShouldBe(1);
     }
 
     [Fact]
     public async Task SingleBeginRollback_DiscardsChanges()
     {
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build());
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("a"));
         await _uow.SaveChangesAsync();
         await _uow.CloseTransactionAsync(new Exception("boom"));
 
-        (await _ctx.Animals.CountAsync()).ShouldBe(0);
+        (await _ctx.TestEntities.CountAsync()).ShouldBe(0);
     }
 
     [Fact]
     public async Task NestedBeginCommit_CommitsOnce()
     {
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build().WithName("Outer"));
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("Outer"));
 
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build().WithName("Inner"));
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("Inner"));
         await _uow.SaveChangesAsync();
         await _uow.CloseTransactionAsync(null);
 
         await _uow.SaveChangesAsync();
         await _uow.CloseTransactionAsync(null);
 
-        (await _ctx.Animals.CountAsync()).ShouldBe(2);
+        (await _ctx.TestEntities.CountAsync()).ShouldBe(2);
     }
 
     [Fact]
     public async Task InnerCloseWithException_PoisonsOuterCommit()
     {
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build().WithName("Outer"));
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("Outer"));
         await _uow.SaveChangesAsync();
 
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build().WithName("Inner"));
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("Inner"));
         await _uow.SaveChangesAsync();
         await _uow.CloseTransactionAsync(new Exception("inner failed"));
 
         await _uow.CloseTransactionAsync(null);
 
-        (await _ctx.Animals.CountAsync()).ShouldBe(0);
+        (await _ctx.TestEntities.CountAsync()).ShouldBe(0);
     }
 
     [Fact]
@@ -98,10 +96,10 @@ public class EfCoreUnitOfWorkTests : IDisposable
         await _uow.CloseTransactionAsync(null);
 
         await _uow.BeginTransactionAsync();
-        _uow.RepositoryFor<Animal>().Add(AnimalBuilder.Build().WithName("AfterPoison"));
+        _uow.RepositoryFor<TestEntity>().Add(TestEntity.Create("AfterPoison"));
         await _uow.SaveChangesAsync();
         await _uow.CloseTransactionAsync(null);
 
-        (await _ctx.Animals.CountAsync()).ShouldBe(1);
+        (await _ctx.TestEntities.CountAsync()).ShouldBe(1);
     }
 }

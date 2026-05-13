@@ -34,7 +34,6 @@ src/
   routes/           File-based routes
     __root.tsx      Root layout with nav
     index.tsx       Home page
-    animals.tsx     Animals table (fetches from API)
   router.tsx        Router factory
   styles.css        Tailwind CSS entry
 ```

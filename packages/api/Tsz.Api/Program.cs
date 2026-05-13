@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Tsz.Api.Common.Auth;
 using Tsz.Api.Common.Persistence;
-using Tsz.Api.Modules.Animals;
 using Tsz.Api.Modules.Users;
 using Tsz.Infrastructure.Extensions;
 using FluentValidation;
@@ -136,8 +135,6 @@ using (var scope = app.Services.CreateScope())
         db.Database.Migrate();
     else
         db.Database.EnsureCreated();
-    if (!db.Animals.Any())
-        new AnimalSeeder(db).Seed();
     if (app.Environment.IsDevelopment())
         new UserSeeder(db).Seed();
 }
@@ -156,7 +153,6 @@ app.MapGet("/", () => new
     version = Assembly.GetExecutingAssembly().GetName().Version?.ToString()
 }).AllowAnonymous();
 
-AnimalEndpoints.Map(app);
 UserEndpoints.Map(app);
 
 

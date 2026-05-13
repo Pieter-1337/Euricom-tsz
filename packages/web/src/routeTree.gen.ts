@@ -13,9 +13,7 @@ import { Route as NoAccessRouteImport } from './routes/no-access'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAdminRouteImport } from './routes/_protected/admin'
-import { Route as ProtectedAnimalsIndexRouteImport } from './routes/_protected/animals/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ProtectedAnimalsIdRouteImport } from './routes/_protected/animals/$id'
 import { Route as ProtectedAdminUsersIndexRouteImport } from './routes/_protected/admin/users/index'
 import { Route as ProtectedAdminUsersNewRouteImport } from './routes/_protected/admin/users/new'
 import { Route as ProtectedAdminUsersIdRouteImport } from './routes/_protected/admin/users/$id'
@@ -39,20 +37,10 @@ const ProtectedAdminRoute = ProtectedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedAnimalsIndexRoute = ProtectedAnimalsIndexRouteImport.update({
-  id: '/animals/',
-  path: '/animals/',
-  getParentRoute: () => ProtectedRoute,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedAnimalsIdRoute = ProtectedAnimalsIdRouteImport.update({
-  id: '/animals/$id',
-  path: '/animals/$id',
-  getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedAdminUsersIndexRoute =
   ProtectedAdminUsersIndexRouteImport.update({
@@ -75,9 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
   '/no-access': typeof NoAccessRoute
   '/admin': typeof ProtectedAdminRouteWithChildren
-  '/animals/$id': typeof ProtectedAnimalsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/animals/': typeof ProtectedAnimalsIndexRoute
   '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAdminUsersNewRoute
   '/admin/users/': typeof ProtectedAdminUsersIndexRoute
@@ -86,9 +72,7 @@ export interface FileRoutesByTo {
   '/no-access': typeof NoAccessRoute
   '/admin': typeof ProtectedAdminRouteWithChildren
   '/': typeof ProtectedIndexRoute
-  '/animals/$id': typeof ProtectedAnimalsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/animals': typeof ProtectedAnimalsIndexRoute
   '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAdminUsersNewRoute
   '/admin/users': typeof ProtectedAdminUsersIndexRoute
@@ -99,9 +83,7 @@ export interface FileRoutesById {
   '/no-access': typeof NoAccessRoute
   '/_protected/admin': typeof ProtectedAdminRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
-  '/_protected/animals/$id': typeof ProtectedAnimalsIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/_protected/animals/': typeof ProtectedAnimalsIndexRoute
   '/_protected/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/_protected/admin/users/new': typeof ProtectedAdminUsersNewRoute
   '/_protected/admin/users/': typeof ProtectedAdminUsersIndexRoute
@@ -112,9 +94,7 @@ export interface FileRouteTypes {
     | '/'
     | '/no-access'
     | '/admin'
-    | '/animals/$id'
     | '/api/auth/$'
-    | '/animals/'
     | '/admin/users/$id'
     | '/admin/users/new'
     | '/admin/users/'
@@ -123,9 +103,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/admin'
     | '/'
-    | '/animals/$id'
     | '/api/auth/$'
-    | '/animals'
     | '/admin/users/$id'
     | '/admin/users/new'
     | '/admin/users'
@@ -135,9 +113,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/_protected/admin'
     | '/_protected/'
-    | '/_protected/animals/$id'
     | '/api/auth/$'
-    | '/_protected/animals/'
     | '/_protected/admin/users/$id'
     | '/_protected/admin/users/new'
     | '/_protected/admin/users/'
@@ -179,26 +155,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAdminRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/animals/': {
-      id: '/_protected/animals/'
-      path: '/animals'
-      fullPath: '/animals/'
-      preLoaderRoute: typeof ProtectedAnimalsIndexRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_protected/animals/$id': {
-      id: '/_protected/animals/$id'
-      path: '/animals/$id'
-      fullPath: '/animals/$id'
-      preLoaderRoute: typeof ProtectedAnimalsIdRouteImport
-      parentRoute: typeof ProtectedRoute
     }
     '/_protected/admin/users/': {
       id: '/_protected/admin/users/'
@@ -243,15 +205,11 @@ const ProtectedAdminRouteWithChildren = ProtectedAdminRoute._addFileChildren(
 interface ProtectedRouteChildren {
   ProtectedAdminRoute: typeof ProtectedAdminRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
-  ProtectedAnimalsIdRoute: typeof ProtectedAnimalsIdRoute
-  ProtectedAnimalsIndexRoute: typeof ProtectedAnimalsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAdminRoute: ProtectedAdminRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
-  ProtectedAnimalsIdRoute: ProtectedAnimalsIdRoute,
-  ProtectedAnimalsIndexRoute: ProtectedAnimalsIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(

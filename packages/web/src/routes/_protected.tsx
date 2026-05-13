@@ -27,9 +27,6 @@ function ProtectedLayout() {
         <Link to="/" className="[&.active]:font-bold">
           Home
         </Link>
-        <Link to="/animals" className="[&.active]:font-bold">
-          Animals
-        </Link>
         {isAdmin && (
           <Link to="/admin/users" className="[&.active]:font-bold">
             Users
