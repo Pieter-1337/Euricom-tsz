@@ -1,4 +1,4 @@
-using Tsz.Api.Common.Persistence;
+using Tsz.Api.Persistence;
 
 namespace Tsz.Api.Modules.Users;
 

@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Tsz.Api.Common.Auth;
-using Tsz.Api.Common.Persistence;
 using Tsz.Api.Modules.Users;
+using Tsz.Api.Persistence;
+using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -124,6 +124,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+builder.Services.AddScoped<ICurrentUserResolver, CurrentUserResolver>();
 builder.Services.AddScoped<IAuthorizationHandler, RequireAdminAuthorizationHandler>();
 
 var app = builder.Build();

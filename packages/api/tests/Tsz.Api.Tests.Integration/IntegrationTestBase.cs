@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Tsz.Api.Common.Persistence;
+using Tsz.Api.Persistence;
 using Tsz.Api.Tests.Integration.TestAuth;
 
 namespace Tsz.Api.Tests.Integration;

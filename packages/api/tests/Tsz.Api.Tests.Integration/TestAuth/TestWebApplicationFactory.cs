@@ -1,4 +1,4 @@
-using Tsz.Api.Common.Persistence;
+using Tsz.Api.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;

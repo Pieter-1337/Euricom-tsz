@@ -1,4 +1,4 @@
-using Tsz.Api.Common.Filters;
+using Tsz.Infrastructure.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Tsz.Api.Modules.Users;
+using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
 
 namespace Tsz.Api.Tests.Integration;

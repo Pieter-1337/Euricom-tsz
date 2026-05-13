@@ -1,6 +1,7 @@
-using Tsz.Api.Common.Auth;
-using Tsz.Api.Common.Extensions;
-using Tsz.Api.Common.Filters;
+using Tsz.Api.Modules.Users.Features;
+using Tsz.Infrastructure.Auth;
+using Tsz.Infrastructure.Endpoints;
+using Tsz.Infrastructure.Validation;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Modules.Users;
