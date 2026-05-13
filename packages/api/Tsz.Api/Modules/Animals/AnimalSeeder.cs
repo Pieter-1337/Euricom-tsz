@@ -1,6 +1,8 @@
+using Tsz.Api.Common.Persistence;
+
 namespace Tsz.Api.Modules.Animals;
 
-public class AnimalSeeder(AnimalDbContext context)
+public class AnimalSeeder(AppDbContext context)
 {
     public void Seed()
     {

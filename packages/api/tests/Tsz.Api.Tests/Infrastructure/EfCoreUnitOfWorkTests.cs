@@ -1,3 +1,4 @@
+using Tsz.Api.Common.Persistence;
 using Tsz.Api.Modules.Animals;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Persistence;
@@ -10,20 +11,20 @@ namespace Tsz.Api.Tests.Infrastructure;
 public class EfCoreUnitOfWorkTests : IDisposable
 {
     private readonly SqliteConnection _connection;
-    private readonly AnimalDbContext _ctx;
-    private readonly EfCoreUnitOfWork<AnimalDbContext> _uow;
+    private readonly AppDbContext _ctx;
+    private readonly EfCoreUnitOfWork<AppDbContext> _uow;
 
     public EfCoreUnitOfWorkTests()
     {
         _connection = new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
-        var options = new DbContextOptionsBuilder<AnimalDbContext>()
+        var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(_connection)
             .Options;
-        _ctx = new AnimalDbContext(options);
+        _ctx = new AppDbContext(options);
         _ctx.Database.EnsureCreated();
-        _uow = new EfCoreUnitOfWork<AnimalDbContext>(_ctx);
+        _uow = new EfCoreUnitOfWork<AppDbContext>(_ctx);
     }
 
     public void Dispose()
