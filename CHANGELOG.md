@@ -2,6 +2,21 @@
 
 ## 2026-05-14
 
+feat: add paged users endpoint and IRepository.GetPagedAsync
+
+Add GET /api/users/paged returning KeysetPage<UserDto> alongside the
+existing GET /api/users (plain list, untouched). Add
+IRepository<TEntity>.GetPagedAsync facade so handlers do not need
+to import KeysetQueryableExtensions directly. Implement it in
+EfCoreRepository as a one-liner delegation to ToKeysetPageAsync.
+New GetUsersPaged slice: query record derives from KeysetQueryOptions,
+validator subclasses KeysetQueryOptionsValidator with a three-column
+SortMap (name/email/role), handler delegates to GetPagedAsync with
+firstName/lastName/email searchable columns. 17 new unit tests
+(10 handler, 6 validator) + 7 new integration tests covering
+pagination, search, sort, soft-delete visibility, and 400 guard
+cases for bad sortBy/cursor.
+
 feat: paged user list with search/sort/infinite-scroll
 
 Rewrite the admin user list to consume the new GET /api/users/paged

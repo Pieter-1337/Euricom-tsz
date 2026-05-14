@@ -1,3 +1,5 @@
+using Tsz.Infrastructure.Common.Pagination;
+
 namespace Tsz.Infrastructure.Abstractions;
 
 public interface IRepository<TEntity> where TEntity : class, IEntityBase
@@ -54,6 +56,15 @@ public interface IRepository<TEntity> where TEntity : class, IEntityBase
 
     Task<bool> ExistsAsync(
         Expression<Func<TEntity, bool>> filter,
+        CancellationToken ct = default,
+        bool ignoreQueryFilters = false);
+
+    Task<KeysetPage<TDto>> GetPagedAsync<TDto>(
+        KeysetQueryOptions options,
+        SortMap<TEntity> sortMap,
+        Expression<Func<TEntity, string>>[] searchableColumns,
+        Expression<Func<TEntity, TDto>> projection,
+        Expression<Func<TEntity, bool>>? filter = null,
         CancellationToken ct = default,
         bool ignoreQueryFilters = false);
 

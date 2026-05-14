@@ -4,6 +4,7 @@ using System.Text.Json;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
+using Tsz.Infrastructure.Common.Pagination;
 
 namespace Tsz.Api.Tests.Integration;
 
@@ -255,5 +256,138 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
         Assert.Equal("ERR_USER_NOT_FOUND", body.GetProperty("code").GetString());
+    }
+
+    // ── GET /api/users/paged ──────────────────────────────────────────────────
+
+
+    [Fact]
+    public async Task GetUsersPaged_AsNonAdmin_ReturnsForbidden()
+    {
+        await SeedUserAsync(TestEmail, UserRole.User, oid: TestOid);
+
+        var response = await Client.GetAsync("/api/users/paged");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_PaginatesThrough23Users()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        for (var i = 1; i <= 22; i++)
+            await SeedUserAsync($"user{i:D2}@example.com", UserRole.User);
+
+        var firstResponse = await Client.GetAsync("/api/users/paged?pageSize=10");
+        firstResponse.EnsureSuccessStatusCode();
+        var firstPage = await firstResponse.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        Assert.NotNull(firstPage);
+        Assert.Equal(10, firstPage.Items.Count);
+        Assert.Equal(23, firstPage.Total);
+        Assert.NotNull(firstPage.NextCursor);
+
+        var secondResponse = await Client.GetAsync($"/api/users/paged?pageSize=10&cursor={Uri.EscapeDataString(firstPage.NextCursor)}");
+        secondResponse.EnsureSuccessStatusCode();
+        var secondPage = await secondResponse.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        Assert.NotNull(secondPage);
+        Assert.Equal(10, secondPage.Items.Count);
+        Assert.Equal(23, secondPage.Total);
+        Assert.NotNull(secondPage.NextCursor);
+
+        var thirdResponse = await Client.GetAsync($"/api/users/paged?pageSize=10&cursor={Uri.EscapeDataString(secondPage.NextCursor)}");
+        thirdResponse.EnsureSuccessStatusCode();
+        var thirdPage = await thirdResponse.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        Assert.NotNull(thirdPage);
+        Assert.Equal(3, thirdPage.Items.Count);
+        Assert.Equal(23, thirdPage.Total);
+        Assert.Null(thirdPage.NextCursor);
+
+        // All item IDs distinct across the three pages.
+        var allIds = firstPage.Items.Select(u => u.Id)
+            .Concat(secondPage.Items.Select(u => u.Id))
+            .Concat(thirdPage.Items.Select(u => u.Id))
+            .ToList();
+        Assert.Equal(23, allIds.Distinct().Count());
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_Search_FiltersResults()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        await WithUowAsync(async uow =>
+        {
+            uow.RepositoryFor<User>().Add(User.Create("Alice", "Smith", "alice@example.com", UserRole.User));
+            uow.RepositoryFor<User>().Add(User.Create("Bob", "Jones", "bob@example.com", UserRole.User));
+            await uow.SaveChangesAsync();
+        });
+
+        var response = await Client.GetAsync("/api/users/paged?search=alice");
+        response.EnsureSuccessStatusCode();
+        var page = await response.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        Assert.NotNull(page);
+        Assert.All(page.Items, u =>
+            Assert.True(
+                u.FirstName.Contains("alice", StringComparison.OrdinalIgnoreCase) ||
+                u.LastName.Contains("alice", StringComparison.OrdinalIgnoreCase) ||
+                u.Email.Contains("alice", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_SortByEmailDesc_ReturnsCorrectOrder()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        await WithUowAsync(async uow =>
+        {
+            uow.RepositoryFor<User>().Add(User.Create("A", "A", "aaa@example.com", UserRole.User));
+            uow.RepositoryFor<User>().Add(User.Create("Z", "Z", "zzz@example.com", UserRole.User));
+            await uow.SaveChangesAsync();
+        });
+
+        var response = await Client.GetAsync("/api/users/paged?sortBy=email&sortDir=Desc");
+        response.EnsureSuccessStatusCode();
+        var page = await response.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        Assert.NotNull(page);
+        Assert.True(page.Items.Count >= 2);
+
+        for (var i = 0; i < page.Items.Count - 1; i++)
+            Assert.True(
+                string.Compare(page.Items[i].Email, page.Items[i + 1].Email, StringComparison.OrdinalIgnoreCase) >= 0,
+                $"Expected descending order but found {page.Items[i].Email} before {page.Items[i + 1].Email}");
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_IncludeDeleted_SurfacesSoftDeletedUsers()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var createResponse = await Client.PostAsJsonAsync("/api/users",
+            new CreateUserCommand("Doomed", "User", "doomed2@example.com", UserRole.User));
+        var dto = (await createResponse.Content.ReadFromJsonAsync<UserDto>(Json))!;
+        await Client.DeleteAsync($"/api/users/{dto.Id}");
+
+        var withDeleted = await Client.GetAsync("/api/users/paged?includeDeleted=true");
+        withDeleted.EnsureSuccessStatusCode();
+        var page = await withDeleted.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        Assert.NotNull(page);
+        Assert.Contains(page.Items, u => u.Id == dto.Id);
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_BadSortBy_Returns400()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+
+        var response = await Client.GetAsync("/api/users/paged?sortBy=ssn");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_BadCursor_Returns400()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+
+        var response = await Client.GetAsync("/api/users/paged?cursor=garbage");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }

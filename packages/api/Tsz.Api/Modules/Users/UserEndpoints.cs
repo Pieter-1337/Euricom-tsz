@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Infrastructure.Auth;
+using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
 
@@ -23,6 +24,18 @@ public static class UserEndpoints
 
         adminGroup.MapGet("/", async (IDispatcher dispatcher, CancellationToken ct) =>
             TypedResults.Ok(await dispatcher.SendAsync(new GetUsersQuery(), ct)));
+
+        adminGroup.MapGet("/paged", async (
+            string? search,
+            string? sortBy,
+            SortDirection sortDir = SortDirection.Asc,
+            int pageSize = 0,
+            string? cursor = null,
+            bool includeDeleted = false,
+            IDispatcher dispatcher = null!,
+            CancellationToken ct = default) =>
+                TypedResults.Ok(await dispatcher.SendAsync(
+                    new GetUsersPagedQuery(search, sortBy, sortDir, pageSize, cursor, includeDeleted), ct)));
 
         adminGroup.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
         {
