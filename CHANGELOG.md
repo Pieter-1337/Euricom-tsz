@@ -2,6 +2,31 @@
 
 ## 2026-05-14
 
+feat: add list-base frontend primitives
+
+Add keyset pagination types (KeysetPage, SortDir, KeysetQueryParams)
+in api/pagination.ts. Add useListQuery (wraps useInfiniteQuery, holds
+search/sort/includeDeleted state, flattens pages, wires sentinel) and
+useInfiniteScrollSentinel (IntersectionObserver callback-ref hook) in
+lib/. Add sortable-header, list-toolbar, infinite-table, and list-shell
+components in components/list/. Add shadcn Switch primitive (hand-
+written from radix-ui, matching existing component style) since the
+CLI add could not run interactively. Add @tanstack/react-query to
+package.json (was in bun.lock via transitive dep but not declared).
+
+docs: rewrite user-list plan to consume listBase
+
+Refactor docs/product/requirements/users/plan-list.md to focus on
+user-specific configuration (SortMap, searchable columns, validator
+rules) instead of duplicating generic listBase mechanics. Delegates
+keyset cursor schema, IQueryable helpers, frontend hooks, and edge
+cases to the new generic plan at docs/product/requirements/generics/
+list/plan.md. Updates to consume the listBase primitives: SortMap<User>
++ SearchableColumns; GetUsersQuery subclassing KeysetQueryOptions;
+GetUsersHandler calling ToKeysetPageAsync; frontend useListQuery +
+ListToolbar + InfiniteTable + SortableHeader components. Verifies
+Name field is now FirstName + LastName post-split.
+
 docs: add generic list-base plan; relocate form-base plan
 
 Move the form-base PLAN.md verbatim to
