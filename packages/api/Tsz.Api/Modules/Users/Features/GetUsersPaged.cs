@@ -35,6 +35,7 @@ public sealed class GetUsersPagedHandler(IUnitOfWork uow)
         u => u.FirstName,
         u => u.LastName,
         u => u.Email,
+        u => u.Role.ToString(),
     ];
 
     public Task<KeysetPage<UserDto>> HandleAsync(GetUsersPagedQuery query, CancellationToken ct = default) =>

@@ -26,16 +26,21 @@ public static class UserEndpoints
             TypedResults.Ok(await dispatcher.SendAsync(new GetUsersQuery(), ct)));
 
         adminGroup.MapGet("/paged", async (
-            string? search,
-            string? sortBy,
-            SortDirection sortDir = SortDirection.Asc,
+            IDispatcher dispatcher,
+            CancellationToken ct,
+            string? search = null,
+            string? sortBy = null,
+            string? sortDir = null,
             int pageSize = 0,
             string? cursor = null,
-            bool includeDeleted = false,
-            IDispatcher dispatcher = null!,
-            CancellationToken ct = default) =>
-                TypedResults.Ok(await dispatcher.SendAsync(
-                    new GetUsersPagedQuery(search, sortBy, sortDir, pageSize, cursor, includeDeleted), ct)));
+            bool includeDeleted = false) =>
+        {
+            var dir = Enum.TryParse<SortDirection>(sortDir, ignoreCase: true, out var parsed)
+                ? parsed
+                : SortDirection.Asc;
+            return TypedResults.Ok(await dispatcher.SendAsync(
+                new GetUsersPagedQuery(search, sortBy, dir, pageSize, cursor, includeDeleted), ct));
+        });
 
         adminGroup.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
         {

@@ -17,7 +17,7 @@ interface ListToolbarProps {
 
 export function ListToolbar({ search, onSearchChange, total, toggle }: ListToolbarProps) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-1 items-center gap-4">
       <Input
         placeholder="Filter…"
         value={search}
@@ -34,7 +34,7 @@ export function ListToolbar({ search, onSearchChange, total, toggle }: ListToolb
           <Label htmlFor="list-toolbar-toggle">{toggle.label}</Label>
         </div>
       )}
-      <span className="ml-auto text-sm text-muted-foreground">
+      <span className="ml-auto whitespace-nowrap text-sm text-muted-foreground">
         {total ?? '—'} items
       </span>
     </div>

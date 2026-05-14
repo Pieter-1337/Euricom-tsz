@@ -1,5 +1,5 @@
-import { useDeferredValue, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import type { KeysetPage, KeysetQueryParams, SortDir } from '#/api/pagination.ts';
 import { useInfiniteScrollSentinel } from '#/lib/use-infinite-scroll-sentinel.ts';
 
@@ -12,14 +12,18 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
   const { queryKey, fetcher, defaultSort, pageSize } = opts;
 
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState<TSortKey>(defaultSort.by);
   const [sortDir, setSortDir] = useState<SortDir>(defaultSort.dir);
   const [includeDeleted, setIncludeDeleted] = useState(false);
 
-  const deferredSearch = useDeferredValue(search);
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(id);
+  }, [search]);
 
   const params: KeysetQueryParams<TSortKey> = {
-    search: deferredSearch || undefined,
+    search: debouncedSearch || undefined,
     sortBy,
     sortDir,
     pageSize,
@@ -32,6 +36,7 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
       fetcher({ ...params, cursor: pageParam }),
     getNextPageParam: (last: KeysetPage<TItem>) => last.nextCursor ?? undefined,
     initialPageParam: undefined as string | undefined,
+    placeholderData: keepPreviousData,
   });
 
   const { data, isLoading, isFetchingNextPage, error, fetchNextPage, hasNextPage } = query;

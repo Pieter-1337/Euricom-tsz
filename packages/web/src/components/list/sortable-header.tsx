@@ -27,15 +27,11 @@ export function SortableHeader<TSortKey extends string>({
       onClick={() => onSort(sortKey)}
     >
       {label}
-      {isActive && (
-        <span className="ml-1">
-          {currentSortDir === 'asc' ? (
-            <ChevronUp className="size-3.5" />
-          ) : (
-            <ChevronDown className="size-3.5" />
-          )}
-        </span>
-      )}
+      <span className="ml-1 inline-flex" aria-hidden={!isActive}>
+        {isActive && currentSortDir === 'asc' && <ChevronUp className="size-3.5" />}
+        {isActive && currentSortDir === 'desc' && <ChevronDown className="size-3.5" />}
+        {!isActive && <ChevronUp className="size-3.5 invisible" />}
+      </span>
     </Button>
   );
 }
