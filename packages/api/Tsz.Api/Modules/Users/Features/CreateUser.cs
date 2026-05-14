@@ -4,7 +4,7 @@ using Tsz.Infrastructure.Validation;
 
 namespace Tsz.Api.Modules.Users.Features;
 
-public sealed record CreateUserCommand(string Name, string Email, UserRole Role)
+public sealed record CreateUserCommand(string FirstName, string LastName, string Email, UserRole Role)
     : ICommand<UserDto>;
 
 public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
@@ -15,7 +15,8 @@ public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
     {
         _uow = uow;
 
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.LastName).NotEmpty().MaximumLength(128);
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
         RuleFor(x => x.Role).IsInEnum();
         RuleFor(x => x.Email)
@@ -36,7 +37,7 @@ public sealed class CreateUserHandler(IUnitOfWork uow, TimeProvider timeProvider
 {
     public async Task<UserDto> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
     {
-        var user = User.Create(command.Name, command.Email, command.Role);
+        var user = User.Create(command.FirstName, command.LastName, command.Email, command.Role);
         uow.RepositoryFor<User>().Add(user);
 
         var leaveTypes = await uow.RepositoryFor<LeaveType>().GetAllAsListAsync(ct: ct);

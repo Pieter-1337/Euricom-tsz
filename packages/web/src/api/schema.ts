@@ -259,7 +259,8 @@ export interface components {
             version: null | string;
         };
         CreateUserCommand: {
-            name: string;
+            firstName: string;
+            lastName: string;
             email: string;
             role: components["schemas"]["UserRole"];
         };
@@ -268,7 +269,8 @@ export interface components {
         UpdateUserCommand: {
             /** Format: uuid */
             id: string;
-            name: string;
+            firstName: string;
+            lastName: string;
             role: components["schemas"]["UserRole"];
         };
         UpdateUserLeavesBody: {
@@ -286,7 +288,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             email: string;
-            name: string;
+            firstName: string;
+            lastName: string;
             role: components["schemas"]["UserRole"];
         };
         UserLeaveDto: {

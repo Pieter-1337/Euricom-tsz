@@ -28,24 +28,33 @@ public class CreateUserValidatorTests
     public async Task Valid_Passes()
     {
         var (validator, _) = BuildValidator(emailExists: false);
-        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "jane@example.com", UserRole.User));
+        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User));
         result.IsValid.ShouldBeTrue();
     }
 
     [Fact]
-    public async Task EmptyName_Fails()
+    public async Task EmptyFirstName_Fails()
     {
         var (validator, _) = BuildValidator();
-        var result = await validator.ValidateAsync(new CreateUserCommand("", "jane@example.com", UserRole.User));
+        var result = await validator.ValidateAsync(new CreateUserCommand("", "Doe", "jane@example.com", UserRole.User));
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateUserCommand.Name));
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateUserCommand.FirstName));
+    }
+
+    [Fact]
+    public async Task EmptyLastName_Fails()
+    {
+        var (validator, _) = BuildValidator();
+        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "", "jane@example.com", UserRole.User));
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateUserCommand.LastName));
     }
 
     [Fact]
     public async Task BadEmail_Fails()
     {
         var (validator, _) = BuildValidator();
-        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "not-an-email", UserRole.User));
+        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "Doe", "not-an-email", UserRole.User));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateUserCommand.Email));
     }
@@ -54,7 +63,7 @@ public class CreateUserValidatorTests
     public async Task RoleOutOfEnum_Fails()
     {
         var (validator, _) = BuildValidator();
-        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "jane@example.com", (UserRole)999));
+        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", (UserRole)999));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateUserCommand.Role));
     }
@@ -63,7 +72,7 @@ public class CreateUserValidatorTests
     public async Task EmailAlreadyTaken_Fails_WithUserEmailAlreadyExistsError()
     {
         var (validator, _) = BuildValidator(emailExists: true);
-        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "taken@example.com", UserRole.User));
+        var result = await validator.ValidateAsync(new CreateUserCommand("Jane", "Doe", "taken@example.com", UserRole.User));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateUserCommand.Email));
         var emailError = result.Errors.First(e => e.PropertyName == nameof(CreateUserCommand.Email)

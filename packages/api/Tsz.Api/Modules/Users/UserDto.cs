@@ -6,13 +6,14 @@ namespace Tsz.Api.Modules.Users;
 public sealed record UserDto(
     Guid Id,
     string Email,
-    string Name,
+    string FirstName,
+    string LastName,
     UserRole Role)
     : IEntityDto<User, UserDto>
 {
     public static Expression<Func<User, UserDto>> Project =>
-        u => new UserDto(u.Id, u.Email, u.Name, u.Role);
+        u => new UserDto(u.Id, u.Email, u.FirstName, u.LastName, u.Role);
 
     public static UserDto ToDto(User entity) =>
-        new(entity.Id, entity.Email, entity.Name, entity.Role);
+        new(entity.Id, entity.Email, entity.FirstName, entity.LastName, entity.Role);
 }

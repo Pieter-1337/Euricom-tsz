@@ -38,7 +38,7 @@ function UsersList() {
             <TableRow key={u.id}>
               <TableCell>
                 <Link to="/admin/users/$id" params={{ id: u.id }} className="hover:underline">
-                  {u.name}
+                  {u.firstName} {u.lastName}
                 </Link>
               </TableCell>
               <TableCell>{u.email}</TableCell>

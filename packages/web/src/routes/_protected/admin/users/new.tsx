@@ -8,7 +8,8 @@ import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/lib/use-form-server-errors';
 
 const createUserSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
   role: z.enum(USER_ROLES),
 });
@@ -30,7 +31,8 @@ function NewUser() {
 
   const form = useAppForm({
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       role: UserRole.User as UserRole,
     },
@@ -47,7 +49,12 @@ function NewUser() {
     },
   });
 
-  const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, ['name', 'email', 'role']);
+  const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, [
+    'firstName',
+    'lastName',
+    'email',
+    'role',
+  ]);
 
   return (
     <main>
@@ -62,7 +69,9 @@ function NewUser() {
           }}
           className="mt-4 grid max-w-md gap-4"
         >
-          <form.AppField name="name">{(field) => <field.TextField label="Name" />}</form.AppField>
+          <form.AppField name="firstName">{(field) => <field.TextField label="First name" />}</form.AppField>
+
+          <form.AppField name="lastName">{(field) => <field.TextField label="Last name" />}</form.AppField>
 
           <form.AppField name="email">{(field) => <field.TextField label="Email" type="email" />}</form.AppField>
 

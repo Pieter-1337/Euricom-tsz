@@ -21,7 +21,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     private Task SeedUserAsync(string email, UserRole role, string? oid = null) => WithUowAsync(async uow =>
     {
-        var user = User.Create($"User_{Guid.NewGuid().ToString()[..6]}", email, role);
+        var user = User.Create("User", $"_{Guid.NewGuid().ToString()[..6]}", email, role);
         if (oid is not null) user.LinkEntraOid(oid);
         uow.RepositoryFor<User>().Add(user);
         await uow.SaveChangesAsync();
@@ -99,14 +99,15 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_AsAdmin_Valid_ReturnsCreated()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "jane@example.com", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User);
 
         var response = await Client.PostAsJsonAsync("/api/users", command);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var dto = await response.Content.ReadFromJsonAsync<UserDto>(Json);
         Assert.NotNull(dto);
-        Assert.Equal("Jane", dto.Name);
+        Assert.Equal("Jane", dto.FirstName);
+        Assert.Equal("Doe", dto.LastName);
         Assert.Equal("jane@example.com", dto.Email);
         Assert.Equal(UserRole.User, dto.Role);
     }
@@ -115,7 +116,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_AsAdmin_SeedsUserLeaveRows()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "jane@example.com", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User);
 
         var createResponse = await Client.PostAsJsonAsync("/api/users", command);
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
@@ -133,7 +134,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_AsAdmin_Invalid_ReturnsBadRequest()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("", "not-an-email", UserRole.User);
+        var command = new CreateUserCommand("", "", "not-an-email", UserRole.User);
 
         var response = await Client.PostAsJsonAsync("/api/users", command);
 
@@ -144,7 +145,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_DuplicateEmail_Returns409WithProblemDetails()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "dup@example.com", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "dup@example.com", UserRole.User);
         var first = await Client.PostAsJsonAsync("/api/users", command);
         first.EnsureSuccessStatusCode();
 
@@ -164,7 +165,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_InvalidEmail_Returns400WithFieldErrors()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "not-an-email", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "not-an-email", UserRole.User);
 
         var response = await Client.PostAsJsonAsync("/api/users", command);
 
@@ -181,16 +182,16 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var created = await Client.PostAsJsonAsync("/api/users",
-            new CreateUserCommand("Old", "u@example.com", UserRole.User));
+            new CreateUserCommand("Old", "Name", "u@example.com", UserRole.User));
         var dto = (await created.Content.ReadFromJsonAsync<UserDto>(Json))!;
 
-        var update = new UpdateUserCommand(dto.Id, "New", UserRole.ClientManager);
+        var update = new UpdateUserCommand(dto.Id, "New", "Name", UserRole.ClientManager);
         var response = await Client.PutAsJsonAsync($"/api/users/{dto.Id}", update);
 
         response.EnsureSuccessStatusCode();
         var updated = await response.Content.ReadFromJsonAsync<UserDto>(Json);
         Assert.NotNull(updated);
-        Assert.Equal("New", updated.Name);
+        Assert.Equal("New", updated.FirstName);
         Assert.Equal(UserRole.ClientManager, updated.Role);
     }
 
@@ -198,7 +199,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task UpdateUser_RouteIdMismatch_ReturnsBadRequest()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var update = new UpdateUserCommand(Guid.NewGuid(), "x", UserRole.User);
+        var update = new UpdateUserCommand(Guid.NewGuid(), "x", "y", UserRole.User);
 
         var response = await Client.PutAsJsonAsync($"/api/users/{Guid.NewGuid()}", update);
 
@@ -212,7 +213,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var id = Guid.NewGuid();
 
         var response = await Client.PutAsJsonAsync($"/api/users/{id}",
-            new UpdateUserCommand(id, "x", UserRole.User));
+            new UpdateUserCommand(id, "x", "y", UserRole.User));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -226,7 +227,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var created = await Client.PostAsJsonAsync("/api/users",
-            new CreateUserCommand("Doomed", "doomed@example.com", UserRole.User));
+            new CreateUserCommand("Doomed", "User", "doomed@example.com", UserRole.User));
         var dto = (await created.Content.ReadFromJsonAsync<UserDto>(Json))!;
 
         var response = await Client.DeleteAsync($"/api/users/{dto.Id}");

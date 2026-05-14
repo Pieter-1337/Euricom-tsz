@@ -9,7 +9,8 @@ public static class UserBuilder
     {
         var id = Guid.NewGuid();
         var user = User.Create(
-            name: "Name_" + id.ToString()[..8],
+            firstName: "Test",
+            lastName: "User",
             email: $"user_{id.ToString()[..8]}@example.com",
             role: UserRole.User);
         user.Id = id;
@@ -22,9 +23,21 @@ public static class UserBuilder
         return entity;
     }
 
-    public static User WithName(this User entity, string name)
+    public static User WithName(this User entity, string firstName, string lastName)
     {
-        entity.Rename(name);
+        entity.Rename(firstName, lastName);
+        return entity;
+    }
+
+    public static User WithFirstName(this User entity, string firstName)
+    {
+        entity.Rename(firstName, entity.LastName);
+        return entity;
+    }
+
+    public static User WithLastName(this User entity, string lastName)
+    {
+        entity.Rename(entity.FirstName, lastName);
         return entity;
     }
 

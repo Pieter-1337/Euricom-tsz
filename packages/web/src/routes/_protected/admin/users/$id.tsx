@@ -16,7 +16,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#
 const userIdSchema = z.string().min(1);
 
 const updateUserSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
   role: z.enum(USER_ROLES),
 });
 
@@ -46,7 +47,12 @@ const saveUser = createServerFn({ method: 'POST' })
   .inputValidator(saveUserInputSchema)
   .handler(async ({ data }) => {
     try {
-      await updateUser(data.id, { id: data.id, name: data.user.name, role: data.user.role });
+      await updateUser(data.id, {
+        id: data.id,
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        role: data.user.role,
+      });
     } catch (e) {
       throwApiError(e);
     }
@@ -83,7 +89,8 @@ function EditUser() {
 
   const form = useAppForm({
     defaultValues: {
-      name: user?.name ?? '',
+      firstName: user?.firstName ?? '',
+      lastName: user?.lastName ?? '',
       role: (user?.role ?? UserRole.User) as UserRole,
     },
     validators: { onChange: updateUserSchema },
@@ -100,7 +107,11 @@ function EditUser() {
     },
   });
 
-  const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, ['name', 'role']);
+  const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, [
+    'firstName',
+    'lastName',
+    'role',
+  ]);
 
   if (!user) {
     return (
@@ -113,13 +124,15 @@ function EditUser() {
   return (
     <main>
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{user.name}</h1>
+        <h1 className="text-2xl font-bold">
+          {user.firstName} {user.lastName}
+        </h1>
         <Button
           type="button"
           variant="destructive"
           size="sm"
           onClick={async () => {
-            if (!confirm(`Delete ${user.name}?`)) return;
+            if (!confirm(`Delete ${user.firstName} ${user.lastName}?`)) return;
             try {
               await deleteUser({ data: user.id });
               router.navigate({ to: '/admin/users' });
@@ -149,7 +162,9 @@ function EditUser() {
               <Input id="email" value={user.email} disabled />
             </div>
 
-            <form.AppField name="name">{(field) => <field.TextField label="Name" />}</form.AppField>
+            <form.AppField name="firstName">{(field) => <field.TextField label="First name" />}</form.AppField>
+
+            <form.AppField name="lastName">{(field) => <field.TextField label="Last name" />}</form.AppField>
 
             <form.AppField name="role">
               {(field) => <field.SelectField label="Role" options={USER_ROLES} />}

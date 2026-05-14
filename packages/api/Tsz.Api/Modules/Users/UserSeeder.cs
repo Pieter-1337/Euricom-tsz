@@ -12,8 +12,13 @@ public class UserSeeder(IUnitOfWork uow, TimeProvider timeProvider)
         var admin = await userRepo.FirstOrDefaultAsync(u => u.Email == AdminEmail, ct);
         if (admin is null)
         {
-            admin = User.Create(name: "Pieter Bracke", email: AdminEmail, role: UserRole.Admin);
+            admin = User.Create(firstName: "Pieter", lastName: "Bracke", email: AdminEmail, role: UserRole.Admin);
             userRepo.Add(admin);
+            await uow.SaveChangesAsync(ct);
+        }
+        else if (string.IsNullOrEmpty(admin.FirstName) || string.IsNullOrEmpty(admin.LastName))
+        {
+            admin.Rename("Pieter", "Bracke");
             await uow.SaveChangesAsync(ct);
         }
 

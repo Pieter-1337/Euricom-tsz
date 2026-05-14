@@ -4,7 +4,7 @@ using Tsz.Infrastructure.Validation;
 
 namespace Tsz.Api.Modules.Users.Features;
 
-public sealed record UpdateUserCommand(Guid Id, string Name, UserRole Role)
+public sealed record UpdateUserCommand(Guid Id, string FirstName, string LastName, UserRole Role)
     : ICommand<UserDto>;
 
 public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
@@ -16,7 +16,8 @@ public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
         _uow = uow;
 
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.LastName).NotEmpty().MaximumLength(128);
         RuleFor(x => x.Role).IsInEnum();
         RuleFor(x => x.Id)
             .MustAsync(UserExists).WithError(UserErrors.NotFound)
@@ -33,7 +34,7 @@ public sealed class UpdateUserHandler(IUnitOfWork uow)
     public async Task<UserDto> HandleAsync(UpdateUserCommand command, CancellationToken ct = default)
     {
         var user = await uow.RepositoryFor<User>().GetByIdAsync(command.Id, ct);
-        user!.Rename(command.Name);
+        user!.Rename(command.FirstName, command.LastName);
         user.ChangeRole(command.Role);
 
         await uow.SaveChangesAsync(ct);

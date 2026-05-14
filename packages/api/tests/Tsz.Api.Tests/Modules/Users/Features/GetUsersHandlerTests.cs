@@ -14,8 +14,8 @@ public class GetUsersHandlerTests
     {
         var dtos = new[]
         {
-            new UserDto(Guid.NewGuid(), "a@x.com", "A", UserRole.Admin),
-            new UserDto(Guid.NewGuid(), "b@x.com", "B", UserRole.User),
+            new UserDto(Guid.NewGuid(), "a@x.com", "A", "Alpha", UserRole.Admin),
+            new UserDto(Guid.NewGuid(), "b@x.com", "B", "Beta", UserRole.User),
         };
         var repo = new Mock<IRepository<User>>();
         repo.Setup(r => r.GetAllAsDtosAsync<UserDto>(null, It.IsAny<CancellationToken>(), false))
@@ -28,7 +28,7 @@ public class GetUsersHandlerTests
         var result = await handler.HandleAsync(new GetUsersQuery());
 
         result.Count.ShouldBe(2);
-        result[0].Name.ShouldBe("A");
+        result[0].FirstName.ShouldBe("A");
         result[1].Role.ShouldBe(UserRole.User);
     }
 }

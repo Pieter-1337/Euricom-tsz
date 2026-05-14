@@ -2,6 +2,18 @@
 
 ## 2026-05-14
 
+feat: split User.Name into firstName/lastName
+
+Replace the single Name field on User with FirstName + LastName
+across the domain entity, DTO, EF configuration, and a new
+SplitUserName migration. Both fields are required and max 128
+chars. UserSeeder, CreateUser, UpdateUser, and all user test
+fixtures update to the new shape. Web side regenerates the
+OpenAPI schema; the admin user list/create/edit routes show
+and edit the two fields separately.
+
+## 2026-05-14
+
 feat: per-year UserLeave + bulk leaves PUT; baseform polish
 
 - Drop the LeaveTypes module: LeaveType + LeaveAllowed fold into
