@@ -2,6 +2,13 @@
 
 ## 2026-05-14
 
+style: add cursor-pointer to navbar sign out button
+
+Plain <button> elements default to the arrow cursor; users expect a
+pointer on interactive controls. One-class change in _protected.tsx.
+
+## 2026-05-14
+
 build: pin vite dev port with --strictPort
 
 Add --strictPort to the web dev script so Vite errors out when

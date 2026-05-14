@@ -34,7 +34,7 @@ function ProtectedLayout() {
           <UserIcon className="h-4 w-4" />
           <span>Hi, {firstName}!</span>
           <button
-            className="text-slate-300 underline-offset-4 hover:text-slate-100 hover:underline"
+            className="cursor-pointer text-slate-300 underline-offset-4 hover:text-slate-100 hover:underline"
             onClick={() =>
               authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })
             }
