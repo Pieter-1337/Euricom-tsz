@@ -1,6 +1,5 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import { useState, useCallback } from 'react';
 import { getUserById, removeUser, updateUser } from '#/api/users.server';
@@ -9,17 +8,12 @@ import { getUserLeaves, updateUserLeave } from '#/api/user-leaves.server';
 import { LeaveAllowed } from '#/api/leave-types';
 import type { UserLeave, UpdateUserLeaveRequest } from '#/api/user-leaves';
 import { throwApiError, parseServerError } from '#/lib/server-error';
-import { hasClientSideError } from '#/lib/form-utils';
+import { useAppForm } from '#/components/form/form-context';
+import { useFormServerErrors } from '#/lib/use-form-server-errors';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '#/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '#/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 
 const userIdSchema = z.string().min(1);
@@ -84,9 +78,8 @@ export const Route = createFileRoute('/_protected/admin/users/$id')({
 function EditUser() {
   const user = Route.useLoaderData();
   const router = useRouter();
-  const [serverError, setServerError] = useState<string | null>(null);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: user?.name ?? '',
       role: (user?.role ?? UserRole.User) as UserRole,
@@ -94,37 +87,18 @@ function EditUser() {
     validators: { onChange: updateUserSchema },
     onSubmit: async ({ value }) => {
       if (!user) return;
-      setServerError(null);
-      for (const field of ['name', 'role'] as const) {
-        form.setFieldMeta(field, (prev) => ({
-          ...prev,
-          errorMap: { ...prev.errorMap, onServer: undefined },
-        }));
-      }
+      clearServerErrors();
       try {
         await saveUser({ data: { id: user.id, user: value } });
         await router.invalidate();
+        form.reset(value);
       } catch (e) {
-        const apiErr = parseServerError(e);
-        if (apiErr) {
-          const fieldErrors = apiErr.fieldErrors;
-          if (fieldErrors) {
-            for (const [field, errs] of Object.entries(fieldErrors)) {
-              const key = (field.charAt(0).toLowerCase() + field.slice(1)) as 'name' | 'role';
-              form.setFieldMeta(key, (prev) => ({
-                ...prev,
-                errorMap: { ...prev.errorMap, onServer: errs.map((fe) => fe.message) },
-                isTouched: true,
-              }));
-            }
-          }
-          setServerError(apiErr.userMessage);
-        } else {
-          setServerError('Something went wrong.');
-        }
+        handleApiError(e);
       }
     },
   });
+
+  const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, ['name', 'role']);
 
   if (!user) {
     return (
@@ -136,97 +110,53 @@ function EditUser() {
 
   return (
     <main>
-      <h1 className="text-2xl font-bold">{user.name}</h1>
-      {serverError && (
-        <p className="mt-2 text-sm text-destructive">{serverError}</p>
-      )}
-
-      <section className="mt-6">
-        <h2 className="mb-4 text-lg font-semibold">General</h2>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            form.handleSubmit();
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">{user.name}</h1>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={async () => {
+            if (!confirm(`Delete ${user.name}?`)) return;
+            try {
+              await deleteUser({ data: user.id });
+              router.navigate({ to: '/admin/users' });
+            } catch (e) {
+              handleApiError(e);
+            }
           }}
-          className="grid max-w-md gap-4"
         >
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" value={user.email} disabled />
-          </div>
+          Delete
+        </Button>
+      </div>
+      <form.AppForm>
+        <form.FormErrorBanner message={serverError} />
 
-          <form.Field name="name">
-            {(field) => (
-              <div className="grid gap-2">
-                <Label htmlFor={field.name}>Name</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                <FieldError field={field} />
-              </div>
-            )}
-          </form.Field>
+        <section className="mt-6">
+          <h2 className="mb-4 text-lg font-semibold">General</h2>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              form.handleSubmit();
+            }}
+            className="grid max-w-md gap-4"
+          >
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" value={user.email} disabled />
+            </div>
 
-          <form.Field name="role">
-            {(field) => (
-              <div className="grid gap-2">
-                <Label htmlFor={field.name}>Role</Label>
-                <select
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value as UserRole)}
-                  className="border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
-                >
-                  {USER_ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-                <FieldError field={field} />
-              </div>
-            )}
-          </form.Field>
+            <form.AppField name="name">{(field) => <field.TextField label="Name" />}</form.AppField>
 
-          <div className="flex items-center gap-3">
-            <form.Subscribe
-              selector={(state) => ({
-                hasClientError: hasClientSideError(state.fieldMeta),
-                isSubmitting: state.isSubmitting,
-              })}
-            >
-              {({ hasClientError, isSubmitting }) => (
-                <Button type="submit" disabled={hasClientError || isSubmitting}>
-                  {isSubmitting ? 'Saving…' : 'Save'}
-                </Button>
-              )}
-            </form.Subscribe>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={async () => {
-                if (!confirm(`Delete ${user.name}?`)) return;
-                try {
-                  await deleteUser({ data: user.id });
-                  router.navigate({ to: '/admin/users' });
-                } catch (e) {
-                  const apiErr = parseServerError(e);
-                  setServerError(apiErr ? apiErr.userMessage : 'Something went wrong.');
-                }
-              }}
-            >
-              Delete
-            </Button>
-          </div>
-        </form>
-      </section>
+            <form.AppField name="role">
+              {(field) => <field.SelectField label="Role" options={USER_ROLES} />}
+            </form.AppField>
+
+            <form.FormActions cancel />
+          </form>
+        </section>
+      </form.AppForm>
 
       <LeavesSection userId={user.id} />
     </main>
@@ -337,7 +267,7 @@ function EditLeaveDialog({
   const isOpen = leave !== null;
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       totalDays: leave?.totalDays ?? 0,
     },
@@ -369,73 +299,56 @@ function EditLeaveDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Leave</DialogTitle>
         </DialogHeader>
-        {serverError && (
-          <p className="text-sm text-destructive">{serverError}</p>
-        )}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          className="grid gap-4"
-        >
-          <div className="grid gap-2">
-            <Label>Name</Label>
-            <p className="text-sm">{leave?.leaveTypeName}</p>
-          </div>
+        <form.AppForm>
+          <form.FormErrorBanner message={serverError} />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
+            }}
+            className="grid gap-4"
+          >
+            <div className="grid gap-2">
+              <Label>Name</Label>
+              <p className="text-sm">{leave?.leaveTypeName}</p>
+            </div>
 
-          <form.Field name="totalDays">
-            {(field) => (
-              <div className="grid gap-2">
-                <Label htmlFor={field.name}>
-                  Total <span className="text-destructive">*</span>
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id={field.name}
-                    type="number"
-                    min={0}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
-                  />
-                  <span className="text-sm text-muted-foreground">days</span>
-                </div>
-                <FieldError field={field} />
-              </div>
-            )}
-          </form.Field>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting] as const}>
-              {([canSubmit, isSubmitting]) => (
-                <Button type="submit" disabled={!canSubmit}>
-                  {isSubmitting ? 'Saving…' : 'Update leave'}
-                </Button>
+            <form.AppField name="totalDays">
+              {(field) => (
+                <field.NumberField
+                  label={
+                    <>
+                      Total <span className="text-destructive">*</span>
+                    </>
+                  }
+                  suffix="days"
+                  min={0}
+                />
               )}
-            </form.Subscribe>
-          </DialogFooter>
-        </form>
+            </form.AppField>
+
+            <DialogFooter>
+              <form.FormActions
+                saveLabel="Update leave"
+                savePendingLabel="Saving…"
+                cancel={onClose}
+                className="contents"
+              />
+            </DialogFooter>
+          </form>
+        </form.AppForm>
       </DialogContent>
     </Dialog>
   );
-}
-
-function FieldError({ field }: { field: { state: { meta: { isTouched: boolean; errors: Array<unknown> } } } }) {
-  if (!field.state.meta.isTouched || field.state.meta.errors.length === 0) return null;
-  const message = field.state.meta.errors
-    .map((err) => (typeof err === 'string' ? err : (err as { message?: string })?.message))
-    .filter(Boolean)
-    .join(', ');
-  if (!message) return null;
-  return <p className="text-sm text-destructive">{message}</p>;
 }
