@@ -11,7 +11,7 @@ paths: packages/api/**
 
 # Backend Slice
 
-Adds a vertical slice to an existing module. One file per operation, one endpoint registration. No mediator — endpoint resolves the handler interface from DI directly.
+Adds a vertical slice to an existing module. One file per operation, one endpoint registration. Commands flow through `IDispatcher` (CQRS pipeline with validation); queries call handlers directly.
 
 ## Conventions
 - Slice file: `Modules/<Feature>/Features/<Operation><Feature>.cs` — e.g. `CreateUser.cs`, `GetUserById.cs`
@@ -20,11 +20,12 @@ Adds a vertical slice to an existing module. One file per operation, one endpoin
 - Commands implement `ICommand<TResponse>`; handler implements `ICommandHandler<TCommand, TResponse>`
 - Queries implement `IQuery<TResponse>`; handler implements `IQueryHandler<TQuery, TResponse>`
 - All handler methods are named `HandleAsync` and take a `CancellationToken`
-- Atomicity comes from a single `IUnitOfWork.SaveChangesAsync(ct)` call per handler — EF wraps it in an implicit transaction. No explicit `Begin/Commit` API exists; if a slice ever needs multi-step or nested transactions, add one back at that time
+- Atomicity comes from a single `IUnitOfWork.SaveChangesAsync(ct)` call per handler — EF wraps it in an implicit transaction.
 - Writes use `Entity.Create(...)` / named mutators on the entity — never property-bag construction
 - Reads use `repo.GetAllAsDtosAsync<TDto>` / `repo.FirstOrDefaultAsDtoAsync<TDto>` with a DTO that implements `IEntityDto<TEntity, TDto>`
-- Validation via FluentValidation, applied through `.AddEndpointFilter<ValidationFilter<TCommand>>()`
+- **Validation via FluentValidation**: Write an `AbstractValidator<TCommand>` injecting `IUnitOfWork` for async checks. Use `.WithError(ErrorCodeBase)` to attach business-rule error codes with categories. Validators auto-register via `AddValidatorsFromAssembly`; the dispatcher pipeline runs them automatically — no manual endpoint filters.
 - Handlers and validators auto-register via `AddHandlersFromAssembly` / `AddValidatorsFromAssembly` — never wire them by hand
+- **Handler responses are plain DTOs** (or `Tsz.Infrastructure.Cqrs.Unit` for deletes). No custom result records or bool/nullable returns — errors flow as `ValidationException`.
 - After changes run `bun run build:api` and fix all errors
 
 ## Step 1 — Clarify scope
@@ -42,43 +43,48 @@ For a CRUD bundle, repeat Steps 2–3 for each operation.
 **Command example — `Features/CreateUser.cs`:**
 
 ```csharp
-using Tsz.Infrastructure.Abstractions;
 using FluentValidation;
+using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Validation;
 
 namespace Tsz.Api.Modules.Users.Features;
 
 public sealed record CreateUserCommand(string Name, string Email, UserRole Role)
-    : ICommand<CreateUserResult>;
-
-public sealed record CreateUserResult(UserDto? User, bool Conflict)
-{
-    public static CreateUserResult Created(UserDto user) => new(user, false);
-    public static CreateUserResult EmailConflict() => new(null, true);
-}
+    : ICommand<UserDto>;
 
 public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
 {
-    public CreateUserValidator()
+    private readonly IUnitOfWork _uow;
+
+    public CreateUserValidator(IUnitOfWork uow)
     {
+        _uow = uow;
+
         RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
         RuleFor(x => x.Role).IsInEnum();
+        RuleFor(x => x.Email)
+            .MustAsync(EmailNotTaken).WithError(UserErrors.EmailAlreadyExists)
+            .When(x => !string.IsNullOrEmpty(x.Email));
+    }
+
+    private async Task<bool> EmailNotTaken(string email, CancellationToken ct)
+    {
+        var exists = await _uow.RepositoryFor<User>()
+            .ExistsAsync(u => u.Email == email, ct);
+        return !exists;
     }
 }
 
 public sealed class CreateUserHandler(IUnitOfWork uow)
-    : ICommandHandler<CreateUserCommand, CreateUserResult>
+    : ICommandHandler<CreateUserCommand, UserDto>
 {
-    public async Task<CreateUserResult> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
+    public async Task<UserDto> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
     {
-        var repo = uow.RepositoryFor<User>();
-        if (await repo.ExistsAsync(u => u.Email == command.Email, ct))
-            return CreateUserResult.EmailConflict();
-
         var user = User.Create(command.Name, command.Email, command.Role);
-        repo.Add(user);
+        uow.RepositoryFor<User>().Add(user);
         await uow.SaveChangesAsync(ct);
-        return CreateUserResult.Created(UserDto.ToDto(user));
+        return UserDto.ToDto(user);
     }
 }
 ```
@@ -130,7 +136,7 @@ await uow.SaveChangesAsync(ct);
 
 ## Step 3 — Register endpoint
 
-In `<Feature>Endpoints.cs` inside `Map()`, depend on the handler **interface** (not the concrete type):
+In `<Feature>Endpoints.cs` inside `Map()`, inject the handler/dispatcher interface and call it directly. Validation errors automatically throw `ValidationException`, caught by the global handler.
 
 ```csharp
 // GET list
@@ -149,20 +155,42 @@ group.MapGet("/{id:guid}", async (
     return user is not null ? Results.Ok(user) : Results.NotFound();
 });
 
-// POST
+// POST — use IDispatcher for commands
 group.MapPost("/", async (
     CreateUserCommand command,
-    ICommandHandler<CreateUserCommand, CreateUserResult> handler,
+    IDispatcher dispatcher,
     CancellationToken ct) =>
 {
-    var result = await handler.HandleAsync(command, ct);
-    return result.Conflict
-        ? Results.Conflict(new { error = "A user with this email already exists." })
-        : Results.Created($"/api/users/{result.User!.Id}", result.User);
-}).AddEndpointFilter<ValidationFilter<CreateUserCommand>>();
+    var dto = await dispatcher.SendAsync(command, ct);
+    return Results.CreatedAtRoute("GetUserById", new { id = dto.Id }, dto);
+});
+
+// PUT — dispatcher handles validation + error mapping
+group.MapPut("/{id:guid}", async (
+    Guid id,
+    UpdateUserCommand command,
+    IDispatcher dispatcher,
+    CancellationToken ct) =>
+{
+    if (command.Id != id)
+        return Results.BadRequest("Route id does not match command id.");
+
+    var dto = await dispatcher.SendAsync(command, ct);
+    return Results.Ok(dto);
+});
+
+// DELETE — returns Unit from dispatcher
+group.MapDelete("/{id:guid}", async (
+    Guid id,
+    IDispatcher dispatcher,
+    CancellationToken ct) =>
+{
+    await dispatcher.SendAsync(new DeleteUserCommand(id), ct);
+    return Results.NoContent();
+});
 ```
 
-`ValidationFilter<T>` lives in `Tsz.Infrastructure.Validation`. For routes that need authorization, layer a sub-group: `group.MapGroup("").RequireAuthorization(AuthorizationPolicies.RequireAdmin)` — see `UserEndpoints.cs` for the live pattern.
+For routes that need authorization, layer a sub-group: `group.MapGroup("").RequireAuthorization(AuthorizationPolicies.RequireAdmin)` — see `UserEndpoints.cs` for the live pattern.
 
 ## Step 4 — If the entity changed, regenerate the migration
 

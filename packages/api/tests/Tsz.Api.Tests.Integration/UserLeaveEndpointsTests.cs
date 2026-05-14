@@ -106,6 +106,13 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var response = await Client.PutAsJsonAsync($"/api/users/{userId}/leaves/{dto.Id}", update);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        var errors = body.GetProperty("errors");
+        Assert.True(errors.EnumerateObject().Any());
+        var firstError = errors.EnumerateObject().First().Value[0];
+        Assert.Equal("ERR_INVALID", firstError.GetProperty("code").GetString());
     }
 
     [Fact]
@@ -121,6 +128,13 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var response = await Client.PutAsJsonAsync($"/api/users/{userId}/leaves/{dto.Id}", update);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        var errors = body.GetProperty("errors");
+        Assert.True(errors.EnumerateObject().Any());
+        var firstError = errors.EnumerateObject().First().Value[0];
+        Assert.Equal("ERR_INVALID", firstError.GetProperty("code").GetString());
     }
 
     [Fact]
@@ -138,6 +152,46 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
         Assert.Equal("ERR_USER_LEAVE_NOT_FOUND", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task AddUserLeave_NewCombination_Returns201WithDto_AndPersistsRow()
+    {
+        await SeedAdminAsync();
+        Guid userId = Guid.Empty;
+        Guid ltId = Guid.Empty;
+        await WithUowAsync(async uow =>
+        {
+            var lt = LeaveType.Create("NewLeave", LeaveAllowed.Limited, 15m);
+            uow.RepositoryFor<LeaveType>().Add(lt);
+            ltId = lt.Id;
+
+            var user = User.Create("Fresh User", $"fresh_{Guid.NewGuid().ToString()[..6]}@example.com", UserRole.User);
+            uow.RepositoryFor<User>().Add(user);
+            userId = user.Id;
+
+            await uow.SaveChangesAsync();
+        });
+
+        var command = new AddUserLeaveCommand(userId, ltId, 15m);
+        var response = await Client.PostAsJsonAsync($"/api/users/{userId}/leaves", command);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+
+        var dto = await response.Content.ReadFromJsonAsync<UserLeaveDto>(Json);
+        Assert.NotNull(dto);
+        Assert.NotEqual(Guid.Empty, dto.Id);
+        Assert.Equal(ltId, dto.LeaveTypeId);
+        Assert.Equal(15m, dto.TotalDays);
+        Assert.Equal(LeaveAllowed.Limited, dto.DefaultAllowed);
+        Assert.Equal("NewLeave", dto.LeaveTypeName);
+
+        var persisted = await WithUowAsync(uow =>
+            uow.RepositoryFor<UserLeave>().FirstOrDefaultAsync(ul => ul.Id == dto.Id));
+        Assert.NotNull(persisted);
+        Assert.Equal(ltId, persisted.LeaveTypeId);
+        Assert.Equal(15m, persisted.TotalDays);
     }
 
     [Fact]

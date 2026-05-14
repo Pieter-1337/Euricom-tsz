@@ -95,4 +95,14 @@ public class UpdateUserLeaveValidatorTests
         error.ShouldNotBeNull();
         (error.CustomState as IErrorCode)?.Category.ShouldBe(ErrorCategory.NotFound);
     }
+
+    [Fact]
+    public async Task UnlimitedType_WithDays_Fails_WithInvalidErrorCode()
+    {
+        var validator = BuildValidator(rowExists: true, allowed: LeaveAllowed.Unlimited, entityDays: null);
+        var result = await validator.ValidateAsync(new UpdateUserLeaveCommand(Guid.NewGuid(), Guid.NewGuid(), 5m));
+        result.IsValid.ShouldBeFalse();
+        var error = result.Errors.First(e => e.ErrorCode == CommonErrors.Invalid.Code);
+        error.ShouldNotBeNull();
+    }
 }

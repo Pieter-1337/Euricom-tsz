@@ -138,18 +138,24 @@ packages/api/
 └── Tsz.Infrastructure/
     ├── Abstractions/                 # ICommand, ICommandHandler, IQuery, IQueryHandler,
     │                                 # IRepository, IUnitOfWork, IEntityBase, IEntityDto
+    ├── Cqrs/                         # IDispatcher, Dispatcher, IPipelineBehavior, ValidationBehavior, Unit
+    ├── Errors/                       # ErrorCodeBase<TEnum>, IErrorCode, ErrorCategory, CommonErrors
     ├── Persistence/                  # EfCoreRepository<T>, EfCoreUnitOfWork<TContext>
     ├── Auth/                         # ICurrentUser, HttpContextCurrentUser, AuthorizationPolicies,
     │                                 # RequireAdminRequirement
     ├── Endpoints/                    # MapApiGroup() extension
-    ├── Extensions/                   # AddInfrastructure<TContext>(), AddHandlersFromAssembly()
-    └── Validation/                   # ValidationFilter<TRequest> endpoint filter
+    ├── Validation/                   # FluentValidationExtensions (WithError), adds validators to DI
+    └── Extensions/                   # AddInfrastructure<TContext>(), AddHandlersFromAssembly()
 ```
 
 **Conventions**
-- Endpoints depend only on `ICommandHandler<,>` / `IQueryHandler<,>` — handlers are auto-registered from the assembly by `AddHandlersFromAssembly`.
+- **Dispatcher pattern**: Endpoints inject `IDispatcher` and call `await dispatcher.SendAsync(command, ct)` for write operations; queries still call the handler directly. Dispatching routes commands through a CQRS pipeline (`Tsz.Infrastructure/Cqrs/`).
+- **Validation pipeline**: `ValidationBehavior` runs all `IValidator<TCommand>` registered via `AddValidatorsFromAssembly`; on failure throws `FluentValidation.ValidationException` aggregating failures. No manual endpoint filters.
+- **Error codes**: Bespoke `ErrorCodeBase<TEnum>` SmartEnum per module (e.g., `UserErrors : ErrorCodeBase<UserErrors>`) with static instances like `EmailAlreadyExists`, `NotFound`. Categories (`Validation`, `NotFound`, `Conflict`, `Forbidden`) auto-map to HTTP status in the global handler.
+- **Validators as business rules**: FluentValidation rules use `.WithError(ErrorCodeBase)` extension (`Tsz.Infrastructure/Validation/FluentValidationExtensions.cs`) to embed error metadata (code, category) so the global handler reads it without string lookups.
+- **Handlers return plain DTOs**: Commands return the DTO (or `Tsz.Infrastructure.Cqrs.Unit` for delete-like operations). No custom result records. Endpoints translate via `Results.Created(...)`, `Results.Ok(dto)`, `Results.NoContent()`.
+- **Global exception handler** (`Tsz.Api/Infrastructure/GlobalExceptionHandler.cs`): Catches `FluentValidation.ValidationException`, emits RFC 7807 ProblemDetails with appropriate status (highest category wins), and includes per-property `errors` map with code + message.
 - All data access goes through `IUnitOfWork` + `IRepository<T>`. `AppDbContext` has no `DbSet<T>` properties; entities are wired in via their `IEntityTypeConfiguration<T>` (auto-discovered) so modules stay self-contained.
-- Validation: write commands attach `AddEndpointFilter<ValidationFilter<TCommand>>()` and provide an `AbstractValidator<TCommand>`. Validators are picked up by `AddValidatorsFromAssembly`.
 - Authorization: a fallback policy requires an authenticated user; admin-only endpoints opt into `AuthorizationPolicies.RequireAdmin` (custom `RequireAdminRequirement` + handler resolves the current user via `ICurrentUser` / `ICurrentUserResolver`).
 - Database: `db.Database.Migrate()` runs at startup; in `Development` the relevant module seeder (e.g. `UserSeeder`) runs through `IUnitOfWork`.
 - OpenAPI: a schema transformer marks non-nullable properties as `required` so the generated TS schema omits `?`, and strips the spurious `string` type that `JsonNumberHandling.Strict` adds to numeric schemas.

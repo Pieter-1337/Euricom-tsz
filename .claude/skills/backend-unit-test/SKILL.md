@@ -61,7 +61,7 @@ public class <Operation><Feature>HandlerTests
 }
 ```
 
-Live reference: `CreateUserHandlerTests` covers the happy path and a duplicate-email conflict; mirror that shape.
+Handlers return plain DTOs (no custom result records). Live reference: `CreateUserHandlerTests` mirrors this shape. Validation errors are tested separately in the validator test class — handlers assume the command passed validation.
 
 ## Step 3 — Not-found / negative-path test
 
@@ -89,9 +89,11 @@ public async Task HandleAsync_Missing_ReturnsNull()
 `Modules/<Feature>/Features/<Operation><Feature>ValidatorTests.cs`:
 
 ```csharp
+using Moq;
 using Shouldly;
 using Tsz.Api.Modules.<Feature>;
 using Tsz.Api.Modules.<Feature>.Features;
+using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Tests.Modules.<Feature>.Features;
 
@@ -100,7 +102,8 @@ public class <Operation><Feature>ValidatorTests
     [Fact]
     public async Task Valid_Passes()
     {
-        var validator = new <Operation><Feature>Validator();
+        var uow = new Mock<IUnitOfWork>();
+        var validator = new <Operation><Feature>Validator(uow.Object);
         var result = await validator.ValidateAsync(new <Operation><Feature>Command(/* valid */));
         result.IsValid.ShouldBeTrue();
     }
@@ -108,15 +111,32 @@ public class <Operation><Feature>ValidatorTests
     [Fact]
     public async Task <BrokenField>_Fails()
     {
-        var validator = new <Operation><Feature>Validator();
+        var uow = new Mock<IUnitOfWork>();
+        var validator = new <Operation><Feature>Validator(uow.Object);
         var result = await validator.ValidateAsync(new <Operation><Feature>Command(/* broken */));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(<Operation><Feature>Command.<Field>));
     }
+
+    [Fact]
+    public async Task BusinessRuleViolation_Fails()
+    {
+        var repo = new Mock<IRepository<<Feature>>>();
+        repo.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<<Feature>, bool>>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true); // e.g., email already exists
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(u => u.RepositoryFor<<Feature>>()).Returns(repo.Object);
+
+        var validator = new <Operation><Feature>Validator(uow.Object);
+        var result = await validator.ValidateAsync(new <Operation><Feature>Command(/* values */));
+
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorCode == "<Feature>Errors.Code");
+    }
 }
 ```
 
-`CreateUserValidatorTests` is the live reference — one fact per validation rule (empty name, bad email, out-of-enum role).
+Validators may inject `IUnitOfWork` for async business-rule checks (e.g., uniqueness). Use `.WithError(ErrorCodeBase)` to embed error codes with categories so the global handler can route to the correct HTTP status. Live reference: `CreateUserValidatorTests`.
 
 ## Step 5 — Query handler tests
 

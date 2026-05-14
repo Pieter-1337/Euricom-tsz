@@ -90,6 +90,25 @@ public class <Feature>EndpointsTests : IntegrationTestBase, IAsyncLifetime
         var response = await Client.PostAsJsonAsync("/api/<feature>s", command, Json);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(Json);
+        Assert.NotNull(problem);
+        Assert.NotNull(problem.Errors);
+    }
+
+    [Fact]
+    public async Task Create<Feature>_BusinessRuleViolation_ReturnsConflict()
+    {
+        // Seed a feature that violates uniqueness
+        await Seed<Feature>Async();
+
+        var command = new Create<Feature>Command(/* values that conflict */);
+
+        var response = await Client.PostAsJsonAsync("/api/<feature>s", command, Json);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(Json);
+        Assert.NotNull(problem);
+        Assert.Equal("<Feature>Errors.ConflictCode", problem.Code);
     }
 
     [Fact]
@@ -130,6 +149,15 @@ Or directly:
 ```
 dotnet test packages/api/tests/Tsz.Api.Tests.Integration
 ```
+
+## Validation & Error Testing
+
+Endpoints use `IDispatcher` for commands (queries call handlers directly). Validation failures throw `FluentValidation.ValidationException`, caught by the global exception handler (`Tsz.Api/Infrastructure/GlobalExceptionHandler.cs`) and emitted as RFC 7807 ProblemDetails. Parse and assert on:
+- `problem.Code` — top-level error code (highest-severity error)
+- `problem.Status` — HTTP status (derived from error categories: NotFound → 404, Conflict → 409, Validation → 400, etc.)
+- `problem.Errors` — per-property map of `{ code, message }[]`
+
+See `UserEndpointsTests` for live examples asserting validation and conflict scenarios.
 
 ## Notes on InMemory vs real SQLite
 
