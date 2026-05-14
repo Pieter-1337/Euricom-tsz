@@ -2,6 +2,21 @@
 
 ## 2026-05-14
 
+feat: add keyset pagination primitives to Tsz.Infrastructure
+
+New Common/Pagination/ folder under Tsz.Infrastructure with five files:
+KeysetCursor (base64-url opaque cursor, version-gated decode),
+KeysetPage<T> (items + nextCursor + total), KeysetQueryOptions record
+with SortDirection enum, SortMap<TEntity> + SortColumn<TEntity> (case-
+insensitive key lookup, AllowedKeys for validator), and
+KeysetQueryableExtensions.ToKeysetPageAsync (8-step algorithm: search
+via string.Contains/ToLower, cursor predicate via IComparable.CompareTo
+so string columns work, ORDER BY sortCol + Id tiebreaker, LIMIT+1
+cursor detection, parallel COUNT). KeysetQueryOptionsValidator<TQuery,
+TEntity> base enforces universal rules (search ≤200, sortBy in map,
+pageSize 1-200, cursor decodable). 40 new unit tests across three files
+(cursor encode/decode, extensions against EF InMemory, validator rules).
+
 feat: add list-base frontend primitives
 
 Add keyset pagination types (KeysetPage, SortDir, KeysetQueryParams)
