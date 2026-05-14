@@ -2,6 +2,17 @@
 
 ## 2026-05-14
 
+build: pin vite dev port with --strictPort
+
+Add --strictPort to the web dev script so Vite errors out when
+port 3000 is taken instead of silently drifting to the next free
+port. The drift breaks better-auth: BETTER_AUTH_URL is pinned to
+:3000, so a request from :3002 fails origin check on POST routes
+(signOut returns 403). Failing loud on port conflict is cheaper
+than debugging silent auth breakage.
+
+## 2026-05-14
+
 docs: note browser restart requirement after mkcert -install
 
 Add a line to certs/README.md telling contributors to fully quit
