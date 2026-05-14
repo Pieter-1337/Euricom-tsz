@@ -1,6 +1,27 @@
 import { apiClient as client } from '#/lib/api.server';
 import { ApiRequestError } from '#/api/client';
 import type { User, CreateUserRequest, UpdateUserRequest } from '#/api/users';
+import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';
+
+type UserSortKey = 'name' | 'email' | 'role';
+
+export const getUsersPaged = async (
+  params: KeysetQueryParams<UserSortKey>,
+): Promise<KeysetPage<User>> => {
+  const resp = await client.GET('/api/users/paged', {
+    params: {
+      query: {
+        search: params.search,
+        sortBy: params.sortBy,
+        sortDir: params.sortDir,
+        pageSize: params.pageSize,
+        cursor: params.cursor,
+        includeDeleted: params.includeDeleted,
+      },
+    },
+  });
+  return resp.data ?? { items: [], nextCursor: null, total: 0 };
+};
 
 export const getCurrentUser = async (): Promise<User | null> => {
   try {

@@ -2,6 +2,34 @@
 
 ## 2026-05-14
 
+feat: paged user list with search/sort/infinite-scroll
+
+Rewrite the admin user list to consume the new GET /api/users/paged
+endpoint. Add getUsersPaged to users.server.ts (hand-typed against
+a new /api/users/paged path added to schema.ts; uses the same
+openapi-fetch client as all other server-side wrappers). The
+existing getUsers plain-list wrapper is untouched.
+
+Route rewrites index.tsx: loader removed; component uses
+useListQuery with a fetchUsersPaged createServerFn as the
+fetcher. Renders ListShell (ListToolbar + InfiniteTable)
+with SortableHeader columns on Name, Email, Role; Active toggle
+wired to includeDeleted; row click navigates to /admin/users/$id;
+"New user" button kept in page header. Infinite scroll via
+sentinelRef from useListQuery.
+
+docs: update user-list plan for new paged endpoint
+
+Rewrite docs/product/requirements/users/plan-list.md to reflect the
+new approach: keep GET /api/users (plain IEnumerable<UserDto>)
+unchanged for dropdown/lookup consumers, add GET /api/users/paged
+returning KeysetPage<UserDto> for the admin overview. Update the
+backend section to add a new GetUsersPaged slice alongside the
+existing GetUsers, and reference the new IRepository.GetPagedAsync
+facade that hides the keyset extension method from handlers.
+Update the steps and test matrix to clearly delineate which surfaces
+are new and which remain untouched.
+
 feat: add keyset pagination primitives to Tsz.Infrastructure
 
 New Common/Pagination/ folder under Tsz.Infrastructure with five files:
