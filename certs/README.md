@@ -44,6 +44,9 @@ mkcert -install
 This adds mkcert's root CA to the OS (and browser) trust stores so any cert
 it signs is trusted without warnings.
 
+Fully quit and reopen any already-running browsers afterwards — a tab
+reload is not enough; browsers read the trust store on startup.
+
 ## 3. Generate the cert
 
 From the repo root:

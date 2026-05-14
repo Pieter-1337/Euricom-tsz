@@ -2,6 +2,15 @@
 
 ## 2026-05-14
 
+docs: note browser restart requirement after mkcert -install
+
+Add a line to certs/README.md telling contributors to fully quit
+and reopen any running browsers after running mkcert -install —
+a tab reload is not enough since browsers read the trust store
+on startup. Saves a "why is my cert still untrusted" round trip.
+
+## 2026-05-14
+
 chore: move Azure AD values to appsettings.Development.json
 
 Relocate dev TenantId/ClientId/Audience from base appsettings.json
