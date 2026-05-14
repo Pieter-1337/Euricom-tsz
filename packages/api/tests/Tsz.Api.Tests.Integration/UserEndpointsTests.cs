@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.EntityFrameworkCore;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
@@ -14,25 +13,21 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     public UserEndpointsTests(TestWebApplicationFactory factory) : base(factory) { }
 
-    public Task InitializeAsync() => WithDbAsync(async db =>
-    {
-        var users = await db.Users.IgnoreQueryFilters().ToListAsync();
-        db.Users.RemoveRange(users);
-        await db.SaveChangesAsync();
-    });
+    public Task InitializeAsync() => WithUowAsync(uow =>
+        uow.RepositoryFor<User>().BatchHardDeleteAsync(_ => true));
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private Task SeedUserAsync(string email, UserRole role, string? oid = null) => WithDbAsync(async db =>
+    private Task SeedUserAsync(string email, UserRole role, string? oid = null) => WithUowAsync(async uow =>
     {
         var user = User.Create($"User_{Guid.NewGuid().ToString()[..6]}", email, role);
         if (oid is not null) user.LinkEntraOid(oid);
-        db.Users.Add(user);
-        await db.SaveChangesAsync();
+        uow.RepositoryFor<User>().Add(user);
+        await uow.SaveChangesAsync();
     });
 
-    private Task<User?> GetUserByEmailAsync(string email) => WithDbAsync(db =>
-        db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Email == email));
+    private Task<User?> GetUserByEmailAsync(string email) => WithUowAsync(uow =>
+        uow.RepositoryFor<User>().FirstOrDefaultAsync(u => u.Email == email, ignoreQueryFilters: true));
 
     [Fact]
     public async Task GetMe_NotProvisioned_ReturnsNotFound()
@@ -199,8 +194,8 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var getResponse = await Client.GetAsync($"/api/users/{dto.Id}");
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
 
-        var row = await WithDbAsync(db =>
-            db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Id == dto.Id));
+        var row = await WithUowAsync(uow =>
+            uow.RepositoryFor<User>().FirstOrDefaultAsync(u => u.Id == dto.Id, ignoreQueryFilters: true));
         Assert.NotNull(row);
         Assert.NotNull(row.DeletedAt);
     }

@@ -2,28 +2,32 @@
 name: 'backend-module'
 description: >
   Scaffold a new domain module in packages/api/Tsz.Api: DDD-ish entity (private setters,
-  static Create factory, named mutators), EF IEntityTypeConfiguration, DbSet registration,
-  endpoint file shell with Map(), and Program.cs wiring.
-  Use once per new domain concept before adding slices with backend-slice.
+  static Create factory, named mutators), EF IEntityTypeConfiguration (auto-discovered),
+  endpoint file shell with Map(), and Program.cs wiring. No DbSet plumbing — all access
+  flows through IUnitOfWork / IRepository. Use once per new domain concept before adding
+  slices with backend-slice.
 paths: packages/api/**
 ---
 
 # Backend Module
 
-One-time scaffold for a new domain module. Run this first, then use `backend-slice` to add operations.
+One-time scaffold for a new domain module. Run this first, then use `backend-slice` to add operations. Users is the canonical live example to mirror.
 
 ## Conventions
 - Module lives in `packages/api/Tsz.Api/Modules/<Feature>/`
-- Entity implements `IEntityBase` (`Guid Id`); all writable state has **private setters**; construction via `static Create(...)`; mutation via named methods (`Rename`, `ChangeAge`, ...)
-- EF config in `<Feature>Configuration.cs` implementing `IEntityTypeConfiguration<T>`
+- Slice files (commands/queries/handlers) live in `Modules/<Feature>/Features/`
+- Entity implements `IEntityBase` (`Guid Id`); writable state has **private setters**; construction via `static Create(...)`; mutation via named methods (`Rename`, `ChangeRole`, …)
+- EF config in `<Feature>Configuration.cs` implementing `IEntityTypeConfiguration<T>` — picked up automatically by `AppDbContext.OnModelCreating` via `ApplyConfigurationsFromAssembly`. Nothing else needs to be done to register the entity — `AppDbContext` has no explicit `DbSet<T>` properties; everything flows through `context.Set<T>()` inside the repo.
+- One shared `AppDbContext` at `Tsz.Api/Persistence/AppDbContext.cs` for the whole API — never spin up a per-module DbContext
+- All persistence access from slices, seeders, and tests goes through `IUnitOfWork` → `IRepository<T>` (in `Tsz.Infrastructure.Abstractions`). Direct `AppDbContext` access is reserved for `Program.cs` startup wiring (`Migrate`/`EnsureCreated`).
 - Endpoints file: `<Feature>Endpoints.cs` — one static class, one `Map()` method
-- Register endpoint `Map()` in `Program.cs` next to `AnimalEndpoints.Map(app)`
-- After changes run `bun run build:api` and fix all errors
+- Register `Map()` in `Program.cs` next to `UserEndpoints.Map(app)`
+- After changes run `bun run check` (or `dotnet build packages/api/Tsz.Api`) and fix all errors
 
 ## Step 1 — Clarify scope
 - Feature name (PascalCase, used for folder and class names)
 - What fields does the entity have, and which are mutable after creation?
-- Does this module share an existing `DbContext` or need a new one?
+- Are any cross-entity relationships needed (FKs to other modules)?
 
 ## Step 2 — Entity
 
@@ -76,28 +80,17 @@ public class <Feature>Configuration : IEntityTypeConfiguration<<Feature>>
 }
 ```
 
-## Step 4 — DbContext
+No registration needed — `AppDbContext` calls `ApplyConfigurationsFromAssembly` and picks it up.
 
-If reusing an existing context, add to it. Otherwise create `<Feature>DbContext.cs`:
-```csharp
-using Microsoft.EntityFrameworkCore;
+## Step 4 — DbContext registration
 
-namespace Tsz.Api.Modules.<Feature>;
-
-public class <Feature>DbContext(DbContextOptions<<Feature>DbContext> options) : DbContext(options)
-{
-    public DbSet<<Feature>> <Feature>s => Set<<Feature>>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-        => modelBuilder.ApplyConfiguration(new <Feature>Configuration());
-}
-```
+Nothing to do. `AppDbContext.OnModelCreating` calls `ApplyConfigurationsFromAssembly`, which discovers your new `<Feature>Configuration` and registers the entity. No `DbSet<T>` property is needed — slices, seeders, and tests reach the entity via `IUnitOfWork.RepositoryFor<<Feature>>()`, which internally calls `context.Set<<Feature>>()`.
 
 ## Step 5 — Endpoint file shell
 
 `Modules/<Feature>/<Feature>Endpoints.cs`:
 ```csharp
-using Tsz.Api.Common.Extensions;
+using Tsz.Infrastructure.Endpoints;
 
 namespace Tsz.Api.Modules.<Feature>;
 
@@ -112,25 +105,23 @@ public static class <Feature>Endpoints
 }
 ```
 
+`MapApiGroup` lives in `Tsz.Infrastructure.Endpoints` and prefixes routes with `/api/`.
+
 ## Step 6 — Wire up in Program.cs
 
-Module-specific:
-```csharp
-builder.Services.AddDbContext<<Feature>DbContext>(options => options.UseSqlite(/* ... */));
-builder.Services.AddInfrastructure<<Feature>DbContext>(); // only if new DbContext
+At the end of the pipeline, next to the existing module wires:
 
-// At end of pipeline:
+```csharp
 <Feature>Endpoints.Map(app);
 ```
 
-Handlers and validators are picked up automatically by `AddHandlersFromAssembly` and `AddValidatorsFromAssembly` already wired in `Program.cs` — no per-handler registration needed.
+`AddDbContext<AppDbContext>(...)`, `AddInfrastructure<AppDbContext>()`, `AddHandlersFromAssembly(...)`, and `AddValidatorsFromAssembly(...)` are already wired once at the top of `Program.cs`. Handlers and validators in the new module are discovered automatically — no per-handler registration.
 
 ## Step 7 — Test builder
 
-Every entity gets a builder in `packages/api/tests/Tsz.Api.Tests/Builders/<Feature>Builder.cs`. The builder calls the static `Create(...)` factory (so invariants stay enforced), fills the rest with NBuilder randoms, and exposes one `WithXxx` extension per named mutator.
+Every entity gets a builder in `packages/api/tests/Tsz.Api.Tests/Builders/<Feature>Builder.cs`. The builder calls the static `Create(...)` factory (so invariants stay enforced) and exposes one `WithXxx` extension per named mutator.
 
 ```csharp
-using FizzWare.NBuilder;
 using FizzWare.NBuilder.Generators;
 using Tsz.Api.Modules.<Feature>;
 
@@ -143,7 +134,7 @@ public static class <Feature>Builder
         var id = Guid.NewGuid();
         var entity = <Feature>.Create(
             name: "Name_" + id.ToString()[..8]
-            /* ... fill remaining required Create params with GetRandom.*/);
+            /* ... fill remaining required Create params */);
         entity.Id = id;
         return entity;
     }
@@ -164,7 +155,7 @@ public static class <Feature>Builder
 }
 ```
 
-`AnimalBuilder.cs` is the canonical example. Use `Pick<string>.RandomItemFrom(...)` for enum-like string fields and `GetRandom.Int(min, max)` / `GetRandom.Email()` / `GetRandom.AlphaString(n)` for primitives. Builders ship sensible defaults so test call sites only spell out the field they care about: `AnimalBuilder.Build().WithAge(0)` for an age-boundary test.
+`UserBuilder.cs` is the canonical example. Use `GetRandom.Int(min, max)` / `GetRandom.Email()` / `GetRandom.AlphaString(n)` for primitives. Builders ship sensible defaults so test call sites only spell out the field they care about: `UserBuilder.Build().WithRole(UserRole.Admin)`.
 
 ## Step 8 — Generate the migration
 
@@ -174,22 +165,12 @@ The new entity needs a schema. From the repo root:
 dotnet ef migrations add Add<Feature> \
   --project packages/api/Tsz.Api \
   --startup-project packages/api/Tsz.Api \
-  --output-dir Migrations
+  --output-dir Persistence/Migrations
 ```
 
-Inspect the generated `Up()` to confirm the `CreateTable` looks right. Commit the migration + updated `AnimalDbContextModelSnapshot.cs`. The migration runs automatically on next API start via `db.Database.Migrate()` in `Program.cs`. See the `ef-migration` skill for more.
+Inspect the generated `Up()` to confirm the `CreateTable` looks right. Commit the migration + updated `AppDbContextModelSnapshot.cs`. Migrations run automatically on next API start via `db.Database.Migrate()` in `Program.cs`. See the `ef-migration` skill for hand-edit guidance (data backfills, SQLite ALTER limits).
 
-If this module needs its own DbContext (Step 4 path), the `--context` flag is required:
-
-```
-dotnet ef migrations add Add<Feature> \
-  --project packages/api/Tsz.Api \
-  --startup-project packages/api/Tsz.Api \
-  --context <Feature>DbContext \
-  --output-dir Migrations/<Feature>
-```
-
-And `Program.cs` needs a `Migrate()` call against the new context too.
+Note: `dotnet ef` discovers the entity via the configuration's `ApplyConfigurationsFromAssembly` call, not via a `DbSet<T>` property. No `AppDbContext` edit is required.
 
 ## Step 9 — Verify
 

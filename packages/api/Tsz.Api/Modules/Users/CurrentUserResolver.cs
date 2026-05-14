@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Tsz.Api.Persistence;
+using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
 
 namespace Tsz.Api.Modules.Users;
@@ -9,7 +8,7 @@ public interface ICurrentUserResolver
     Task<User?> ResolveAsync(CancellationToken ct = default);
 }
 
-public sealed class CurrentUserResolver(ICurrentUser currentUser, AppDbContext db) : ICurrentUserResolver
+public sealed class CurrentUserResolver(ICurrentUser currentUser, IUnitOfWork uow) : ICurrentUserResolver
 {
     private User? _cached;
     private bool _loaded;
@@ -18,12 +17,13 @@ public sealed class CurrentUserResolver(ICurrentUser currentUser, AppDbContext d
     {
         if (_loaded) return _cached;
 
+        var repo = uow.RepositoryFor<User>();
         var oid = currentUser.EntraOid;
         var email = currentUser.Email;
 
         if (oid is not null)
         {
-            _cached = await db.Users.FirstOrDefaultAsync(u => u.EntraOid == oid, ct);
+            _cached = await repo.FirstOrDefaultAsync(u => u.EntraOid == oid, ct);
             if (_cached is not null)
             {
                 _loaded = true;
@@ -33,13 +33,13 @@ public sealed class CurrentUserResolver(ICurrentUser currentUser, AppDbContext d
 
         if (email is not null)
         {
-            var emailMatch = await db.Users
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower(), ct);
+            var lowered = email.ToLower();
+            var emailMatch = await repo.FirstOrDefaultAsync(u => u.Email.ToLower() == lowered, ct);
 
             if (emailMatch is not null && emailMatch.EntraOid is null && oid is not null)
             {
                 emailMatch.LinkEntraOid(oid);
-                await db.SaveChangesAsync(ct);
+                await uow.SaveChangesAsync(ct);
             }
 
             _cached = emailMatch;

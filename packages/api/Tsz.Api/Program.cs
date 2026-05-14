@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Persistence;
+using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Extensions;
 using FluentValidation;
@@ -137,7 +138,10 @@ using (var scope = app.Services.CreateScope())
     else
         db.Database.EnsureCreated();
     if (app.Environment.IsDevelopment())
-        new UserSeeder(db).Seed();
+    {
+        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await new UserSeeder(uow).SeedAsync();
+    }
 }
 app.UseHttpsRedirection();
 app.UseAuthentication();

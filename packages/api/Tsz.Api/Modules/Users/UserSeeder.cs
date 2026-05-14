@@ -1,20 +1,21 @@
-using Tsz.Api.Persistence;
+using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Modules.Users;
 
-public class UserSeeder(AppDbContext context)
+public class UserSeeder(IUnitOfWork uow)
 {
     private const string AdminEmail = "pieter.bracke@euri.com";
 
-    public void Seed()
+    public async Task SeedAsync(CancellationToken ct = default)
     {
-        if (context.Users.Any(u => u.Email == AdminEmail)) return;
+        var repo = uow.RepositoryFor<User>();
+        if (await repo.ExistsAsync(u => u.Email == AdminEmail, ct)) return;
 
-        context.Users.Add(User.Create(
+        repo.Add(User.Create(
             name: "Pieter Bracke",
             email: AdminEmail,
             role: UserRole.Admin));
 
-        context.SaveChanges();
+        await uow.SaveChangesAsync(ct);
     }
 }

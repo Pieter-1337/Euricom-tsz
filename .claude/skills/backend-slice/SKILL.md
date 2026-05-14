@@ -2,9 +2,10 @@
 name: 'backend-slice'
 description: >
   Add one operation (or a CRUD bundle) to an existing module in packages/api/Tsz.Api.
-  Each slice gets its own file with command/query, response, handler implementing
-  ICommandHandler / IQueryHandler, and FluentValidation validator for writes.
-  Endpoint is registered in the module's endpoints file. Use after backend-module.
+  Each slice gets its own file under Modules/<Feature>/Features/ with command/query,
+  response, handler implementing ICommandHandler / IQueryHandler, and FluentValidation
+  validator for writes. Endpoint is registered in the module's endpoints file. Use
+  after backend-module.
 paths: packages/api/**
 ---
 
@@ -13,9 +14,9 @@ paths: packages/api/**
 Adds a vertical slice to an existing module. One file per operation, one endpoint registration. No mediator — endpoint resolves the handler interface from DI directly.
 
 ## Conventions
-- Slice file: `Modules/<Feature>/<Operation><Feature>.cs` — e.g. `CreateAnimal.cs`, `GetAnimals.cs`
-- Each file contains: command/query record, validator (writes only), handler
-- Response shape lives **in the slice** unless ≥2 slices share the *exact* same shape — only then promote to a module-level DTO
+- Slice file: `Modules/<Feature>/Features/<Operation><Feature>.cs` — e.g. `CreateUser.cs`, `GetUserById.cs`
+- Each file contains: command/query record, validator (writes only), handler — all in `Tsz.Api.Modules.<Feature>.Features`
+- Response shape lives **in the slice** unless ≥2 slices share the *exact* same shape — only then promote to a module-level DTO (e.g. `UserDto.cs` at the module root)
 - Commands implement `ICommand<TResponse>`; handler implements `ICommandHandler<TCommand, TResponse>`
 - Queries implement `IQuery<TResponse>`; handler implements `IQueryHandler<TQuery, TResponse>`
 - All handler methods are named `HandleAsync` and take a `CancellationToken`
@@ -34,86 +35,96 @@ Ask:
 - What does the request look like? What does it return?
 - Is the response identical to an existing module-level DTO, or slice-private?
 
-For a CRUD bundle, repeat Steps 2–4 for each operation.
+For a CRUD bundle, repeat Steps 2–3 for each operation.
 
 ## Step 2 — Slice file
 
-**Command example — `CreateAnimal.cs`:**
+**Command example — `Features/CreateUser.cs`:**
 
 ```csharp
 using Tsz.Infrastructure.Abstractions;
 using FluentValidation;
 
-namespace Tsz.Api.Modules.Animals;
+namespace Tsz.Api.Modules.Users.Features;
 
-public sealed record CreateAnimalCommand(string Name, string Species, int Age)
-    : ICommand<AnimalDto>;
+public sealed record CreateUserCommand(string Name, string Email, UserRole Role)
+    : ICommand<CreateUserResult>;
 
-public sealed class CreateAnimalValidator : AbstractValidator<CreateAnimalCommand>
+public sealed record CreateUserResult(UserDto? User, bool Conflict)
 {
-    public CreateAnimalValidator()
+    public static CreateUserResult Created(UserDto user) => new(user, false);
+    public static CreateUserResult EmailConflict() => new(null, true);
+}
+
+public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
+{
+    public CreateUserValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.Species).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.Age).InclusiveBetween(0, 200);
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+        RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
+        RuleFor(x => x.Role).IsInEnum();
     }
 }
 
-public sealed class CreateAnimalHandler(IUnitOfWork uow)
-    : ICommandHandler<CreateAnimalCommand, AnimalDto>
+public sealed class CreateUserHandler(IUnitOfWork uow)
+    : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
-    public async Task<AnimalDto> HandleAsync(CreateAnimalCommand command, CancellationToken ct = default)
+    public async Task<CreateUserResult> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
     {
-        var animal = Animal.Create(command.Name, command.Species, command.Age);
-        uow.RepositoryFor<Animal>().Add(animal);
+        var repo = uow.RepositoryFor<User>();
+        if (await repo.ExistsAsync(u => u.Email == command.Email, ct))
+            return CreateUserResult.EmailConflict();
+
+        var user = User.Create(command.Name, command.Email, command.Role);
+        repo.Add(user);
         await uow.SaveChangesAsync(ct);
-        return AnimalDto.ToDto(animal);
+        return CreateUserResult.Created(UserDto.ToDto(user));
     }
 }
 ```
 
-**Query example — `GetAnimalById.cs`:**
+**Query example — `Features/GetUserById.cs`:**
 
 ```csharp
 using Tsz.Infrastructure.Abstractions;
 
-namespace Tsz.Api.Modules.Animals;
+namespace Tsz.Api.Modules.Users.Features;
 
-public sealed record GetAnimalByIdQuery(Guid Id) : IQuery<AnimalDto?>;
+public sealed record GetUserByIdQuery(Guid Id) : IQuery<UserDto?>;
 
-public sealed class GetAnimalByIdHandler(IUnitOfWork uow)
-    : IQueryHandler<GetAnimalByIdQuery, AnimalDto?>
+public sealed class GetUserByIdHandler(IUnitOfWork uow)
+    : IQueryHandler<GetUserByIdQuery, UserDto?>
 {
-    public Task<AnimalDto?> HandleAsync(GetAnimalByIdQuery query, CancellationToken ct = default) =>
-        uow.RepositoryFor<Animal>()
-            .FirstOrDefaultAsDtoAsync<AnimalDto>(a => a.Id == query.Id, ct);
+    public Task<UserDto?> HandleAsync(GetUserByIdQuery query, CancellationToken ct = default) =>
+        uow.RepositoryFor<User>()
+            .FirstOrDefaultAsDtoAsync<UserDto>(u => u.Id == query.Id, ct);
 }
 ```
 
-**Shared module-level DTO (`AnimalDto.cs`)** — opts in to EF projection:
+**Shared module-level DTO (`UserDto.cs` at the module root)** — opts in to EF projection:
 
 ```csharp
 using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
 
-namespace Tsz.Api.Modules.Animals;
+namespace Tsz.Api.Modules.Users;
 
-public sealed record AnimalDto(Guid Id, string Name, string Species, int Age)
-    : IEntityDto<Animal, AnimalDto>
+public sealed record UserDto(Guid Id, string Email, string Name, UserRole Role)
+    : IEntityDto<User, UserDto>
 {
-    public static Expression<Func<Animal, AnimalDto>> Project =>
-        a => new AnimalDto(a.Id, a.Name, a.Species, a.Age);
+    public static Expression<Func<User, UserDto>> Project =>
+        u => new UserDto(u.Id, u.Email, u.Name, u.Role);
 
-    public static AnimalDto ToDto(Animal entity) =>
-        new(entity.Id, entity.Name, entity.Species, entity.Age);
+    public static UserDto ToDto(User entity) =>
+        new(entity.Id, entity.Email, entity.Name, entity.Role);
 }
 ```
 
 **Update commands** load via `repo.GetByIdAsync` then call named mutators:
 ```csharp
-var animal = await uow.RepositoryFor<Animal>().GetByIdAsync(command.Id, ct);
-if (animal is null) return null;
-animal.Rename(command.Name);
+var user = await uow.RepositoryFor<User>().GetByIdAsync(command.Id, ct);
+if (user is null) return null;
+user.Rename(command.Name);
 await uow.SaveChangesAsync(ct);
 ```
 
@@ -124,30 +135,34 @@ In `<Feature>Endpoints.cs` inside `Map()`, depend on the handler **interface** (
 ```csharp
 // GET list
 group.MapGet("/", async (
-    IQueryHandler<GetAnimalsQuery, IReadOnlyList<AnimalDto>> handler,
+    IQueryHandler<GetUsersQuery, IReadOnlyList<UserDto>> handler,
     CancellationToken ct) =>
-        TypedResults.Ok(await handler.HandleAsync(new GetAnimalsQuery(), ct)));
+        TypedResults.Ok(await handler.HandleAsync(new GetUsersQuery(), ct)));
 
 // GET by id
 group.MapGet("/{id:guid}", async (
     Guid id,
-    IQueryHandler<GetAnimalByIdQuery, AnimalDto?> handler,
+    IQueryHandler<GetUserByIdQuery, UserDto?> handler,
     CancellationToken ct) =>
 {
-    var animal = await handler.HandleAsync(new GetAnimalByIdQuery(id), ct);
-    return animal is not null ? Results.Ok(animal) : Results.NotFound();
+    var user = await handler.HandleAsync(new GetUserByIdQuery(id), ct);
+    return user is not null ? Results.Ok(user) : Results.NotFound();
 });
 
 // POST
 group.MapPost("/", async (
-    CreateAnimalCommand command,
-    ICommandHandler<CreateAnimalCommand, AnimalDto> handler,
+    CreateUserCommand command,
+    ICommandHandler<CreateUserCommand, CreateUserResult> handler,
     CancellationToken ct) =>
 {
-    var animal = await handler.HandleAsync(command, ct);
-    return Results.Created($"/api/animals/{animal.Id}", animal);
-}).AddEndpointFilter<ValidationFilter<CreateAnimalCommand>>();
+    var result = await handler.HandleAsync(command, ct);
+    return result.Conflict
+        ? Results.Conflict(new { error = "A user with this email already exists." })
+        : Results.Created($"/api/users/{result.User!.Id}", result.User);
+}).AddEndpointFilter<ValidationFilter<CreateUserCommand>>();
 ```
+
+`ValidationFilter<T>` lives in `Tsz.Infrastructure.Validation`. For routes that need authorization, layer a sub-group: `group.MapGroup("").RequireAuthorization(AuthorizationPolicies.RequireAdmin)` — see `UserEndpoints.cs` for the live pattern.
 
 ## Step 4 — If the entity changed, regenerate the migration
 
@@ -157,10 +172,10 @@ If this slice added a new field, index, or constraint to the entity / `<Feature>
 dotnet ef migrations add <DescriptiveName> \
   --project packages/api/Tsz.Api \
   --startup-project packages/api/Tsz.Api \
-  --output-dir Migrations
+  --output-dir Persistence/Migrations
 ```
 
-Commit the migration + `AnimalDbContextModelSnapshot.cs` along with the slice. See `ef-migration` for hand-edit guidance (data backfills, SQLite ALTER limits).
+Commit the migration + `AppDbContextModelSnapshot.cs` along with the slice. See `ef-migration` for hand-edit guidance (data backfills, SQLite ALTER limits).
 
 Pure read slices and slices that only add commands/queries over an unchanged schema don't need a migration.
 

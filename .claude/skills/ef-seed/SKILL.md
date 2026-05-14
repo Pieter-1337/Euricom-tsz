@@ -3,8 +3,8 @@ name: 'ef-seed'
 description: >
   Seed reference / master data for a module in packages/api/Tsz.Api. Two modes:
   EF Core HasData() in IEntityTypeConfiguration (static reference data baked into a
-  migration), or a runtime ISeeder run at startup (dynamic / demo data). Use after
-  backend-module when the entity needs baseline rows.
+  migration), or a runtime seeder run at startup through IUnitOfWork (dynamic / demo
+  data). Use after backend-module when the entity needs baseline rows.
 paths: packages/api/**
 ---
 
@@ -17,7 +17,7 @@ Two-mode skill. Pick the mode that fits the data:
 | `HasData()` | Reference data: lookups, enums-as-tables, fixed roles | Baked into a generated migration — runs once per environment |
 | Runtime seeder | Demo data, dev fixtures, anything that may grow | Called from `Program.cs` after `Migrate()` — runs every startup, must be idempotent |
 
-`AnimalSeeder` in the codebase today is a runtime seeder. New domains follow the same pattern unless the data is truly static reference data.
+`UserSeeder` in the codebase today is a runtime seeder. New domains follow the same pattern unless the data is truly static reference data.
 
 ## Mode A — `HasData()` for static reference data
 
@@ -42,7 +42,7 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
 }
 ```
 
-Then run the `ef-migration` skill (`dotnet ef migrations add SeedSpecies ...`). The migration's `Up()` will contain `migrationBuilder.InsertData(...)` calls; `Down()` will have the matching `DeleteData`. Editing the `HasData` later generates a new migration that diffs against the previous seed rows — EF handles inserts/updates/deletes automatically.
+Then run the `ef-migration` skill (`dotnet ef migrations add SeedSpecies …`). The migration's `Up()` will contain `migrationBuilder.InsertData(...)` calls; `Down()` will have the matching `DeleteData`. Editing the `HasData` later generates a new migration that diffs against the previous seed rows — EF handles inserts/updates/deletes automatically.
 
 **Limits of HasData:**
 - Cannot reference computed values (`DateTime.UtcNow`, `Guid.NewGuid()`) — IDs must be literals
@@ -51,43 +51,50 @@ Then run the `ef-migration` skill (`dotnet ef migrations add SeedSpecies ...`). 
 
 ## Mode B — runtime seeder at startup
 
-Use when the data is demo/dev fixtures, or any case HasData can't cover. Pattern follows `AnimalSeeder`:
+Use when the data is demo/dev fixtures, or any case HasData can't cover. Pattern follows `UserSeeder` — the seeder talks to `IUnitOfWork` / `IRepository`, never directly to `AppDbContext`:
 
 `Modules/<Feature>/<Feature>Seeder.cs`:
 
 ```csharp
+using Tsz.Infrastructure.Abstractions;
+
 namespace Tsz.Api.Modules.<Feature>;
 
-public class <Feature>Seeder(<Feature>DbContext context)
+public class <Feature>Seeder(IUnitOfWork uow)
 {
-    public void Seed()
+    public async Task SeedAsync(CancellationToken ct = default)
     {
-        if (context.<Feature>s.Any()) return; // idempotent guard
+        var repo = uow.RepositoryFor<<Feature>>();
+        if (await repo.ExistsAsync(_ => true, ct)) return; // idempotent guard
 
-        context.<Feature>s.AddRange(
-            <Feature>.Create(/* ... */),
-            <Feature>.Create(/* ... */));
-        context.SaveChanges();
+        repo.Add(<Feature>.Create(/* ... */));
+        repo.Add(<Feature>.Create(/* ... */));
+        await uow.SaveChangesAsync(ct);
     }
 }
 ```
 
-In `Program.cs`, after `Migrate()`:
+In `Program.cs`, after `Migrate()`, resolve the UoW from the startup scope alongside the existing `UserSeeder`:
 
 ```csharp
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AnimalDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (db.Database.IsRelational())
         db.Database.Migrate();
     else
         db.Database.EnsureCreated();
 
-    new <Feature>Seeder(db).Seed();
+    if (app.Environment.IsDevelopment())
+    {
+        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await new UserSeeder(uow).SeedAsync();
+        await new <Feature>Seeder(uow).SeedAsync();
+    }
 }
 ```
 
-**Idempotency is your job.** The seeder runs on every startup — guard with `.Any()` or equivalent. Don't rely on EF migrations to prevent re-seeding.
+**Idempotency is your job.** The seeder runs on every startup — guard with `ExistsAsync` or a more specific check (e.g. `UserSeeder` checks for the admin email). Don't rely on EF migrations to prevent re-seeding.
 
 ## Step 1 — Pick the mode
 
@@ -100,7 +107,12 @@ Follow the section above for the chosen mode.
 
 ## Step 3 — For Mode A, generate the migration
 
-`dotnet ef migrations add Seed<Feature> --project packages/api/Tsz.Api --startup-project packages/api/Tsz.Api --output-dir Migrations`
+```
+dotnet ef migrations add Seed<Feature> \
+  --project packages/api/Tsz.Api \
+  --startup-project packages/api/Tsz.Api \
+  --output-dir Persistence/Migrations
+```
 
 Inspect the generated `InsertData` calls. Commit.
 
@@ -108,4 +120,4 @@ Inspect the generated `InsertData` calls. Commit.
 
 Start the API and confirm rows exist (Mode A: hit the endpoint; Mode B: same).
 
-For integration tests that depend on baseline data: tests use `UseInMemoryDatabase`, so HasData seeds are NOT applied (InMemory doesn't run migrations). Use Mode B for anything tests need, or create the data inside each test class.
+For integration tests that depend on baseline data: tests use `UseInMemoryDatabase`, so HasData seeds are NOT applied (InMemory doesn't run migrations). Use Mode B for anything tests need, or create the data inside each test class via `IntegrationTestBase.WithUowAsync(...)`.

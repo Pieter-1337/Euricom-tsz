@@ -10,18 +10,20 @@ paths: packages/api/**
 
 # EF Migration
 
-The source of truth is the C# model (entity + `IEntityTypeConfiguration<T>`). Migrations are generated, not hand-written. They live in `packages/api/Tsz.Api/Migrations/` and are applied at startup by `Program.cs`.
+The source of truth is the C# model (entity + `IEntityTypeConfiguration<T>`). Migrations are generated, not hand-written. They live in `packages/api/Tsz.Api/Persistence/Migrations/` and are applied at startup by `Program.cs`.
 
 ## Conventions
-- DbContext: `Tsz.Api/Modules/Animals/AnimalDbContext.cs` (one context for the whole API right now)
-- Migration folder: `packages/api/Tsz.Api/Migrations/`
+- DbContext: `Tsz.Api/Persistence/AppDbContext.cs` — one shared context for the whole API
+- Migration folder: `packages/api/Tsz.Api/Persistence/Migrations/`
+- Snapshot file: `AppDbContextModelSnapshot.cs` (committed)
+- Default dev DB file: `tsz.db` (SQLite, see `appsettings.Development.json` / `Program.cs` connection string)
 - Migrations are applied at startup via `db.Database.Migrate()` (guarded by `IsRelational()` so InMemory tests don't trip on it)
 - Tool: `dotnet ef` is a local tool — installed via `dotnet-tools.json` at the repo root
 - **Never edit a migration that has already been applied to any environment.** Generate a new one to make further changes.
 
 ## Step 1 — Clarify scope
 - What changed on the entity / configuration? (new field, new index, rename, type change, …)
-- A descriptive PascalCase name for the migration (`AddColourToAnimal`, `IndexAnimalSpecies`, …)
+- A descriptive PascalCase name for the migration (`AddColourToUser`, `IndexUserEmail`, …)
 - Does existing data need to be backfilled? If so, the generated migration will need a hand-edited `migrationBuilder.Sql(...)` call.
 
 ## Step 2 — Edit the model
@@ -36,13 +38,13 @@ From the repo root:
 dotnet ef migrations add <Name> \
   --project packages/api/Tsz.Api \
   --startup-project packages/api/Tsz.Api \
-  --output-dir Migrations
+  --output-dir Persistence/Migrations
 ```
 
-This creates three files in `Tsz.Api/Migrations/`:
+This creates three files in `Tsz.Api/Persistence/Migrations/`:
 - `<timestamp>_<Name>.cs` — `Up()` / `Down()` with the generated `migrationBuilder.*` calls
 - `<timestamp>_<Name>.Designer.cs` — generated, do not edit
-- `AnimalDbContextModelSnapshot.cs` — updated snapshot of the full model; **commit this**
+- `AppDbContextModelSnapshot.cs` — updated snapshot of the full model; **commit this**
 
 ## Step 4 — Inspect and hand-edit if needed
 
@@ -53,7 +55,7 @@ Open `<timestamp>_<Name>.cs` and read the generated SQL. Two SQLite-specific thi
 
 ## Step 5 — Apply locally
 
-Stop the API if it's running (`animals.db` will be locked otherwise), then start it again — `db.Database.Migrate()` runs at startup and applies any pending migrations. To apply without starting the API:
+Stop the API if it's running (`tsz.db` will be locked otherwise), then start it again — `db.Database.Migrate()` runs at startup and applies any pending migrations. To apply without starting the API:
 
 ```
 dotnet ef database update \

@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-05-14
+
+refactor: drop AppDbContext DbSets; route plumbing via IRepository
+
+Extend IRepository with a per-call ignoreQueryFilters flag and a
+BatchHardDeleteAsync primitive so seeders, the auth user resolver, and
+integration tests can run through IUnitOfWork instead of reaching for
+AppDbContext directly. With the abstraction now able to express soft-
+delete bypass, the explicit DbSet<User> property comes off AppDbContext
+— entities are still registered via ApplyConfigurationsFromAssembly,
+and IRepository<T> resolves them through context.Set<T>().
+
+EfCoreRepository.BatchHardDeleteAsync uses ExecuteDeleteAsync on
+relational providers and falls back to load+RemoveRange+SaveChanges on
+InMemory, so integration tests get the same observable behaviour
+without depending on the relational SQL path.
+
+Update the backend-module, backend-integration-test, and ef-seed
+skills to reflect the new conventions: no DbSet step, tests cleanup
+via BatchHardDeleteAsync, seeders take IUnitOfWork.
+
 ## 2026-05-13
 
 feat(web): finish entra access gate UI — /no-access, admin users CRUD
