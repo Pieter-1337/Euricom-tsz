@@ -2,6 +2,17 @@
 
 ## 2026-05-14
 
+chore: move Azure AD values to appsettings.Development.json
+
+Relocate dev TenantId/ClientId/Audience from base appsettings.json
+to appsettings.Development.json so prod inherits no Azure config
+by default and has to opt in explicitly. Base appsettings.json
+keeps the AzureAd block with empty strings for discoverability.
+Comment out UserSecretsId in Tsz.Api.csproj since we have no
+actual secrets to store yet; trivial to uncomment when needed.
+
+## 2026-05-14
+
 chore: configure Azure AD settings
 
 Fill in TenantId, ClientId, and Audience in appsettings.json for
