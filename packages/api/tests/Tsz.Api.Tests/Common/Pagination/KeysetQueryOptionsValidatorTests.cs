@@ -39,7 +39,7 @@ public class KeysetQueryOptionsValidatorTests
 
     private static KeysetQueryOptions Valid() =>
         new(Search: null, SortBy: null, SortDir: PaginationSortDir.Asc,
-            PageSize: 20, Cursor: null, IncludeDeleted: false);
+            PageSize: 20, Cursor: null, DeletedOnly: false);
 
     // ── Search ────────────────────────────────────────────────────────────────
 
@@ -166,12 +166,12 @@ public class KeysetQueryOptionsValidatorTests
         result.Errors.ShouldContain(e => e.PropertyName == nameof(KeysetQueryOptions.Cursor));
     }
 
-    // ── IncludeDeleted ────────────────────────────────────────────────────────
+    // ── DeletedOnly ───────────────────────────────────────────────────────────
 
     [Fact]
-    public async Task IncludeDeleted_True_Passes()
+    public async Task DeletedOnly_True_Passes()
     {
-        var result = await Validator.ValidateAsync(Valid() with { IncludeDeleted = true });
+        var result = await Validator.ValidateAsync(Valid() with { DeletedOnly = true });
         result.IsValid.ShouldBeTrue();
     }
 }

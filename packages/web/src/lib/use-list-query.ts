@@ -15,7 +15,7 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState<TSortKey>(defaultSort.by);
   const [sortDir, setSortDir] = useState<SortDir>(defaultSort.dir);
-  const [includeDeleted, setIncludeDeleted] = useState(false);
+  const [deletedOnly, setDeletedOnly] = useState(false);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 300);
@@ -27,7 +27,7 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
     sortBy,
     sortDir,
     pageSize,
-    includeDeleted,
+    deletedOnly,
   };
 
   const query = useInfiniteQuery({
@@ -66,8 +66,8 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
     sortBy,
     sortDir,
     setSort,
-    includeDeleted,
-    setIncludeDeleted,
+    deletedOnly,
+    setDeletedOnly,
     sentinelRef,
     isLoading,
     isFetchingNextPage,

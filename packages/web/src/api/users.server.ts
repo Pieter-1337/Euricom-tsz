@@ -16,7 +16,7 @@ export const getUsersPaged = async (
         sortDir: params.sortDir,
         pageSize: params.pageSize,
         cursor: params.cursor,
-        includeDeleted: params.includeDeleted,
+        deletedOnly: params.deletedOnly,
       },
     },
   });

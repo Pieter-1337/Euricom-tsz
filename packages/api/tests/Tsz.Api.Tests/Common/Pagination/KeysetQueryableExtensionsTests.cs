@@ -62,7 +62,7 @@ public class KeysetQueryableExtensionsTests : IDisposable
     private static KeysetQueryOptions DefaultOpts(int pageSize = 50, string? cursor = null,
         string? search = null, string? sortBy = null, PaginationSortDir dir = PaginationSortDir.Asc)
         => new(Search: search, SortBy: sortBy, SortDir: dir, PageSize: pageSize,
-               Cursor: cursor, IncludeDeleted: false);
+               Cursor: cursor, DeletedOnly: false);
 
     // ── Empty source ──────────────────────────────────────────────────────────
 

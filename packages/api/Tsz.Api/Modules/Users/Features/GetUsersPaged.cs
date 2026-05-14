@@ -10,8 +10,8 @@ public record GetUsersPagedQuery(
     SortDirection SortDir,
     int PageSize,
     string? Cursor,
-    bool IncludeDeleted)
-    : KeysetQueryOptions(Search, SortBy, SortDir, PageSize, Cursor, IncludeDeleted),
+    bool DeletedOnly)
+    : KeysetQueryOptions(Search, SortBy, SortDir, PageSize, Cursor, DeletedOnly),
       IQuery<KeysetPage<UserDto>>;
 
 public sealed class GetUsersPagedQueryValidator
@@ -44,6 +44,7 @@ public sealed class GetUsersPagedHandler(IUnitOfWork uow)
             Sort,
             Searchable,
             UserDto.Project,
+            filter: query.DeletedOnly ? u => u.DeletedAt != null : null,
             ct: ct,
-            ignoreQueryFilters: query.IncludeDeleted);
+            ignoreQueryFilters: query.DeletedOnly);
 }

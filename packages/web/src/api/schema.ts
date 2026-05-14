@@ -201,7 +201,7 @@ export interface paths {
                     sortDir?: string;
                     pageSize?: number;
                     cursor?: string;
-                    includeDeleted?: boolean;
+                    deletedOnly?: boolean;
                 };
                 header?: never;
                 path?: never;

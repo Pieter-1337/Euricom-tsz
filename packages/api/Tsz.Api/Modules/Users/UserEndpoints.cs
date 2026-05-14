@@ -33,13 +33,13 @@ public static class UserEndpoints
             string? sortDir = null,
             int pageSize = 0,
             string? cursor = null,
-            bool includeDeleted = false) =>
+            bool deletedOnly = false) =>
         {
             var dir = Enum.TryParse<SortDirection>(sortDir, ignoreCase: true, out var parsed)
                 ? parsed
                 : SortDirection.Asc;
             return TypedResults.Ok(await dispatcher.SendAsync(
-                new GetUsersPagedQuery(search, sortBy, dir, pageSize, cursor, includeDeleted), ct));
+                new GetUsersPagedQuery(search, sortBy, dir, pageSize, cursor, deletedOnly), ct));
         });
 
         adminGroup.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>

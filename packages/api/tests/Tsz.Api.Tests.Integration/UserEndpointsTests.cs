@@ -356,7 +356,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetUsersPaged_IncludeDeleted_SurfacesSoftDeletedUsers()
+    public async Task GetUsersPaged_DeletedOnly_ReturnsOnlySoftDeletedUsers()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var createResponse = await Client.PostAsJsonAsync("/api/users",
@@ -364,11 +364,12 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var dto = (await createResponse.Content.ReadFromJsonAsync<UserDto>(Json))!;
         await Client.DeleteAsync($"/api/users/{dto.Id}");
 
-        var withDeleted = await Client.GetAsync("/api/users/paged?includeDeleted=true");
-        withDeleted.EnsureSuccessStatusCode();
-        var page = await withDeleted.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
+        var deletedOnly = await Client.GetAsync("/api/users/paged?deletedOnly=true");
+        deletedOnly.EnsureSuccessStatusCode();
+        var page = await deletedOnly.Content.ReadFromJsonAsync<KeysetPage<UserDto>>(Json);
         Assert.NotNull(page);
         Assert.Contains(page.Items, u => u.Id == dto.Id);
+        Assert.DoesNotContain(page.Items, u => u.Email == TestEmail);
     }
 
     [Fact]

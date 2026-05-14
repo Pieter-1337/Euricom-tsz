@@ -12,5 +12,5 @@ export type KeysetQueryParams<TSortKey extends string = string> = {
   sortDir?: SortDir;
   pageSize?: number;
   cursor?: string;
-  includeDeleted?: boolean;
+  deletedOnly?: boolean;
 };

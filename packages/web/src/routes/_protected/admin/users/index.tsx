@@ -19,7 +19,7 @@ const getUsersPagedParamsSchema = z.object({
   sortDir: z.enum(['asc', 'desc']).optional(),
   pageSize: z.number().optional(),
   cursor: z.string().optional(),
-  includeDeleted: z.boolean().optional(),
+  deletedOnly: z.boolean().optional(),
 });
 
 const fetchUsersPaged = createServerFn({ method: 'GET' })
@@ -35,7 +35,7 @@ export const Route = createFileRoute('/_protected/admin/users/')({
 function UsersList() {
   const router = useRouter();
 
-  const { items, total, search, setSearch, sortBy, sortDir, setSort, includeDeleted, setIncludeDeleted, sentinelRef, isLoading, isFetchingNextPage, error } =
+  const { items, total, search, setSearch, sortBy, sortDir, setSort, deletedOnly, setDeletedOnly, sentinelRef, isLoading, isFetchingNextPage, error } =
     useListQuery<User, UserSortKey>({
       queryKey: ['users-paged'],
       fetcher: (params) => fetchUsersPaged({ data: params }),
@@ -56,8 +56,8 @@ function UsersList() {
         total={total}
         toggle={{
           label: 'Active',
-          checked: !includeDeleted,
-          onChange: (checked) => setIncludeDeleted(!checked),
+          checked: !deletedOnly,
+          onChange: (checked) => setDeletedOnly(!checked),
         }}
         items={items}
         rowKey={(u) => u.id}

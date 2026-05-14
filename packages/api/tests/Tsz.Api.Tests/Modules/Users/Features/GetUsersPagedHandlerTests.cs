@@ -50,8 +50,8 @@ public class GetUsersPagedHandlerTests : IDisposable
         SortDir sortDir = SortDir.Asc,
         int pageSize = 50,
         string? cursor = null,
-        bool includeDeleted = false)
-        => new(search, sortBy, sortDir, pageSize, cursor, includeDeleted);
+        bool deletedOnly = false)
+        => new(search, sortBy, sortDir, pageSize, cursor, deletedOnly);
 
     // ── tests ─────────────────────────────────────────────────────────────────
 
@@ -189,7 +189,7 @@ public class GetUsersPagedHandlerTests : IDisposable
         var deleted = UserBuilder.Build().WithFirstName("Deleted").SoftDeleted();
         var handler = BuildHandler([active, deleted]);
 
-        var page = await handler.HandleAsync(PagedQuery(includeDeleted: false));
+        var page = await handler.HandleAsync(PagedQuery(deletedOnly: false));
 
         page.Items.Count.ShouldBe(1);
         page.Items[0].FirstName.ShouldBe("Active");
@@ -197,16 +197,17 @@ public class GetUsersPagedHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task SoftDeleted_ShownWithIncludeDeleted()
+    public async Task SoftDeleted_OnlyShownWithDeletedOnly()
     {
         var active = UserBuilder.Build().WithFirstName("Active");
         var deleted = UserBuilder.Build().WithFirstName("Deleted").SoftDeleted();
         var handler = BuildHandler([active, deleted]);
 
-        var page = await handler.HandleAsync(PagedQuery(includeDeleted: true));
+        var page = await handler.HandleAsync(PagedQuery(deletedOnly: true));
 
-        page.Items.Count.ShouldBe(2);
-        page.Total.ShouldBe(2);
+        page.Items.Count.ShouldBe(1);
+        page.Items[0].FirstName.ShouldBe("Deleted");
+        page.Total.ShouldBe(1);
     }
 
     [Fact]

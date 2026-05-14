@@ -8,7 +8,7 @@ public record KeysetQueryOptions(
     SortDirection SortDir,
     int PageSize,
     string? Cursor,
-    bool IncludeDeleted)
+    bool DeletedOnly)
 {
     public int PageSize { get; init; } = PageSize <= 0 ? 50 : PageSize;
 }
