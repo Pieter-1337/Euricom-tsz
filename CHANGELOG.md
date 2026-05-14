@@ -2,6 +2,21 @@
 
 ## 2026-05-14
 
+fix: toggle Active shows only active or only deleted, not both
+
+Rename IncludeDeleted → DeletedOnly throughout (backend, frontend).
+New semantics: Active ON (toggle checked) shows only active users
+(default, DeletedOnly=false). Active OFF (toggle unchecked) shows
+only soft-deleted users (DeletedOnly=true). Query filter applies
+when false; when true, ignoreQueryFilters + filter to DeletedAt != null.
+
+Backend: KeysetQueryOptions record, GetUsersPagedQuery, endpoint,
+handler adds filter expression when DeletedOnly=true. Update tests
+to reflect new behavior. All 57 unit tests pass.
+
+Frontend: pagination types, users.server, useListQuery, route schema,
+component toggle logic. Toggle semantic: checked={!deletedOnly}.
+
 fix: polish paged users list — binding, search, and UI stability
 
 Backend:
