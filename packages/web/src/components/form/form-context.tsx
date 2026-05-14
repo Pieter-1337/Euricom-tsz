@@ -6,9 +6,23 @@ import { Textarea } from '#/components/ui/textarea';
 import { Checkbox } from '#/components/ui/checkbox';
 import { Button } from '#/components/ui/button';
 import { FieldError } from '#/components/form/field-error';
-import { hasClientSideError } from '#/lib/form-utils';
+import { hasFormError } from '#/lib/form-utils';
 
 export const { fieldContext, formContext, useFieldContext, useFormContext } = createFormHookContexts();
+
+type FieldWithForm = {
+  name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: { setFieldMeta: (name: any, updater: (prev: any) => any) => void };
+};
+
+function clearServerErrorFor(field: FieldWithForm) {
+  field.form.setFieldMeta(field.name, (prev) => {
+    if (!prev?.errorMap?.onServer) return prev;
+    const { onServer: _drop, ...rest } = prev.errorMap;
+    return { ...prev, errorMap: rest };
+  });
+}
 
 function TextField({ label, type }: { label: string; type?: string }) {
   const field = useFieldContext<string>();
@@ -22,7 +36,10 @@ function TextField({ label, type }: { label: string; type?: string }) {
         value={field.state.value}
         aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) => {
+          clearServerErrorFor(field);
+          field.handleChange(e.target.value);
+        }}
       />
       <FieldError field={field} />
     </div>
@@ -43,7 +60,10 @@ function NumberField({ label, suffix, min }: { label: ReactNode; suffix?: string
           value={field.state.value}
           aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
           onBlur={field.handleBlur}
-          onChange={(e) => field.handleChange(Number(e.target.value))}
+          onChange={(e) => {
+            clearServerErrorFor(field);
+            field.handleChange(Number(e.target.value));
+          }}
         />
         {suffix && <span className="text-sm text-muted-foreground">{suffix}</span>}
       </div>
@@ -62,7 +82,10 @@ function SelectField<T extends string>({ label, options }: { label: string; opti
         name={field.name}
         value={field.state.value}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value as T)}
+        onChange={(e) => {
+          clearServerErrorFor(field);
+          field.handleChange(e.target.value as T);
+        }}
         className="border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
       >
         {options.map((o) => (
@@ -88,7 +111,10 @@ function TextareaField({ label, rows }: { label: string; rows?: number }) {
         value={field.state.value}
         aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) => {
+          clearServerErrorFor(field);
+          field.handleChange(e.target.value);
+        }}
       />
       <FieldError field={field} />
     </div>
@@ -104,7 +130,10 @@ function CheckboxField({ label }: { label: string }) {
         name={field.name}
         checked={field.state.value}
         onBlur={field.handleBlur}
-        onCheckedChange={(checked) => field.handleChange(checked === true ? true : false)}
+        onCheckedChange={(checked) => {
+          clearServerErrorFor(field);
+          field.handleChange(checked === true ? true : false);
+        }}
       />
       <Label htmlFor={field.name}>{label}</Label>
       <FieldError field={field} />
@@ -124,7 +153,10 @@ function DateField({ label }: { label: string }) {
         value={field.state.value}
         aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) => {
+          clearServerErrorFor(field);
+          field.handleChange(e.target.value);
+        }}
       />
       <FieldError field={field} />
     </div>
@@ -136,13 +168,13 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
   return (
     <form.Subscribe
       selector={(state) => ({
-        hasClientError: hasClientSideError(state.fieldMeta),
+        hasError: hasFormError(state.fieldMeta),
         isSubmitting: state.isSubmitting,
         isChanged: !state.isDefaultValue,
       })}
     >
-      {({ hasClientError, isSubmitting, isChanged }) => (
-        <Button type="submit" disabled={hasClientError || isSubmitting || !isChanged}>
+      {({ hasError, isSubmitting, isChanged }) => (
+        <Button type="submit" disabled={hasError || isSubmitting || !isChanged}>
           {isSubmitting ? pendingLabel : label}
         </Button>
       )}
@@ -182,14 +214,14 @@ function FormActions({
   return (
     <form.Subscribe
       selector={(state) => ({
-        hasClientError: hasClientSideError(state.fieldMeta),
+        hasError: hasFormError(state.fieldMeta),
         isSubmitting: state.isSubmitting,
         isChanged: !state.isDefaultValue,
       })}
     >
-      {({ hasClientError, isSubmitting, isChanged }) => (
+      {({ hasError, isSubmitting, isChanged }) => (
         <div className={className}>
-          <Button type="submit" disabled={hasClientError || isSubmitting || !isChanged}>
+          <Button type="submit" disabled={hasError || isSubmitting || !isChanged}>
             {isSubmitting ? savePendingLabel : saveLabel}
           </Button>
           {showCancel && (customCancel || isChanged) && (

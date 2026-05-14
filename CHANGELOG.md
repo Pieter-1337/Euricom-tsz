@@ -2,6 +2,21 @@
 
 ## 2026-05-14
 
+feat: unify form error handling, auto-clear server errors on edit
+
+Server-side field errors now behave like client-side ones for the
+purpose of disabling Save: any unresolved error (regardless of
+source) blocks submit. Drop the onServer carve-out in
+hasClientSideError and rename it hasFormError. Each bound field
+component (Text/Number/Select/Textarea/Checkbox/Date) clears its
+own errorMap.onServer on change, so a stale server error never
+sticks to a field after the user starts fixing it. The form-level
+banner clears itself the moment any field value changes, via a
+form.store subscription in useFormServerErrors that snapshots
+values when the error is set.
+
+## 2026-05-14
+
 feat: sidebar shell + emerald/slate theme tokens
 
 Replace the top-nav bar with a two-column shell: a dark slate

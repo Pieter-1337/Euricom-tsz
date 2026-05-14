@@ -1,15 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { parseServerError } from '#/lib/server-error';
 
 interface FormWithSetFieldMeta {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFieldMeta: (field: never, updater: (prev: any) => any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  store: { subscribe: (cb: () => void) => { unsubscribe: () => void }; state: { values: any } };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: { values: any };
 }
 
 export function useFormServerErrors(form: FormWithSetFieldMeta, fieldNames: readonly string[]) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const errorAtValuesRef = useRef<unknown>(null);
+
+  useEffect(() => {
+    const sub = form.store.subscribe(() => {
+      if (errorAtValuesRef.current != null && form.state.values !== errorAtValuesRef.current) {
+        errorAtValuesRef.current = null;
+        setServerError(null);
+      }
+    });
+    return () => sub.unsubscribe();
+  }, [form]);
 
   function clearServerErrors() {
+    errorAtValuesRef.current = null;
     setServerError(null);
     for (const field of fieldNames) {
       form.setFieldMeta(field as never, (prev) => ({
@@ -37,6 +53,7 @@ export function useFormServerErrors(form: FormWithSetFieldMeta, fieldNames: read
     } else {
       setServerError('Something went wrong.');
     }
+    errorAtValuesRef.current = form.state.values;
   }
 
   return { serverError, clearServerErrors, handleApiError };
