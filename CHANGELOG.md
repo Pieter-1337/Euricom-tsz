@@ -2,6 +2,17 @@
 
 ## 2026-05-14
 
+feat: sidebar shell + emerald/slate theme tokens
+
+Replace the top-nav bar with a two-column shell: a dark slate
+header (brand + greeting + sign out + theme toggle) above a
+sidebar (Home, and Users for admins) and a flex main pane.
+Drop the max-w-3xl wrapper on the root so the layout owns its
+own width. Repoint the shadcn theme tokens from neutral grey
+to emerald-primary / slate-neutrals in both light and dark.
+
+## 2026-05-14
+
 feat: split User.Name into firstName/lastName
 
 Replace the single Name field on User with FirstName + LastName

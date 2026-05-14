@@ -66,9 +66,5 @@ function RootLayout() {
 
   if (!session?.user) return null;
 
-  return (
-    <div className="mx-auto max-w-3xl p-6">
-      <Outlet />
-    </div>
-  );
+  return <Outlet />;
 }

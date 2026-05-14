@@ -1,4 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
+import { Home as HomeIcon, Users as UsersIcon, User as UserIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { UserRole } from '#/api/users';
 import { ThemeToggle } from '#/components/theme-toggle';
 import { authClient } from '#/lib/auth-client';
@@ -17,38 +19,75 @@ export const Route = createFileRoute('/_protected')({
 });
 
 function ProtectedLayout() {
-  const ctx = Route.useRouteContext() as {
+  const { currentUser } = Route.useRouteContext() as {
     user: SessionUser;
     currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
   };
-  const { user, currentUser } = ctx;
   const isAdmin = currentUser.role === UserRole.Admin;
+  const firstName = currentUser.firstName;
 
   return (
-    <>
-      <nav className="mb-6 flex items-center gap-4 text-sm">
-        <Link to="/" className="[&.active]:font-bold">
-          Home
-        </Link>
-        {isAdmin && (
-          <Link to="/admin/users" className="[&.active]:font-bold">
-            Users
-          </Link>
-        )}
-        <div className="ml-auto flex items-center gap-3">
-          <span className="text-muted-foreground">
-            {user.name} ·{' '}
-            <button
-              className="underline-offset-4 hover:underline"
-              onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })}
-            >
-              Sign out
-            </button>
-          </span>
+    <div className="flex min-h-screen flex-col">
+      <header className="flex h-12 items-center justify-between bg-slate-900 px-6 text-slate-100">
+        <span className="text-base font-semibold text-emerald-400">Timesheet Zone</span>
+        <div className="flex items-center gap-3 text-sm">
+          <UserIcon className="h-4 w-4" />
+          <span>Hi, {firstName}!</span>
+          <button
+            className="text-slate-300 underline-offset-4 hover:text-slate-100 hover:underline"
+            onClick={() =>
+              authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })
+            }
+          >
+            Sign out
+          </button>
           <ThemeToggle />
         </div>
-      </nav>
-      <Outlet />
-    </>
+      </header>
+      <div className="flex flex-1">
+        <aside className="w-64 shrink-0 border-r bg-sidebar text-sidebar-foreground">
+          <nav className="px-3 py-6">
+            <SidebarLink
+              to="/"
+              icon={<HomeIcon className="h-4 w-4" />}
+              label="Home"
+              activeOptions={{ exact: true }}
+            />
+            {isAdmin && (
+              <>
+                <div className="my-3 border-t border-sidebar-border" />
+                <SidebarLink to="/admin/users" icon={<UsersIcon className="h-4 w-4" />} label="Users" />
+              </>
+            )}
+          </nav>
+        </aside>
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function SidebarLink({
+  to,
+  icon,
+  label,
+  activeOptions,
+}: {
+  to: string;
+  icon: ReactNode;
+  label: string;
+  activeOptions?: { exact?: boolean };
+}) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground [&.active]:bg-sidebar-accent [&.active]:font-medium [&.active]:text-sidebar-accent-foreground"
+      activeOptions={activeOptions}
+    >
+      {icon}
+      {label}
+    </Link>
   );
 }
