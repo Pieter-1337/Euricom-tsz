@@ -103,6 +103,7 @@ public class UpdateUserLeaveValidatorTests
         var result = await validator.ValidateAsync(new UpdateUserLeaveCommand(Guid.NewGuid(), Guid.NewGuid(), 5m));
         result.IsValid.ShouldBeFalse();
         var error = result.Errors.First(e => e.ErrorCode == CommonErrors.Invalid.Code);
-        error.ShouldNotBeNull();
+        error.CustomState.ShouldBe(CommonErrors.Invalid);
+        ((IErrorCode)error.CustomState).Category.ShouldBe(ErrorCategory.Validation);
     }
 }

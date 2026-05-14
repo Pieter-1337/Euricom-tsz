@@ -28,7 +28,7 @@ public sealed class UpdateUserLeaveValidator : AbstractValidator<UpdateUserLeave
             .When(x => x.Id != Guid.Empty && x.UserId != Guid.Empty);
         RuleFor(x => x)
             .MustAsync(TotalDaysMatchesAllowed)
-            .WithErrorCode(CommonErrors.Invalid.Code)
+            .WithError(CommonErrors.Invalid)
             .WithMessage("TotalDays must be set for Limited leave types and null for non-Limited leave types.")
             .When(x => x.Id != Guid.Empty && x.UserId != Guid.Empty);
     }
