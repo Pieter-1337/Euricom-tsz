@@ -2,6 +2,108 @@
 
 ## 2026-05-14
 
+feat: per-year UserLeave + bulk leaves PUT; baseform polish
+
+- Drop the LeaveTypes module: LeaveType + LeaveAllowed fold into
+  Modules/Users as supporting reference data. Catalogue (Verlof, ADV
+  dagen, Anciënniteit, Ziekte) seeded via EF HasData() with stable
+  GUIDs so every environment gets it on Migrate().
+- UserLeave gains Year; unique index on (UserId, LeaveTypeId, Year).
+  CreateUser seeds one row per LeaveType for the current year via
+  injected TimeProvider. UserSeeder tops up missing rows idempotently
+  so existing admins get the new shape on next startup.
+- Endpoint surface for leaves shrinks to two: GET
+  /api/users/{userId}/leaves?year= and atomic bulk PUT with the full
+  year set. No POST/DELETE/PUT-by-id. UpdateUserLeavesValidator
+  pre-loads referenced rows + joined LeaveType in one query and
+  validates per-item via RuleForEach.ChildRules so failures key under
+  items[i].*. Single LeavesModel migration replaces the prior
+  LeavesModel+SimplifyLeaves pair.
+- Admin user edit page: replace per-row dialog with a single
+  useAppForm-driven Leave overview table for the current year.
+  Limited rows render NumberField; Unlimited rows render a muted
+  "Unlimited" label. Taken/Balance render "—" until timesheets ship.
+- Baseform fixes: dirty state now reads TanStack Form's
+  state.isDefaultValue so form.reset(updated) re-baselines correctly
+  after save; Cancel only renders when the form is dirty (custom-
+  handler cancels still always render); FormActions defaults to a
+  left-aligned button row so every form is consistent.
+
+## 2026-05-14
+
+chore(web): prettier sweep across web package
+
+No logical changes — re-runs of formatter on previously unformatted
+files.
+
+## 2026-05-14
+
+feat(web): shared form base + migrate admin user forms
+
+- useAppForm via createFormHook with bound field components (TextField,
+  NumberField, SelectField, TextareaField, CheckboxField, DateField)
+  and bound form components (FormActions, SubmitButton, CancelButton,
+  FormErrorBanner)
+- useFormServerErrors hook: ProblemDetails -> errorMap.onServer
+- FormActions: Save disabled when unchanged from baseline (deep-equal);
+  Cancel opt-in via `cancel` prop (true = reset, fn = custom action)
+- Button: cursor-pointer / cursor-not-allowed for proper hover
+  affordance
+- Migrate admin users new/edit + EditLeaveDialog to the new base
+- New user submit redirects to /admin/users/$id; Delete moved to header
+- Update frontend-form skill for the new conventions
+
+## 2026-05-14
+
+refactor(api): standardise UpdateUserLeaveValidator on .WithError()
+
+Last legacy `.WithErrorCode(CommonErrors.Invalid.Code)` chain replaced
+with the typed `.WithError(CommonErrors.Invalid)` helper, so
+ValidationFailure.CustomState carries the SmartEnum and the global
+exception handler can read the category directly instead of falling
+back to Validation. Custom message preserved via trailing .WithMessage.
+
+Test strengthened to assert CustomState + Category.
+
+## 2026-05-14
+
+docs+test: post-refactor follow-ups for the result pattern
+
+- Reflect the new dispatcher / typed-errors / ProblemDetails contract
+  in agent conventions, architecture, and the backend-slice /
+  unit-test / integration-test skill files.
+- Close 4 coverage gaps identified by audit: AddUserLeave happy-path
+  integration, UpdateUserLeave 400 ProblemDetails body shape,
+  end-to-end 500 smoke via a throwing test-only endpoint, and the
+  unlimited-type-with-days validator failure case. 81 unit + 34
+  integration green.
+
+## 2026-05-14
+
+feat: dispatcher + typed errors via ProblemDetails; leaves data model
+
+Two coupled changes landing together:
+
+* Result pattern. In-house IDispatcher + ValidationBehavior pipeline
+  replaces direct handler.HandleAsync calls. Per-module ErrorCode
+  SmartEnums (UserErrors, LeaveTypeErrors, UserLeaveErrors) with
+  categories (NotFound/Conflict/Forbidden/Validation) attached to
+  FluentValidation failures via .WithError(). GlobalExceptionHandler
+  catches ValidationException and emits RFC 7807 ProblemDetails
+  (404/409/403/400 by highest-severity category; 500 generic for
+  unexpected, no detail leaked). ValidationFilter removed. Frontend
+  ApiRequestError parses application/problem+json; forms surface
+  userMessage + per-field errors via TanStack Form errorMap.onServer.
+  IUnitOfWork Begin/Close removed (unused; EF implicit txn suffices).
+
+* Leaves model. New LeaveType (seeded reference data) + per-user
+  UserLeave entity. CreateUser seeds a UserLeave row per LeaveType.
+  Admin endpoints for LeaveType CRUD and per-user leave management.
+  Drops User's flat HolidayDays/AdvDays/AncienniteitDays/SicknessDays
+  columns.
+
+## 2026-05-14
+
 refactor: drop AppDbContext DbSets; route plumbing via IRepository
 
 Extend IRepository with a per-call ignoreQueryFilters flag and a

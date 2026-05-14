@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Tsz.Api.Modules.LeaveTypes;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
@@ -127,7 +126,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         leavesResponse.EnsureSuccessStatusCode();
         var leaves = await leavesResponse.Content.ReadFromJsonAsync<List<UserLeaveDto>>(Json);
         Assert.NotNull(leaves);
-        Assert.Empty(leaves);
+        Assert.Equal(4, leaves.Count);
     }
 
     [Fact]

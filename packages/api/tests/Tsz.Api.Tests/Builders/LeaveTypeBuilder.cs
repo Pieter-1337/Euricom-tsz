@@ -1,14 +1,17 @@
-using Tsz.Api.Modules.LeaveTypes;
+using Tsz.Api.Modules.Users;
 
 namespace Tsz.Api.Tests.Builders;
 
 public static class LeaveTypeBuilder
 {
-    public static LeaveType Build(string? name = null, LeaveAllowed allowed = LeaveAllowed.Limited, decimal? days = 5m) =>
-        LeaveType.Create(
-            name: name ?? "LeaveType_" + Guid.NewGuid().ToString()[..8],
-            defaultAllowed: allowed,
-            defaultDays: days);
+    public static LeaveType WithName(string name) =>
+        LeaveType.Create(name, LeaveAllowed.Limited, 5m);
+
+    public static LeaveType Limited(string name, decimal days) =>
+        LeaveType.Create(name, LeaveAllowed.Limited, days);
+
+    public static LeaveType Unlimited(string name) =>
+        LeaveType.Create(name, LeaveAllowed.Unlimited, null);
 
     public static LeaveType WithId(this LeaveType entity, Guid id)
     {

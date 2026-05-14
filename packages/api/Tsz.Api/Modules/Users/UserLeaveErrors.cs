@@ -10,12 +10,8 @@ public sealed class UserLeaveErrors : ErrorCodeBase<UserLeaveErrors>
     public static readonly UserLeaveErrors NotFound =
         new("ERR_USER_LEAVE_NOT_FOUND", "User leave not found.", ErrorCategory.NotFound);
 
-    public static readonly UserLeaveErrors UserNotFound =
-        new("ERR_USER_LEAVE_USER_NOT_FOUND", "User not found.", ErrorCategory.NotFound);
-
-    public static readonly UserLeaveErrors LeaveTypeNotFound =
-        new("ERR_USER_LEAVE_LEAVE_TYPE_NOT_FOUND", "Leave type not found.", ErrorCategory.NotFound);
-
-    public static readonly UserLeaveErrors Duplicate =
-        new("ERR_USER_LEAVE_DUPLICATE", "A leave record for this user, leave type, and year already exists.", ErrorCategory.Conflict);
+    public static readonly UserLeaveErrors TotalDaysAllowedMismatch =
+        new("ERR_USER_LEAVE_TOTAL_ALLOWED_MISMATCH",
+            "TotalDays must be set for Limited leave types and null otherwise.",
+            ErrorCategory.Validation);
 }

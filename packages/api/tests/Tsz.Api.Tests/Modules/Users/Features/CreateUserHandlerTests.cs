@@ -1,9 +1,9 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Api.Modules.LeaveTypes;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
+using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Tests.Modules.Users.Features;
@@ -17,7 +17,7 @@ public class CreateUserHandlerTests
 
         var leaveTypeRepo = new Mock<IRepository<LeaveType>>();
         leaveTypeRepo.Setup(r => r.GetAllAsListAsync(null, It.IsAny<CancellationToken>(), false))
-            .ReturnsAsync(leaveTypes ?? []);
+            .ReturnsAsync(leaveTypes?.ToList() ?? []);
 
         var userLeaveRepo = new Mock<IRepository<UserLeave>>();
 
@@ -33,8 +33,8 @@ public class CreateUserHandlerTests
     public async Task HandleAsync_NoLeaveTypes_AddsUserAndReturnsDto()
     {
         var (uow, userRepo, _, userLeaveRepo) = BuildMocks();
-
-        var handler = new CreateUserHandler(uow.Object);
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero));
+        var handler = new CreateUserHandler(uow.Object, timeProvider);
 
         var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "jane@example.com", UserRole.User));
 
@@ -52,22 +52,33 @@ public class CreateUserHandlerTests
     [Fact]
     public async Task HandleAsync_WithLeaveTypes_SeedsOneUserLeaveRowPerLeaveType()
     {
-        var verlof = LeaveType.Create("Verlof", LeaveAllowed.Limited, 20m, group: "Verlof");
-        var ziekte = LeaveType.Create("Ziekte", LeaveAllowed.Unlimited, null, group: "Illness");
+        var fixedDate = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero);
+        var timeProvider = new FakeTimeProvider(fixedDate);
+        var verlof = LeaveTypeBuilder.Limited("Verlof", 20m);
+        var ziekte = LeaveTypeBuilder.Unlimited("Ziekte");
         var (uow, _, _, userLeaveRepo) = BuildMocks(leaveTypes: [verlof, ziekte]);
 
-        var handler = new CreateUserHandler(uow.Object);
+        var handler = new CreateUserHandler(uow.Object, timeProvider);
 
         var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "jane@example.com", UserRole.User));
 
         dto.ShouldNotBeNull();
 
         userLeaveRepo.Verify(r => r.Add(It.Is<UserLeave>(ul =>
-            ul.LeaveTypeId == verlof.Id && ul.TotalDays == 20m)), Times.Once);
+            ul.LeaveTypeId == verlof.Id &&
+            ul.TotalDays == 20m &&
+            ul.Year == 2026)), Times.Once);
 
         userLeaveRepo.Verify(r => r.Add(It.Is<UserLeave>(ul =>
-            ul.LeaveTypeId == ziekte.Id && ul.TotalDays == null)), Times.Once);
+            ul.LeaveTypeId == ziekte.Id &&
+            ul.TotalDays == null &&
+            ul.Year == 2026)), Times.Once);
 
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    private sealed class FakeTimeProvider(DateTimeOffset utcNow) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => utcNow;
     }
 }

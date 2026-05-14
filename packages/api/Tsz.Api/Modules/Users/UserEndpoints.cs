@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Cqrs;
@@ -71,45 +72,24 @@ public static class UserEndpoints
         // UserLeave endpoints
         adminGroup.MapGet("/{userId:guid}/leaves", async (
             Guid userId,
+            int? year,
+            TimeProvider timeProvider,
             IQueryHandler<GetUserLeavesQuery, IReadOnlyList<UserLeaveDto>> handler,
             CancellationToken ct) =>
-                TypedResults.Ok(await handler.HandleAsync(new GetUserLeavesQuery(userId), ct)));
-
-        adminGroup.MapPost("/{userId:guid}/leaves", async (
-            Guid userId,
-            AddUserLeaveCommand command,
-            IDispatcher dispatcher,
-            CancellationToken ct) =>
         {
-            if (command.UserId != userId)
-                return Results.BadRequest("Route userId does not match command UserId.");
-
-            var dto = await dispatcher.SendAsync(command, ct);
-            return Results.Created($"/api/users/{userId}/leaves/{dto.Id}", dto);
+            var resolvedYear = year ?? timeProvider.GetUtcNow().Year;
+            return TypedResults.Ok(await handler.HandleAsync(new GetUserLeavesQuery(userId, resolvedYear), ct));
         });
 
-        adminGroup.MapPut("/{userId:guid}/leaves/{id:guid}", async (
+        adminGroup.MapPut("/{userId:guid}/leaves", async Task<Ok<IReadOnlyList<UserLeaveDto>>> (
             Guid userId,
-            Guid id,
-            UpdateUserLeaveCommand command,
+            UpdateUserLeavesBody body,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
-            if (command.Id != id || command.UserId != userId)
-                return Results.BadRequest("Route id does not match command id.");
-
-            var dto = await dispatcher.SendAsync(command, ct);
-            return Results.Ok(dto);
-        });
-
-        adminGroup.MapDelete("/{userId:guid}/leaves/{id:guid}", async (
-            Guid userId,
-            Guid id,
-            IDispatcher dispatcher,
-            CancellationToken ct) =>
-        {
-            await dispatcher.SendAsync(new DeleteUserLeaveCommand(userId, id), ct);
-            return Results.NoContent();
+            var command = new UpdateUserLeavesCommand(userId, body.Year, body.Items);
+            var dtos = await dispatcher.SendAsync(command, ct);
+            return TypedResults.Ok(dtos);
         });
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Tsz.Api.Modules.LeaveTypes;
 
 namespace Tsz.Api.Modules.Users;
 
@@ -25,7 +24,7 @@ public class UserLeaveConfiguration : IEntityTypeConfiguration<UserLeave>
             .HasForeignKey(ul => ul.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(ul => new { ul.UserId, ul.LeaveTypeId })
+        builder.HasIndex(ul => new { ul.UserId, ul.LeaveTypeId, ul.Year })
             .IsUnique();
     }
 }

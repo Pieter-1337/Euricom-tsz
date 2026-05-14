@@ -1,21 +1,16 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Text.Json.Serialization;
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Tsz.Api.Extensions;
 using Tsz.Api.Infrastructure;
-using Tsz.Api.Modules.LeaveTypes;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Persistence;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Extensions;
-using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
-using Microsoft.OpenApi;
-using Scalar.AspNetCore;
 
 JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
@@ -27,94 +22,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-builder.Services.AddAuthentication()
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
-    {
-        options.MapInboundClaims = false;
-
-        var previousOnFailed = options.Events.OnAuthenticationFailed;
-        options.Events.OnAuthenticationFailed = async ctx =>
-        {
-            await previousOnFailed(ctx);
-            var logger = ctx.HttpContext.RequestServices
-                .GetRequiredService<ILoggerFactory>()
-                .CreateLogger("JwtDebug");
-
-            var auth = ctx.Request.Headers.Authorization.ToString();
-            var token = auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
-                ? auth["Bearer ".Length..]
-                : auth;
-
-            logger.LogWarning("JWT auth failed: {Exception}", ctx.Exception?.ToString());
-            logger.LogWarning("Raw token: {Token}", token);
-        };
-
-        var previousOnValidated = options.Events.OnTokenValidated;
-        options.Events.OnTokenValidated = async ctx =>
-        {
-            await previousOnValidated(ctx);
-            var logger = ctx.HttpContext.RequestServices
-                .GetRequiredService<ILoggerFactory>()
-                .CreateLogger("JwtDebug");
-            logger.LogInformation("JWT validated. iss={Iss} aud={Aud} tid={Tid}",
-                ctx.Principal?.FindFirst("iss")?.Value,
-                ctx.Principal?.FindFirst("aud")?.Value,
-                ctx.Principal?.FindFirst("tid")?.Value);
-        };
-    });
-}
-else
-{
-    builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
-    {
-        options.MapInboundClaims = false;
-    });
-}
-
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-
-    options.AddPolicy(AuthorizationPolicies.RequireAdmin, policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.Requirements.Add(new RequireAdminRequirement());
-    });
-});
-
-builder.Services.AddOpenApi(options =>
-{
-    options.AddSchemaTransformer((schema, _, _) =>
-    {
-        // Remove spurious string type from numeric schemas (JsonNumberHandling artefact)
-        if (schema.Type.HasValue &&
-            (schema.Type.Value & (JsonSchemaType.Integer | JsonSchemaType.Number)) != 0 &&
-            (schema.Type.Value & JsonSchemaType.String) != 0)
-        {
-            schema.Type &= ~JsonSchemaType.String;
-        }
-
-        // Mark all non-nullable properties as required so TS omits the `?`
-        if (schema.Properties is { Count: > 0 })
-        {
-            schema.Required ??= new HashSet<string>();
-            foreach (var (name, property) in schema.Properties)
-            {
-                var isNullable = property.Type is { } t && (t & JsonSchemaType.Null) != 0;
-                if (!isNullable)
-                    schema.Required.Add(name);
-            }
-        }
-
-        return Task.CompletedTask;
-    });
-});
+builder.Services.AddTszAuthentication(builder.Configuration, builder.Environment);
+builder.Services.AddTszOpenApi();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -148,27 +57,16 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment())
     {
         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        await new LeaveTypeSeeder(uow).SeedAsync();
-        await new UserSeeder(uow).SeedAsync();
+        var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
+        await new UserSeeder(uow, timeProvider).SeedAsync();
     }
 }
+
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapOpenApi("/openapi/{documentName}.json").AllowAnonymous();
-app.MapScalarApiReference("/openapi", options =>
-{
-    options.WithOpenApiRoutePattern("/openapi/{documentName}.json");
-}).AllowAnonymous();
 
-app.MapGet("/", () => new
-{
-    name = "Tsz API",
-    version = Assembly.GetExecutingAssembly().GetName().Version?.ToString()
-}).AllowAnonymous();
-
-UserEndpoints.Map(app);
-LeaveTypeEndpoints.Map(app);
+app.MapTszEndpoints();
 
 app.Run();

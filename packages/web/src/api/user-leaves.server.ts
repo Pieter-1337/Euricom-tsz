@@ -1,16 +1,17 @@
 import { apiClient as client } from '#/lib/api.server';
-import type { UserLeave, UpdateUserLeaveRequest } from '#/api/user-leaves';
+import type { UserLeave, UpdateUserLeavesBody } from '#/api/user-leaves';
 
-export const getUserLeaves = async (userId: string): Promise<UserLeave[]> => {
+export const getUserLeaves = async (userId: string, year?: number): Promise<UserLeave[]> => {
   const resp = await client.GET('/api/users/{userId}/leaves', {
-    params: { path: { userId } },
+    params: { path: { userId }, query: year !== undefined ? { year } : {} },
   });
   return resp.data ?? [];
 };
 
-export const updateUserLeave = async (userId: string, id: string, body: UpdateUserLeaveRequest): Promise<void> => {
-  await client.PUT('/api/users/{userId}/leaves/{id}', {
-    params: { path: { userId, id } },
+export const updateUserLeaves = async (userId: string, body: UpdateUserLeavesBody): Promise<UserLeave[]> => {
+  const resp = await client.PUT('/api/users/{userId}/leaves', {
+    params: { path: { userId } },
     body,
   });
+  return resp.data ?? [];
 };

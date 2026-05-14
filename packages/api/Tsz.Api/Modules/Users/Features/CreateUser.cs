@@ -1,5 +1,4 @@
 using FluentValidation;
-using Tsz.Api.Modules.LeaveTypes;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Validation;
 
@@ -32,7 +31,7 @@ public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
     }
 }
 
-public sealed class CreateUserHandler(IUnitOfWork uow)
+public sealed class CreateUserHandler(IUnitOfWork uow, TimeProvider timeProvider)
     : ICommandHandler<CreateUserCommand, UserDto>
 {
     public async Task<UserDto> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
@@ -41,10 +40,11 @@ public sealed class CreateUserHandler(IUnitOfWork uow)
         uow.RepositoryFor<User>().Add(user);
 
         var leaveTypes = await uow.RepositoryFor<LeaveType>().GetAllAsListAsync(ct: ct);
+        var year = timeProvider.GetUtcNow().Year;
         var leaveRepo = uow.RepositoryFor<UserLeave>();
         foreach (var lt in leaveTypes)
         {
-            leaveRepo.Add(UserLeave.Create(user.Id, lt.Id, lt.DefaultDays));
+            leaveRepo.Add(UserLeave.Create(user.Id, lt.Id, year, lt.DefaultDays));
         }
 
         await uow.SaveChangesAsync(ct);

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Tsz.Api.Persistence.Migrations
 {
     /// <inheritdoc />
@@ -33,13 +35,8 @@ namespace Tsz.Api.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    PayrollCode = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    ReportingCode = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    Group = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    PrioInGroup = table.Column<int>(type: "INTEGER", nullable: true),
                     DefaultDays = table.Column<decimal>(type: "TEXT", precision: 5, scale: 2, nullable: true),
-                    DefaultAllowed = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                    DefaultAllowed = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,7 +51,6 @@ namespace Tsz.Api.Persistence.Migrations
                     UserId = table.Column<Guid>(type: "TEXT", nullable: false),
                     LeaveTypeId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Year = table.Column<int>(type: "INTEGER", nullable: false),
-                    Allowed = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
                     TotalDays = table.Column<decimal>(type: "TEXT", precision: 5, scale: 2, nullable: true)
                 },
                 constraints: table =>
@@ -74,12 +70,22 @@ namespace Tsz.Api.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "LeaveTypes",
+                columns: new[] { "Id", "DefaultAllowed", "DefaultDays", "Name" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-1111-1111-1111-000000000001"), "Limited", 20m, "Verlof" },
+                    { new Guid("11111111-1111-1111-1111-000000000002"), "Limited", 5m, "ADV dagen" },
+                    { new Guid("11111111-1111-1111-1111-000000000003"), "Limited", 0m, "Anciënniteit" },
+                    { new Guid("11111111-1111-1111-1111-000000000004"), "Unlimited", null, "Ziekte" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_LeaveTypes_Name",
                 table: "LeaveTypes",
                 column: "Name",
-                unique: true,
-                filter: "\"DeletedAt\" IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLeaves_LeaveTypeId",

@@ -1,19 +1,16 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { useState, useCallback } from 'react';
 import { getUserById, removeUser, updateUser } from '#/api/users.server';
-import { USER_ROLES, UserRole, type User } from '#/api/users';
-import { getUserLeaves, updateUserLeave } from '#/api/user-leaves.server';
-import { LeaveAllowed } from '#/api/leave-types';
-import type { UserLeave, UpdateUserLeaveRequest } from '#/api/user-leaves';
-import { throwApiError, parseServerError } from '#/lib/server-error';
+import { USER_ROLES, UserRole } from '#/api/users';
+import { getUserLeaves, updateUserLeaves } from '#/api/user-leaves.server';
+import { LeaveAllowed, type UserLeave, type UpdateUserLeavesBody } from '#/api/user-leaves';
+import { throwApiError } from '#/lib/server-error';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/lib/use-form-server-errors';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '#/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 
 const userIdSchema = z.string().min(1);
@@ -28,10 +25,21 @@ const saveUserInputSchema = z.object({
   user: updateUserSchema,
 });
 
-const fetchUserById = createServerFn({ method: 'GET' })
+const leavesFormSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string(),
+      leaveTypeId: z.string(),
+      totalDays: z.coerce.number().min(0).nullable(),
+    }),
+  ),
+});
+
+const fetchUserAndLeaves = createServerFn({ method: 'GET' })
   .inputValidator(userIdSchema)
-  .handler(async ({ data: id }): Promise<User | null> => {
-    return await getUserById(id);
+  .handler(async ({ data: id }) => {
+    const [user, leaves] = await Promise.all([getUserById(id), getUserLeaves(id)]);
+    return { user, leaves };
   });
 
 const saveUser = createServerFn({ method: 'POST' })
@@ -54,29 +62,23 @@ const deleteUser = createServerFn({ method: 'POST' })
     }
   });
 
-const fetchUserLeaves = createServerFn({ method: 'GET' })
-  .inputValidator(userIdSchema)
-  .handler(async ({ data: userId }): Promise<UserLeave[]> => {
-    return await getUserLeaves(userId);
-  });
-
-const submitUpdateUserLeave = createServerFn({ method: 'POST' })
-  .inputValidator((input: unknown) => input as { userId: string; id: string; body: UpdateUserLeaveRequest })
-  .handler(async ({ data }) => {
+const submitUpdateUserLeaves = createServerFn({ method: 'POST' })
+  .inputValidator((input: unknown) => input as { userId: string; body: UpdateUserLeavesBody })
+  .handler(async ({ data }): Promise<UserLeave[]> => {
     try {
-      await updateUserLeave(data.userId, data.id, data.body);
+      return await updateUserLeaves(data.userId, data.body);
     } catch (e) {
       throwApiError(e);
     }
   });
 
 export const Route = createFileRoute('/_protected/admin/users/$id')({
-  loader: ({ params }) => fetchUserById({ data: params.id }),
+  loader: ({ params }) => fetchUserAndLeaves({ data: params.id }),
   component: EditUser,
 });
 
 function EditUser() {
-  const user = Route.useLoaderData();
+  const { user, leaves } = Route.useLoaderData();
   const router = useRouter();
 
   const form = useAppForm({
@@ -158,197 +160,80 @@ function EditUser() {
         </section>
       </form.AppForm>
 
-      <LeavesSection userId={user.id} />
+      <LeaveOverviewSection userId={user.id} leaves={leaves} />
     </main>
   );
 }
 
-function LeavesSection({ userId }: { userId: string }) {
-  const [leaves, setLeaves] = useState<UserLeave[] | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [editing, setEditing] = useState<UserLeave | null>(null);
+function LeaveOverviewSection({ userId, leaves }: { userId: string; leaves: UserLeave[] }) {
+  const router = useRouter();
+  const currentYear = new Date().getFullYear();
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const lv = await fetchUserLeaves({ data: userId });
-      setLeaves(lv);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  const [loaded, setLoaded] = useState(false);
-  if (!loaded) {
-    setLoaded(true);
-    void load();
-  }
-
-  return (
-    <section className="mt-8">
-      <h2 className="mb-4 text-lg font-semibold">Leaves</h2>
-
-      {loading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Allowed</TableHead>
-              <TableHead>Total (days)</TableHead>
-              <TableHead />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(leaves ?? []).length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground">
-                  No leaves
-                </TableCell>
-              </TableRow>
-            ) : (
-              (leaves ?? []).map((leave) => {
-                const isUnlimited = leave.defaultAllowed === LeaveAllowed.Unlimited;
-                return (
-                  <TableRow key={leave.id}>
-                    <TableCell>{leave.leaveTypeName}</TableCell>
-                    <TableCell>
-                      {isUnlimited ? (
-                        <span className="rounded bg-muted px-2 py-0.5 text-xs">Unlimited</span>
-                      ) : (
-                        leave.defaultAllowed
-                      )}
-                    </TableCell>
-                    <TableCell>{isUnlimited ? '—' : (leave.totalDays ?? '—')}</TableCell>
-                    <TableCell className="text-right">
-                      {!isUnlimited && (
-                        <Button variant="outline" size="sm" onClick={() => setEditing(leave)}>
-                          Edit
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      )}
-
-      <EditLeaveDialog
-        leave={editing}
-        userId={userId}
-        onClose={() => setEditing(null)}
-        onSuccess={async () => {
-          setEditing(null);
-          await load();
-        }}
-      />
-    </section>
-  );
-}
-
-const editLeaveSchema = z.object({
-  totalDays: z.coerce.number().min(0),
-});
-
-function EditLeaveDialog({
-  leave,
-  userId,
-  onClose,
-  onSuccess,
-}: {
-  leave: UserLeave | null;
-  userId: string;
-  onClose: () => void;
-  onSuccess: () => Promise<void>;
-}) {
-  const isOpen = leave !== null;
-  const [serverError, setServerError] = useState<string | null>(null);
+  const toFormItems = (rows: UserLeave[]) =>
+    rows.map((l) => ({ id: l.id, leaveTypeId: l.leaveTypeId, totalDays: l.totalDays }));
 
   const form = useAppForm({
-    defaultValues: {
-      totalDays: leave?.totalDays ?? 0,
-    },
-    validators: { onChange: editLeaveSchema },
+    defaultValues: { items: toFormItems(leaves) },
+    validators: { onChange: leavesFormSchema },
     onSubmit: async ({ value }) => {
-      if (!leave) return;
-      setServerError(null);
+      clearServerErrors();
       try {
-        await submitUpdateUserLeave({
-          data: {
-            userId,
-            id: leave.id,
-            body: { userId, id: leave.id, totalDays: value.totalDays },
-          },
+        const updated = await submitUpdateUserLeaves({
+          data: { userId, body: { year: currentYear, items: value.items } },
         });
-        await onSuccess();
+        form.reset({ items: toFormItems(updated) });
+        await router.invalidate();
       } catch (e) {
-        const apiErr = parseServerError(e);
-        setServerError(apiErr ? apiErr.userMessage : 'Something went wrong.');
+        handleApiError(e);
       }
     },
   });
 
-  const [prevLeaveId, setPrevLeaveId] = useState<string | null>(null);
-  const currentLeaveId = leave?.id ?? null;
-  if (prevLeaveId !== currentLeaveId) {
-    setPrevLeaveId(currentLeaveId);
-    form.reset({ totalDays: leave?.totalDays ?? 0 });
-  }
+  const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, ['items']);
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Leave</DialogTitle>
-        </DialogHeader>
-        <form.AppForm>
-          <form.FormErrorBanner message={serverError} />
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              form.handleSubmit();
-            }}
-            className="grid gap-4"
-          >
-            <div className="grid gap-2">
-              <Label>Name</Label>
-              <p className="text-sm">{leave?.leaveTypeName}</p>
-            </div>
-
-            <form.AppField name="totalDays">
-              {(field) => (
-                <field.NumberField
-                  label={
-                    <>
-                      Total <span className="text-destructive">*</span>
-                    </>
-                  }
-                  suffix="days"
-                  min={0}
-                />
-              )}
-            </form.AppField>
-
-            <DialogFooter>
-              <form.FormActions
-                saveLabel="Update leave"
-                savePendingLabel="Saving…"
-                cancel={onClose}
-                className="contents"
-              />
-            </DialogFooter>
-          </form>
-        </form.AppForm>
-      </DialogContent>
-    </Dialog>
+    <section className="mt-8">
+      <h2 className="mb-4 text-lg font-semibold">Leave overview — {currentYear}</h2>
+      <form.AppForm>
+        <form.FormErrorBanner message={serverError} />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Taken</TableHead>
+                <TableHead>Balance</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {leaves.map((l, i) => (
+                <TableRow key={l.id}>
+                  <TableCell>{l.leaveTypeName}</TableCell>
+                  <TableCell>
+                    {l.defaultAllowed === LeaveAllowed.Unlimited ? (
+                      <span className="text-muted-foreground">Unlimited</span>
+                    ) : (
+                      <form.AppField name={`items[${i}].totalDays`}>
+                        {(field) => <field.NumberField label="" min={0} />}
+                      </form.AppField>
+                    )}
+                  </TableCell>
+                  <TableCell>—</TableCell>
+                  <TableCell>—</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <form.FormActions cancel />
+        </form>
+      </form.AppForm>
+    </section>
   );
 }

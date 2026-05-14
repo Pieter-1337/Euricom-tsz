@@ -131,19 +131,6 @@ function DateField({ label }: { label: string }) {
   );
 }
 
-function isEqual(a: unknown, b: unknown): boolean {
-  if (Object.is(a, b)) return true;
-  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
-  const keysA = Object.keys(a as Record<string, unknown>);
-  const keysB = Object.keys(b as Record<string, unknown>);
-  if (keysA.length !== keysB.length) return false;
-  for (const k of keysA) {
-    if (!isEqual((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k])) return false;
-  }
-  return true;
-}
-
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const form = useFormContext();
   return (
@@ -151,7 +138,7 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
       selector={(state) => ({
         hasClientError: hasClientSideError(state.fieldMeta),
         isSubmitting: state.isSubmitting,
-        isChanged: !isEqual(state.values, form.options.defaultValues),
+        isChanged: !state.isDefaultValue,
       })}
     >
       {({ hasClientError, isSubmitting, isChanged }) => (
@@ -166,7 +153,7 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 function CancelButton({ label = 'Cancel' }: { label?: string }) {
   const form = useFormContext();
   return (
-    <form.Subscribe selector={(state) => !isEqual(state.values, form.options.defaultValues)}>
+    <form.Subscribe selector={(state) => !state.isDefaultValue}>
       {(isChanged) => (
         <Button type="button" variant="outline" disabled={!isChanged} onClick={() => form.reset()}>
           {label}
@@ -181,7 +168,7 @@ function FormActions({
   savePendingLabel = 'Saving…',
   cancelLabel = 'Cancel',
   cancel,
-  className = 'flex items-center gap-3',
+  className = 'mt-2 flex items-center justify-start gap-3',
 }: {
   saveLabel?: string;
   savePendingLabel?: string;
@@ -197,7 +184,7 @@ function FormActions({
       selector={(state) => ({
         hasClientError: hasClientSideError(state.fieldMeta),
         isSubmitting: state.isSubmitting,
-        isChanged: !isEqual(state.values, form.options.defaultValues),
+        isChanged: !state.isDefaultValue,
       })}
     >
       {({ hasClientError, isSubmitting, isChanged }) => (
@@ -205,11 +192,10 @@ function FormActions({
           <Button type="submit" disabled={hasClientError || isSubmitting || !isChanged}>
             {isSubmitting ? savePendingLabel : saveLabel}
           </Button>
-          {showCancel && (
+          {showCancel && (customCancel || isChanged) && (
             <Button
               type="button"
               variant="outline"
-              disabled={!customCancel && !isChanged}
               onClick={() => (customCancel ? customCancel() : form.reset())}
             >
               {cancelLabel}

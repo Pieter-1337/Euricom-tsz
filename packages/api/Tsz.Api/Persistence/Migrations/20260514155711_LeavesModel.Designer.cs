@@ -11,8 +11,8 @@ using Tsz.Api.Persistence;
 namespace Tsz.Api.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260514125323_SimplifyLeaves")]
-    partial class SimplifyLeaves
+    [Migration("20260514155711_LeavesModel")]
+    partial class LeavesModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,7 +20,7 @@ namespace Tsz.Api.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
 
-            modelBuilder.Entity("Tsz.Api.Modules.LeaveTypes.LeaveType", b =>
+            modelBuilder.Entity("Tsz.Api.Modules.Users.LeaveType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,24 +35,9 @@ namespace Tsz.Api.Persistence.Migrations
                         .HasPrecision(5, 2)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Group")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PayrollCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("PrioInGroup")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ReportingCode")
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -61,6 +46,35 @@ namespace Tsz.Api.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("LeaveTypes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-000000000001"),
+                            DefaultAllowed = "Limited",
+                            DefaultDays = 20m,
+                            Name = "Verlof"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-000000000002"),
+                            DefaultAllowed = "Limited",
+                            DefaultDays = 5m,
+                            Name = "ADV dagen"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-000000000003"),
+                            DefaultAllowed = "Limited",
+                            DefaultDays = 0m,
+                            Name = "Anciënniteit"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-000000000004"),
+                            DefaultAllowed = "Unlimited",
+                            Name = "Ziekte"
+                        });
                 });
 
             modelBuilder.Entity("Tsz.Api.Modules.Users.User", b =>
@@ -120,11 +134,14 @@ namespace Tsz.Api.Persistence.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Year")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LeaveTypeId");
 
-                    b.HasIndex("UserId", "LeaveTypeId")
+                    b.HasIndex("UserId", "LeaveTypeId", "Year")
                         .IsUnique();
 
                     b.ToTable("UserLeaves", (string)null);
@@ -132,7 +149,7 @@ namespace Tsz.Api.Persistence.Migrations
 
             modelBuilder.Entity("Tsz.Api.Modules.Users.UserLeave", b =>
                 {
-                    b.HasOne("Tsz.Api.Modules.LeaveTypes.LeaveType", null)
+                    b.HasOne("Tsz.Api.Modules.Users.LeaveType", null)
                         .WithMany()
                         .HasForeignKey("LeaveTypeId")
                         .OnDelete(DeleteBehavior.Restrict)

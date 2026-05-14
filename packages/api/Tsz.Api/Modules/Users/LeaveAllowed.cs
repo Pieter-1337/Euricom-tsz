@@ -1,4 +1,4 @@
-namespace Tsz.Api.Modules.LeaveTypes;
+namespace Tsz.Api.Modules.Users;
 
 public enum LeaveAllowed
 {
