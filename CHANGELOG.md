@@ -2,6 +2,19 @@
 
 ## 2026-05-14
 
+docs: add generic list-base plan; relocate form-base plan
+
+Move the form-base PLAN.md verbatim to
+docs/product/requirements/generics/form/plan.md so it lives alongside
+other generics plans and frees PLAN.md at the repo root (no longer
+needed there). Add docs/product/requirements/generics/list/plan.md
+describing the generic listBase primitives: backend KeysetCursor,
+KeysetPage, SortMap, and IQueryable extension; frontend useListQuery,
+sortable header, list toolbar, and infinite table. The user list is
+the first planned consumer.
+
+## 2026-05-14
+
 style: add cursor-pointer to navbar sign out button
 
 Plain <button> elements default to the arrow cursor; users expect a
