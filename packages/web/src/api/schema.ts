@@ -205,18 +205,299 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{userId}/leaves": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserLeaveDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AddUserLeaveCommand"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{userId}/leaves/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateUserLeaveCommand"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/leave-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeaveTypeDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateLeaveTypeCommand"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/leave-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateLeaveTypeCommand"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AddUserLeaveCommand: {
+            /** Format: uuid */
+            userId: string;
+            /** Format: uuid */
+            leaveTypeId: string;
+            /** Format: double */
+            totalDays: null | number;
+        };
         AnonymousTypeOfstringAndstring: {
             name: null | string;
             version: null | string;
+        };
+        CreateLeaveTypeCommand: {
+            name: string;
+            defaultAllowed: components["schemas"]["LeaveAllowed"];
+            /** Format: double */
+            defaultDays: null | number;
+            payrollCode: null | string;
+            reportingCode: null | string;
+            group: null | string;
+            /** Format: int32 */
+            prioInGroup: null | number;
         };
         CreateUserCommand: {
             name: string;
             email: string;
             role: components["schemas"]["UserRole"];
+        };
+        /** @enum {unknown} */
+        LeaveAllowed: "NotAllowed" | "Limited" | "Unlimited";
+        LeaveTypeDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            payrollCode: null | string;
+            reportingCode: null | string;
+            group: null | string;
+            /** Format: int32 */
+            prioInGroup: null | number;
+            /** Format: double */
+            defaultDays: null | number;
+            defaultAllowed: components["schemas"]["LeaveAllowed"];
+        };
+        UpdateLeaveTypeCommand: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            defaultAllowed: components["schemas"]["LeaveAllowed"];
+            /** Format: double */
+            defaultDays: null | number;
+            payrollCode: null | string;
+            reportingCode: null | string;
+            group: null | string;
+            /** Format: int32 */
+            prioInGroup: null | number;
         };
         UpdateUserCommand: {
             /** Format: uuid */
@@ -224,20 +505,30 @@ export interface components {
             name: string;
             role: components["schemas"]["UserRole"];
         };
+        UpdateUserLeaveCommand: {
+            /** Format: uuid */
+            userId: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: double */
+            totalDays: null | number;
+        };
         UserDto: {
             /** Format: uuid */
             id: string;
             email: string;
             name: string;
             role: components["schemas"]["UserRole"];
+        };
+        UserLeaveDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            leaveTypeId: string;
+            leaveTypeName: string;
+            defaultAllowed: components["schemas"]["LeaveAllowed"];
             /** Format: double */
-            holidayDays: number;
-            /** Format: double */
-            advDays: number;
-            /** Format: double */
-            ancienniteitDays: number;
-            /** Format: double */
-            sicknessDays: number;
+            totalDays: null | number;
         };
         /** @enum {unknown} */
         UserRole: "User" | "Admin" | "ClientManager";

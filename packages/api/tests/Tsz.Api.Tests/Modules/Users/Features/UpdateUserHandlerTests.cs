@@ -14,7 +14,7 @@ public class UpdateUserHandlerTests
     {
         var existing = UserBuilder.Build().WithName("Old").WithRole(UserRole.User);
         var repo = new Mock<IRepository<User>>();
-        repo.Setup(r => r.GetByIdAsync(existing.Id, It.IsAny<CancellationToken>()))
+        repo.Setup(r => r.GetByIdAsync(existing.Id, It.IsAny<CancellationToken>(), false))
             .ReturnsAsync(existing);
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<User>()).Returns(repo.Object);
@@ -29,22 +29,5 @@ public class UpdateUserHandlerTests
         existing.Name.ShouldBe("New");
         existing.Role.ShouldBe(UserRole.Admin);
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleAsync_Missing_ReturnsNull()
-    {
-        var repo = new Mock<IRepository<User>>();
-        repo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((User?)null);
-        var uow = new Mock<IUnitOfWork>();
-        uow.Setup(u => u.RepositoryFor<User>()).Returns(repo.Object);
-
-        var handler = new UpdateUserHandler(uow.Object);
-
-        var result = await handler.HandleAsync(new UpdateUserCommand(Guid.NewGuid(), "x", UserRole.User));
-
-        result.ShouldBeNull();
-        uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

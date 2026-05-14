@@ -17,18 +17,53 @@ namespace Tsz.Api.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
 
-            modelBuilder.Entity("Tsz.Api.Modules.Users.User", b =>
+            modelBuilder.Entity("Tsz.Api.Modules.LeaveTypes.LeaveType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("AdvDays")
+                    b.Property<string>("DefaultAllowed")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("DefaultDays")
                         .HasPrecision(5, 2)
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("AncienniteitDays")
-                        .HasPrecision(5, 2)
+                    b.Property<string>("Group")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayrollCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("PrioInGroup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReportingCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("LeaveTypes", (string)null);
+                });
+
+            modelBuilder.Entity("Tsz.Api.Modules.Users.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -43,10 +78,6 @@ namespace Tsz.Api.Persistence.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("HolidayDays")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -55,10 +86,6 @@ namespace Tsz.Api.Persistence.Migrations
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("SicknessDays")
-                        .HasPrecision(5, 2)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -72,6 +99,47 @@ namespace Tsz.Api.Persistence.Migrations
                         .HasFilter("\"EntraOid\" IS NOT NULL");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Tsz.Api.Modules.Users.UserLeave", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("LeaveTypeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("TotalDays")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeaveTypeId");
+
+                    b.HasIndex("UserId", "LeaveTypeId")
+                        .IsUnique();
+
+                    b.ToTable("UserLeaves", (string)null);
+                });
+
+            modelBuilder.Entity("Tsz.Api.Modules.Users.UserLeave", b =>
+                {
+                    b.HasOne("Tsz.Api.Modules.LeaveTypes.LeaveType", null)
+                        .WithMany()
+                        .HasForeignKey("LeaveTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tsz.Api.Modules.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

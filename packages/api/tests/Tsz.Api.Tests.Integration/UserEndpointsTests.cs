@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using Tsz.Api.Modules.LeaveTypes;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
@@ -95,7 +97,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task CreateUser_AsAdmin_Valid_ReturnsCreated_WithLeaveDefaults()
+    public async Task CreateUser_AsAdmin_Valid_ReturnsCreated()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var command = new CreateUserCommand("Jane", "jane@example.com", UserRole.User);
@@ -108,10 +110,24 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.Equal("Jane", dto.Name);
         Assert.Equal("jane@example.com", dto.Email);
         Assert.Equal(UserRole.User, dto.Role);
-        Assert.Equal(User.DefaultHolidayDays, dto.HolidayDays);
-        Assert.Equal(User.DefaultAdvDays, dto.AdvDays);
-        Assert.Equal(User.DefaultAncienniteitDays, dto.AncienniteitDays);
-        Assert.Equal(User.DefaultSicknessDays, dto.SicknessDays);
+    }
+
+    [Fact]
+    public async Task CreateUser_AsAdmin_SeedsUserLeaveRows()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var command = new CreateUserCommand("Jane", "jane@example.com", UserRole.User);
+
+        var createResponse = await Client.PostAsJsonAsync("/api/users", command);
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var dto = await createResponse.Content.ReadFromJsonAsync<UserDto>(Json);
+        Assert.NotNull(dto);
+
+        var leavesResponse = await Client.GetAsync($"/api/users/{dto.Id}/leaves");
+        leavesResponse.EnsureSuccessStatusCode();
+        var leaves = await leavesResponse.Content.ReadFromJsonAsync<List<UserLeaveDto>>(Json);
+        Assert.NotNull(leaves);
+        Assert.Empty(leaves);
     }
 
     [Fact]
@@ -126,7 +142,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task CreateUser_DuplicateEmail_ReturnsConflict()
+    public async Task CreateUser_DuplicateEmail_Returns409WithProblemDetails()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var command = new CreateUserCommand("Jane", "dup@example.com", UserRole.User);
@@ -136,6 +152,29 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var second = await Client.PostAsJsonAsync("/api/users", command);
 
         Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);
+        Assert.Contains("application/problem+json", second.Content.Headers.ContentType?.MediaType);
+
+        var body = await second.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_USER_EMAIL_ALREADY_EXISTS", body.GetProperty("code").GetString());
+
+        var emailErrors = body.GetProperty("errors").GetProperty("Email");
+        Assert.Equal("ERR_USER_EMAIL_ALREADY_EXISTS", emailErrors[0].GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task CreateUser_InvalidEmail_Returns400WithFieldErrors()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var command = new CreateUserCommand("Jane", "not-an-email", UserRole.User);
+
+        var response = await Client.PostAsJsonAsync("/api/users", command);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        var emailErrors = body.GetProperty("errors").GetProperty("Email");
+        Assert.True(emailErrors.GetArrayLength() > 0);
     }
 
     [Fact]
@@ -168,7 +207,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task UpdateUser_Missing_ReturnsNotFound()
+    public async Task UpdateUser_Missing_Returns404WithProblemDetails()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var id = Guid.NewGuid();
@@ -177,6 +216,10 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
             new UpdateUserCommand(id, "x", UserRole.User));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_USER_NOT_FOUND", body.GetProperty("code").GetString());
     }
 
     [Fact]
@@ -201,12 +244,16 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task DeleteUser_Missing_ReturnsNotFound()
+    public async Task DeleteUser_Missing_Returns404WithProblemDetails()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
 
         var response = await Client.DeleteAsync($"/api/users/{Guid.NewGuid()}");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_USER_NOT_FOUND", body.GetProperty("code").GetString());
     }
 }

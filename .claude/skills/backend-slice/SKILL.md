@@ -20,7 +20,7 @@ Adds a vertical slice to an existing module. One file per operation, one endpoin
 - Commands implement `ICommand<TResponse>`; handler implements `ICommandHandler<TCommand, TResponse>`
 - Queries implement `IQuery<TResponse>`; handler implements `IQueryHandler<TQuery, TResponse>`
 - All handler methods are named `HandleAsync` and take a `CancellationToken`
-- Transactions live **inside the handler** via `IUnitOfWork.SaveChangesAsync(ct)` for single-step writes; explicit `Begin/CloseTransactionAsync` only for multi-step
+- Atomicity comes from a single `IUnitOfWork.SaveChangesAsync(ct)` call per handler — EF wraps it in an implicit transaction. No explicit `Begin/Commit` API exists; if a slice ever needs multi-step or nested transactions, add one back at that time
 - Writes use `Entity.Create(...)` / named mutators on the entity — never property-bag construction
 - Reads use `repo.GetAllAsDtosAsync<TDto>` / `repo.FirstOrDefaultAsDtoAsync<TDto>` with a DTO that implements `IEntityDto<TEntity, TDto>`
 - Validation via FluentValidation, applied through `.AddEndpointFilter<ValidationFilter<TCommand>>()`

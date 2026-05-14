@@ -1,41 +1,53 @@
-using Tsz.Infrastructure.Abstractions;
 using FluentValidation;
+using Tsz.Api.Modules.LeaveTypes;
+using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Validation;
 
 namespace Tsz.Api.Modules.Users.Features;
 
 public sealed record CreateUserCommand(string Name, string Email, UserRole Role)
-    : ICommand<CreateUserResult>;
-
-public sealed record CreateUserResult(UserDto? User, bool Conflict)
-{
-    public static CreateUserResult Created(UserDto user) => new(user, false);
-    public static CreateUserResult EmailConflict() => new(null, true);
-}
+    : ICommand<UserDto>;
 
 public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
 {
-    public CreateUserValidator()
+    private readonly IUnitOfWork _uow;
+
+    public CreateUserValidator(IUnitOfWork uow)
     {
+        _uow = uow;
+
         RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
         RuleFor(x => x.Role).IsInEnum();
+        RuleFor(x => x.Email)
+            .MustAsync(EmailNotTaken).WithError(UserErrors.EmailAlreadyExists)
+            .When(x => !string.IsNullOrEmpty(x.Email));
+    }
+
+    private async Task<bool> EmailNotTaken(string email, CancellationToken ct)
+    {
+        var exists = await _uow.RepositoryFor<User>()
+            .ExistsAsync(u => u.Email == email, ct);
+        return !exists;
     }
 }
 
 public sealed class CreateUserHandler(IUnitOfWork uow)
-    : ICommandHandler<CreateUserCommand, CreateUserResult>
+    : ICommandHandler<CreateUserCommand, UserDto>
 {
-    public async Task<CreateUserResult> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
+    public async Task<UserDto> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
     {
-        var repo = uow.RepositoryFor<User>();
-        var emailLower = command.Email.ToLowerInvariant();
-
-        if (await repo.ExistsAsync(u => u.Email.ToLower() == emailLower, ct))
-            return CreateUserResult.EmailConflict();
-
         var user = User.Create(command.Name, command.Email, command.Role);
-        repo.Add(user);
+        uow.RepositoryFor<User>().Add(user);
+
+        var leaveTypes = await uow.RepositoryFor<LeaveType>().GetAllAsListAsync(ct: ct);
+        var leaveRepo = uow.RepositoryFor<UserLeave>();
+        foreach (var lt in leaveTypes)
+        {
+            leaveRepo.Add(UserLeave.Create(user.Id, lt.Id, lt.DefaultDays));
+        }
+
         await uow.SaveChangesAsync(ct);
-        return CreateUserResult.Created(UserDto.ToDto(user));
+        return UserDto.ToDto(user);
     }
 }

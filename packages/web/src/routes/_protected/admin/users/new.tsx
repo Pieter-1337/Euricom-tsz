@@ -2,8 +2,11 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
+import { useState } from 'react';
 import { createUser } from '#/api/users.server';
 import { USER_ROLES, UserRole } from '#/api/users';
+import { throwApiError, parseServerError } from '#/lib/server-error';
+import { hasClientSideError } from '#/lib/form-utils';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
@@ -17,13 +20,18 @@ const createUserSchema = z.object({
 const submitCreateUser = createServerFn({ method: 'POST' })
   .inputValidator(createUserSchema)
   .handler(async ({ data }) => {
-    return await createUser(data);
+    try {
+      return await createUser(data);
+    } catch (e) {
+      throwApiError(e);
+    }
   });
 
 export const Route = createFileRoute('/_protected/admin/users/new')({ component: NewUser });
 
 function NewUser() {
   const router = useRouter();
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -33,15 +41,45 @@ function NewUser() {
     },
     validators: { onChange: createUserSchema },
     onSubmit: async ({ value }) => {
-      await submitCreateUser({ data: value });
-      await router.invalidate();
-      router.navigate({ to: '/admin/users' });
+      setServerError(null);
+      for (const field of ['name', 'email', 'role'] as const) {
+        form.setFieldMeta(field, (prev) => ({
+          ...prev,
+          errorMap: { ...prev.errorMap, onServer: undefined },
+        }));
+      }
+      try {
+        await submitCreateUser({ data: value });
+        await router.invalidate();
+        router.navigate({ to: '/admin/users' });
+      } catch (e) {
+        const apiErr = parseServerError(e);
+        if (apiErr) {
+          const fieldErrors = apiErr.fieldErrors;
+          if (fieldErrors) {
+            for (const [field, errs] of Object.entries(fieldErrors)) {
+              const key = (field.charAt(0).toLowerCase() + field.slice(1)) as 'name' | 'email' | 'role';
+              form.setFieldMeta(key, (prev) => ({
+                ...prev,
+                errorMap: { ...prev.errorMap, onServer: errs.map((fe) => fe.message) },
+                isTouched: true,
+              }));
+            }
+          }
+          setServerError(apiErr.userMessage);
+        } else {
+          setServerError('Something went wrong.');
+        }
+      }
     },
   });
 
   return (
     <main>
       <h1 className="text-2xl font-bold">New user</h1>
+      {serverError && (
+        <p className="mt-2 text-sm text-destructive">{serverError}</p>
+      )}
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -106,10 +144,15 @@ function NewUser() {
           )}
         </form.Field>
 
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting] as const}>
-          {([canSubmit, isSubmitting]) => (
+        <form.Subscribe
+          selector={(state) => ({
+            hasClientError: hasClientSideError(state.fieldMeta),
+            isSubmitting: state.isSubmitting,
+          })}
+        >
+          {({ hasClientError, isSubmitting }) => (
             <div>
-              <Button type="submit" disabled={!canSubmit}>
+              <Button type="submit" disabled={hasClientError || isSubmitting}>
                 {isSubmitting ? 'Creating…' : 'Create user'}
               </Button>
             </div>

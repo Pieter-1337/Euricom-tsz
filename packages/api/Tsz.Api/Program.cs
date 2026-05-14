@@ -1,10 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Tsz.Api.Infrastructure;
+using Tsz.Api.Modules.LeaveTypes;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Persistence;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
+using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -113,12 +116,17 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
            ?? "Data Source=tsz.db");
 });
 builder.Services.AddInfrastructure<AppDbContext>();
+builder.Services.AddDispatcher();
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddHandlersFromAssembly(typeof(Program).Assembly);
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
@@ -140,9 +148,11 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment())
     {
         var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await new LeaveTypeSeeder(uow).SeedAsync();
         await new UserSeeder(uow).SeedAsync();
     }
 }
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -159,6 +169,6 @@ app.MapGet("/", () => new
 }).AllowAnonymous();
 
 UserEndpoints.Map(app);
-
+LeaveTypeEndpoints.Map(app);
 
 app.Run();

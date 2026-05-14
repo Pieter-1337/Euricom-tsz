@@ -1,5 +1,6 @@
 using System.Reflection;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,12 @@ public static class ServiceCollectionExtensions
         where TContext : DbContext
     {
         services.AddScoped<IUnitOfWork, EfCoreUnitOfWork<TContext>>();
+        return services;
+    }
+
+    public static IServiceCollection AddDispatcher(this IServiceCollection services)
+    {
+        services.AddScoped<IDispatcher, Dispatcher>();
         return services;
     }
 

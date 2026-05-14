@@ -1,7 +1,7 @@
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Infrastructure.Auth;
+using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
-using Tsz.Infrastructure.Validation;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Modules.Users;
@@ -35,38 +35,81 @@ public static class UserEndpoints
         {
             var user = await handler.HandleAsync(new GetUserByIdQuery(id), ct);
             return user is not null ? Results.Ok(user) : Results.NotFound();
-        });
+        }).WithName("GetUserById");
 
         adminGroup.MapPost("/", async (
             CreateUserCommand command,
-            ICommandHandler<CreateUserCommand, CreateUserResult> handler,
+            IDispatcher dispatcher,
             CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(command, ct);
-            return result.Conflict
-                ? Results.Conflict(new { error = "A user with this email already exists." })
-                : Results.Created($"/api/users/{result.User!.Id}", result.User);
-        }).AddEndpointFilter<ValidationFilter<CreateUserCommand>>();
+            var dto = await dispatcher.SendAsync(command, ct);
+            return Results.CreatedAtRoute("GetUserById", new { id = dto.Id }, dto);
+        });
 
         adminGroup.MapPut("/{id:guid}", async (
             Guid id,
             UpdateUserCommand command,
-            ICommandHandler<UpdateUserCommand, UserDto?> handler,
+            IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             if (command.Id != id)
                 return Results.BadRequest("Route id does not match command id.");
 
-            var user = await handler.HandleAsync(command, ct);
-            return user is not null ? Results.Ok(user) : Results.NotFound();
-        }).AddEndpointFilter<ValidationFilter<UpdateUserCommand>>();
+            var dto = await dispatcher.SendAsync(command, ct);
+            return Results.Ok(dto);
+        });
 
         adminGroup.MapDelete("/{id:guid}", async (
             Guid id,
-            ICommandHandler<DeleteUserCommand, bool> handler,
+            IDispatcher dispatcher,
             CancellationToken ct) =>
-                await handler.HandleAsync(new DeleteUserCommand(id), ct)
-                    ? Results.NoContent()
-                    : Results.NotFound());
+        {
+            await dispatcher.SendAsync(new DeleteUserCommand(id), ct);
+            return Results.NoContent();
+        });
+
+        // UserLeave endpoints
+        adminGroup.MapGet("/{userId:guid}/leaves", async (
+            Guid userId,
+            IQueryHandler<GetUserLeavesQuery, IReadOnlyList<UserLeaveDto>> handler,
+            CancellationToken ct) =>
+                TypedResults.Ok(await handler.HandleAsync(new GetUserLeavesQuery(userId), ct)));
+
+        adminGroup.MapPost("/{userId:guid}/leaves", async (
+            Guid userId,
+            AddUserLeaveCommand command,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            if (command.UserId != userId)
+                return Results.BadRequest("Route userId does not match command UserId.");
+
+            var dto = await dispatcher.SendAsync(command, ct);
+            return Results.Created($"/api/users/{userId}/leaves/{dto.Id}", dto);
+        });
+
+        adminGroup.MapPut("/{userId:guid}/leaves/{id:guid}", async (
+            Guid userId,
+            Guid id,
+            UpdateUserLeaveCommand command,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            if (command.Id != id || command.UserId != userId)
+                return Results.BadRequest("Route id does not match command id.");
+
+            var dto = await dispatcher.SendAsync(command, ct);
+            return Results.Ok(dto);
+        });
+
+        adminGroup.MapDelete("/{userId:guid}/leaves/{id:guid}", async (
+            Guid userId,
+            Guid id,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            await dispatcher.SendAsync(new DeleteUserLeaveCommand(userId, id), ct);
+            return Results.NoContent();
+        });
     }
 }

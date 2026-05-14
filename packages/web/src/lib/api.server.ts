@@ -19,8 +19,19 @@ const bearerMiddleware: Middleware = {
 };
 
 const errorMiddleware: Middleware = {
-  onResponse({ response }) {
-    if (!response.ok) throw new ApiRequestError(response.status);
+  async onResponse({ response }) {
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type') ?? '';
+      let problem: import('#/api/client').ProblemDetails | null = null;
+      if (contentType.includes('application/problem+json') || contentType.includes('application/json')) {
+        try {
+          problem = (await response.clone().json()) as import('#/api/client').ProblemDetails;
+        } catch {
+          problem = null;
+        }
+      }
+      throw new ApiRequestError(response.status, problem);
+    }
   },
 };
 

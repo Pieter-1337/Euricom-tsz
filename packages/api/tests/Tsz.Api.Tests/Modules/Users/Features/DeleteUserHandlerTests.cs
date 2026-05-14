@@ -4,17 +4,18 @@ using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Cqrs;
 
 namespace Tsz.Api.Tests.Modules.Users.Features;
 
 public class DeleteUserHandlerTests
 {
     [Fact]
-    public async Task HandleAsync_Existing_SoftDeletesAndReturnsTrue()
+    public async Task HandleAsync_Existing_SoftDeletesAndReturnsUnit()
     {
         var existing = UserBuilder.Build();
         var repo = new Mock<IRepository<User>>();
-        repo.Setup(r => r.GetByIdAsync(existing.Id, It.IsAny<CancellationToken>()))
+        repo.Setup(r => r.GetByIdAsync(existing.Id, It.IsAny<CancellationToken>(), false))
             .ReturnsAsync(existing);
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<User>()).Returns(repo.Object);
@@ -26,26 +27,9 @@ public class DeleteUserHandlerTests
 
         var result = await handler.HandleAsync(new DeleteUserCommand(existing.Id));
 
-        result.ShouldBeTrue();
+        result.ShouldBe(default(Unit));
         existing.DeletedAt.ShouldBe(now);
         repo.Verify(r => r.Remove(It.IsAny<User>()), Times.Never);
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task HandleAsync_Missing_ReturnsFalse()
-    {
-        var repo = new Mock<IRepository<User>>();
-        repo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((User?)null);
-        var uow = new Mock<IUnitOfWork>();
-        uow.Setup(u => u.RepositoryFor<User>()).Returns(repo.Object);
-
-        var handler = new DeleteUserHandler(uow.Object, TimeProvider.System);
-
-        var result = await handler.HandleAsync(new DeleteUserCommand(Guid.NewGuid()));
-
-        result.ShouldBeFalse();
-        uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

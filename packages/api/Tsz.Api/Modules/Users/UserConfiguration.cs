@@ -27,11 +27,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<string>()
             .HasMaxLength(32);
 
-        builder.Property(u => u.HolidayDays).HasPrecision(5, 2);
-        builder.Property(u => u.AdvDays).HasPrecision(5, 2);
-        builder.Property(u => u.AncienniteitDays).HasPrecision(5, 2);
-        builder.Property(u => u.SicknessDays).HasPrecision(5, 2);
-
         builder.HasIndex(u => u.EntraOid)
             .IsUnique()
             .HasFilter("\"EntraOid\" IS NOT NULL");

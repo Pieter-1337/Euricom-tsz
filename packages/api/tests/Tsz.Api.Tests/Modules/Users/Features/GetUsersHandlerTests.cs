@@ -14,11 +14,11 @@ public class GetUsersHandlerTests
     {
         var dtos = new[]
         {
-            new UserDto(Guid.NewGuid(), "a@x.com", "A", UserRole.Admin, 20, 5, 0, 0),
-            new UserDto(Guid.NewGuid(), "b@x.com", "B", UserRole.User, 20, 5, 0, 0),
+            new UserDto(Guid.NewGuid(), "a@x.com", "A", UserRole.Admin),
+            new UserDto(Guid.NewGuid(), "b@x.com", "B", UserRole.User),
         };
         var repo = new Mock<IRepository<User>>();
-        repo.Setup(r => r.GetAllAsDtosAsync<UserDto>(null, It.IsAny<CancellationToken>()))
+        repo.Setup(r => r.GetAllAsDtosAsync<UserDto>(null, It.IsAny<CancellationToken>(), false))
             .ReturnsAsync(dtos);
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<User>()).Returns(repo.Object);

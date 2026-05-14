@@ -13,7 +13,7 @@ public class GetUserByIdHandlerTests
     public async Task HandleAsync_Existing_ReturnsDto()
     {
         var id = Guid.NewGuid();
-        var dto = new UserDto(id, "u@x.com", "User", UserRole.User, 20, 5, 0, 0);
+        var dto = new UserDto(id, "u@x.com", "User", UserRole.User);
         var repo = new Mock<IRepository<User>>();
         repo.Setup(r => r.FirstOrDefaultAsDtoAsync<UserDto>(
                 It.IsAny<Expression<Func<User, bool>>>(),
