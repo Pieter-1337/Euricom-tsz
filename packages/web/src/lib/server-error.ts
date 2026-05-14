@@ -4,9 +4,7 @@ const PREFIX = '__api_error__:';
 
 export function throwApiError(err: unknown): never {
   if (err instanceof ApiRequestError) {
-    throw new Error(
-      PREFIX + JSON.stringify({ status: err.status, problem: err.problem }),
-    );
+    throw new Error(PREFIX + JSON.stringify({ status: err.status, problem: err.problem }));
   }
   throw err;
 }

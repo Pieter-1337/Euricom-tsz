@@ -9,15 +9,11 @@ function NoAccess() {
     <main className="grid min-h-[60vh] place-items-center">
       <div className="max-w-md text-center">
         <h1 className="text-2xl font-bold">No access</h1>
-        <p className="text-muted-foreground mt-2">
-          Your account isn't set up yet. Ask an administrator to add you.
-        </p>
+        <p className="text-muted-foreground mt-2">Your account isn't set up yet. Ask an administrator to add you.</p>
         <Button
           className="mt-6"
           variant="outline"
-          onClick={() =>
-            authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })
-          }
+          onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => window.location.assign('/') } })}
         >
           Sign out
         </Button>

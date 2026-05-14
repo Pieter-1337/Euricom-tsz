@@ -8,8 +8,4 @@ export const LeaveAllowed = {
   Unlimited: 'Unlimited',
 } as const satisfies Record<string, components['schemas']['LeaveAllowed']>;
 export type LeaveAllowed = (typeof LeaveAllowed)[keyof typeof LeaveAllowed];
-export const LEAVE_ALLOWED_VALUES = [
-  LeaveAllowed.NotAllowed,
-  LeaveAllowed.Limited,
-  LeaveAllowed.Unlimited,
-] as const;
+export const LEAVE_ALLOWED_VALUES = [LeaveAllowed.NotAllowed, LeaveAllowed.Limited, LeaveAllowed.Unlimited] as const;

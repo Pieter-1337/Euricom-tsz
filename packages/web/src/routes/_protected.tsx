@@ -17,7 +17,10 @@ export const Route = createFileRoute('/_protected')({
 });
 
 function ProtectedLayout() {
-  const ctx = Route.useRouteContext() as { user: SessionUser; currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>> };
+  const ctx = Route.useRouteContext() as {
+    user: SessionUser;
+    currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+  };
   const { user, currentUser } = ctx;
   const isAdmin = currentUser.role === UserRole.Admin;
 
