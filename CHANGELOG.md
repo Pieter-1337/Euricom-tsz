@@ -2,6 +2,19 @@
 
 ## 2026-05-14
 
+fix: polish paged users list — binding, search, and UI stability
+
+Backend:
+- Fix sortDir query binding: accept string, parse case-insensitively
+  (minimal API doesn't use TypeConverter; "asc" → SortDirection.Asc)
+- Add Role to searchable columns for filter support
+
+Frontend:
+- Sortable header: reserve icon space so columns don't shift on sort
+- Toolbar: make flex-1 so "N items" pushes to far right; prevent wrap
+- Debounce search 300ms to reduce request volume during typing
+- Use keepPreviousData so results stay visible during refetch (no flicker)
+
 feat: add paged users endpoint and IRepository.GetPagedAsync
 
 Add GET /api/users/paged returning KeysetPage<UserDto> alongside the
