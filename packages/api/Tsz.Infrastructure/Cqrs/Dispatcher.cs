@@ -6,54 +6,54 @@ namespace Tsz.Infrastructure.Cqrs;
 
 public sealed class Dispatcher(IServiceProvider services) : IDispatcher
 {
-    public Task<TResponse> SendAsync<TResponse>(ICommand<TResponse> command, CancellationToken ct = default)
+    public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct = default)
     {
-        var commandType = command.GetType();
-        var handlerType = typeof(ICommandHandler<,>).MakeGenericType(commandType, typeof(TResponse));
+        var requestType = request.GetType();
+        var handlerType = typeof(IRequestHandler<,>).MakeGenericType(requestType, typeof(TResponse));
         var handler = services.GetRequiredService(handlerType);
 
-        var behaviorType = typeof(IPipelineBehavior<,>).MakeGenericType(commandType, typeof(TResponse));
+        var behaviorType = typeof(IPipelineBehavior<,>).MakeGenericType(requestType, typeof(TResponse));
         var behaviors = services.GetServices(behaviorType).ToList();
 
-        Func<Task<TResponse>> invoke = () => InvokeHandler<TResponse>(handlerType, handler, command, ct);
+        Func<Task<TResponse>> invoke = () => InvokeHandler<TResponse>(handlerType, handler, request, ct);
 
         foreach (var behavior in Enumerable.Reverse(behaviors))
         {
             var captured = invoke;
             var b = behavior!;
-            invoke = () => InvokeBehavior<TResponse>(behaviorType, b, command, captured, ct);
+            invoke = () => InvokeBehavior<TResponse>(behaviorType, b, request, captured, ct);
         }
 
         return invoke();
     }
 
     private static async Task<TResponse> InvokeHandler<TResponse>(
-        Type handlerType, object handler, object command, CancellationToken ct)
+        Type handlerType, object handler, object request, CancellationToken ct)
     {
         var method = handlerType.GetMethod("HandleAsync")!;
         try
         {
-            return await (Task<TResponse>)method.Invoke(handler, [command, ct])!;
+            return await (Task<TResponse>)method.Invoke(handler, [request, ct])!;
         }
         catch (TargetInvocationException tie) when (tie.InnerException is not null)
         {
             System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(tie.InnerException).Throw();
-            throw; // unreachable
+            throw;
         }
     }
 
     private static async Task<TResponse> InvokeBehavior<TResponse>(
-        Type behaviorType, object behavior, object command, Func<Task<TResponse>> next, CancellationToken ct)
+        Type behaviorType, object behavior, object request, Func<Task<TResponse>> next, CancellationToken ct)
     {
         var method = behaviorType.GetMethod("HandleAsync")!;
         try
         {
-            return await (Task<TResponse>)method.Invoke(behavior, [command, next, ct])!;
+            return await (Task<TResponse>)method.Invoke(behavior, [request, next, ct])!;
         }
         catch (TargetInvocationException tie) when (tie.InnerException is not null)
         {
             System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(tie.InnerException).Throw();
-            throw; // unreachable
+            throw;
         }
     }
 }

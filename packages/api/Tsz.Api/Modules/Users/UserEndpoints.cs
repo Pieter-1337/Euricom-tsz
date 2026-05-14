@@ -3,7 +3,6 @@ using Tsz.Api.Modules.Users.Features;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
-using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Modules.Users;
 
@@ -13,28 +12,21 @@ public static class UserEndpoints
     {
         var group = app.MapApiGroup("users");
 
-        group.MapGet("/me", async (
-            IQueryHandler<GetCurrentUserQuery, UserDto?> handler,
-            CancellationToken ct) =>
+        group.MapGet("/me", async (IDispatcher dispatcher, CancellationToken ct) =>
         {
-            var user = await handler.HandleAsync(new GetCurrentUserQuery(), ct);
+            var user = await dispatcher.SendAsync(new GetCurrentUserQuery(), ct);
             return user is not null ? Results.Ok(user) : Results.NotFound();
         });
 
         var adminGroup = group.MapGroup("")
             .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
-        adminGroup.MapGet("/", async (
-            IQueryHandler<GetUsersQuery, IReadOnlyList<UserDto>> handler,
-            CancellationToken ct) =>
-                TypedResults.Ok(await handler.HandleAsync(new GetUsersQuery(), ct)));
+        adminGroup.MapGet("/", async (IDispatcher dispatcher, CancellationToken ct) =>
+            TypedResults.Ok(await dispatcher.SendAsync(new GetUsersQuery(), ct)));
 
-        adminGroup.MapGet("/{id:guid}", async (
-            Guid id,
-            IQueryHandler<GetUserByIdQuery, UserDto?> handler,
-            CancellationToken ct) =>
+        adminGroup.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
         {
-            var user = await handler.HandleAsync(new GetUserByIdQuery(id), ct);
+            var user = await dispatcher.SendAsync(new GetUserByIdQuery(id), ct);
             return user is not null ? Results.Ok(user) : Results.NotFound();
         }).WithName("GetUserById");
 
@@ -74,11 +66,11 @@ public static class UserEndpoints
             Guid userId,
             int? year,
             TimeProvider timeProvider,
-            IQueryHandler<GetUserLeavesQuery, IReadOnlyList<UserLeaveDto>> handler,
+            IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             var resolvedYear = year ?? timeProvider.GetUtcNow().Year;
-            return TypedResults.Ok(await handler.HandleAsync(new GetUserLeavesQuery(userId, resolvedYear), ct));
+            return TypedResults.Ok(await dispatcher.SendAsync(new GetUserLeavesQuery(userId, resolvedYear), ct));
         });
 
         adminGroup.MapPut("/{userId:guid}/leaves", async Task<Ok<IReadOnlyList<UserLeaveDto>>> (

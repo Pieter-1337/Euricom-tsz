@@ -1,6 +1,6 @@
 namespace Tsz.Infrastructure.Cqrs;
 
-public interface IPipelineBehavior<in TCommand, TResponse>
+public interface IPipelineBehavior<in TRequest, TResponse>
 {
-    Task<TResponse> HandleAsync(TCommand command, Func<Task<TResponse>> next, CancellationToken ct);
+    Task<TResponse> HandleAsync(TRequest request, Func<Task<TResponse>> next, CancellationToken ct);
 }

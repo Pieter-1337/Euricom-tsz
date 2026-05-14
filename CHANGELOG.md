@@ -2,6 +2,22 @@
 
 ## 2026-05-14
 
+refactor: unify dispatcher for commands and queries
+
+Add IRequest<TR> base interface with ICommand and IQuery extending
+it. Add IRequestHandler<TRequest, TR> base handler interface; both
+ICommandHandler and IQueryHandler now extend it. Dispatcher.SendAsync
+accepts IRequest<TR> and looks up IRequestHandler<,> reflectively,
+so both commands and queries flow through the pipeline (validation
+for commands, no-op for queries). Register all handlers against
+IRequestHandler<,> in DI; endpoint signatures unchanged (accept
+IDispatcher now instead of IQueryHandler directly). Enables logging,
+authorization, and caching behaviors across all requests uniformly.
+Also fixes missed GetUserByIdHandlerTests.cs constructor call from
+name-split refactor.
+
+## 2026-05-14
+
 feat: unify form error handling, auto-clear server errors on edit
 
 Server-side field errors now behave like client-side ones for the

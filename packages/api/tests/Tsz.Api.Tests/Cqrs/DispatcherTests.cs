@@ -35,11 +35,11 @@ public class DispatcherTests
     }
 
     private static IDispatcher BuildDispatcher(
-        ICommandHandler<PingCommand, string> handler,
+        IRequestHandler<PingCommand, string> handler,
         IEnumerable<IPipelineBehavior<PingCommand, string>>? behaviors = null)
     {
         var services = new ServiceCollection();
-        services.AddScoped<ICommandHandler<PingCommand, string>>(_ => handler);
+        services.AddScoped<IRequestHandler<PingCommand, string>>(_ => handler);
         services.AddDispatcher();
 
         foreach (var b in behaviors ?? [])

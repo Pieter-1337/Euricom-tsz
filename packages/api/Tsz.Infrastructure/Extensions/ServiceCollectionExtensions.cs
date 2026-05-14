@@ -24,19 +24,13 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddHandlersFromAssembly(this IServiceCollection services, Assembly assembly)
     {
-        var openHandlerInterfaces = new[]
-        {
-            typeof(ICommandHandler<,>),
-            typeof(IQueryHandler<,>),
-        };
-
         var implementations = assembly.GetTypes()
             .Where(t => t is { IsClass: true, IsAbstract: false });
 
         foreach (var impl in implementations)
         {
             var handlerInterfaces = impl.GetInterfaces()
-                .Where(i => i.IsGenericType && openHandlerInterfaces.Contains(i.GetGenericTypeDefinition()));
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
 
             foreach (var handlerInterface in handlerInterfaces)
                 services.AddScoped(handlerInterface, impl);

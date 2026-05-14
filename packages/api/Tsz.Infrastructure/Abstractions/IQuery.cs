@@ -1,3 +1,3 @@
 namespace Tsz.Infrastructure.Abstractions;
 
-public interface IQuery<TResult>;
+public interface IQuery<TResult> : IRequest<TResult>;
