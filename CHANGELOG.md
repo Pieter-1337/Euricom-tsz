@@ -2,6 +2,15 @@
 
 ## 2026-05-14
 
+chore: configure Azure AD settings
+
+Fill in TenantId, ClientId, and Audience in appsettings.json for
+local development. These are OAuth configuration identifiers
+(not credentials). Overridable via appsettings.Development.json
+or environment variables per the ASP.NET configuration hierarchy.
+
+## 2026-05-14
+
 refactor: unify dispatcher for commands and queries
 
 Add IRequest<TR> base interface with ICommand and IQuery extending
