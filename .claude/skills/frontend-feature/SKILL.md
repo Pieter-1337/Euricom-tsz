@@ -150,7 +150,39 @@ export function <Feature>List() {
 }
 ```
 
-For paginated/sortable/searchable lists, use `useListQuery` + `ListShell` + `SortableHeader` (see `src/features/users/components/users-list.tsx`).
+For paginated/sortable/searchable lists, use `useListQuery` + `ListShell` driven by TanStack Table column definitions. Reference: `src/features/users/components/users-list.tsx`. Sketch:
+
+```typescript
+import type { ColumnDef } from '@tanstack/react-table';
+import { ListShell } from '#/components/list/list-shell';
+import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
+import { useListQuery } from '#/hooks/use-list-query';
+
+type <Feature>SortKey = 'name' | 'email'; // sort keys the backend accepts
+
+const columns: ColumnDef<<Feature>, unknown>[] = [
+  {
+    id: 'name' satisfies <Feature>SortKey,
+    accessorKey: 'name',
+    header: ({ column }) => <SortableHeaderCell column={column} label="Name" />,
+  },
+  // ...
+];
+
+export function <Feature>List() {
+  const list = useListQuery<<Feature>, <Feature>SortKey>({
+    queryKey: ['<features>-paged'],
+    fetcher: (params) => fetch<Features>Paged({ data: params }),
+    defaultSort: { by: 'name', dir: 'asc' },
+  });
+  return <ListShell columns={columns} {...list} rowKey={(x) => x.id} emptyState="None found." />;
+}
+```
+
+Notes:
+- `satisfies <Feature>SortKey` keeps column ids checked against the backend's allowed sort keys.
+- `SortableHeaderCell` wraps a `Column` from TanStack Table and handles the asc/desc toggle.
+- `useListQuery` returns the TanStack `sorting` + `onSortingChange` that `<ListShell>` forwards to the table; it also returns `search`, `setSearch`, `deletedOnly`, `setDeletedOnly`, `sentinelRef`, `items`, `total`, and the query state flags.
 
 `src/features/<feature>/components/<feature>-detail.tsx`:
 

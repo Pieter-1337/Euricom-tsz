@@ -1,44 +1,74 @@
-import type { ReactNode } from 'react';
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type OnChangeFn,
+  type SortingState,
+} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
 } from '#/components/ui/table.tsx';
 
 interface InfiniteTableProps<TItem> {
+  columns: ColumnDef<TItem, unknown>[];
   items: TItem[];
   rowKey: (item: TItem) => string;
+  sorting: SortingState;
+  onSortingChange: OnChangeFn<SortingState>;
   isLoading: boolean;
   isFetchingNextPage: boolean;
   error: unknown;
   emptyState: string;
   sentinelRef: (node: HTMLElement | null) => void;
   onRowClick?: (item: TItem) => void;
-  children: {
-    head: ReactNode;
-    row: (item: TItem) => ReactNode;
-  };
 }
 
 export function InfiniteTable<TItem>({
+  columns,
   items,
   rowKey,
+  sorting,
+  onSortingChange,
   isLoading,
   isFetchingNextPage,
   error,
   emptyState,
   sentinelRef,
   onRowClick,
-  children,
 }: InfiniteTableProps<TItem>) {
-  const colSpan = 99;
+  const table = useReactTable({
+    data: items,
+    columns,
+    state: { sorting },
+    onSortingChange,
+    manualSorting: true,
+    enableMultiSort: false,
+    getRowId: rowKey,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  const colSpan = columns.length || 1;
 
   return (
     <Table>
       <TableHeader>
-        <TableRow>{children.head}</TableRow>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead key={header.id}>
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
       </TableHeader>
       <TableBody>
         {isLoading && (
@@ -62,13 +92,17 @@ export function InfiniteTable<TItem>({
             </TableCell>
           </TableRow>
         )}
-        {items.map((item) => (
+        {table.getRowModel().rows.map((row) => (
           <TableRow
-            key={rowKey(item)}
-            onClick={onRowClick ? () => onRowClick(item) : undefined}
+            key={row.id}
+            onClick={onRowClick ? () => onRowClick(row.original) : undefined}
             className={onRowClick ? 'cursor-pointer' : undefined}
           >
-            {children.row(item)}
+            {row.getVisibleCells().map((cell) => (
+              <TableCell key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
           </TableRow>
         ))}
         {isFetchingNextPage && (

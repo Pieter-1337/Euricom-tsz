@@ -2,6 +2,36 @@
 
 ## 2026-05-18
 
+refactor: drive list views with TanStack Table
+
+Adopt @tanstack/react-table for column definitions, sort state, and
+header rendering. Keep custom code only where the library does not
+reach (react-query glue, IntersectionObserver sentinel, search
+debounce, deletedOnly toggle).
+
+useListQuery now holds TanStack SortingState instead of sortBy/
+sortDir useState; it returns sorting + onSortingChange. The hook
+translates SortingState to the server's sortBy/sortDir params via
+a derived memo. enableMultiSort is off and onSortingChange refuses
+empty sorting so the server always receives one sort key.
+
+InfiniteTable instantiates useReactTable with manualSorting and
+getCoreRowModel, then renders via flexRender. Loading/empty/error
+states and the sentinel row are preserved. ListShell now takes a
+columns: ColumnDef[] prop and forwards sorting state to the table
+instead of accepting a { head, row } slot.
+
+Replace SortableHeader (37 lines, render-prop based) with
+SortableHeaderCell (~20 lines) that takes a TanStack Column and
+toggles asc/desc via column.toggleSorting.
+
+users-list.tsx declares a top-level columns array; column ids use
+`satisfies UserSortKey` so typos are caught at compile time while
+keeping the value typed as string for TanStack Table.
+
+Update frontend-feature skill to show the columns/SortableHeaderCell
+pattern instead of the old render-prop layout.
+
 test: drop unused repo tuple from user validator test helpers
 
 CreateUserValidatorTests and UpdateUserValidatorTests returned a

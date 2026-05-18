@@ -1,22 +1,52 @@
 import { Link, useRouter } from '@tanstack/react-router';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { User } from '#/api/users';
 import { Button } from '#/components/ui/button';
-import { TableCell, TableHead } from '#/components/ui/table';
 import { ListShell } from '#/components/list/list-shell';
-import { SortableHeader } from '#/components/list/sortable-header';
+import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
 import { useListQuery } from '#/hooks/use-list-query';
 import { fetchUsersPaged } from '#/features/users/server-fns';
 import type { UserSortKey } from '#/features/users/schemas';
 
+const columns: ColumnDef<User, unknown>[] = [
+  {
+    id: 'name' satisfies UserSortKey,
+    header: ({ column }) => <SortableHeaderCell column={column} label="Name" />,
+    cell: ({ row }) => `${row.original.firstName} ${row.original.lastName}`,
+  },
+  {
+    id: 'email' satisfies UserSortKey,
+    accessorKey: 'email',
+    header: ({ column }) => <SortableHeaderCell column={column} label="Email" />,
+  },
+  {
+    id: 'role' satisfies UserSortKey,
+    accessorKey: 'role',
+    header: ({ column }) => <SortableHeaderCell column={column} label="Role" />,
+  },
+];
+
 export function UsersList() {
   const router = useRouter();
 
-  const { items, total, search, setSearch, sortBy, sortDir, setSort, deletedOnly, setDeletedOnly, sentinelRef, isLoading, isFetchingNextPage, error } =
-    useListQuery<User, UserSortKey>({
-      queryKey: ['users-paged'],
-      fetcher: (params) => fetchUsersPaged({ data: params }),
-      defaultSort: { by: 'name', dir: 'asc' },
-    });
+  const {
+    items,
+    total,
+    search,
+    setSearch,
+    sorting,
+    onSortingChange,
+    deletedOnly,
+    setDeletedOnly,
+    sentinelRef,
+    isLoading,
+    isFetchingNextPage,
+    error,
+  } = useListQuery<User, UserSortKey>({
+    queryKey: ['users-paged'],
+    fetcher: (params) => fetchUsersPaged({ data: params }),
+    defaultSort: { by: 'name', dir: 'asc' },
+  });
 
   return (
     <div className="space-y-4">
@@ -35,58 +65,18 @@ export function UsersList() {
           checked: !deletedOnly,
           onChange: (checked) => setDeletedOnly(!checked),
         }}
+        columns={columns}
         items={items}
         rowKey={(u) => u.id}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         isLoading={isLoading}
         isFetchingNextPage={isFetchingNextPage}
         error={error}
         emptyState="No users found."
         sentinelRef={sentinelRef}
         onRowClick={(u) => void router.navigate({ to: '/admin/users/$id', params: { id: u.id } })}
-      >
-        {{
-          head: (
-            <>
-              <TableHead>
-                <SortableHeader<UserSortKey>
-                  label="Name"
-                  sortKey="name"
-                  currentSortBy={sortBy}
-                  currentSortDir={sortDir}
-                  onSort={setSort}
-                />
-              </TableHead>
-              <TableHead>
-                <SortableHeader<UserSortKey>
-                  label="Email"
-                  sortKey="email"
-                  currentSortBy={sortBy}
-                  currentSortDir={sortDir}
-                  onSort={setSort}
-                />
-              </TableHead>
-              <TableHead>
-                <SortableHeader<UserSortKey>
-                  label="Role"
-                  sortKey="role"
-                  currentSortBy={sortBy}
-                  currentSortDir={sortDir}
-                  onSort={setSort}
-                />
-              </TableHead>
-            </>
-          ),
-          row: (u) => (
-            <>
-              <TableCell>
-                {u.firstName} {u.lastName}
-              </TableCell>
-              <TableCell>{u.email}</TableCell>
-              <TableCell>{u.role}</TableCell>
-            </>
-          ),
-        }}
-      </ListShell>
+      />
     </div>
   );
 }

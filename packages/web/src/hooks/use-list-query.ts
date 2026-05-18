@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
+import type { OnChangeFn, SortingState } from '@tanstack/react-table';
 import type { KeysetPage, KeysetQueryParams, SortDir } from '#/api/pagination.ts';
 import { useInfiniteScrollSentinel } from '#/hooks/use-infinite-scroll-sentinel';
 
@@ -13,8 +14,9 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
 
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [sortBy, setSortBy] = useState<TSortKey>(defaultSort.by);
-  const [sortDir, setSortDir] = useState<SortDir>(defaultSort.dir);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: defaultSort.by, desc: defaultSort.dir === 'desc' },
+  ]);
   const [deletedOnly, setDeletedOnly] = useState(false);
 
   useEffect(() => {
@@ -22,13 +24,19 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
     return () => clearTimeout(id);
   }, [search]);
 
-  const params: KeysetQueryParams<TSortKey> = {
-    search: debouncedSearch || undefined,
-    sortBy,
-    sortDir,
-    pageSize,
-    deletedOnly,
-  };
+  const sortBy = (sorting[0]?.id ?? defaultSort.by) as TSortKey;
+  const sortDir: SortDir = sorting[0]?.desc ? 'desc' : 'asc';
+
+  const params: KeysetQueryParams<TSortKey> = useMemo(
+    () => ({
+      search: debouncedSearch || undefined,
+      sortBy,
+      sortDir,
+      pageSize,
+      deletedOnly,
+    }),
+    [debouncedSearch, sortBy, sortDir, pageSize, deletedOnly],
+  );
 
   const query = useInfiniteQuery({
     queryKey: [...queryKey, params],
@@ -44,14 +52,12 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
   const items = data?.pages.flatMap((p: KeysetPage<TItem>) => p.items) ?? [];
   const total = data?.pages[0]?.total;
 
-  function setSort(by: TSortKey) {
-    if (by === sortBy) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortBy(by);
-      setSortDir('asc');
-    }
-  }
+  const onSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSorting((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      return next.length === 0 ? prev : next;
+    });
+  };
 
   const sentinelRef = useInfiniteScrollSentinel({
     enabled: !!(hasNextPage && !isFetchingNextPage),
@@ -63,9 +69,8 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
     total,
     search,
     setSearch,
-    sortBy,
-    sortDir,
-    setSort,
+    sorting,
+    onSortingChange,
     deletedOnly,
     setDeletedOnly,
     sentinelRef,
