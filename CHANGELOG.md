@@ -2,6 +2,27 @@
 
 ## 2026-05-18
 
+feat: validate web env vars via zod and centralize access
+
+Add env.server.ts that parses process.env through a zod schema at
+module load and exits the process on failure, so missing or
+malformed env crashes at boot instead of producing runtime !-bang
+unwraps deep in the auth flow. Server-only files (auth.server,
+api-client.server) import the typed env object instead of reaching
+into process.env. tests/setup.ts populates the required vars so
+server modules can still be imported in tests. Drive-by: drop
+unused ctx param in better-auth onError handler so the file
+typechecks cleanly.
+
+docs: add module decomposition adr and volatility watch-list
+
+ADR-0001 records the choice of functional decomposition over
+volatility-based for v1, with the trigger to revisit. Companion
+volatilities.md walks each requirement through expected axes of
+change, synthesises shared volatilities into a candidate
+volatility-based decomposition (kept as reference, not built),
+and lists early-warning signals for future extractions.
+
 refactor: flatten api test projects out of tests subfolder
 
 Move Tsz.Api.Tests and Tsz.Api.Tests.Integration up from

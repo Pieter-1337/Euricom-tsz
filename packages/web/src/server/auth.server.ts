@@ -1,30 +1,27 @@
 import { betterAuth } from 'better-auth';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import Database from 'better-sqlite3';
-
-console.log('[auth init] MICROSOFT_CLIENT_ID:', process.env.MICROSOFT_CLIENT_ID?.slice(0, 8) + '...');
-console.log('[auth init] MICROSOFT_CLIENT_SECRET length:', process.env.MICROSOFT_CLIENT_SECRET?.length ?? 'UNDEFINED');
-console.log('[auth init] BETTER_AUTH_URL:', process.env.BETTER_AUTH_URL);
+import { env } from '#/env.server';
 
 const sqlite = new Database('auth.db');
 sqlite.exec('PRAGMA journal_mode = WAL');
 
 export const auth = betterAuth({
   database: sqlite,
-  secret: process.env.BETTER_AUTH_SECRET!,
-  baseURL: process.env.BETTER_AUTH_URL!,
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL,
   logger: { level: 'debug' },
   onAPIError: {
-    onError: (error, ctx) => {
+    onError: (error) => {
       console.error('[better-auth] onAPIError:', error);
     },
   },
   socialProviders: {
     microsoft: {
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
-      scope: ['openid', 'profile', 'email', 'offline_access', `api://${process.env.API_CLIENT_ID}/access`],
+      clientId: env.MICROSOFT_CLIENT_ID,
+      clientSecret: env.MICROSOFT_CLIENT_SECRET,
+      tenantId: env.MICROSOFT_TENANT_ID,
+      scope: ['openid', 'profile', 'email', 'offline_access', `api://${env.API_CLIENT_ID}/access`],
       prompt: 'select_account',
       mapProfileToUser: (profile) => ({
         id: profile.oid ?? profile.sub,

@@ -1,6 +1,7 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import type { paths } from '#/api/schema';
 import { ApiRequestError } from '#/api/client';
+import { env } from '#/env.server';
 import { auth } from './auth.server';
 import { getRequest } from '@tanstack/react-start/server';
 
@@ -35,6 +36,6 @@ const errorMiddleware: Middleware = {
   },
 };
 
-export const apiClient = createClient<paths>({ baseUrl: process.env.API_URL });
+export const apiClient = createClient<paths>({ baseUrl: env.API_URL });
 apiClient.use(bearerMiddleware);
 apiClient.use(errorMiddleware);
