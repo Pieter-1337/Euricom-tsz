@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import type { KeysetPage, KeysetQueryParams, SortDir } from '#/api/pagination.ts';
-import { useInfiniteScrollSentinel } from '#/lib/use-infinite-scroll-sentinel.ts';
+import { useInfiniteScrollSentinel } from '#/hooks/use-infinite-scroll-sentinel';
 
 export function useListQuery<TItem, TSortKey extends string>(opts: {
   queryKey: readonly unknown[];

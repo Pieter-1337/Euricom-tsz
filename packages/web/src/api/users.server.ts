@@ -1,4 +1,4 @@
-import { apiClient as client } from '#/lib/api.server';
+import { apiClient as client } from '#/server/api-client.server';
 import { ApiRequestError } from '#/api/client';
 import type { User, CreateUserRequest, UpdateUserRequest } from '#/api/users';
 import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';

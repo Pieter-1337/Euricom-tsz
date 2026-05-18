@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 import { UserRole } from '#/api/users';
 import { ThemeToggle } from '#/components/theme-toggle';
 import { authClient } from '#/lib/auth-client';
-import { getCurrentUser } from '#/lib/current-user';
-import type { SessionUser } from '#/lib/auth.functions';
+import { getCurrentUser } from '#/server/current-user';
+import type { SessionUser } from '#/server/auth-functions';
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ context }) => {

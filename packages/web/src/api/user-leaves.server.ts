@@ -1,4 +1,4 @@
-import { apiClient as client } from '#/lib/api.server';
+import { apiClient as client } from '#/server/api-client.server';
 import type { UserLeave, UpdateUserLeavesBody } from '#/api/user-leaves';
 
 export const getUserLeaves = async (userId: string, year?: number): Promise<UserLeave[]> => {

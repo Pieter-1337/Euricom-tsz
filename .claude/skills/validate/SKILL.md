@@ -42,10 +42,9 @@ delegate to packages (e.g. `bun run check` at root runs `bun run --filter '*' ch
 
 **Then run the relevant ones:**
 
-- TypeScript: `bun run typecheck` from the repo root (falls back to `bun x tsc --noEmit` if no typecheck script). Note: `bun run check` often runs a formatter/linter (like `vp check`) that does NOT do full TypeScript type-checking — always run a separate typecheck step too.
+- TypeScript + lint + format: `bun run check` from the repo root (delegates to package `check` scripts). In this repo the web package uses `vp check`, which covers TypeScript type-checking — no separate `typecheck` step is needed.
 - Tests: `bun run test` from the repo root (bun delegates to packages that have a test script). If that fails, try `cd packages/<name> && bun run test`.
-- Lint/format: `bun run check` if it exists
-- Run all three — don't stop at the first failure. Collect everything before reporting.
+- Run both — don't stop at the first failure. Collect everything before reporting.
 
 Run checks in parallel where they're independent. Don't stop at the first failure — collect all
 failures before reporting.

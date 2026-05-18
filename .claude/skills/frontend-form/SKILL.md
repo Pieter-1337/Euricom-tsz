@@ -1,7 +1,7 @@
 ---
 name: 'frontend-form'
 description: >
-  Add a form to an existing route in packages/web. Uses the shared `useAppForm`
+  Add a form to a feature in packages/web. Uses the shared `useAppForm`
   base (TanStack Form + Zod + bound field components), `createServerFn` submission,
   server-error wiring, and `<form.FormActions>` for buttons. Use after
   frontend-feature, or standalone for any form need.
@@ -10,10 +10,24 @@ paths: packages/web/**
 
 # Frontend Form
 
-Adds a form to an existing route using the shared form base in
+Adds a form component to a feature, using the shared form base in
 `packages/web/src/components/form/form-context.tsx`. The base hides TanStack Form
 boilerplate (field wrappers, submit/cancel, server errors). Callers only own:
 schema, defaults, fields list, and submit business logic.
+
+## Where the form lives
+
+Forms are React components — they live with other feature components, not in route files. The standard layout:
+
+```
+src/features/<feature>/
+  schemas.ts         zod schemas (form schema goes here)
+  server-fns.ts      createServerFn submit handler goes here
+  components/
+    <name>-form.tsx  the form component
+```
+
+The route file imports the form component and stays thin. Reference: `src/features/users/components/user-create-form.tsx` + `src/features/users/components/user-edit-card.tsx`.
 
 ## What the base provides
 
@@ -67,7 +81,9 @@ Only ask the gaps. If the plan covers everything, skip straight to Step 2.
 **Items to confirm** (ask only those not already answered):
 
 **Placement**
-- Which route file gets the form? (Standalone page, section inside a route, dialog?)
+- Which feature does this form belong to? (Folder under `src/features/`.)
+- Standalone page (its own component), section inside an existing component, or dialog?
+- File name for the form component (e.g. `user-create-form.tsx`, `user-edit-card.tsx`).
 
 **Mode**
 - Create (POST) or edit (PUT/PATCH)?
@@ -104,30 +120,35 @@ Only after every item is settled — by plan, by the user's message, or by direc
 
 ## Step 2 — Zod schema
 
-Near the top of the route file:
+Add to `src/features/<feature>/schemas.ts` (create the file if it doesn't exist):
 
 ```ts
 import { z } from 'zod';
 
-const <feature>FormSchema = z.object({
+export const <feature>FormSchema = z.object({
   fieldName: z.string().min(1, 'Required'),
   // ...
 });
 
-const save<Feature>InputSchema = z.object({
+export const save<Feature>InputSchema = z.object({
   id: z.string(), // omit for create-only
   <feature>: <feature>FormSchema,
 });
 ```
 
+Form schemas live in the feature folder, not in route files. Use named exports.
+
 ## Step 3 — Server function
+
+Add to `src/features/<feature>/server-fns.ts` (create the file if it doesn't exist):
 
 ```ts
 import { createServerFn } from '@tanstack/react-start';
 import { throwApiError } from '#/lib/server-error';
 import { update<Feature> } from '#/api/<feature>.server';
+import { save<Feature>InputSchema } from '#/features/<feature>/schemas';
 
-const save<Feature> = createServerFn({ method: 'POST' })
+export const save<Feature> = createServerFn({ method: 'POST' })
   .inputValidator(save<Feature>InputSchema)
   .handler(async ({ data }) => {
     try {
@@ -141,25 +162,30 @@ const save<Feature> = createServerFn({ method: 'POST' })
 `throwApiError` is mandatory — it re-throws `ApiRequestError` in the serialized
 form `parseServerError` (used inside `useFormServerErrors`) can recognise.
 
+The component imports the server fn (safe — body becomes an RPC stub on the client). Never import `#/api/<feature>.server` directly from a component.
+
 ## Step 4 — Form component (edit example)
+
+Create `src/features/<feature>/components/<feature>-form.tsx`. Data flows in as a prop — `Route.useLoaderData()` stays in the route file, not the feature component.
 
 ```tsx
 import { useRouter } from '@tanstack/react-router';
 import { useAppForm } from '#/components/form/form-context';
-import { useFormServerErrors } from '#/lib/use-form-server-errors';
+import { useFormServerErrors } from '#/hooks/use-form-server-errors';
+import { <feature>FormSchema } from '#/features/<feature>/schemas';
+import { save<Feature> } from '#/features/<feature>/server-fns';
+import type { <Feature> } from '#/api/<feature>.server';
 
-function Edit<Feature>() {
-  const item = Route.useLoaderData();
+export function <Feature>EditForm({ item }: { item: <Feature> }) {
   const router = useRouter();
 
   const form = useAppForm({
     defaultValues: {
-      fieldName: item?.fieldName ?? '',
+      fieldName: item.fieldName,
       // match schema fields exactly
     },
     validators: { onChange: <feature>FormSchema },
     onSubmit: async ({ value }) => {
-      if (!item) return;
       clearServerErrors();
       try {
         await save<Feature>({ data: { id: item.id, <feature>: value } });
@@ -191,6 +217,26 @@ function Edit<Feature>() {
       </form>
     </form.AppForm>
   );
+}
+```
+
+The route file stays thin — it owns `useLoaderData()` and the not-found branch, and passes `item` down as a prop:
+
+```tsx
+// src/routes/_protected/<feature>/$id.tsx
+import { createFileRoute } from '@tanstack/react-router';
+import { fetch<Feature>ById } from '#/features/<feature>/server-fns';
+import { <Feature>EditForm } from '#/features/<feature>/components/<feature>-form';
+
+export const Route = createFileRoute('/_protected/<feature>/$id')({
+  loader: ({ params }) => fetch<Feature>ById({ data: params.id }),
+  component: <Feature>Page,
+});
+
+function <Feature>Page() {
+  const item = Route.useLoaderData();
+  if (!item) return <main><h1 className="text-2xl font-bold"><Feature> not found</h1></main>;
+  return <main><<Feature>EditForm item={item} /></main>;
 }
 ```
 
@@ -275,7 +321,7 @@ For dialogs without field-level server errors (just a banner), it's fine to mana
 
 ## Step 5 — Verify
 
-Run `bun --filter web check` (or `cd packages/web && bun run check`). Check:
+Run `bun --filter web-tanstack-start check` (covers typecheck + lint). Check:
 - Zod schema fields match `defaultValues` shape exactly.
 - Server function `inputValidator` schema matches what `onSubmit` passes as `data`.
 - `useFormServerErrors` `fieldNames` lists every form field.

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import appCss from '../styles.css?url';
 import { ErrorBoundary } from '#/components/error-boundary';
-import { getSession } from '#/lib/auth.functions';
+import { getSession } from '#/server/auth-functions';
 import { authClient } from '#/lib/auth-client';
 
 const themeInitScript = `(() => {

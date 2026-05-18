@@ -1,7 +1,7 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import type { paths } from '#/api/schema';
 import { ApiRequestError } from '#/api/client';
-import { auth } from './auth';
+import { auth } from './auth.server';
 import { getRequest } from '@tanstack/react-start/server';
 
 const bearerMiddleware: Middleware = {

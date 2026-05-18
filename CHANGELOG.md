@@ -2,6 +2,28 @@
 
 ## 2026-05-18
 
+refactor: reorganize web package into features/lib/hooks/server
+
+Extract users-route code into src/features/users/ (schemas.ts,
+server-fns.ts, components/). Routes under _protected/admin/users/
+become thin composers: index/new just import the component;
+$id keeps the loader and a thin EditUserPage that handles the
+not-found branch and passes data as props.
+
+Split src/lib/ into three folders by runtime target:
+- src/lib/ — browser+server safe utils (cn, parseServerError,
+  authClient, form-utils)
+- src/hooks/ — shared React hooks (useListQuery,
+  useInfiniteScrollSentinel, useFormServerErrors)
+- src/server/ — server-only code (apiClient, better-auth instance,
+  getSession/SessionUser, getCurrentUser, bun-sqlite types)
+
+Update frontend-feature, frontend-form, and validate skills to
+match the new layout. frontend-feature now shows the
+features/<name>/ vertical slice and thin routes; frontend-form
+places schemas/server fns/components in the feature folder and
+shows a thin route that hands data as a prop.
+
 chore: clean up skills and add worktree to gitignore
 
 Remove create-auth-skill and associated eval workspace files. Update
