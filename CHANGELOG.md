@@ -2,6 +2,14 @@
 
 ## 2026-05-18
 
+test: drop unused repo tuple from user validator test helpers
+
+CreateUserValidatorTests and UpdateUserValidatorTests returned a
+(validator, Mock<IRepository<User>>) tuple from BuildValidator, but
+every call site discarded the repo with `_`. The mock is only needed
+inside the helper to wire up the IUnitOfWork. Return just the
+validator and drop the tuple destructuring at each call site.
+
 refactor: reorganize web package into features/lib/hooks/server
 
 Extract users-route code into src/features/users/ (schemas.ts,
