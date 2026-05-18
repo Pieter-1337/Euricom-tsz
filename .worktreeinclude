@@ -1,0 +1,20 @@
+# Gitignored files to copy into new worktrees.
+# Uses .gitignore syntax. Only files that are ALSO matched by .gitignore are copied.
+# Docs: https://code.claude.com/docs/en/worktrees#copy-gitignored-files-into-worktrees
+
+# Environment files
+.env
+.env.local
+packages/web/.env.local
+
+# Local databases (auth + app data)
+packages/web/auth.db
+packages/web/auth.db-shm
+packages/web/auth.db-wal
+packages/api/Tsz.Api/tsz.db
+packages/api/Tsz.Api/tsz.db-shm
+packages/api/Tsz.Api/tsz.db-wal
+
+# Local mkcert certificates
+certs/local-cert.pem
+certs/local-key.pem

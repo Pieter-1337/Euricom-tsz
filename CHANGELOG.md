@@ -2,6 +2,24 @@
 
 ## 2026-05-18
 
+feat: apply Euricom design system to app chrome
+
+Replace the header and sidebar in _protected.tsx with the Euricom
+Tech Tribes design: 56px charcoal header (brand-anchored in both
+themes) with brandmark, wordmark, user pill, sign-out, and theme
+toggle; collapsible eyebrow-sectioned sidebar (NAVIGATE / ADMIN)
+that toggles between 240px expanded and a 64px icon rail, with
+the collapse state persisted to localStorage. Default the app
+to dark mode and silence the resulting hydration warning on
+<html>. Add the Euricom palette + motion tokens to styles.css and
+expose them as Tailwind utilities via @theme inline, load
+Montserrat from Google Fonts, drop brandmark.svg and
+grid-pattern.svg into public/, add the shadcn Separator primitive,
+and save the durable design reference at packages/web/docs/
+DESIGN.md (with a pointer from CLAUDE.md). Also add a
+.worktreeinclude so new worktrees auto-copy .env, .env.local, the
+local SQLite databases, and the mkcert local certs.
+
 feat: validate web env vars via zod and centralize access
 
 Add env.server.ts that parses process.env through a zod schema at

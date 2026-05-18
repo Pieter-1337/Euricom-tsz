@@ -38,9 +38,43 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Euricom palette — exposed as Tailwind utilities */
+  --color-euri-green: var(--euri-green);
+  --color-euri-charcoal: var(--euri-charcoal);
+  --color-euri-charcoal-deep: var(--euri-charcoal-deep);
+  --color-euri-charcoal-raised: var(--euri-charcoal-raised);
+  --color-euri-sidebar-dark: var(--euri-sidebar-dark);
+  --color-euri-midnight: var(--euri-midnight);
+  --color-euri-midnight-light: var(--euri-midnight-light);
+  --color-euri-steel: var(--euri-steel);
+  --color-euri-steel-light: var(--euri-steel-light);
 }
 
 :root {
+  /* Euricom — primary palette */
+  --euri-green: #00FF00;
+  --euri-charcoal: #1D252D;
+  --euri-charcoal-deep: #141A20;
+  --euri-charcoal-raised: #232C35;
+  --euri-sidebar-dark: #171E25;
+  --euri-white: #FFFFFF;
+  --euri-black: #000000;
+
+  /* Cool steel range — light theme surfaces */
+  --euri-midnight: #014046;
+  --euri-midnight-light: #809FA2;
+  --euri-steel: #CBD9DA;
+  --euri-steel-light: #F1F5F6;
+
+  /* Type */
+  --font-euri: 'Montserrat', 'Helvetica Neue', Arial, system-ui, sans-serif;
+
+  /* Motion */
+  --euri-ease-out: cubic-bezier(.22,.61,.36,1);
+  --euri-dur-fast: 120ms;
+  --euri-dur-base: 220ms;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.208 0.042 265.755);
@@ -112,6 +146,10 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  html,
+  body {
+    font-family: var(--font-euri);
   }
   body {
     @apply bg-background text-foreground;
