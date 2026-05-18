@@ -2,6 +2,16 @@
 
 ## 2026-05-18
 
+refactor: flatten api test projects out of tests subfolder
+
+Move Tsz.Api.Tests and Tsz.Api.Tests.Integration up from
+packages/api/tests/ to packages/api/, matching the layout of the
+other projects (Tsz.Api, Tsz.Infrastructure) that sit directly
+under packages/api. Update csproj ProjectReference paths, the
+tsz.slnx solution (collapse /tests/ folder into /api/),
+package.json scripts (test:api, test:api:int), and the skill docs
+that hard-code the old paths.
+
 refactor: drive list views with TanStack Table
 
 Adopt @tanstack/react-table for column definitions, sort state, and

@@ -2,9 +2,7 @@
   <Folder Name="/api/">
     <Project Path="packages/api/Tsz.Api/Tsz.Api.csproj" />
     <Project Path="packages/api/Tsz.Infrastructure/Tsz.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="packages/api/tests/Tsz.Api.Tests/Tsz.Api.Tests.csproj" />
-    <Project Path="packages/api/tests/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj" />
+    <Project Path="packages/api/Tsz.Api.Tests/Tsz.Api.Tests.csproj" />
+    <Project Path="packages/api/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj" />
   </Folder>
 </Solution>

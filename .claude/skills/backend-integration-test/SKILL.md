@@ -1,7 +1,7 @@
 ---
 name: 'backend-integration-test'
 description: >
-  Add integration tests for an endpoint in packages/api/tests/Tsz.Api.Tests.Integration.
+  Add integration tests for an endpoint in packages/api/Tsz.Api.Tests.Integration.
   Uses xUnit + IntegrationTestBase (Client + WithUowAsync helpers), WebApplicationFactory
   with UseInMemoryDatabase per fixture, TestAuthHandler bypass for [Authorize]. One test
   class per endpoint group, derived from IntegrationTestBase. All DB access via
@@ -15,7 +15,7 @@ Tests the HTTP surface of an endpoint against an in-memory EF Core database.
 Each test class is an `IntegrationTestBase` that shares a `TestWebApplicationFactory` via `IClassFixture`. The factory swaps `AppDbContext` to `UseInMemoryDatabase($"IntegrationTests_{Guid}")` and installs `TestAuthHandler` so `[Authorize]` is satisfied. Tests within a class share the same DB — use `IAsyncLifetime.InitializeAsync` to purge rows between tests.
 
 ## Conventions
-- Test project: `packages/api/tests/Tsz.Api.Tests.Integration`
+- Test project: `packages/api/Tsz.Api.Tests.Integration`
 - xUnit (`[Fact]`, `Assert.*`); Shouldly available — match the style of the file you're in
 - One test class per endpoint group: `<Feature>EndpointsTests`, inheriting `IntegrationTestBase`
 - Cleanup between tests via `IAsyncLifetime.InitializeAsync` — call `repo.BatchHardDeleteAsync(_ => true)` (it ignores soft-delete query filters, so soft-deleted rows are wiped too)
@@ -147,7 +147,7 @@ bun run test:api:int
 
 Or directly:
 ```
-dotnet test packages/api/tests/Tsz.Api.Tests.Integration
+dotnet test packages/api/Tsz.Api.Tests.Integration
 ```
 
 ## Validation & Error Testing

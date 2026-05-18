@@ -12,8 +12,8 @@
     "check": "bun run --filter '*' check",
     "typecheck": "bun run --filter '*' typecheck",
     "fallow": "bun run --filter '*' fallow",
-    "test:api": "dotnet test packages/api/tests/Tsz.Api.Tests",
-    "test:api:int": "dotnet test packages/api/tests/Tsz.Api.Tests.Integration",
+    "test:api": "dotnet test packages/api/Tsz.Api.Tests",
+    "test:api:int": "dotnet test packages/api/Tsz.Api.Tests.Integration",
     "cleanup": "bun run --filter '*' cleanup",
     "test": "vp test"
   },

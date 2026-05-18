@@ -119,7 +119,7 @@ At the end of the pipeline, next to the existing module wires:
 
 ## Step 7 — Test builder
 
-Every entity gets a builder in `packages/api/tests/Tsz.Api.Tests/Builders/<Feature>Builder.cs`. The builder calls the static `Create(...)` factory (so invariants stay enforced) and exposes one `WithXxx` extension per named mutator.
+Every entity gets a builder in `packages/api/Tsz.Api.Tests/Builders/<Feature>Builder.cs`. The builder calls the static `Create(...)` factory (so invariants stay enforced) and exposes one `WithXxx` extension per named mutator.
 
 ```csharp
 using FizzWare.NBuilder.Generators;

@@ -1,7 +1,7 @@
 ---
 name: 'backend-unit-test'
 description: >
-  Add unit tests for a handler or validator in packages/api/tests/Tsz.Api.Tests.
+  Add unit tests for a handler or validator in packages/api/Tsz.Api.Tests.
   Uses xUnit, Moq for IUnitOfWork and IRepository<T>, Shouldly assertions, and
   per-entity builders (Builders/<Entity>Builder.cs) for fixture data.
   Tests in isolation - no HTTP, no real DB.
@@ -13,13 +13,13 @@ paths: packages/api/**
 Tests a single handler or validator class in isolation using xUnit + Moq + Shouldly + per-entity builders.
 
 ## Conventions
-- Test project: `packages/api/tests/Tsz.Api.Tests`
+- Test project: `packages/api/Tsz.Api.Tests`
 - Mirrors the source layout: `Modules/<Feature>/Features/<Operation><Feature>HandlerTests.cs` next to the matching `…ValidatorTests.cs`
 - Namespace: `Tsz.Api.Tests.Modules.<Feature>.Features`
 - One `[Fact]` per meaningful scenario (happy path + key failure cases)
 - Use Shouldly for assertions (`result.ShouldBe(...)`, `task.ShouldThrowAsync<...>()`)
 - Use Moq for dependencies — `Mock<IRepository<T>>`, `Mock<IUnitOfWork>`
-- Use the per-entity builder under `tests/Tsz.Api.Tests/Builders/<Entity>Builder.cs` to construct entities — `UserBuilder.Build().WithName("Jane")`. The builder calls `Entity.Create(...)` and named mutators, so invariants stay enforced. Each `Build()` produces unique randomized defaults so callers only spell out the fields that matter.
+- Use the per-entity builder under `Tsz.Api.Tests/Builders/<Entity>Builder.cs` to construct entities — `UserBuilder.Build().WithName("Jane")`. The builder calls `Entity.Create(...)` and named mutators, so invariants stay enforced. Each `Build()` produces unique randomized defaults so callers only spell out the fields that matter.
 - For DTO lists where values don't matter (mock returns), use NBuilder directly: `Builder<<Feature>Dto>.CreateListOfSize(3).Build()`. Positional records work via NBuilder's ctor-param synthesis.
 
 ## Step 1 — Clarify scope
