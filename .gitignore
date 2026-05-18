@@ -52,3 +52,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # SSL certificates (generated locally via mkcert)
 certs/*
 !certs/README.md
+
+# Worktrees
+.claude/worktrees

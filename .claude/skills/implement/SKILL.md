@@ -7,6 +7,8 @@ description: >
   "go ahead and build it", "execute the plan", "start implementing", "now write the code",
   or when a planning session has concluded and the user is ready to code.
   Always use this skill when a PLAN.md exists and the user says they're ready to start.
+context: fork
+model: sonnet
 ---
 
 # Implement
