@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-18
+
+chore: clean up skills and add worktree to gitignore
+
+Remove create-auth-skill and associated eval workspace files. Update
+implement skill with improved description. Add .claude/worktrees to
+.gitignore to exclude temporary worktree directories.
+
 ## 2026-05-14
 
 fix: toggle Active shows only active or only deleted, not both
