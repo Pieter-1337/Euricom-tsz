@@ -1,0 +1,27 @@
+CHANGELOG.md
+  s_3378ba7ea90d46::t_0c6b27ebc374df 5-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "0c4e51a1941aa9c32427d686d327cb8965ac41fc",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  },
+  "sessions": {
+    "s_3378ba7ea90d46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3018e0be-7012-4d10-93d3-9610aee041e5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
