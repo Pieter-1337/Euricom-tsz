@@ -11,6 +11,11 @@ Add a new Customers aggregate with minimal data (id, name). Includes:
   structure, server functions, and sidebar nav entry
 - Regenerate OpenAPI schema and route tree
 
+style: apply linter formatting to web files
+
+Reformat ~10 web files for line length and collapsing (printWidth 120).
+Changes are purely formatting: no behavior change.
+
 ## 2026-05-18
 
 feat: apply Euricom design system to app chrome

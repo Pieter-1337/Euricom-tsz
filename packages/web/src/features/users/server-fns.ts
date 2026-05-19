@@ -15,9 +15,7 @@ import {
 
 export const fetchUsersPaged = createServerFn({ method: 'GET' })
   .inputValidator((input: unknown) => getUsersPagedParamsSchema.parse(input))
-  .handler(
-    async ({ data }): Promise<KeysetPage<User>> => getUsersPaged(data as KeysetQueryParams<UserSortKey>),
-  );
+  .handler(async ({ data }): Promise<KeysetPage<User>> => getUsersPaged(data as KeysetQueryParams<UserSortKey>));
 
 export const submitCreateUser = createServerFn({ method: 'POST' })
   .inputValidator(createUserSchema)

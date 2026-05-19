@@ -3,7 +3,5 @@ type FieldMetaLike = {
 };
 
 export function hasFormError(fieldMeta: Record<string, FieldMetaLike>): boolean {
-  return Object.values(fieldMeta).some((meta) =>
-    Object.values(meta.errorMap ?? {}).some((value) => value != null),
-  );
+  return Object.values(fieldMeta).some((meta) => Object.values(meta.errorMap ?? {}).some((value) => value != null));
 }

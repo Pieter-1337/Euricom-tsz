@@ -26,17 +26,11 @@ export function ListToolbar({ search, onSearchChange, total, toggle }: ListToolb
       />
       {toggle && (
         <div className="flex items-center gap-2">
-          <Switch
-            id="list-toolbar-toggle"
-            checked={toggle.checked}
-            onCheckedChange={toggle.onChange}
-          />
+          <Switch id="list-toolbar-toggle" checked={toggle.checked} onCheckedChange={toggle.onChange} />
           <Label htmlFor="list-toolbar-toggle">{toggle.label}</Label>
         </div>
       )}
-      <span className="ml-auto whitespace-nowrap text-sm text-muted-foreground">
-        {total ?? '—'} items
-      </span>
+      <span className="ml-auto whitespace-nowrap text-sm text-muted-foreground">{total ?? '—'} items</span>
     </div>
   );
 }

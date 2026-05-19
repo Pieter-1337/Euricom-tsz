@@ -9,8 +9,8 @@
 ## What we use
 
 **Brand: Euricom — Tech Tribes.** Dark canvas, neon green accent, geometric type.
-Official brand guidelines: `_research/Euricom-Guidelines.pdf` *(if mirrored
-in repo)* — otherwise hosted internally by the Euricom design team.
+Official brand guidelines: `_research/Euricom-Guidelines.pdf` _(if mirrored
+in repo)_ — otherwise hosted internally by the Euricom design team.
 
 **Tech**: Tailwind CSS v4 (`@import 'tailwindcss'` + `@theme inline`),
 shadcn-style primitives under `src/components/ui/`, `lucide-react` icons,
@@ -28,13 +28,13 @@ the brand's display accent — reserve it for hero moments, not chrome.
 
 ### Brand-fixed (same in both themes)
 
-| Token                    | Value     | Use                              |
-|--------------------------|-----------|----------------------------------|
-| `--euri-green`           | `#00FF00` | Single accent — active states, focus, brandmark. **One per screen.** |
-| `--euri-charcoal`        | `#1D252D` | Default dark canvas + header bg in both themes |
-| `--euri-sidebar-dark`    | `#171E25` | Sidebar surface on dark theme    |
-| `--euri-steel-light`     | `#F1F5F6` | Sidebar / muted surface on light theme |
-| `--euri-white`           | `#FFFFFF` | Primary text on dark; canvas on light |
+| Token                 | Value     | Use                                                                  |
+| --------------------- | --------- | -------------------------------------------------------------------- |
+| `--euri-green`        | `#00FF00` | Single accent — active states, focus, brandmark. **One per screen.** |
+| `--euri-charcoal`     | `#1D252D` | Default dark canvas + header bg in both themes                       |
+| `--euri-sidebar-dark` | `#171E25` | Sidebar surface on dark theme                                        |
+| `--euri-steel-light`  | `#F1F5F6` | Sidebar / muted surface on light theme                               |
+| `--euri-white`        | `#FFFFFF` | Primary text on dark; canvas on light                                |
 
 ### Color rules
 
@@ -71,11 +71,11 @@ Sentence case for everything except eyebrow labels and the brand wordmark
 
 ## Motion
 
-| Token             | Value                          | Use                          |
-|-------------------|--------------------------------|------------------------------|
-| `--euri-dur-fast` | `120ms`                        | Color/background transitions |
-| `--euri-dur-base` | `220ms`                        | Width / size transitions     |
-| `--euri-ease-out` | `cubic-bezier(.22,.61,.36,1)`  | Default easing               |
+| Token             | Value                         | Use                          |
+| ----------------- | ----------------------------- | ---------------------------- |
+| `--euri-dur-fast` | `120ms`                       | Color/background transitions |
+| `--euri-dur-base` | `220ms`                       | Width / size transitions     |
+| `--euri-ease-out` | `cubic-bezier(.22,.61,.36,1)` | Default easing               |
 
 **No bounces. No spring overshoot. Always respect `prefers-reduced-motion`.**
 
@@ -94,11 +94,11 @@ icon represents the active/primary state of the screen.
 
 ## Components / surfaces shipped
 
-| Where                            | File                                          | Notes |
-|----------------------------------|-----------------------------------------------|-------|
-| App chrome (header + sidebar)    | `packages/web/src/routes/_protected.tsx`      | Charcoal header, collapsible eyebrow-sectioned sidebar with `localStorage` persistence (`tsz.sidebar.collapsed`). |
-| Theme toggle                     | `packages/web/src/components/theme-toggle.tsx`| Toggles `.dark` on `<html>`, writes `theme` to `localStorage`. Reused inside the dark header. |
-| Brand assets                     | `packages/web/public/`                        | `brandmark.svg`, `grid-pattern.svg`. Brandmark at 22px in the header; grid as low-opacity background on the workspace. |
+| Where                         | File                                           | Notes                                                                                                                  |
+| ----------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| App chrome (header + sidebar) | `packages/web/src/routes/_protected.tsx`       | Charcoal header, collapsible eyebrow-sectioned sidebar with `localStorage` persistence (`tsz.sidebar.collapsed`).      |
+| Theme toggle                  | `packages/web/src/components/theme-toggle.tsx` | Toggles `.dark` on `<html>`, writes `theme` to `localStorage`. Reused inside the dark header.                          |
+| Brand assets                  | `packages/web/public/`                         | `brandmark.svg`, `grid-pattern.svg`. Brandmark at 22px in the header; grid as low-opacity background on the workspace. |
 
 **Add a row to this table whenever you style a new piece of chrome or a
 reusable component.**
@@ -108,23 +108,27 @@ reusable component.**
 ## Patterns
 
 ### Active-state recipe (nav links, tabs, segmented controls)
+
 - **Background**: `bg-[rgba(0,255,0,0.10)]` (light) / `bg-[rgba(0,255,0,0.08)]` (dark)
 - **Foreground**: full-strength text colour
 - **Marker**: 2px inset green rail — `shadow-[inset_2px_0_0_#00FF00]` for full-width items, or an absolutely-positioned `<span>` for icon-only rails
 - **Icon stroke**: `#00FF00`
 
 ### Focus rings
+
 - `outline: 2px solid #00FF00; outline-offset: 2px;`
 - Use Tailwind: `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00FF00]`
 - Skip `ring-*` utilities — they clash with the brand's flat aesthetic.
 
 ### Hover states
+
 - **Ghost button**: bg fades to `rgba(0,255,0,0.08)` (dark) / `rgba(0,0,0,0.04)` (light)
 - **Filled green button**: `opacity: 0.9` (no colour shift)
 - **Link**: underline appears (was invisible), `text-underline-offset: 4px`
 - **Press**: `translateY(1px)` (no colour change)
 
 ### Eyebrow labels
+
 ```tsx
 <div className="px-3 text-[10.5px] font-medium uppercase tracking-[0.32em] text-[#6B7682] dark:text-white/40">
   Section name
@@ -132,13 +136,17 @@ reusable component.**
 ```
 
 ### Plus-grid background atmosphere
+
 On full-bleed surfaces (workspace, hero):
+
 ```tsx
-<div className="absolute inset-0 pointer-events-none
+<div
+  className="absolute inset-0 pointer-events-none
                 [background-image:url('/grid-pattern.svg')]
                 [background-size:160px_160px]
                 opacity-[0.18] [filter:invert(1)]
-                dark:opacity-[0.55] dark:[filter:none]" />
+                dark:opacity-[0.55] dark:[filter:none]"
+/>
 ```
 
 ---
@@ -165,7 +173,7 @@ On full-bleed surfaces (workspace, hero):
   source of truth, mirroring `colors_and_type.css`, `assets/`, and
   `ui_kits/`. Ask Pieter for a current pointer if that's gone stale.
 - **Original handoff bundle for this chrome**:
-  `design_handoff_euricom_layout/` *(if not yet merged & deleted)* — has
+  `design_handoff_euricom_layout/` _(if not yet merged & deleted)_ — has
   pixel-level specs and 4 reference screenshots.
 
 ---

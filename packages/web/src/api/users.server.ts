@@ -5,9 +5,7 @@ import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';
 
 type UserSortKey = 'name' | 'email' | 'role';
 
-export const getUsersPaged = async (
-  params: KeysetQueryParams<UserSortKey>,
-): Promise<KeysetPage<User>> => {
+export const getUsersPaged = async (params: KeysetQueryParams<UserSortKey>): Promise<KeysetPage<User>> => {
   const resp = await client.GET('/api/users/paged', {
     params: {
       query: {
