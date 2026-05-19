@@ -1,0 +1,33 @@
+packages/web/src/components/form/form-context.tsx
+  s_3378ba7ea90d46::t_753f0a2013b225 2,8,10-11,58,72,75-78,80-88,94,97,100-101,103,108-110,112-116,118,120,211
+packages/web/src/components/ui/select-input.tsx
+  s_3378ba7ea90d46::t_467a70c95aabba 1-56
+packages/web/src/components/ui/number-input.tsx
+  s_3378ba7ea90d46::t_55b5d486495476 1-113
+packages/web/src/components/ui/date-input.tsx
+  s_3378ba7ea90d46::t_4b59f87cd892b0 1-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "bb2412e61bedb4bc79be2aee333a6aeeb01dbc96",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  },
+  "sessions": {
+    "s_3378ba7ea90d46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3018e0be-7012-4d10-93d3-9610aee041e5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
