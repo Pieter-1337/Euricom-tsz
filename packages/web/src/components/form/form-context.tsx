@@ -225,11 +225,7 @@ function FormActions({
             {isSubmitting ? savePendingLabel : saveLabel}
           </Button>
           {showCancel && (customCancel || isChanged) && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => (customCancel ? customCancel() : form.reset())}
-            >
+            <Button type="button" variant="outline" onClick={() => (customCancel ? customCancel() : form.reset())}>
               {cancelLabel}
             </Button>
           )}

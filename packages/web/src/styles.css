@@ -53,25 +53,25 @@
 
 :root {
   /* Euricom — primary palette */
-  --euri-green: #00FF00;
-  --euri-charcoal: #1D252D;
-  --euri-charcoal-deep: #141A20;
-  --euri-charcoal-raised: #232C35;
-  --euri-sidebar-dark: #171E25;
-  --euri-white: #FFFFFF;
+  --euri-green: #00ff00;
+  --euri-charcoal: #1d252d;
+  --euri-charcoal-deep: #141a20;
+  --euri-charcoal-raised: #232c35;
+  --euri-sidebar-dark: #171e25;
+  --euri-white: #ffffff;
   --euri-black: #000000;
 
   /* Cool steel range — light theme surfaces */
   --euri-midnight: #014046;
-  --euri-midnight-light: #809FA2;
-  --euri-steel: #CBD9DA;
-  --euri-steel-light: #F1F5F6;
+  --euri-midnight-light: #809fa2;
+  --euri-steel: #cbd9da;
+  --euri-steel-light: #f1f5f6;
 
   /* Type */
   --font-euri: 'Montserrat', 'Helvetica Neue', Arial, system-ui, sans-serif;
 
   /* Motion */
-  --euri-ease-out: cubic-bezier(.22,.61,.36,1);
+  --euri-ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --euri-dur-fast: 120ms;
   --euri-dur-base: 220ms;
 

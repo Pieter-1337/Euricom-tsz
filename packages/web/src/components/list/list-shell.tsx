@@ -49,12 +49,7 @@ export function ListShell<TItem>({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <ListToolbar
-          search={search}
-          onSearchChange={onSearchChange}
-          total={total}
-          toggle={toggle}
-        />
+        <ListToolbar search={search} onSearchChange={onSearchChange} total={total} toggle={toggle} />
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
       <InfiniteTable

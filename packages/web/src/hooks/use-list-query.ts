@@ -14,9 +14,7 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
 
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: defaultSort.by, desc: defaultSort.dir === 'desc' },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: defaultSort.by, desc: defaultSort.dir === 'desc' }]);
   const [deletedOnly, setDeletedOnly] = useState(false);
 
   useEffect(() => {
@@ -40,8 +38,7 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
 
   const query = useInfiniteQuery({
     queryKey: [...queryKey, params],
-    queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
-      fetcher({ ...params, cursor: pageParam }),
+    queryFn: ({ pageParam }: { pageParam: string | undefined }) => fetcher({ ...params, cursor: pageParam }),
     getNextPageParam: (last: KeysetPage<TItem>) => last.nextCursor ?? undefined,
     initialPageParam: undefined as string | undefined,
     placeholderData: keepPreviousData,
