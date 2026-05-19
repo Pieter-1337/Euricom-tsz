@@ -29,6 +29,31 @@ One-time scaffold for a new domain module. Run this first, then use `backend-sli
 - What fields does the entity have, and which are mutable after creation?
 - Are any cross-entity relationships needed (FKs to other modules)?
 
+### Cross-module relationships
+
+Modules reference each other by **`Guid` FK only** — no EF navigation properties and no DB-level foreign-key constraints between tables that live in different modules. This keeps modules independently evolvable and avoids EF eagerly pulling foreign aggregates through `Include`s.
+
+- Carry the related id as a plain `Guid` (or `Guid?`) property on the entity.
+- In the `IEntityTypeConfiguration`, map it as `builder.Property(x => x.OtherId)` — **no** `HasOne(...).WithMany(...)`, **no** `HasForeignKey(...)`.
+- Cross-module integrity (the referenced row exists, is in the right state, etc.) is enforced in the slice's **FluentValidation validator** via `MustAsync` + the other module's `IRepository<T>`, not by the database.
+- The convention only applies across modules. Inside a single module, owned value objects (`OwnsOne` / `OwnsMany`) and parent/child entity collections are fine — see `User.RoleAssignments` for a same-module owned-collection example.
+
+Example — `Customer.ClientManagerId` references a `User` from another module:
+
+```csharp
+// Modules/Customers/Customer.cs
+public Guid? ClientManagerId { get; private set; }
+public void AssignClientManager(Guid? userId) => ClientManagerId = userId;
+
+// Modules/Customers/CustomerConfiguration.cs
+builder.Property(c => c.ClientManagerId); // plain column, no nav, no FK
+
+// Modules/Customers/Features/UpdateCustomer.cs (validator)
+RuleFor(x => x.ClientManagerId!.Value)
+    .MustAsync(UserExists).WithError(CustomerErrors.ClientManagerNotFound)
+    .When(x => x.ClientManagerId is not null);
+```
+
 ## Step 2 — Entity
 
 `Modules/<Feature>/<Feature>.cs`:

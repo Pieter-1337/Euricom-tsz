@@ -1,4 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import type { Customer } from '#/api/customers';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
@@ -6,8 +7,10 @@ import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
 import { COUNTRY_OPTIONS } from '#/lib/countries';
+import { UserRole } from '#/api/users';
 import { customerFormSchema, type CustomerFormValues } from '#/features/customers/schemas';
 import { deleteCustomer, saveCustomer } from '#/features/customers/server-fns';
+import { fetchUsersByRole } from '#/features/users/server-fns';
 
 const FIELD_PATHS: (keyof CustomerFormValues)[] = [
   'name',
@@ -17,10 +20,20 @@ const FIELD_PATHS: (keyof CustomerFormValues)[] = [
   'zip',
   'city',
   'country',
+  'clientManagerId',
 ];
 
 export function CustomerEditCard({ customer }: { customer: Customer }) {
   const router = useRouter();
+
+  const { data: managers = [] } = useQuery({
+    queryKey: ['client-managers'],
+    queryFn: () => fetchUsersByRole({ data: UserRole.ClientManager }),
+  });
+  const managerOptions = [
+    { value: '', label: '(none)' },
+    ...managers.map((u) => ({ value: u.id, label: `${u.firstName} ${u.lastName}` })),
+  ];
 
   const form = useAppForm({
     defaultValues: {
@@ -31,6 +44,7 @@ export function CustomerEditCard({ customer }: { customer: Customer }) {
       zip: customer.address.zip ?? '',
       city: customer.address.city ?? '',
       country: customer.address.country ?? '',
+      clientManagerId: customer.clientManagerId ?? '',
     } satisfies CustomerFormValues,
     validators: { onChange: customerFormSchema },
     onSubmit: async ({ value }) => {
@@ -93,6 +107,16 @@ export function CustomerEditCard({ customer }: { customer: Customer }) {
             <form.AppField name="contactName">{(field) => <field.TextField label="Contact name" />}</form.AppField>
             <form.AppField name="contactEmail">
               {(field) => <field.TextField label="Contact email" type="email" />}
+            </form.AppField>
+            <form.AppField name="clientManagerId">
+              {(field) => (
+                <field.ComboboxField
+                  label="Client manager"
+                  options={managerOptions}
+                  placeholder="(none)"
+                  emptyMessage="No client managers found."
+                />
+              )}
             </form.AppField>
           </section>
 

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Tsz.Api.Modules.Users;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Validation;
 
@@ -8,7 +9,8 @@ public sealed record UpdateCustomerCommand(
     Guid Id,
     string Name,
     ContactPersonDto ContactPerson,
-    AddressDto? Address)
+    AddressDto? Address,
+    Guid? ClientManagerId)
     : ICommand<CustomerDto>;
 
 public sealed class UpdateCustomerValidator : AbstractValidator<UpdateCustomerCommand>
@@ -42,6 +44,15 @@ public sealed class UpdateCustomerValidator : AbstractValidator<UpdateCustomerCo
                 .WithMessage("Country must be a valid ISO 3166-1 alpha-2 code.");
         });
 
+        When(x => x.ClientManagerId is not null, () =>
+        {
+            RuleFor(x => x.ClientManagerId!.Value)
+                .MustAsync(UserExists)
+                    .WithError(CustomerErrors.ClientManagerNotFound)
+                .MustAsync(UserHasClientManagerRole)
+                    .WithError(CustomerErrors.ClientManagerMissingRole);
+        });
+
         RuleFor(x => x.Id)
             .MustAsync(CustomerExists).WithError(CustomerErrors.NotFound)
             .When(x => x.Id != Guid.Empty);
@@ -49,6 +60,13 @@ public sealed class UpdateCustomerValidator : AbstractValidator<UpdateCustomerCo
 
     private async Task<bool> CustomerExists(Guid id, CancellationToken ct) =>
         await _uow.RepositoryFor<Customer>().ExistsAsync(c => c.Id == id, ct);
+
+    private async Task<bool> UserExists(Guid id, CancellationToken ct) =>
+        await _uow.RepositoryFor<User>().ExistsAsync(u => u.Id == id, ct);
+
+    private async Task<bool> UserHasClientManagerRole(Guid id, CancellationToken ct) =>
+        await _uow.RepositoryFor<User>().ExistsAsync(
+            u => u.Id == id && u.RoleAssignments.Any(r => r.Role == UserRole.ClientManager), ct);
 }
 
 public sealed class UpdateCustomerHandler(IUnitOfWork uow)
@@ -63,6 +81,7 @@ public sealed class UpdateCustomerHandler(IUnitOfWork uow)
         customer.UpdateAddress(command.Address is null
             ? Address.Empty
             : Address.Create(command.Address.Street, command.Address.Zip, command.Address.City, command.Address.Country));
+        customer.AssignClientManager(command.ClientManagerId);
 
         await uow.SaveChangesAsync(ct);
         return CustomerDto.ToDto(customer);

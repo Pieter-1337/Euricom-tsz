@@ -40,11 +40,13 @@ export function useFormServerErrors(form: FormWithSetFieldMeta, fieldNames: read
     if (apiErr) {
       const fieldErrors = apiErr.fieldErrors;
       if (fieldErrors) {
+        const known = new Set(fieldNames);
         for (const [field, errs] of Object.entries(fieldErrors)) {
-          const key = (field.charAt(0).toLowerCase() + field.slice(1)) as never;
-          form.setFieldMeta(key, (prev) => ({
+          const key = field.charAt(0).toLowerCase() + field.slice(1);
+          if (!known.has(key)) continue;
+          form.setFieldMeta(key as never, (prev) => ({
             ...prev,
-            errorMap: { ...prev.errorMap, onServer: errs.map((fe) => fe.message) },
+            errorMap: { ...prev?.errorMap, onServer: errs.map((fe) => fe.message) },
             isTouched: true,
           }));
         }

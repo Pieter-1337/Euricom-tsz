@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Tsz.Api.Modules.Customers;
+using Tsz.Api.Modules.Customers.Features;
 using Tsz.Api.Modules.Users;
 using Tsz.Api.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
@@ -15,8 +17,11 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     public UserEndpointsTests(TestWebApplicationFactory factory) : base(factory) { }
 
-    public Task InitializeAsync() => WithUowAsync(uow =>
-        uow.RepositoryFor<User>().BatchHardDeleteAsync(_ => true));
+    public async Task InitializeAsync()
+    {
+        await WithUowAsync(uow => uow.RepositoryFor<Customer>().BatchHardDeleteAsync(_ => true));
+        await WithUowAsync(uow => uow.RepositoryFor<User>().BatchHardDeleteAsync(_ => true));
+    }
 
     public Task DisposeAsync() => Task.CompletedTask;
 
@@ -451,5 +456,96 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var response = await Client.GetAsync("/api/users/paged?cursor=garbage");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    // ── ?role= filter + ClientManager guards ─────────────────────────────────
+
+    [Fact]
+    public async Task GetUsers_WithRoleFilter_ReturnsOnlyMatchingUsers()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        await WithUowAsync(async uow =>
+        {
+            uow.RepositoryFor<User>().Add(User.Create("Cam", "Manager", "cm@example.com", [UserRole.ClientManager]));
+            uow.RepositoryFor<User>().Add(User.Create("Reg", "User", "reg@example.com", [UserRole.User]));
+            await uow.SaveChangesAsync();
+        });
+
+        var response = await Client.GetAsync("/api/users?role=ClientManager");
+        response.EnsureSuccessStatusCode();
+        var list = await response.Content.ReadFromJsonAsync<List<UserDto>>(Json);
+        Assert.NotNull(list);
+        Assert.All(list, u => Assert.Contains(UserRole.ClientManager, u.Roles));
+        Assert.Contains(list, u => u.Email == "cm@example.com");
+        Assert.DoesNotContain(list, u => u.Email == "reg@example.com");
+    }
+
+    [Fact]
+    public async Task UpdateUser_RemovingClientManagerRole_WhileLinkedToCustomer_Returns409()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var managerId = await SeedManagerAndLinkCustomerAsync();
+
+        var update = new UpdateUserCommand(managerId, "Cam", "Manager", [UserRole.User]);
+        var response = await Client.PutAsJsonAsync($"/api/users/{managerId}", update);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_USER_CANNOT_REMOVE_CLIENT_MANAGER_ROLE_WHILE_ASSIGNED",
+            body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task UpdateUser_RemovingClientManagerRole_AfterCustomerSoftDeleted_Succeeds()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var managerId = await SeedManagerAndLinkCustomerAsync();
+        await WithUowAsync(async uow =>
+        {
+            var custRepo = uow.RepositoryFor<Customer>();
+            var customer = (await custRepo.GetAllAsListAsync()).First();
+            customer.SoftDelete(DateTimeOffset.UtcNow);
+            await uow.SaveChangesAsync();
+        });
+
+        var update = new UpdateUserCommand(managerId, "Cam", "Manager", [UserRole.User]);
+        var response = await Client.PutAsJsonAsync($"/api/users/{managerId}", update);
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task DeleteUser_LinkedAsClientManager_Returns409()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var managerId = await SeedManagerAndLinkCustomerAsync();
+
+        var response = await Client.DeleteAsync($"/api/users/{managerId}");
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_USER_CANNOT_REMOVE_CLIENT_MANAGER_ROLE_WHILE_ASSIGNED",
+            body.GetProperty("code").GetString());
+    }
+
+    private async Task<Guid> SeedManagerAndLinkCustomerAsync()
+    {
+        var managerId = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var manager = User.Create("Cam", "Manager", "cm@example.com", [UserRole.ClientManager]);
+            manager.Id = managerId;
+            uow.RepositoryFor<User>().Add(manager);
+
+            var customer = Customer.Create(
+                1,
+                "Acme",
+                ContactPerson.Create(null, "a@x.com"),
+                clientManagerId: managerId);
+            uow.RepositoryFor<Customer>().Add(customer);
+
+            await uow.SaveChangesAsync();
+        });
+        return managerId;
     }
 }

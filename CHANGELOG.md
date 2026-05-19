@@ -2,6 +2,13 @@
 
 ## 2026-05-19
 
+feat: support multiple roles per user
+
+Refactor user model from single role to role collection. Update handlers,
+validators, DTOs, and tests. Add UserRoleAssignment join table and
+migration. Update frontend components to display and manage multiple roles.
+Add multi-combobox and badge UI components.
+
 feat: customers module — full CRUD with admin pages
 
 Expand Customers from { Id, Name } stub to full CRUD with admin

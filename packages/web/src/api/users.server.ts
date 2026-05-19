@@ -1,6 +1,6 @@
 import { apiClient as client } from '#/server/api-client.server';
 import { ApiRequestError } from '#/api/client';
-import type { User, CreateUserRequest, UpdateUserRequest } from '#/api/users';
+import type { User, CreateUserRequest, UpdateUserRequest, UserRole } from '#/api/users';
 import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';
 
 type UserSortKey = 'name' | 'email';
@@ -33,8 +33,8 @@ export const getCurrentUser = async (): Promise<User | null> => {
   }
 };
 
-export const getUsers = async (): Promise<User[]> => {
-  const resp = await client.GET('/api/users');
+export const getUsers = async (role?: UserRole): Promise<User[]> => {
+  const resp = await client.GET('/api/users', { params: { query: { role } } });
   return resp.data ?? [];
 };
 

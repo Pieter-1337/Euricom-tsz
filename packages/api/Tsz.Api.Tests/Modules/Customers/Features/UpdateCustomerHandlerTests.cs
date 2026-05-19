@@ -25,7 +25,8 @@ public class UpdateCustomerHandlerTests
             existing.Id,
             "New Inc",
             new ContactPersonDto("Bob", "new@x.com"),
-            new AddressDto("Park 7", null, "Antwerp", "BE")));
+            new AddressDto("Park 7", null, "Antwerp", "BE"),
+            ClientManagerId: null));
 
         result.Number.ShouldBe(42);
         result.Name.ShouldBe("New Inc");
@@ -36,6 +37,38 @@ public class UpdateCustomerHandlerTests
         existing.Number.ShouldBe(42);
         existing.Name.ShouldBe("New Inc");
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task HandleAsync_AssignsAndClearsClientManager()
+    {
+        var managerId = Guid.NewGuid();
+        var existing = CustomerBuilder.Build(5);
+        var repo = new Mock<IRepository<Customer>>();
+        repo.Setup(r => r.GetByIdAsync(existing.Id, It.IsAny<CancellationToken>(), false))
+            .ReturnsAsync(existing);
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(u => u.RepositoryFor<Customer>()).Returns(repo.Object);
+
+        var handler = new UpdateCustomerHandler(uow.Object);
+
+        var assigned = await handler.HandleAsync(new UpdateCustomerCommand(
+            existing.Id,
+            "Acme",
+            new ContactPersonDto(null, "x@x.com"),
+            null,
+            ClientManagerId: managerId));
+        assigned.ClientManagerId.ShouldBe(managerId);
+        existing.ClientManagerId.ShouldBe(managerId);
+
+        var cleared = await handler.HandleAsync(new UpdateCustomerCommand(
+            existing.Id,
+            "Acme",
+            new ContactPersonDto(null, "x@x.com"),
+            null,
+            ClientManagerId: null));
+        cleared.ClientManagerId.ShouldBeNull();
+        existing.ClientManagerId.ShouldBeNull();
     }
 
     [Fact]
@@ -54,7 +87,8 @@ public class UpdateCustomerHandlerTests
             existing.Id,
             "Same",
             new ContactPersonDto(null, "x@x.com"),
-            null));
+            null,
+            ClientManagerId: null));
 
         result.Address.Street.ShouldBeNull();
         result.Address.City.ShouldBeNull();

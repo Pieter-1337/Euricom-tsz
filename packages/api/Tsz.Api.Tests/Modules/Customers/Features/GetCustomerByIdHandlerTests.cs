@@ -15,7 +15,8 @@ public class GetCustomerByIdHandlerTests
         var id = Guid.NewGuid();
         var dto = new CustomerDto(id, 1, "Acme",
             new AddressDto(null, null, null, null),
-            new ContactPersonDto(null, "c@x.com"));
+            new ContactPersonDto(null, "c@x.com"),
+            ClientManagerId: null);
         var repo = new Mock<IRepository<Customer>>();
         repo.Setup(r => r.FirstOrDefaultAsDtoAsync<CustomerDto>(
                 It.IsAny<Expression<Func<Customer, bool>>>(),

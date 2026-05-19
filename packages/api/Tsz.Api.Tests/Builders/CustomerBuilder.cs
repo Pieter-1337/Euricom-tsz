@@ -42,4 +42,10 @@ public static class CustomerBuilder
         entity.SoftDelete(DateTimeOffset.UtcNow);
         return entity;
     }
+
+    public static Customer WithClientManager(this Customer entity, Guid? userId)
+    {
+        entity.AssignClientManager(userId);
+        return entity;
+    }
 }

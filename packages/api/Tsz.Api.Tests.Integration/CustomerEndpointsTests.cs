@@ -57,7 +57,8 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var command = new CreateCustomerCommand(
             "Acme",
             new ContactPersonDto("Jane", "jane@example.com"),
-            new AddressDto("Main 1", "1000", "Brussels", "BE"));
+            new AddressDto("Main 1", "1000", "Brussels", "BE"),
+            ClientManagerId: null);
 
         var response = await Client.PostAsJsonAsync("/api/customers", command);
 
@@ -68,6 +69,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.Equal("Acme", dto.Name);
         Assert.Equal("jane@example.com", dto.ContactPerson.Email);
         Assert.Equal("Brussels", dto.Address.City);
+        Assert.Null(dto.ClientManagerId);
     }
 
     [Fact]
@@ -75,12 +77,12 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedAdminAsync();
         var first = await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("A", new ContactPersonDto(null, "a@x.com"), null));
+            new CreateCustomerCommand("A", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: null));
         var firstDto = (await first.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
         Assert.Equal(1, firstDto.Number);
 
         var second = await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("B", new ContactPersonDto(null, "b@x.com"), null));
+            new CreateCustomerCommand("B", new ContactPersonDto(null, "b@x.com"), null, ClientManagerId: null));
         var secondDto = (await second.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
         Assert.Equal(2, secondDto.Number);
     }
@@ -89,7 +91,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateCustomer_InvalidEmail_Returns400()
     {
         await SeedAdminAsync();
-        var command = new CreateCustomerCommand("Acme", new ContactPersonDto(null, "not-an-email"), null);
+        var command = new CreateCustomerCommand("Acme", new ContactPersonDto(null, "not-an-email"), null, ClientManagerId: null);
 
         var response = await Client.PostAsJsonAsync("/api/customers", command);
 
@@ -111,14 +113,15 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedAdminAsync();
         var created = await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("Old", new ContactPersonDto(null, "old@x.com"), null));
+            new CreateCustomerCommand("Old", new ContactPersonDto(null, "old@x.com"), null, ClientManagerId: null));
         var dto = (await created.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
 
         var update = new UpdateCustomerCommand(
             dto.Id,
             "New",
             new ContactPersonDto("Bob", "new@x.com"),
-            new AddressDto(null, null, "Antwerp", null));
+            new AddressDto(null, null, "Antwerp", null),
+            ClientManagerId: null);
         var response = await Client.PutAsJsonAsync($"/api/customers/{dto.Id}", update);
 
         response.EnsureSuccessStatusCode();
@@ -134,7 +137,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task UpdateCustomer_RouteIdMismatch_ReturnsBadRequest()
     {
         await SeedAdminAsync();
-        var update = new UpdateCustomerCommand(Guid.NewGuid(), "x", new ContactPersonDto(null, "x@x.com"), null);
+        var update = new UpdateCustomerCommand(Guid.NewGuid(), "x", new ContactPersonDto(null, "x@x.com"), null, ClientManagerId: null);
 
         var response = await Client.PutAsJsonAsync($"/api/customers/{Guid.NewGuid()}", update);
 
@@ -148,7 +151,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var id = Guid.NewGuid();
 
         var response = await Client.PutAsJsonAsync($"/api/customers/{id}",
-            new UpdateCustomerCommand(id, "x", new ContactPersonDto(null, "x@x.com"), null));
+            new UpdateCustomerCommand(id, "x", new ContactPersonDto(null, "x@x.com"), null, ClientManagerId: null));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
@@ -160,7 +163,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedAdminAsync();
         var created = await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("Doomed", new ContactPersonDto(null, "doomed@x.com"), null));
+            new CreateCustomerCommand("Doomed", new ContactPersonDto(null, "doomed@x.com"), null, ClientManagerId: null));
         var dto = (await created.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
 
         var response = await Client.DeleteAsync($"/api/customers/{dto.Id}");
@@ -182,7 +185,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
         for (var i = 1; i <= 12; i++)
         {
             await Client.PostAsJsonAsync("/api/customers",
-                new CreateCustomerCommand($"Cust {i:D2}", new ContactPersonDto(null, $"c{i}@x.com"), null));
+                new CreateCustomerCommand($"Cust {i:D2}", new ContactPersonDto(null, $"c{i}@x.com"), null, ClientManagerId: null));
         }
 
         var firstResponse = await Client.GetAsync("/api/customers/paged?pageSize=10&sortBy=number");
@@ -207,9 +210,9 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedAdminAsync();
         await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("Alpha", new ContactPersonDto(null, "alice@example.com"), null));
+            new CreateCustomerCommand("Alpha", new ContactPersonDto(null, "alice@example.com"), null, ClientManagerId: null));
         await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("Beta", new ContactPersonDto(null, "bob@example.com"), null));
+            new CreateCustomerCommand("Beta", new ContactPersonDto(null, "bob@example.com"), null, ClientManagerId: null));
 
         var response = await Client.GetAsync("/api/customers/paged?search=alice");
         response.EnsureSuccessStatusCode();
@@ -226,7 +229,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedAdminAsync();
         var created = await Client.PostAsJsonAsync("/api/customers",
-            new CreateCustomerCommand("Doomed", new ContactPersonDto(null, "doomed@x.com"), null));
+            new CreateCustomerCommand("Doomed", new ContactPersonDto(null, "doomed@x.com"), null, ClientManagerId: null));
         var dto = (await created.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
         await Client.DeleteAsync($"/api/customers/{dto.Id}");
 
@@ -245,5 +248,86 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var response = await Client.GetAsync("/api/customers/paged");
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    private async Task<Guid> SeedClientManagerAsync(string email = "cm@test.com")
+    {
+        var id = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Cam", "Manager", email, [UserRole.ClientManager]);
+            user.Id = id;
+            uow.RepositoryFor<User>().Add(user);
+            await uow.SaveChangesAsync();
+        });
+        return id;
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WithValidClientManager_PersistsAssignment()
+    {
+        await SeedAdminAsync();
+        var managerId = await SeedClientManagerAsync();
+
+        var response = await Client.PostAsJsonAsync("/api/customers",
+            new CreateCustomerCommand("Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: managerId));
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var dto = await response.Content.ReadFromJsonAsync<CustomerDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(managerId, dto.ClientManagerId);
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WithUserMissingClientManagerRole_Returns400()
+    {
+        await SeedAdminAsync();
+        // SeedAdmin user has Admin role only, not ClientManager
+        var adminId = Guid.Empty;
+        await WithUowAsync(async uow =>
+        {
+            var existing = await uow.RepositoryFor<User>().FirstOrDefaultAsync(u => u.Email == TestEmail);
+            adminId = existing!.Id;
+        });
+
+        var response = await Client.PostAsJsonAsync("/api/customers",
+            new CreateCustomerCommand("Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: adminId));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_CUSTOMER_CLIENT_MANAGER_MISSING_ROLE", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task CreateCustomer_WithUnknownClientManager_Returns404()
+    {
+        await SeedAdminAsync();
+
+        var response = await Client.PostAsJsonAsync("/api/customers",
+            new CreateCustomerCommand("Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: Guid.NewGuid()));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_CUSTOMER_CLIENT_MANAGER_NOT_FOUND", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task UpdateCustomer_AssignsAndClearsClientManager()
+    {
+        await SeedAdminAsync();
+        var managerId = await SeedClientManagerAsync();
+        var created = await Client.PostAsJsonAsync("/api/customers",
+            new CreateCustomerCommand("Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: null));
+        var dto = (await created.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
+
+        var assigned = await Client.PutAsJsonAsync($"/api/customers/{dto.Id}",
+            new UpdateCustomerCommand(dto.Id, "Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: managerId));
+        var assignedDto = (await assigned.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
+        Assert.Equal(managerId, assignedDto.ClientManagerId);
+
+        var cleared = await Client.PutAsJsonAsync($"/api/customers/{dto.Id}",
+            new UpdateCustomerCommand(dto.Id, "Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: null));
+        var clearedDto = (await cleared.Content.ReadFromJsonAsync<CustomerDto>(Json))!;
+        Assert.Null(clearedDto.ClientManagerId);
     }
 }

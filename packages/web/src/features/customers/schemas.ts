@@ -12,6 +12,7 @@ export const customerFormSchema = z.object({
   zip: z.string().max(32),
   city: z.string().max(128),
   country: z.string().max(128),
+  clientManagerId: z.string(),
 });
 
 export type CustomerFormValues = z.infer<typeof customerFormSchema>;

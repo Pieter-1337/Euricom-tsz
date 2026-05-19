@@ -1,4 +1,5 @@
 using FluentValidation;
+using Tsz.Api.Modules.Customers;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Validation;
 
@@ -27,10 +28,28 @@ public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
         RuleFor(x => x.Id)
             .MustAsync(UserExists).WithError(UserErrors.NotFound)
             .When(x => x.Id != Guid.Empty);
+
+        RuleFor(x => x)
+            .MustAsync(CanRemoveClientManagerRole)
+            .WithError(UserErrors.CannotRemoveClientManagerRoleWhileAssigned)
+            .When(x => x.Id != Guid.Empty && x.Roles is { Count: > 0 });
     }
 
     private async Task<bool> UserExists(Guid id, CancellationToken ct) =>
         await _uow.RepositoryFor<User>().ExistsAsync(u => u.Id == id, ct);
+
+    private async Task<bool> CanRemoveClientManagerRole(UpdateUserCommand cmd, CancellationToken ct)
+    {
+        if (cmd.Roles.Contains(UserRole.ClientManager)) return true;
+
+        var currentlyHasRole = await _uow.RepositoryFor<User>().ExistsAsync(
+            u => u.Id == cmd.Id && u.RoleAssignments.Any(r => r.Role == UserRole.ClientManager), ct);
+        if (!currentlyHasRole) return true;
+
+        var stillLinked = await _uow.RepositoryFor<Customer>().ExistsAsync(
+            c => c.ClientManagerId == cmd.Id, ct);
+        return !stillLinked;
+    }
 }
 
 public sealed class UpdateUserHandler(IUnitOfWork uow)

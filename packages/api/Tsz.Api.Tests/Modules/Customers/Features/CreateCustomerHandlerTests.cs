@@ -33,7 +33,8 @@ public class CreateCustomerHandlerTests
         var dto = await handler.HandleAsync(new CreateCustomerCommand(
             "Acme",
             new ContactPersonDto("Jane", "jane@example.com"),
-            new AddressDto("Main 1", "1000", "Brussels", "BE")));
+            new AddressDto("Main 1", "1000", "Brussels", "BE"),
+            ClientManagerId: null));
 
         dto.Number.ShouldBe(1);
         dto.Name.ShouldBe("Acme");
@@ -54,7 +55,8 @@ public class CreateCustomerHandlerTests
         var dto = await handler.HandleAsync(new CreateCustomerCommand(
             "B Corp",
             new ContactPersonDto(null, "b@x.com"),
-            null));
+            null,
+            ClientManagerId: null));
 
         dto.Number.ShouldBe(8);
         dto.Address.Street.ShouldBeNull();
@@ -70,7 +72,8 @@ public class CreateCustomerHandlerTests
         var dto = await handler.HandleAsync(new CreateCustomerCommand(
             "Acme",
             new ContactPersonDto("  Jane  ", "jane@example.com"),
-            new AddressDto("  Main 1  ", "   ", "Brussels", "")));
+            new AddressDto("  Main 1  ", "   ", "Brussels", ""),
+            ClientManagerId: null));
 
         dto.Address.Street.ShouldBe("Main 1");
         dto.Address.Zip.ShouldBeNull();

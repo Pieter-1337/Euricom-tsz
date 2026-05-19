@@ -33,6 +33,7 @@ const toCreateRequest = (form: CustomerFormValues): CreateCustomerRequest => {
     name: form.name.trim(),
     contactPerson: { name: nullIfEmpty(form.contactName), email: form.contactEmail.trim() },
     address: anyAddress ? { street, zip, city, country } : null,
+    clientManagerId: nullIfEmpty(form.clientManagerId),
   };
 };
 

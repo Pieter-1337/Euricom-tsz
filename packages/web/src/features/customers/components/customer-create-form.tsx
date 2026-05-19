@@ -1,9 +1,12 @@
 import { useRouter } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
 import { COUNTRY_OPTIONS } from '#/lib/countries';
+import { UserRole } from '#/api/users';
 import { customerFormSchema, type CustomerFormValues } from '#/features/customers/schemas';
 import { submitCreateCustomer } from '#/features/customers/server-fns';
+import { fetchUsersByRole } from '#/features/users/server-fns';
 
 const FIELD_PATHS: (keyof CustomerFormValues)[] = [
   'name',
@@ -13,10 +16,20 @@ const FIELD_PATHS: (keyof CustomerFormValues)[] = [
   'zip',
   'city',
   'country',
+  'clientManagerId',
 ];
 
 export function CustomerCreateForm() {
   const router = useRouter();
+
+  const { data: managers = [] } = useQuery({
+    queryKey: ['client-managers'],
+    queryFn: () => fetchUsersByRole({ data: UserRole.ClientManager }),
+  });
+  const managerOptions = [
+    { value: '', label: '(none)' },
+    ...managers.map((u) => ({ value: u.id, label: `${u.firstName} ${u.lastName}` })),
+  ];
 
   const form = useAppForm({
     defaultValues: {
@@ -27,6 +40,7 @@ export function CustomerCreateForm() {
       zip: '',
       city: '',
       country: '',
+      clientManagerId: '',
     } satisfies CustomerFormValues,
     validators: { onChange: customerFormSchema },
     onSubmit: async ({ value }) => {
@@ -66,6 +80,16 @@ export function CustomerCreateForm() {
             <form.AppField name="contactName">{(field) => <field.TextField label="Contact name" />}</form.AppField>
             <form.AppField name="contactEmail">
               {(field) => <field.TextField label="Contact email" type="email" />}
+            </form.AppField>
+            <form.AppField name="clientManagerId">
+              {(field) => (
+                <field.ComboboxField
+                  label="Client manager"
+                  options={managerOptions}
+                  placeholder="(none)"
+                  emptyMessage="No client managers found."
+                />
+              )}
             </form.AppField>
           </section>
 

@@ -32,6 +32,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             cp.Property(p => p.Email).HasColumnName("ContactPerson_Email").IsRequired().HasMaxLength(256);
         });
 
+        // Cross-module reference to Users — Guid only, no nav, no FK constraint.
+        builder.Property(c => c.ClientManagerId);
+
         builder.HasIndex(c => c.Number)
             .IsUnique()
             .HasFilter("\"DeletedAt\" IS NULL");

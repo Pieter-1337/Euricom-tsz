@@ -12,4 +12,9 @@ public sealed class UserErrors : ErrorCodeBase<UserErrors>
 
     public static readonly UserErrors NotFound =
         new("ERR_USER_NOT_FOUND", "User not found.", ErrorCategory.NotFound);
+
+    public static readonly UserErrors CannotRemoveClientManagerRoleWhileAssigned =
+        new("ERR_USER_CANNOT_REMOVE_CLIENT_MANAGER_ROLE_WHILE_ASSIGNED",
+            "User is still assigned as ClientManager to one or more customers.",
+            ErrorCategory.Conflict);
 }

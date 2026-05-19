@@ -81,7 +81,9 @@ export interface paths {
     };
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          role?: string;
+        };
         header?: never;
         path?: never;
         cookie?: never;
@@ -470,6 +472,8 @@ export interface components {
       name: string;
       contactPerson: components['schemas']['ContactPersonDto'];
       address: null | components['schemas']['AddressDto'];
+      /** Format: uuid */
+      clientManagerId: null | string;
     };
     CreateUserCommand: {
       firstName: string;
@@ -485,6 +489,8 @@ export interface components {
       name: string;
       address: components['schemas']['AddressDto'];
       contactPerson: components['schemas']['ContactPersonDto'];
+      /** Format: uuid */
+      clientManagerId: null | string;
     };
     KeysetPageOfCustomerDto: {
       items: components['schemas']['CustomerDto'][];
@@ -506,6 +512,8 @@ export interface components {
       name: string;
       contactPerson: components['schemas']['ContactPersonDto'];
       address: null | components['schemas']['AddressDto'];
+      /** Format: uuid */
+      clientManagerId: null | string;
     };
     UpdateUserCommand: {
       /** Format: uuid */

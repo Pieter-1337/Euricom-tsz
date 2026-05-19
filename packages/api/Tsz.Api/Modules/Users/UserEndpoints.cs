@@ -22,8 +22,16 @@ public static class UserEndpoints
         var adminGroup = group.MapGroup("")
             .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
-        adminGroup.MapGet("/", async (IDispatcher dispatcher, CancellationToken ct) =>
-            TypedResults.Ok(await dispatcher.SendAsync(new GetUsersQuery(), ct)));
+        adminGroup.MapGet("/", async (
+            IDispatcher dispatcher,
+            CancellationToken ct,
+            string? role = null) =>
+        {
+            UserRole? roleFilter = Enum.TryParse<UserRole>(role, ignoreCase: true, out var parsed)
+                ? parsed
+                : null;
+            return TypedResults.Ok(await dispatcher.SendAsync(new GetUsersQuery(roleFilter), ct));
+        });
 
         adminGroup.MapGet("/paged", async (
             IDispatcher dispatcher,

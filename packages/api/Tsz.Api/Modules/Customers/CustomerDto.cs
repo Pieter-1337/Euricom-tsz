@@ -12,7 +12,8 @@ public sealed record CustomerDto(
     int Number,
     string Name,
     AddressDto Address,
-    ContactPersonDto ContactPerson)
+    ContactPersonDto ContactPerson,
+    Guid? ClientManagerId)
     : IEntityDto<Customer, CustomerDto>
 {
     public static Expression<Func<Customer, CustomerDto>> Project =>
@@ -21,7 +22,8 @@ public sealed record CustomerDto(
             c.Number,
             c.Name,
             new AddressDto(c.Address.Street, c.Address.Zip, c.Address.City, c.Address.Country),
-            new ContactPersonDto(c.ContactPerson.Name, c.ContactPerson.Email));
+            new ContactPersonDto(c.ContactPerson.Name, c.ContactPerson.Email),
+            c.ClientManagerId);
 
     public static CustomerDto ToDto(Customer entity) =>
         new(
@@ -29,5 +31,6 @@ public sealed record CustomerDto(
             entity.Number,
             entity.Name,
             new AddressDto(entity.Address.Street, entity.Address.Zip, entity.Address.City, entity.Address.Country),
-            new ContactPersonDto(entity.ContactPerson.Name, entity.ContactPerson.Email));
+            new ContactPersonDto(entity.ContactPerson.Name, entity.ContactPerson.Email),
+            entity.ClientManagerId);
 }
