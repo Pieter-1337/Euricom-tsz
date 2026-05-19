@@ -22,7 +22,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     private Task SeedUserAsync(string email, UserRole role, string? oid = null) => WithUowAsync(async uow =>
     {
-        var user = User.Create("User", $"_{Guid.NewGuid().ToString()[..6]}", email, role);
+        var user = User.Create("User", $"_{Guid.NewGuid().ToString()[..6]}", email, [role]);
         if (oid is not null) user.LinkEntraOid(oid);
         uow.RepositoryFor<User>().Add(user);
         await uow.SaveChangesAsync();
@@ -100,7 +100,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_AsAdmin_Valid_ReturnsCreated()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]);
 
         var response = await Client.PostAsJsonAsync("/api/users", command);
 
@@ -110,14 +110,75 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.Equal("Jane", dto.FirstName);
         Assert.Equal("Doe", dto.LastName);
         Assert.Equal("jane@example.com", dto.Email);
-        Assert.Equal(UserRole.User, dto.Role);
+        Assert.Equal(new[] { UserRole.User }, dto.Roles);
+    }
+
+    [Fact]
+    public async Task CreateUser_WithMultipleRoles_PersistsAllRoles()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var command = new CreateUserCommand("Multi", "Role", "multi@example.com", [UserRole.Admin, UserRole.ClientManager]);
+
+        var response = await Client.PostAsJsonAsync("/api/users", command);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var dto = await response.Content.ReadFromJsonAsync<UserDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(2, dto.Roles.Count);
+        Assert.Contains(UserRole.Admin, dto.Roles);
+        Assert.Contains(UserRole.ClientManager, dto.Roles);
+    }
+
+    [Fact]
+    public async Task UpdateUser_RemovingAdminRole_RevokesAdminAccess()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+
+        var meBefore = await Client.GetAsync("/api/users");
+        meBefore.EnsureSuccessStatusCode();
+
+        var current = await GetUserByEmailAsync(TestEmail);
+        Assert.NotNull(current);
+        var demote = new UpdateUserCommand(current.Id, current.FirstName, current.LastName, [UserRole.User]);
+        var put = await Client.PutAsJsonAsync($"/api/users/{current.Id}", demote);
+        put.EnsureSuccessStatusCode();
+
+        var meAfter = await Client.GetAsync("/api/users");
+        Assert.Equal(HttpStatusCode.Forbidden, meAfter.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUser_EmptyRoles_ReturnsBadRequest()
+    {
+        await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
+        var command = new CreateUserCommand("Jane", "Doe", "noroles@example.com", []);
+
+        var response = await Client.PostAsJsonAsync("/api/users", command);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsers_AsAdminAmongManyRoles_ReturnsOk()
+    {
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Multi", "Admin", TestEmail, [UserRole.ClientManager, UserRole.Admin]);
+            user.LinkEntraOid(TestOid);
+            uow.RepositoryFor<User>().Add(user);
+            await uow.SaveChangesAsync();
+        });
+
+        var response = await Client.GetAsync("/api/users");
+
+        response.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task CreateUser_AsAdmin_SeedsUserLeaveRows()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]);
 
         var createResponse = await Client.PostAsJsonAsync("/api/users", command);
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
@@ -135,7 +196,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_AsAdmin_Invalid_ReturnsBadRequest()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("", "", "not-an-email", UserRole.User);
+        var command = new CreateUserCommand("", "", "not-an-email", [UserRole.User]);
 
         var response = await Client.PostAsJsonAsync("/api/users", command);
 
@@ -146,7 +207,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_DuplicateEmail_Returns409WithProblemDetails()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "Doe", "dup@example.com", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "dup@example.com", [UserRole.User]);
         var first = await Client.PostAsJsonAsync("/api/users", command);
         first.EnsureSuccessStatusCode();
 
@@ -166,7 +227,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task CreateUser_InvalidEmail_Returns400WithFieldErrors()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var command = new CreateUserCommand("Jane", "Doe", "not-an-email", UserRole.User);
+        var command = new CreateUserCommand("Jane", "Doe", "not-an-email", [UserRole.User]);
 
         var response = await Client.PostAsJsonAsync("/api/users", command);
 
@@ -183,24 +244,24 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var created = await Client.PostAsJsonAsync("/api/users",
-            new CreateUserCommand("Old", "Name", "u@example.com", UserRole.User));
+            new CreateUserCommand("Old", "Name", "u@example.com", [UserRole.User]));
         var dto = (await created.Content.ReadFromJsonAsync<UserDto>(Json))!;
 
-        var update = new UpdateUserCommand(dto.Id, "New", "Name", UserRole.ClientManager);
+        var update = new UpdateUserCommand(dto.Id, "New", "Name", [UserRole.Admin, UserRole.ClientManager]);
         var response = await Client.PutAsJsonAsync($"/api/users/{dto.Id}", update);
 
         response.EnsureSuccessStatusCode();
         var updated = await response.Content.ReadFromJsonAsync<UserDto>(Json);
         Assert.NotNull(updated);
         Assert.Equal("New", updated.FirstName);
-        Assert.Equal(UserRole.ClientManager, updated.Role);
+        Assert.Equal(new[] { UserRole.Admin, UserRole.ClientManager }, updated.Roles);
     }
 
     [Fact]
     public async Task UpdateUser_RouteIdMismatch_ReturnsBadRequest()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
-        var update = new UpdateUserCommand(Guid.NewGuid(), "x", "y", UserRole.User);
+        var update = new UpdateUserCommand(Guid.NewGuid(), "x", "y", [UserRole.User]);
 
         var response = await Client.PutAsJsonAsync($"/api/users/{Guid.NewGuid()}", update);
 
@@ -214,7 +275,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var id = Guid.NewGuid();
 
         var response = await Client.PutAsJsonAsync($"/api/users/{id}",
-            new UpdateUserCommand(id, "x", "y", UserRole.User));
+            new UpdateUserCommand(id, "x", "y", [UserRole.User]));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.Contains("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -228,7 +289,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var created = await Client.PostAsJsonAsync("/api/users",
-            new CreateUserCommand("Doomed", "User", "doomed@example.com", UserRole.User));
+            new CreateUserCommand("Doomed", "User", "doomed@example.com", [UserRole.User]));
         var dto = (await created.Content.ReadFromJsonAsync<UserDto>(Json))!;
 
         var response = await Client.DeleteAsync($"/api/users/{dto.Id}");
@@ -316,8 +377,8 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         await WithUowAsync(async uow =>
         {
-            uow.RepositoryFor<User>().Add(User.Create("Alice", "Smith", "alice@example.com", UserRole.User));
-            uow.RepositoryFor<User>().Add(User.Create("Bob", "Jones", "bob@example.com", UserRole.User));
+            uow.RepositoryFor<User>().Add(User.Create("Alice", "Smith", "alice@example.com", [UserRole.User]));
+            uow.RepositoryFor<User>().Add(User.Create("Bob", "Jones", "bob@example.com", [UserRole.User]));
             await uow.SaveChangesAsync();
         });
 
@@ -338,8 +399,8 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         await WithUowAsync(async uow =>
         {
-            uow.RepositoryFor<User>().Add(User.Create("A", "A", "aaa@example.com", UserRole.User));
-            uow.RepositoryFor<User>().Add(User.Create("Z", "Z", "zzz@example.com", UserRole.User));
+            uow.RepositoryFor<User>().Add(User.Create("A", "A", "aaa@example.com", [UserRole.User]));
+            uow.RepositoryFor<User>().Add(User.Create("Z", "Z", "zzz@example.com", [UserRole.User]));
             await uow.SaveChangesAsync();
         });
 
@@ -360,7 +421,7 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);
         var createResponse = await Client.PostAsJsonAsync("/api/users",
-            new CreateUserCommand("Doomed", "User", "doomed2@example.com", UserRole.User));
+            new CreateUserCommand("Doomed", "User", "doomed2@example.com", [UserRole.User]));
         var dto = (await createResponse.Content.ReadFromJsonAsync<UserDto>(Json))!;
         await Client.DeleteAsync($"/api/users/{dto.Id}");
 

@@ -36,7 +36,7 @@ function ProtectedLayout() {
     user: SessionUser;
     currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
   };
-  const isAdmin = currentUser.role === UserRole.Admin;
+  const isAdmin = currentUser.roles.includes(UserRole.Admin);
   const firstName = currentUser.firstName;
 
   const [collapsed, setCollapsed] = useState<boolean>(false);

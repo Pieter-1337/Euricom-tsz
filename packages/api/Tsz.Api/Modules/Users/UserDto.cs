@@ -8,12 +8,12 @@ public sealed record UserDto(
     string Email,
     string FirstName,
     string LastName,
-    UserRole Role)
+    IReadOnlyCollection<UserRole> Roles)
     : IEntityDto<User, UserDto>
 {
     public static Expression<Func<User, UserDto>> Project =>
-        u => new UserDto(u.Id, u.Email, u.FirstName, u.LastName, u.Role);
+        u => new UserDto(u.Id, u.Email, u.FirstName, u.LastName, u.RoleAssignments.Select(r => r.Role).ToList());
 
     public static UserDto ToDto(User entity) =>
-        new(entity.Id, entity.Email, entity.FirstName, entity.LastName, entity.Role);
+        new(entity.Id, entity.Email, entity.FirstName, entity.LastName, entity.Roles);
 }

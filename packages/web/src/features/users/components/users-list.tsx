@@ -1,6 +1,7 @@
 import { Link, useRouter } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { User } from '#/api/users';
+import { Badge } from '#/components/ui/badge';
 import { Button } from '#/components/ui/button';
 import { ListShell } from '#/components/list/list-shell';
 import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
@@ -20,29 +21,24 @@ const columns: ColumnDef<User, unknown>[] = [
     header: ({ column }) => <SortableHeaderCell column={column} label="Email" />,
   },
   {
-    id: 'role' satisfies UserSortKey,
-    accessorKey: 'role',
-    header: ({ column }) => <SortableHeaderCell column={column} label="Role" />,
+    id: 'roles',
+    header: 'Roles',
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1">
+        {row.original.roles.map((r) => (
+          <Badge key={r} variant="secondary">
+            {r}
+          </Badge>
+        ))}
+      </div>
+    ),
   },
 ];
 
 export function UsersList() {
   const router = useRouter();
 
-  const {
-    items,
-    total,
-    search,
-    setSearch,
-    sorting,
-    onSortingChange,
-    deletedOnly,
-    setDeletedOnly,
-    sentinelRef,
-    isLoading,
-    isFetchingNextPage,
-    error,
-  } = useListQuery<User, UserSortKey>({
+  const props = useListQuery<User, UserSortKey>({
     queryKey: ['users-paged'],
     fetcher: (params) => fetchUsersPaged({ data: params }),
     defaultSort: { by: 'name', dir: 'asc' },
@@ -57,25 +53,25 @@ export function UsersList() {
         </Button>
       </div>
       <ListShell
-        search={search}
-        onSearchChange={setSearch}
-        total={total}
-        toggle={{
-          label: 'Active',
-          checked: !deletedOnly,
-          onChange: (checked) => setDeletedOnly(!checked),
+        toolbar={{
+          search: props.search,
+          onSearchChange: props.setSearch,
+          total: props.total,
+          deletedFilter: { deletedOnly: props.deletedOnly, onDeletedOnlyChange: props.setDeletedOnly },
         }}
-        columns={columns}
-        items={items}
-        rowKey={(u) => u.id}
-        sorting={sorting}
-        onSortingChange={onSortingChange}
-        isLoading={isLoading}
-        isFetchingNextPage={isFetchingNextPage}
-        error={error}
-        emptyState="No users found."
-        sentinelRef={sentinelRef}
-        onRowClick={(u) => void router.navigate({ to: '/admin/users/$id', params: { id: u.id } })}
+        table={{
+          columns,
+          items: props.items,
+          rowKey: (u) => u.id,
+          sorting: props.sorting,
+          onSortingChange: props.onSortingChange,
+          isLoading: props.isLoading,
+          isFetchingNextPage: props.isFetchingNextPage,
+          error: props.error,
+          emptyState: 'No users found.',
+          sentinelRef: props.sentinelRef,
+          onRowClick: (u) => void router.navigate({ to: '/admin/users/$id', params: { id: u.id } }),
+        }}
       />
     </div>
   );

@@ -42,7 +42,7 @@ export const saveUser = createServerFn({ method: 'POST' })
         id: data.id,
         firstName: data.user.firstName,
         lastName: data.user.lastName,
-        role: data.user.role,
+        roles: data.user.roles,
       });
     } catch (e) {
       throwApiError(e);

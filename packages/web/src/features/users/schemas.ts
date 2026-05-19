@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { USER_ROLES } from '#/api/users';
 
-export type UserSortKey = 'name' | 'email' | 'role';
+export type UserSortKey = 'name' | 'email';
 
 export const userIdSchema = z.string().min(1);
 
@@ -9,13 +9,13 @@ export const createUserSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
-  role: z.enum(USER_ROLES),
+  roles: z.array(z.enum(USER_ROLES)).min(1, 'At least one role is required'),
 });
 
 export const updateUserSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  role: z.enum(USER_ROLES),
+  roles: z.array(z.enum(USER_ROLES)).min(1, 'At least one role is required'),
 });
 
 export const saveUserInputSchema = z.object({
@@ -35,7 +35,7 @@ export const leavesFormSchema = z.object({
 
 export const getUsersPagedParamsSchema = z.object({
   search: z.string().optional(),
-  sortBy: z.enum(['name', 'email', 'role']).optional(),
+  sortBy: z.enum(['name', 'email']).optional(),
   sortDir: z.enum(['asc', 'desc']).optional(),
   pageSize: z.number().optional(),
   cursor: z.string().optional(),

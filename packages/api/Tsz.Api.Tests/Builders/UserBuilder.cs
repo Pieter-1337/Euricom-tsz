@@ -12,7 +12,7 @@ public static class UserBuilder
             firstName: "Test",
             lastName: "User",
             email: $"user_{id.ToString()[..8]}@example.com",
-            role: UserRole.User);
+            roles: [UserRole.User]);
         user.Id = id;
         return user;
     }
@@ -41,9 +41,9 @@ public static class UserBuilder
         return entity;
     }
 
-    public static User WithRole(this User entity, UserRole role)
+    public static User WithRoles(this User entity, params UserRole[] roles)
     {
-        entity.ChangeRole(role);
+        entity.SetRoles(roles);
         return entity;
     }
 

@@ -62,25 +62,25 @@ export function CustomersList() {
         </Button>
       </div>
       <ListShell
-        search={search}
-        onSearchChange={setSearch}
-        total={total}
-        toggle={{
-          label: 'Active',
-          checked: !deletedOnly,
-          onChange: (checked) => setDeletedOnly(!checked),
+        toolbar={{
+          search,
+          onSearchChange: setSearch,
+          total,
+          deletedFilter: { deletedOnly, onDeletedOnlyChange: setDeletedOnly },
         }}
-        columns={columns}
-        items={items}
-        rowKey={(c) => c.id}
-        sorting={sorting}
-        onSortingChange={onSortingChange}
-        isLoading={isLoading}
-        isFetchingNextPage={isFetchingNextPage}
-        error={error}
-        emptyState="No customers found."
-        sentinelRef={sentinelRef}
-        onRowClick={(c) => void router.navigate({ to: '/admin/customers/$id', params: { id: c.id } })}
+        table={{
+          columns,
+          items,
+          rowKey: (c) => c.id,
+          sorting,
+          onSortingChange,
+          isLoading,
+          isFetchingNextPage,
+          error,
+          emptyState: 'No customers found.',
+          sentinelRef,
+          onRowClick: (c) => void router.navigate({ to: '/admin/customers/$id', params: { id: c.id } }),
+        }}
       />
     </div>
   );

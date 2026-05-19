@@ -38,7 +38,7 @@ public class GetUsersPagedQueryValidatorTests
     [Fact]
     public async Task SortBy_AllowedKey_Passes()
     {
-        foreach (var key in new[] { "name", "email", "role" })
+        foreach (var key in new[] { "name", "email" })
         {
             var result = await Validator.ValidateAsync(Query(sortBy: key));
             result.IsValid.ShouldBeTrue($"'{key}' should be an allowed sort key");

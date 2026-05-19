@@ -7,6 +7,7 @@ import { Checkbox } from '#/components/ui/checkbox';
 import { Button } from '#/components/ui/button';
 import { SelectInput, type SelectOption } from '#/components/ui/select-input';
 import { Combobox, type ComboboxOption } from '#/components/ui/combobox';
+import { MultiCombobox, type MultiComboboxOption } from '#/components/ui/multi-combobox';
 import { NumberInput } from '#/components/ui/number-input';
 import { DateInput } from '#/components/ui/date-input';
 import { FieldError } from '#/components/form/field-error';
@@ -152,6 +153,47 @@ function ComboboxField({
         onBlur={field.handleBlur}
         aria-invalid={hasError ? true : undefined}
         options={options}
+        placeholder={placeholder ?? `Select ${label.toLowerCase()}`}
+        searchPlaceholder={searchPlaceholder ?? `Search ${label.toLowerCase()}…`}
+        emptyMessage={emptyMessage}
+      />
+      <FieldError field={field} />
+    </div>
+  );
+}
+
+function MultiSelectField<T extends string>({
+  label,
+  options,
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
+}: {
+  label: string;
+  options: readonly MultiComboboxOption[] | readonly T[];
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+}) {
+  const field = useFieldContext<T[]>();
+  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const normalizedOptions: readonly MultiComboboxOption[] = options.map((o) =>
+    typeof o === 'string' ? { value: o, label: o } : o,
+  );
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <MultiCombobox
+        id={field.name}
+        name={field.name}
+        value={field.state.value ?? []}
+        onValueChange={(next) => {
+          clearServerErrorFor(field);
+          field.handleChange(next as T[]);
+        }}
+        onBlur={field.handleBlur}
+        aria-invalid={hasError ? true : undefined}
+        options={normalizedOptions}
         placeholder={placeholder ?? `Select ${label.toLowerCase()}`}
         searchPlaceholder={searchPlaceholder ?? `Search ${label.toLowerCase()}…`}
         emptyMessage={emptyMessage}
@@ -309,6 +351,7 @@ export const { useAppForm, withForm } = createFormHook({
     NumberField,
     SelectField,
     ComboboxField,
+    MultiSelectField,
     TextareaField,
     CheckboxField,
     DateField,

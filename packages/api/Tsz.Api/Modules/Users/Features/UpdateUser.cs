@@ -4,7 +4,7 @@ using Tsz.Infrastructure.Validation;
 
 namespace Tsz.Api.Modules.Users.Features;
 
-public sealed record UpdateUserCommand(Guid Id, string FirstName, string LastName, UserRole Role)
+public sealed record UpdateUserCommand(Guid Id, string FirstName, string LastName, IReadOnlyCollection<UserRole> Roles)
     : ICommand<UserDto>;
 
 public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
@@ -18,7 +18,12 @@ public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
         RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.FirstName).NotEmpty().MaximumLength(128);
         RuleFor(x => x.LastName).NotEmpty().MaximumLength(128);
-        RuleFor(x => x.Role).IsInEnum();
+        RuleFor(x => x.Roles).NotEmpty();
+        RuleFor(x => x.Roles)
+            .Must(r => r.Distinct().Count() == r.Count)
+            .WithMessage("Roles must not contain duplicates.")
+            .When(x => x.Roles is { Count: > 0 });
+        RuleForEach(x => x.Roles).IsInEnum();
         RuleFor(x => x.Id)
             .MustAsync(UserExists).WithError(UserErrors.NotFound)
             .When(x => x.Id != Guid.Empty);
@@ -35,7 +40,7 @@ public sealed class UpdateUserHandler(IUnitOfWork uow)
     {
         var user = await uow.RepositoryFor<User>().GetByIdAsync(command.Id, ct);
         user!.Rename(command.FirstName, command.LastName);
-        user.ChangeRole(command.Role);
+        user.SetRoles(command.Roles);
 
         await uow.SaveChangesAsync(ct);
         return UserDto.ToDto(user);

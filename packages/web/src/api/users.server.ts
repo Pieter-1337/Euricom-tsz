@@ -3,7 +3,7 @@ import { ApiRequestError } from '#/api/client';
 import type { User, CreateUserRequest, UpdateUserRequest } from '#/api/users';
 import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';
 
-type UserSortKey = 'name' | 'email' | 'role';
+type UserSortKey = 'name' | 'email';
 
 export const getUsersPaged = async (params: KeysetQueryParams<UserSortKey>): Promise<KeysetPage<User>> => {
   const resp = await client.GET('/api/users/paged', {

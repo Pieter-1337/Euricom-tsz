@@ -475,7 +475,7 @@ export interface components {
       firstName: string;
       lastName: string;
       email: string;
-      role: components['schemas']['UserRole'];
+      roles: components['schemas']['UserRole'][];
     };
     CustomerDto: {
       /** Format: uuid */
@@ -512,7 +512,7 @@ export interface components {
       id: string;
       firstName: string;
       lastName: string;
-      role: components['schemas']['UserRole'];
+      roles: components['schemas']['UserRole'][];
     };
     UpdateUserLeavesBody: {
       /** Format: int32 */
@@ -531,7 +531,7 @@ export interface components {
       email: string;
       firstName: string;
       lastName: string;
-      role: components['schemas']['UserRole'];
+      roles: components['schemas']['UserRole'][];
     };
     UserLeaveDto: {
       /** Format: uuid */

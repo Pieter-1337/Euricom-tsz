@@ -36,16 +36,16 @@ public class CreateUserHandlerTests
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero));
         var handler = new CreateUserHandler(uow.Object, timeProvider);
 
-        var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User));
+        var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]));
 
         dto.ShouldNotBeNull();
         dto.FirstName.ShouldBe("Jane");
         dto.LastName.ShouldBe("Doe");
         dto.Email.ShouldBe("jane@example.com");
-        dto.Role.ShouldBe(UserRole.User);
+        dto.Roles.ShouldBe([UserRole.User]);
 
         userRepo.Verify(r => r.Add(It.Is<User>(u =>
-            u.FirstName == "Jane" && u.LastName == "Doe" && u.Email == "jane@example.com" && u.Role == UserRole.User)), Times.Once);
+            u.FirstName == "Jane" && u.LastName == "Doe" && u.Email == "jane@example.com" && u.Roles.Contains(UserRole.User))), Times.Once);
         userLeaveRepo.Verify(r => r.Add(It.IsAny<UserLeave>()), Times.Never);
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -61,7 +61,7 @@ public class CreateUserHandlerTests
 
         var handler = new CreateUserHandler(uow.Object, timeProvider);
 
-        var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", UserRole.User));
+        var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]));
 
         dto.ShouldNotBeNull();
 

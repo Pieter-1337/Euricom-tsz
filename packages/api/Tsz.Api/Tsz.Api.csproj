@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Tsz.Api.Tests" />
     <InternalsVisibleTo Include="Tsz.Api.Tests.Integration" />
   </ItemGroup>
 

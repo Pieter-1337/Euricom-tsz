@@ -12,7 +12,7 @@ public class UpdateUserHandlerTests
     [Fact]
     public async Task HandleAsync_Existing_UpdatesAndReturnsDto()
     {
-        var existing = UserBuilder.Build().WithName("Old", "Name").WithRole(UserRole.User);
+        var existing = UserBuilder.Build().WithName("Old", "Name").WithRoles(UserRole.User);
         var repo = new Mock<IRepository<User>>();
         repo.Setup(r => r.GetByIdAsync(existing.Id, It.IsAny<CancellationToken>(), false))
             .ReturnsAsync(existing);
@@ -21,15 +21,15 @@ public class UpdateUserHandlerTests
 
         var handler = new UpdateUserHandler(uow.Object);
 
-        var result = await handler.HandleAsync(new UpdateUserCommand(existing.Id, "New", "Name", UserRole.Admin));
+        var result = await handler.HandleAsync(new UpdateUserCommand(existing.Id, "New", "Name", [UserRole.Admin, UserRole.ClientManager]));
 
         result.ShouldNotBeNull();
         result.FirstName.ShouldBe("New");
         result.LastName.ShouldBe("Name");
-        result.Role.ShouldBe(UserRole.Admin);
+        result.Roles.ShouldBe([UserRole.Admin, UserRole.ClientManager]);
         existing.FirstName.ShouldBe("New");
         existing.LastName.ShouldBe("Name");
-        existing.Role.ShouldBe(UserRole.Admin);
+        existing.Roles.ShouldBe([UserRole.Admin, UserRole.ClientManager]);
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

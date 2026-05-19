@@ -11,7 +11,7 @@ public sealed class RequireAdminAuthorizationHandler(ICurrentUserResolver resolv
         RequireAdminRequirement requirement)
     {
         var user = await resolver.ResolveAsync();
-        if (user is { Role: UserRole.Admin })
+        if (user is not null && user.Roles.Contains(UserRole.Admin))
             context.Succeed(requirement);
     }
 }

@@ -2,35 +2,38 @@ import { Input } from '#/components/ui/input.tsx';
 import { Label } from '#/components/ui/label.tsx';
 import { Switch } from '#/components/ui/switch.tsx';
 
-interface ToggleProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
+interface DeletedFilterProps {
+  deletedOnly: boolean;
+  onDeletedOnlyChange: (deletedOnly: boolean) => void;
 }
 
-interface ListToolbarProps {
+export interface ListToolbarProps {
   search: string;
   onSearchChange: (value: string) => void;
   total: number | undefined;
-  toggle?: ToggleProps;
+  deletedFilter?: DeletedFilterProps;
 }
 
-export function ListToolbar({ search, onSearchChange, total, toggle }: ListToolbarProps) {
+export function ListToolbar(props: ListToolbarProps) {
   return (
     <div className="flex flex-1 items-center gap-4">
       <Input
         placeholder="Filter…"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
+        value={props.search}
+        onChange={(e) => props.onSearchChange(e.target.value)}
         className="max-w-sm"
       />
-      {toggle && (
+      {props.deletedFilter && (
         <div className="flex items-center gap-2">
-          <Switch id="list-toolbar-toggle" checked={toggle.checked} onCheckedChange={toggle.onChange} />
-          <Label htmlFor="list-toolbar-toggle">{toggle.label}</Label>
+          <Switch
+            id="list-toolbar-active"
+            checked={!props.deletedFilter.deletedOnly}
+            onCheckedChange={(checked) => props.deletedFilter!.onDeletedOnlyChange(!checked)}
+          />
+          <Label htmlFor="list-toolbar-active">Active</Label>
         </div>
       )}
-      <span className="ml-auto whitespace-nowrap text-sm text-muted-foreground">{total ?? '—'} items</span>
+      <span className="ml-auto whitespace-nowrap text-sm text-muted-foreground">{props.total ?? '—'} items</span>
     </div>
   );
 }

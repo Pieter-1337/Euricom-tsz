@@ -13,7 +13,7 @@ export function UserCreateForm() {
       firstName: '',
       lastName: '',
       email: '',
-      role: UserRole.User as UserRole,
+      roles: [UserRole.User] as UserRole[],
     },
     validators: { onChange: createUserSchema },
     onSubmit: async ({ value }) => {
@@ -32,7 +32,7 @@ export function UserCreateForm() {
     'firstName',
     'lastName',
     'email',
-    'role',
+    'roles',
   ]);
 
   return (
@@ -54,8 +54,8 @@ export function UserCreateForm() {
 
           <form.AppField name="email">{(field) => <field.TextField label="Email" type="email" />}</form.AppField>
 
-          <form.AppField name="role">
-            {(field) => <field.SelectField label="Role" options={USER_ROLES} />}
+          <form.AppField name="roles">
+            {(field) => <field.MultiSelectField label="Roles" options={USER_ROLES} />}
           </form.AppField>
 
           <form.FormActions saveLabel="Create user" savePendingLabel="Creating…" />

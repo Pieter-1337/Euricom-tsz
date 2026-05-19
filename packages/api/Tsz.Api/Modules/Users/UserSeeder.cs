@@ -12,7 +12,7 @@ public class UserSeeder(IUnitOfWork uow, TimeProvider timeProvider)
         var admin = await userRepo.FirstOrDefaultAsync(u => u.Email == AdminEmail, ct);
         if (admin is null)
         {
-            admin = User.Create(firstName: "Pieter", lastName: "Bracke", email: AdminEmail, role: UserRole.Admin);
+            admin = User.Create(firstName: "Pieter", lastName: "Bracke", email: AdminEmail, roles: [UserRole.Admin]);
             userRepo.Add(admin);
             await uow.SaveChangesAsync(ct);
         }

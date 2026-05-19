@@ -28,13 +28,7 @@ function SelectInput<T extends string>({
 }: SelectInputProps<T>) {
   return (
     <Select value={value} onValueChange={(v) => onValueChange(v as T)}>
-      <SelectTrigger
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        aria-invalid={ariaInvalid}
-        className={cn('w-full', className)}
-      >
+      <SelectTrigger id={id} name={name} onBlur={onBlur} aria-invalid={ariaInvalid} className={cn('w-full', className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

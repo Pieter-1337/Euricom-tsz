@@ -4,7 +4,7 @@ using Tsz.Infrastructure.Validation;
 
 namespace Tsz.Api.Modules.Users.Features;
 
-public sealed record CreateUserCommand(string FirstName, string LastName, string Email, UserRole Role)
+public sealed record CreateUserCommand(string FirstName, string LastName, string Email, IReadOnlyCollection<UserRole> Roles)
     : ICommand<UserDto>;
 
 public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
@@ -18,7 +18,12 @@ public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.FirstName).NotEmpty().MaximumLength(128);
         RuleFor(x => x.LastName).NotEmpty().MaximumLength(128);
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
-        RuleFor(x => x.Role).IsInEnum();
+        RuleFor(x => x.Roles).NotEmpty();
+        RuleFor(x => x.Roles)
+            .Must(r => r.Distinct().Count() == r.Count)
+            .WithMessage("Roles must not contain duplicates.")
+            .When(x => x.Roles is { Count: > 0 });
+        RuleForEach(x => x.Roles).IsInEnum();
         RuleFor(x => x.Email)
             .MustAsync(EmailNotTaken).WithError(UserErrors.EmailAlreadyExists)
             .When(x => !string.IsNullOrEmpty(x.Email));
@@ -37,7 +42,7 @@ public sealed class CreateUserHandler(IUnitOfWork uow, TimeProvider timeProvider
 {
     public async Task<UserDto> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
     {
-        var user = User.Create(command.FirstName, command.LastName, command.Email, command.Role);
+        var user = User.Create(command.FirstName, command.LastName, command.Email, command.Roles);
         uow.RepositoryFor<User>().Add(user);
 
         var leaveTypes = await uow.RepositoryFor<LeaveType>().GetAllAsListAsync(ct: ct);

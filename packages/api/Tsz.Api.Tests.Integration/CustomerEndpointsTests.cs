@@ -26,7 +26,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     private Task SeedAdminAsync() => WithUowAsync(async uow =>
     {
-        var user = User.Create("Admin", "Test", TestEmail, UserRole.Admin);
+        var user = User.Create("Admin", "Test", TestEmail, [UserRole.Admin]);
         user.LinkEntraOid(TestOid);
         uow.RepositoryFor<User>().Add(user);
         await uow.SaveChangesAsync();
@@ -34,7 +34,7 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     private Task SeedNonAdminAsync() => WithUowAsync(async uow =>
     {
-        var user = User.Create("User", "Test", TestEmail, UserRole.User);
+        var user = User.Create("User", "Test", TestEmail, [UserRole.User]);
         user.LinkEntraOid(TestOid);
         uow.RepositoryFor<User>().Add(user);
         await uow.SaveChangesAsync();

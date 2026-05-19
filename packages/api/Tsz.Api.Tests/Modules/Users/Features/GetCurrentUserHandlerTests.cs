@@ -11,7 +11,7 @@ public class GetCurrentUserHandlerTests
     [Fact]
     public async Task HandleAsync_UserFound_ReturnsDto()
     {
-        var user = UserBuilder.Build().WithName("Jane", "Doe").WithRole(UserRole.Admin);
+        var user = UserBuilder.Build().WithName("Jane", "Doe").WithRoles(UserRole.Admin);
         var resolver = new Mock<ICurrentUserResolver>();
         resolver.Setup(r => r.ResolveAsync(It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
@@ -23,7 +23,7 @@ public class GetCurrentUserHandlerTests
         result!.Id.ShouldBe(user.Id);
         result.FirstName.ShouldBe("Jane");
         result.LastName.ShouldBe("Doe");
-        result.Role.ShouldBe(UserRole.Admin);
+        result.Roles.ShouldBe([UserRole.Admin]);
     }
 
     [Fact]

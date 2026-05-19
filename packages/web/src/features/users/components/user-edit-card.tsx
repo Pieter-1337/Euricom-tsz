@@ -15,7 +15,7 @@ export function UserEditCard({ user }: { user: User }) {
     defaultValues: {
       firstName: user.firstName,
       lastName: user.lastName,
-      role: user.role as UserRole,
+      roles: user.roles as UserRole[],
     },
     validators: { onChange: updateUserSchema },
     onSubmit: async ({ value }) => {
@@ -33,7 +33,7 @@ export function UserEditCard({ user }: { user: User }) {
   const { serverError, clearServerErrors, handleApiError } = useFormServerErrors(form, [
     'firstName',
     'lastName',
-    'role',
+    'roles',
   ]);
 
   return (
@@ -81,8 +81,8 @@ export function UserEditCard({ user }: { user: User }) {
 
             <form.AppField name="lastName">{(field) => <field.TextField label="Last name" />}</form.AppField>
 
-            <form.AppField name="role">
-              {(field) => <field.SelectField label="Role" options={USER_ROLES} />}
+            <form.AppField name="roles">
+              {(field) => <field.MultiSelectField label="Roles" options={USER_ROLES} />}
             </form.AppField>
 
             <form.FormActions cancel />

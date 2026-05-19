@@ -27,15 +27,13 @@ public sealed class GetUsersPagedHandler(IUnitOfWork uow)
     // A future slice can add LastName as a secondary key or rename the wire key to "firstName".
     internal static readonly SortMap<User> Sort = new(
         new SortColumn<User>("name", (Expression<Func<User, string>>)(u => u.FirstName), typeof(string)),
-        new SortColumn<User>("email", (Expression<Func<User, string>>)(u => u.Email), typeof(string)),
-        new SortColumn<User>("role", (Expression<Func<User, string>>)(u => u.Role.ToString()), typeof(string)));
+        new SortColumn<User>("email", (Expression<Func<User, string>>)(u => u.Email), typeof(string)));
 
     private static readonly Expression<Func<User, string>>[] Searchable =
     [
         u => u.FirstName,
         u => u.LastName,
         u => u.Email,
-        u => u.Role.ToString(),
     ];
 
     public Task<KeysetPage<UserDto>> HandleAsync(GetUsersPagedQuery query, CancellationToken ct = default) =>

@@ -26,10 +26,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(128);
 
-        builder.Property(u => u.Role)
-            .IsRequired()
-            .HasConversion<string>()
-            .HasMaxLength(32);
+        builder.OwnsMany(u => u.RoleAssignments, ra =>
+        {
+            ra.ToTable("UserRoles");
+            ra.WithOwner().HasForeignKey("UserId");
+            ra.Property(r => r.Role).HasConversion<string>().HasMaxLength(32);
+            ra.HasKey("UserId", nameof(UserRoleAssignment.Role));
+        });
 
         builder.HasIndex(u => u.EntraOid)
             .IsUnique()

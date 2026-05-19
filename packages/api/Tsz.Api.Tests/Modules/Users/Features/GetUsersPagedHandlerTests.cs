@@ -111,9 +111,9 @@ public class GetUsersPagedHandlerTests : IDisposable
     {
         var users = new[]
         {
-            User.Create("Alice", "Smith", "alice@x.com", UserRole.User),
-            User.Create("Bob", "Jones", "bob@x.com", UserRole.User),
-            User.Create("Charlie", "Alison", "charlie@x.com", UserRole.User),
+            User.Create("Alice", "Smith", "alice@x.com", [UserRole.User]),
+            User.Create("Bob", "Jones", "bob@x.com", [UserRole.User]),
+            User.Create("Charlie", "Alison", "charlie@x.com", [UserRole.User]),
         };
         var handler = BuildHandler(users);
 
@@ -127,8 +127,8 @@ public class GetUsersPagedHandlerTests : IDisposable
     [Fact]
     public async Task Search_FiltersByEmail()
     {
-        var alice = User.Create("Alice", "Smith", "alice@example.com", UserRole.User);
-        var bob = User.Create("Bob", "Jones", "bob@example.com", UserRole.User);
+        var alice = User.Create("Alice", "Smith", "alice@example.com", [UserRole.User]);
+        var bob = User.Create("Bob", "Jones", "bob@example.com", [UserRole.User]);
         var handler = BuildHandler([alice, bob]);
 
         var page = await handler.HandleAsync(PagedQuery(search: "alice@"));
@@ -140,9 +140,9 @@ public class GetUsersPagedHandlerTests : IDisposable
     [Fact]
     public async Task Sort_ByEmailDesc_OrderIsCorrect()
     {
-        var a = User.Create("A", "A", "aaa@example.com", UserRole.User);
-        var b = User.Create("B", "B", "bbb@example.com", UserRole.User);
-        var c = User.Create("C", "C", "ccc@example.com", UserRole.User);
+        var a = User.Create("A", "A", "aaa@example.com", [UserRole.User]);
+        var b = User.Create("B", "B", "bbb@example.com", [UserRole.User]);
+        var c = User.Create("C", "C", "ccc@example.com", [UserRole.User]);
         var handler = BuildHandler([c, a, b]);
 
         var page = await handler.HandleAsync(PagedQuery(sortBy: "email", sortDir: SortDir.Desc));
@@ -155,8 +155,8 @@ public class GetUsersPagedHandlerTests : IDisposable
     [Fact]
     public async Task Sort_ByNameAsc_OrderIsCorrect()
     {
-        var a = User.Create("Zara", "X", "z@x.com", UserRole.User);
-        var b = User.Create("Adam", "Y", "a@x.com", UserRole.User);
+        var a = User.Create("Zara", "X", "z@x.com", [UserRole.User]);
+        var b = User.Create("Adam", "Y", "a@x.com", [UserRole.User]);
         var handler = BuildHandler([a, b]);
 
         var page = await handler.HandleAsync(PagedQuery(sortBy: "name", sortDir: SortDir.Asc));
@@ -170,9 +170,9 @@ public class GetUsersPagedHandlerTests : IDisposable
     {
         var id1 = Guid.Parse("00000000-0000-0000-0000-000000000001");
         var id2 = Guid.Parse("00000000-0000-0000-0000-000000000002");
-        var u1 = User.Create("Same", "X", "x1@x.com", UserRole.User);
+        var u1 = User.Create("Same", "X", "x1@x.com", [UserRole.User]);
         u1.Id = id1;
-        var u2 = User.Create("Same", "Y", "x2@x.com", UserRole.User);
+        var u2 = User.Create("Same", "Y", "x2@x.com", [UserRole.User]);
         u2.Id = id2;
         var handler = BuildHandler([u2, u1]);
 
@@ -214,10 +214,10 @@ public class GetUsersPagedHandlerTests : IDisposable
     public async Task Total_RespectsSearchFilter_IgnoresCursor()
     {
         var users = Enumerable.Range(1, 20)
-            .Select(i => User.Create($"Alice{i:D2}", "X", $"alice{i:D2}@x.com", UserRole.User))
+            .Select(i => User.Create($"Alice{i:D2}", "X", $"alice{i:D2}@x.com", [UserRole.User]))
             .ToList<User>();
         users.AddRange(Enumerable.Range(1, 5)
-            .Select(i => User.Create($"Bob{i:D2}", "Y", $"bob{i:D2}@x.com", UserRole.User)));
+            .Select(i => User.Create($"Bob{i:D2}", "Y", $"bob{i:D2}@x.com", [UserRole.User])));
         var handler = BuildHandler(users);
 
         var firstPage = await handler.HandleAsync(PagedQuery(search: "alice", pageSize: 5));
@@ -241,6 +241,12 @@ public class GetUsersPagedHandlerTests : IDisposable
                 b.Property(u => u.Email).IsRequired();
                 b.Property(u => u.FirstName).IsRequired();
                 b.Property(u => u.LastName).IsRequired();
+                b.OwnsMany(u => u.RoleAssignments, ra =>
+                {
+                    ra.WithOwner().HasForeignKey("UserId");
+                    ra.Property(r => r.Role).HasConversion<string>();
+                    ra.HasKey("UserId", nameof(UserRoleAssignment.Role));
+                });
                 b.HasQueryFilter(u => u.DeletedAt == null);
             });
         }

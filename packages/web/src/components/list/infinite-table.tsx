@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table.tsx';
 
-interface InfiniteTableProps<TItem> {
+export interface InfiniteTableProps<TItem> {
   columns: ColumnDef<TItem, unknown>[];
   items: TItem[];
   rowKey: (item: TItem) => string;
@@ -22,31 +22,19 @@ interface InfiniteTableProps<TItem> {
   onRowClick?: (item: TItem) => void;
 }
 
-export function InfiniteTable<TItem>({
-  columns,
-  items,
-  rowKey,
-  sorting,
-  onSortingChange,
-  isLoading,
-  isFetchingNextPage,
-  error,
-  emptyState,
-  sentinelRef,
-  onRowClick,
-}: InfiniteTableProps<TItem>) {
+export function InfiniteTable<TItem>(props: InfiniteTableProps<TItem>) {
   const table = useReactTable({
-    data: items,
-    columns,
-    state: { sorting },
-    onSortingChange,
+    data: props.items,
+    columns: props.columns,
+    state: { sorting: props.sorting },
+    onSortingChange: props.onSortingChange,
     manualSorting: true,
     enableMultiSort: false,
-    getRowId: rowKey,
+    getRowId: props.rowKey,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const colSpan = columns.length || 1;
+  const colSpan = props.columns.length || 1;
 
   return (
     <Table>
@@ -62,39 +50,39 @@ export function InfiniteTable<TItem>({
         ))}
       </TableHeader>
       <TableBody>
-        {isLoading && (
+        {props.isLoading && (
           <TableRow>
             <TableCell colSpan={colSpan} className="text-center text-muted-foreground">
               Loading…
             </TableCell>
           </TableRow>
         )}
-        {!isLoading && error != null && (
+        {!props.isLoading && props.error != null && (
           <TableRow>
             <TableCell colSpan={colSpan} className="text-center text-destructive">
               Failed to load data.
             </TableCell>
           </TableRow>
         )}
-        {!isLoading && error == null && items.length === 0 && (
+        {!props.isLoading && props.error == null && props.items.length === 0 && (
           <TableRow>
             <TableCell colSpan={colSpan} className="text-center text-muted-foreground">
-              {emptyState}
+              {props.emptyState}
             </TableCell>
           </TableRow>
         )}
         {table.getRowModel().rows.map((row) => (
           <TableRow
             key={row.id}
-            onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-            className={onRowClick ? 'cursor-pointer' : undefined}
+            onClick={props.onRowClick ? () => props.onRowClick!(row.original) : undefined}
+            className={props.onRowClick ? 'cursor-pointer' : undefined}
           >
             {row.getVisibleCells().map((cell) => (
               <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
             ))}
           </TableRow>
         ))}
-        {isFetchingNextPage && (
+        {props.isFetchingNextPage && (
           <TableRow>
             <TableCell colSpan={colSpan} className="text-center text-muted-foreground">
               Loading more…
@@ -102,7 +90,7 @@ export function InfiniteTable<TItem>({
           </TableRow>
         )}
         <TableRow
-          ref={sentinelRef as (node: HTMLTableRowElement | null) => void}
+          ref={props.sentinelRef as (node: HTMLTableRowElement | null) => void}
           className="h-0 border-0"
           aria-hidden
         />
