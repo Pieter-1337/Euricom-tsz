@@ -15,6 +15,7 @@ import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAdminRouteImport } from './routes/_protected/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedAdminUsersIndexRouteImport } from './routes/_protected/admin/users/index'
+import { Route as ProtectedAdminCustomersIndexRouteImport } from './routes/_protected/admin/customers/index'
 import { Route as ProtectedAdminUsersNewRouteImport } from './routes/_protected/admin/users/new'
 import { Route as ProtectedAdminUsersIdRouteImport } from './routes/_protected/admin/users/$id'
 
@@ -48,6 +49,12 @@ const ProtectedAdminUsersIndexRoute =
     path: '/users/',
     getParentRoute: () => ProtectedAdminRoute,
   } as any)
+const ProtectedAdminCustomersIndexRoute =
+  ProtectedAdminCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => ProtectedAdminRoute,
+  } as any)
 const ProtectedAdminUsersNewRoute = ProtectedAdminUsersNewRouteImport.update({
   id: '/users/new',
   path: '/users/new',
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAdminUsersNewRoute
+  '/admin/customers/': typeof ProtectedAdminCustomersIndexRoute
   '/admin/users/': typeof ProtectedAdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAdminUsersNewRoute
+  '/admin/customers': typeof ProtectedAdminCustomersIndexRoute
   '/admin/users': typeof ProtectedAdminUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -86,6 +95,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_protected/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/_protected/admin/users/new': typeof ProtectedAdminUsersNewRoute
+  '/_protected/admin/customers/': typeof ProtectedAdminCustomersIndexRoute
   '/_protected/admin/users/': typeof ProtectedAdminUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/admin/users/$id'
     | '/admin/users/new'
+    | '/admin/customers/'
     | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/admin/users/$id'
     | '/admin/users/new'
+    | '/admin/customers'
     | '/admin/users'
   id:
     | '__root__'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/_protected/admin/users/$id'
     | '/_protected/admin/users/new'
+    | '/_protected/admin/customers/'
     | '/_protected/admin/users/'
   fileRoutesById: FileRoutesById
 }
@@ -169,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAdminUsersIndexRouteImport
       parentRoute: typeof ProtectedAdminRoute
     }
+    '/_protected/admin/customers/': {
+      id: '/_protected/admin/customers/'
+      path: '/customers'
+      fullPath: '/admin/customers/'
+      preLoaderRoute: typeof ProtectedAdminCustomersIndexRouteImport
+      parentRoute: typeof ProtectedAdminRoute
+    }
     '/_protected/admin/users/new': {
       id: '/_protected/admin/users/new'
       path: '/users/new'
@@ -189,12 +209,14 @@ declare module '@tanstack/react-router' {
 interface ProtectedAdminRouteChildren {
   ProtectedAdminUsersIdRoute: typeof ProtectedAdminUsersIdRoute
   ProtectedAdminUsersNewRoute: typeof ProtectedAdminUsersNewRoute
+  ProtectedAdminCustomersIndexRoute: typeof ProtectedAdminCustomersIndexRoute
   ProtectedAdminUsersIndexRoute: typeof ProtectedAdminUsersIndexRoute
 }
 
 const ProtectedAdminRouteChildren: ProtectedAdminRouteChildren = {
   ProtectedAdminUsersIdRoute: ProtectedAdminUsersIdRoute,
   ProtectedAdminUsersNewRoute: ProtectedAdminUsersNewRoute,
+  ProtectedAdminCustomersIndexRoute: ProtectedAdminCustomersIndexRoute,
   ProtectedAdminUsersIndexRoute: ProtectedAdminUsersIndexRoute,
 }
 

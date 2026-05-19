@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
 import {
+  Building2,
   ChevronLeft,
   ChevronRight,
   Home as HomeIcon,
@@ -81,11 +82,7 @@ function ProtectedLayout() {
       </header>
 
       <div className="relative flex min-h-0 flex-1">
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={() => setCollapsed((c) => !c)}
-          isAdmin={isAdmin}
-        />
+        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} isAdmin={isAdmin} />
         <Main />
       </div>
     </div>
@@ -94,15 +91,7 @@ function ProtectedLayout() {
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
-function Sidebar({
-  collapsed,
-  onToggle,
-  isAdmin,
-}: {
-  collapsed: boolean;
-  onToggle: () => void;
-  isAdmin: boolean;
-}) {
+function Sidebar({ collapsed, onToggle, isAdmin }: { collapsed: boolean; onToggle: () => void; isAdmin: boolean }) {
   return (
     <aside
       aria-label="Primary navigation"
@@ -128,6 +117,7 @@ function Sidebar({
         {isAdmin && (
           <NavSection eyebrow="Admin" collapsed={collapsed}>
             <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />
+            <NavLink to="/admin/customers" icon={Building2} label="Customers" collapsed={collapsed} />
           </NavSection>
         )}
       </nav>
@@ -238,10 +228,7 @@ function NavLink({
           aria-hidden="true"
           className="bg-euri-green group-[.active]:block pointer-events-none absolute top-2 -left-3 bottom-2 hidden w-0.5 rounded-sm"
         />
-        <Icon
-          className="group-[.active]:stroke-euri-green h-[18px] w-[18px] stroke-current"
-          strokeWidth={1.75}
-        />
+        <Icon className="group-[.active]:stroke-euri-green h-[18px] w-[18px] stroke-current" strokeWidth={1.75} />
       </Link>
     );
   }
@@ -260,10 +247,7 @@ function NavLink({
         '[&.active]:shadow-[inset_2px_0_0_var(--euri-green)]',
       )}
     >
-      <Icon
-        className="group-[.active]:stroke-euri-green h-4 w-4 stroke-current"
-        strokeWidth={1.75}
-      />
+      <Icon className="group-[.active]:stroke-euri-green h-4 w-4 stroke-current" strokeWidth={1.75} />
       <span>{label}</span>
     </Link>
   );
@@ -290,12 +274,7 @@ function Main() {
 
 function Brandmark({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 256 256"
-      className={cn('fill-euri-green', className)}
-      aria-label="Euricom"
-      role="img"
-    >
+    <svg viewBox="0 0 256 256" className={cn('fill-euri-green', className)} aria-label="Euricom" role="img">
       <path d="M39.981 39.9826H109.998V0H35.1838C15.7526 0 0 15.7532 0 35.1852V110.003H39.9675V39.9826H39.981Z" />
       <path d="M156.702 128.008C156.702 143.856 143.86 156.711 128 156.711C112.14 156.711 99.2979 143.869 99.2979 128.008C99.2979 112.147 112.153 99.3047 128 99.3047C143.847 99.3047 156.702 112.147 156.702 128.008Z" />
       <path d="M220.809 0H145.994V39.9691H216.011V109.989H255.979V35.1852C255.979 15.7532 240.226 0 220.795 0" />

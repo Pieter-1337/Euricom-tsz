@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-05-19
+
+feat: add customers module with list page
+
+Add a new Customers aggregate with minimal data (id, name). Includes:
+- Backend: Customer entity, EF IEntityTypeConfiguration, migration, DTO,
+  GetCustomersQuery handler, and admin-gated /api/customers GET endpoint
+- Frontend: customers list page with id + name table, feature folder
+  structure, server functions, and sidebar nav entry
+- Regenerate OpenAPI schema and route tree
+
 ## 2026-05-18
 
 feat: apply Euricom design system to app chrome
