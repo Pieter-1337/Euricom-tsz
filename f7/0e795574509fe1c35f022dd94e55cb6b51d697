@@ -1,0 +1,123 @@
+packages/api/Tsz.Api/Modules/Customers/Customer.cs
+  s_c3ef9b6f56324e::t_d6af1db8a302e4 12,17-22,29,35
+packages/api/Tsz.Api/Modules/Users/Features/GetUsers.cs
+  s_c3ef9b6f56324e::t_e37c288be2c464 13-18
+  s_c3ef9b6f56324e::t_6b0cc743d2f3d4 1
+  s_c3ef9b6f56324e::t_a30bba2dc6795a 6,19
+  s_c3ef9b6f56324e::t_19eb1ca14eccf4 20
+packages/web/src/features/users/server-fns.ts
+  s_c3ef9b6f56324e::t_d842b4d8662856 2-4
+  s_c3ef9b6f56324e::t_835ed975073489 21-24
+packages/api/Tsz.Api.Tests.Integration/UserEndpointsTests.cs
+  s_c3ef9b6f56324e::t_56a7d219b372a0 4-5
+  s_c3ef9b6f56324e::t_2286bef3f4b716 20-24
+  s_c3ef9b6f56324e::t_8eb8d7c3441da7 460-550
+packages/web/src/hooks/use-form-server-errors.ts
+  s_c3ef9b6f56324e::t_7d554ad1998897 43,45-47,49
+packages/api/Tsz.Api/Modules/Users/UserErrors.cs
+  s_c3ef9b6f56324e::t_da6bd5e18fbf1d 15-19
+packages/api/Tsz.Api/Modules/Users/UserEndpoints.cs
+  s_c3ef9b6f56324e::t_e33fd2ad9f9bda 25-34
+packages/api/Tsz.Api.Tests/Builders/CustomerBuilder.cs
+  s_c3ef9b6f56324e::t_ba7b53a49bb71d 45-50
+packages/web/src/api/users.server.ts
+  s_c3ef9b6f56324e::t_eaa15cbcb18890 37
+  s_c3ef9b6f56324e::t_3ad2e1222d1168 36
+  s_c3ef9b6f56324e::t_f33a24889000cc 3
+packages/api/Tsz.Api/Modules/Customers/CustomerDto.cs
+  s_c3ef9b6f56324e::t_43f3e9981b7eed 15-16,25-26,34-35
+packages/web/src/features/customers/components/customer-create-form.tsx
+  s_c3ef9b6f56324e::t_e4fcc7d3cfcbda 2,6,9,19
+  s_c3ef9b6f56324e::t_40a218d77e4c34 25-33,43
+  s_c3ef9b6f56324e::t_bcabac43999253 84-93
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerHandlerTests.cs
+  s_c3ef9b6f56324e::t_27ebd72bd2c4d7 28-29
+  s_c3ef9b6f56324e::t_b020748af5a256 90-91
+  s_c3ef9b6f56324e::t_284c9a0245f99e 43-73
+packages/web/src/features/customers/server-fns.ts
+  s_c3ef9b6f56324e::t_f96c54c234976f 36
+packages/web/src/features/customers/schemas.ts
+  s_c3ef9b6f56324e::t_60d71f34eda047 15
+packages/api/Tsz.Api/Modules/Customers/CustomerErrors.cs
+  s_c3ef9b6f56324e::t_807c1ad6b0cd72 12-21
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  s_c3ef9b6f56324e::t_6ec57e56233908 26-28
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/GetCustomerByIdHandlerTests.cs
+  s_c3ef9b6f56324e::t_f1fae42178b3ff 18-19
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerValidatorTests.cs
+  s_c3ef9b6f56324e::t_c396076ff2d300 6,13-16,18-19,25-32,34-35,47-48,59-60,73-74,78-117
+packages/api/Tsz.Api/Persistence/Migrations/20260519133347_CustomerClientManager.Designer.cs
+  s_c3ef9b6f56324e::t_6ec57e56233908 1-284
+CHANGELOG.md
+  s_c3ef9b6f56324e::t_0febe9beff1c3f 5-11
+.claude/skills/backend-module/SKILL.md
+  s_c3ef9b6f56324e::t_cce418d5ab73c5 32-56
+packages/api/Tsz.Api/Modules/Users/Features/DeleteUser.cs
+  s_c3ef9b6f56324e::t_ca732175f3f257 2,23-26,31-41
+packages/api/Tsz.Api/Persistence/Migrations/20260519133347_CustomerClientManager.cs
+  s_c3ef9b6f56324e::t_6ec57e56233908 1-29
+packages/web/src/features/customers/components/customers-list.tsx
+  s_c3ef9b6f56324e::t_8731874bda8cbd 2-3,6,12,18-58
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerHandlerTests.cs
+  s_c3ef9b6f56324e::t_c95a2d962f9d83 58-59
+  s_c3ef9b6f56324e::t_3c47b73e47eb3d 75-76
+  s_c3ef9b6f56324e::t_f0b7067ee8f3b6 36-37
+packages/api/Tsz.Api.Tests/Modules/Users/Features/DeleteUserValidatorTests.cs
+  s_c3ef9b6f56324e::t_f0f05e39c2f821 4,14-16,20,23-27,30,62-78
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerValidatorTests.cs
+  s_c3ef9b6f56324e::t_e62a7efe5276bd 1-2,6-7,13-27,35-36,46-47,58-59,70-71,82-83,93-94,105-106,116-155
+packages/api/Tsz.Api/Modules/Customers/Features/CreateCustomer.cs
+  s_c3ef9b6f56324e::t_252042c7adb64f 2,4,11-12,17-19,21-22,44-52,54-60,79
+packages/api/Tsz.Api/Modules/Users/Features/UpdateUser.cs
+  s_c3ef9b6f56324e::t_51c171f6e63ccd 2,31-35,40-52
+packages/web/src/api/schema.ts
+  s_c3ef9b6f56324e::t_bc841ed06cf4fa 84-86,475-476,492-493,515-516
+docs/product/requirements/customers/client-manager/plan.md
+  s_c3ef9b6f56324e::t_08afc0f33b71cc 1-301
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersHandlerTests.cs
+  s_c3ef9b6f56324e::t_c07a08e3338876 13,34-60
+packages/api/Tsz.Api/Modules/Customers/Features/UpdateCustomer.cs
+  s_c3ef9b6f56324e::t_7f29e3f28ec53f 2,12-13,47-55,63-69,84
+packages/api/Tsz.Api.Tests.Integration/CustomerEndpointsTests.cs
+  s_c3ef9b6f56324e::t_264e0cbb74d71a 140
+  s_c3ef9b6f56324e::t_bde18ebe9dcc2f 213,215
+  s_c3ef9b6f56324e::t_da49c8e9c600fd 166
+  s_c3ef9b6f56324e::t_dbcb6340100464 60-61,72,80,85,94
+  s_c3ef9b6f56324e::t_e95a2ccac38d27 116,123-124
+  s_c3ef9b6f56324e::t_7d730ce6705159 154
+  s_c3ef9b6f56324e::t_25a6baf26f6ea0 188
+  s_c3ef9b6f56324e::t_ab278e5878f2ea 232
+  s_c3ef9b6f56324e::t_256b3a9028998d 252-332
+packages/web/src/features/customers/components/customer-edit-card.tsx
+  s_c3ef9b6f56324e::t_20b5d3b2a33c57 111-120
+  s_c3ef9b6f56324e::t_5cb2607b4e6b32 2,10,13,23
+  s_c3ef9b6f56324e::t_072a0be854aefa 29-37,47
+packages/api/Tsz.Api/Modules/Customers/CustomerConfiguration.cs
+  s_c3ef9b6f56324e::t_6d9f784798f354 35-37
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserValidatorTests.cs
+  s_c3ef9b6f56324e::t_031f9196599e20 4,14-16,20,23-27,30,99-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "f70e795574509fe1c35f022dd94e55cb6b51d697",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  },
+  "sessions": {
+    "s_c3ef9b6f56324e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9236f5fe-b625-4aaa-a025-f70d962dd8ef",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
