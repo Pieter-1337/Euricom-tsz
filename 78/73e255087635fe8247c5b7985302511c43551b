@@ -1,0 +1,161 @@
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetCurrentUserHandlerTests.cs
+  s_7ef531421afd10::t_f7db38378f034f 26
+  s_7ef531421afd10::t_c925799b35e155 14
+packages/web/src/components/ui/multi-combobox.tsx
+  s_7ef531421afd10::t_45c5a3130dbe78 1-115,117-146
+  s_7ef531421afd10::t_b6ff74f75d798c 116
+packages/api/Tsz.Api/Modules/Users/RequireAdminAuthorizationHandler.cs
+  s_7ef531421afd10::t_a7bacde15a8d92 14
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersPagedQueryValidatorTests.cs
+  s_7ef531421afd10::t_9c9f0d9dcea95b 41
+packages/api/Tsz.Api/Modules/Users/UserDto.cs
+  s_7ef531421afd10::t_c99f515f306fe2 11,15,18
+packages/api/Tsz.Api/Modules/Users/UserRoleAssignment.cs
+  s_7ef531421afd10::t_f8cea4fac70e1a 1-6
+packages/web/src/features/customers/components/customers-list.tsx
+  s_880ea81f629c2c::t_af67fcb63eef9e 69
+  s_880ea81f629c2c::t_645efbd683a5ff 65-68,71-82
+packages/api/Tsz.Api.Tests/Modules/Users/Features/CreateUserHandlerTests.cs
+  s_7ef531421afd10::t_f93ecb6b6fcca2 39,45,48
+  s_7ef531421afd10::t_e12da5d9253e6a 64
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersPagedHandlerTests.cs
+  s_7ef531421afd10::t_5f8582f698f64e 244-249
+  s_7ef531421afd10::t_7c36a21760a64c 114-116,130-131,143-145,158-159,173,175,217,220
+packages/web/src/features/users/schemas.ts
+  s_7ef531421afd10::t_9a02ca4e83671a 38
+  s_7ef531421afd10::t_42ce8f97259d11 4,12,18
+packages/api/Tsz.Api/Modules/Users/Features/GetUsersPaged.cs
+  s_7ef531421afd10::t_bfa393ca85e090 30
+packages/web/src/components/ui/select-input.tsx
+  s_7ef531421afd10::t_b6ff74f75d798c 31
+packages/web/src/components/list/infinite-table.tsx
+  s_880ea81f629c2c::t_cacd5409a3b733 25,27-30,33,37
+  s_880ea81f629c2c::t_eb70381f8bd630 53,60,67,70,77-78,85,93
+  s_880ea81f629c2c::t_4af59c25170556 11
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  s_7ef531421afd10::t_2d890b8ab627c7 186,202,226,239-260
+packages/web/src/components/form/form-context.tsx
+  s_7ef531421afd10::t_81135bc95c08cf 165-205
+  s_7ef531421afd10::t_1269190966a2c8 354
+  s_7ef531421afd10::t_da156253921e2a 10
+packages/api/Tsz.Api/Modules/Users/Features/CreateUser.cs
+  s_7ef531421afd10::t_cfedc71f8a2ec1 7,21-26,45
+packages/api/Tsz.Api.Tests/Modules/Users/Features/CreateUserValidatorTests.cs
+  s_7ef531421afd10::t_1357f23042c658 30,38,47,56,65,67-93,100
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersHandlerTests.cs
+  s_7ef531421afd10::t_565b2efc038d61 32
+  s_7ef531421afd10::t_bbe42b64b1d723 17-18
+packages/api/Tsz.Api.Tests.Integration/UserEndpointsTests.cs
+  s_7ef531421afd10::t_a0d2898b991803 247,250,257
+  s_7ef531421afd10::t_5943a86758f03c 264
+  s_7ef531421afd10::t_5fe93b8d9cee7d 380-381
+  s_7ef531421afd10::t_2319eab63be91e 278
+  s_7ef531421afd10::t_e370c1f72da98f 230
+  s_7ef531421afd10::t_f5d495f2422e91 117-174
+  s_7ef531421afd10::t_edd420116238f0 103,181
+  s_7ef531421afd10::t_54716d38e42169 292
+  s_7ef531421afd10::t_2a28d178ffcb47 424
+  s_7ef531421afd10::t_f99a045c10d3c3 113
+  s_7ef531421afd10::t_160ce70dea86c0 25,114-116
+  s_7ef531421afd10::t_a89a61606b244a 210
+  s_7ef531421afd10::t_adb1baf7999e25 402-403
+  s_7ef531421afd10::t_c0a321b7de2122 199
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserHandlerTests.cs
+  s_7ef531421afd10::t_e0278fba0d9f18 15,24,29,32
+packages/api/Tsz.Api.Tests.Integration/CustomerEndpointsTests.cs
+  s_7ef531421afd10::t_a3f66881e0e01e 29
+  s_7ef531421afd10::t_34d5e87f5515aa 37
+packages/api/Tsz.Api.Tests.Integration/UserLeaveEndpointsTests.cs
+  s_7ef531421afd10::t_83c0bff0a1ad41 48
+  s_7ef531421afd10::t_fc99c0a168d27c 34
+packages/web/src/components/list/list-toolbar.tsx
+  s_880ea81f629c2c::t_7ce0ab63dae817 5-7,14,17,22-23,26,28-33,36
+  s_880ea81f629c2c::t_9c4dffa182daa9 10
+packages/web/src/features/users/server-fns.ts
+  s_7ef531421afd10::t_707d54dbc5a356 45
+packages/web/src/features/users/components/user-edit-card.tsx
+  s_7ef531421afd10::t_1aa24f1ec1f61d 84-85
+  s_7ef531421afd10::t_93b49101ad82aa 18,36
+packages/web/src/routes/_protected.tsx
+  s_7ef531421afd10::t_1e215cce054534 39
+packages/api/Tsz.Api/Modules/Users/Features/UpdateUser.cs
+  s_7ef531421afd10::t_e300fc293c4152 7,21-26,43
+packages/web/src/api/users.server.ts
+  s_7ef531421afd10::t_a02667c784ab47 6
+packages/web/src/lib/countries.ts
+  s_7ef531421afd10::t_b6ff74f75d798c 3-173,175-188,190-251,258-261
+packages/web/src/components/ui/command.tsx
+  s_7ef531421afd10::t_b6ff74f75d798c 13-16
+packages/api/Tsz.Api/Modules/Users/User.cs
+  s_7ef531421afd10::t_a128db366b9f79 14-19,22-51,53-56
+packages/web/src/api/schema.ts
+  s_7ef531421afd10::t_5c46a359c7f2fa 478
+  s_7ef531421afd10::t_2a55e6807091dd 515
+  s_7ef531421afd10::t_37854d52700b16 534
+packages/api/Tsz.Api/Modules/Users/UserConfiguration.cs
+  s_7ef531421afd10::t_1085afb8331443 29-35
+packages/api/Tsz.Api/Persistence/Migrations/20260519124220_UserRoles.cs
+  s_7ef531421afd10::t_7f7e8b928adf92 31-38,50-57
+  s_7ef531421afd10::t_2d890b8ab627c7 1-30,39-49,58-60
+packages/api/Tsz.Api/Persistence/Migrations/20260519124220_UserRoles.Designer.cs
+  s_7ef531421afd10::t_2d890b8ab627c7 1-281
+packages/web/src/components/list/list-shell.tsx
+  s_880ea81f629c2c::t_25da0ff4f752ef 11,15-16,18
+  s_880ea81f629c2c::t_e4cbd064b85a0f 2-3,6-7
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserValidatorTests.cs
+  s_7ef531421afd10::t_087dd71c5987f5 30,38,47,56,61-78,83
+packages/web/src/features/users/components/users-list.tsx
+  s_880ea81f629c2c::t_fc99bff97518e3 56,62-63,65,71,73
+  s_7ef531421afd10::t_2c4cf33c916e06 4,24-34
+  h_9ef4f126c6bd1c 41,57-59,64,66-70,72
+  s_880ea81f629c2c::t_c8f73453b7a6b6 60
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUserByIdHandlerTests.cs
+  s_7ef531421afd10::t_a76b3f68587445 16
+packages/api/Tsz.Api/Modules/Users/UserSeeder.cs
+  s_7ef531421afd10::t_0fea4ca213ec6c 15
+packages/api/Tsz.Api/Tsz.Api.csproj
+  s_7ef531421afd10::t_83b4cd10e72437 12
+packages/web/src/components/ui/badge.tsx
+  s_7ef531421afd10::t_b6ff74f75d798c 1-3,5,8,12-13,15-18,22,24-25,29,32-33,36-37,40
+  s_7ef531421afd10::t_537c472bc84ed2 4,6-7,9-11,14,19-21,23,26-28,30-31,34-35,38-39
+packages/web/src/routes/_protected/admin.tsx
+  s_7ef531421afd10::t_02ad409960c4c8 7
+packages/api/Tsz.Api.Tests/Builders/UserBuilder.cs
+  s_7ef531421afd10::t_a1d28054335c7f 15
+  s_7ef531421afd10::t_a619f0ff5fe0e7 44,46
+packages/web/src/features/users/components/user-create-form.tsx
+  s_7ef531421afd10::t_d53ec4ae9003e1 57-58
+  s_7ef531421afd10::t_befe5ecc405553 16,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "7873e255087635fe8247c5b7985302511c43551b",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  },
+  "sessions": {
+    "s_7ef531421afd10": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7449cdb5-b893-48b1-a81a-dceec0398ea5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_880ea81f629c2c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d6e5ef7-6cb9-47c8-a2a4-2a4e1ade26a2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
