@@ -2,6 +2,38 @@
 
 ## 2026-05-19
 
+feat: customers module — full CRUD with admin pages
+
+Expand Customers from { Id, Name } stub to full CRUD with admin
+parity to the Users module: auto-incremented Number, Address and
+ContactPerson value objects, soft delete, paged list, and admin
+create/edit pages.
+
+Backend adds Address + ContactPerson value objects, Customer entity
+with named mutators and DeletedAt query filter, CQRS slices
+(GetById, GetPaged with keyset + sort map + searchable, Create with
+Number = max+1, Update, soft Delete), admin-grouped endpoints, EF
+migration with unique Number, and unit + validator + integration
+tests.
+
+Frontend adds customers API client, server fns, paged list using
+ListShell + useListQuery (sortable columns, infinite scroll,
+search, soft-delete filter), and create/edit pages with a shared
+customer form. Adds NumberField (with spin buttons), ComboboxField,
+SelectFieldKV; shadcn combobox/command/popover; countries catalog.
+
+refactor: extract NumberInput/SelectInput/DateInput primitives
+
+Pull the spin-button number input, the Select composition, and the
+type=date input out of form-context into reusable UI primitives in
+components/ui. Every *Field in form-context is now a thin adapter
+(Label + primitive + FieldError) following the same shape as
+TextField/CheckboxField.
+
+Merges SelectField + SelectFieldKV: SelectInput accepts either a
+list of string values or {value, label} pairs and normalizes them
+internally. SelectFieldKV had zero call sites; removed.
+
 feat: add customers module with list page
 
 Add a new Customers aggregate with minimal data (id, name). Includes:
