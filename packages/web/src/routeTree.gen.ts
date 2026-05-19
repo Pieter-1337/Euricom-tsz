@@ -18,6 +18,8 @@ import { Route as ProtectedAdminUsersIndexRouteImport } from './routes/_protecte
 import { Route as ProtectedAdminCustomersIndexRouteImport } from './routes/_protected/admin/customers/index'
 import { Route as ProtectedAdminUsersNewRouteImport } from './routes/_protected/admin/users/new'
 import { Route as ProtectedAdminUsersIdRouteImport } from './routes/_protected/admin/users/$id'
+import { Route as ProtectedAdminCustomersNewRouteImport } from './routes/_protected/admin/customers/new'
+import { Route as ProtectedAdminCustomersIdRouteImport } from './routes/_protected/admin/customers/$id'
 
 const NoAccessRoute = NoAccessRouteImport.update({
   id: '/no-access',
@@ -65,12 +67,26 @@ const ProtectedAdminUsersIdRoute = ProtectedAdminUsersIdRouteImport.update({
   path: '/users/$id',
   getParentRoute: () => ProtectedAdminRoute,
 } as any)
+const ProtectedAdminCustomersNewRoute =
+  ProtectedAdminCustomersNewRouteImport.update({
+    id: '/customers/new',
+    path: '/customers/new',
+    getParentRoute: () => ProtectedAdminRoute,
+  } as any)
+const ProtectedAdminCustomersIdRoute =
+  ProtectedAdminCustomersIdRouteImport.update({
+    id: '/customers/$id',
+    path: '/customers/$id',
+    getParentRoute: () => ProtectedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
   '/no-access': typeof NoAccessRoute
   '/admin': typeof ProtectedAdminRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/customers/$id': typeof ProtectedAdminCustomersIdRoute
+  '/admin/customers/new': typeof ProtectedAdminCustomersNewRoute
   '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAdminUsersNewRoute
   '/admin/customers/': typeof ProtectedAdminCustomersIndexRoute
@@ -81,6 +97,8 @@ export interface FileRoutesByTo {
   '/admin': typeof ProtectedAdminRouteWithChildren
   '/': typeof ProtectedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/customers/$id': typeof ProtectedAdminCustomersIdRoute
+  '/admin/customers/new': typeof ProtectedAdminCustomersNewRoute
   '/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAdminUsersNewRoute
   '/admin/customers': typeof ProtectedAdminCustomersIndexRoute
@@ -93,6 +111,8 @@ export interface FileRoutesById {
   '/_protected/admin': typeof ProtectedAdminRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_protected/admin/customers/$id': typeof ProtectedAdminCustomersIdRoute
+  '/_protected/admin/customers/new': typeof ProtectedAdminCustomersNewRoute
   '/_protected/admin/users/$id': typeof ProtectedAdminUsersIdRoute
   '/_protected/admin/users/new': typeof ProtectedAdminUsersNewRoute
   '/_protected/admin/customers/': typeof ProtectedAdminCustomersIndexRoute
@@ -105,6 +125,8 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/admin'
     | '/api/auth/$'
+    | '/admin/customers/$id'
+    | '/admin/customers/new'
     | '/admin/users/$id'
     | '/admin/users/new'
     | '/admin/customers/'
@@ -115,6 +137,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/'
     | '/api/auth/$'
+    | '/admin/customers/$id'
+    | '/admin/customers/new'
     | '/admin/users/$id'
     | '/admin/users/new'
     | '/admin/customers'
@@ -126,6 +150,8 @@ export interface FileRouteTypes {
     | '/_protected/admin'
     | '/_protected/'
     | '/api/auth/$'
+    | '/_protected/admin/customers/$id'
+    | '/_protected/admin/customers/new'
     | '/_protected/admin/users/$id'
     | '/_protected/admin/users/new'
     | '/_protected/admin/customers/'
@@ -203,10 +229,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAdminUsersIdRouteImport
       parentRoute: typeof ProtectedAdminRoute
     }
+    '/_protected/admin/customers/new': {
+      id: '/_protected/admin/customers/new'
+      path: '/customers/new'
+      fullPath: '/admin/customers/new'
+      preLoaderRoute: typeof ProtectedAdminCustomersNewRouteImport
+      parentRoute: typeof ProtectedAdminRoute
+    }
+    '/_protected/admin/customers/$id': {
+      id: '/_protected/admin/customers/$id'
+      path: '/customers/$id'
+      fullPath: '/admin/customers/$id'
+      preLoaderRoute: typeof ProtectedAdminCustomersIdRouteImport
+      parentRoute: typeof ProtectedAdminRoute
+    }
   }
 }
 
 interface ProtectedAdminRouteChildren {
+  ProtectedAdminCustomersIdRoute: typeof ProtectedAdminCustomersIdRoute
+  ProtectedAdminCustomersNewRoute: typeof ProtectedAdminCustomersNewRoute
   ProtectedAdminUsersIdRoute: typeof ProtectedAdminUsersIdRoute
   ProtectedAdminUsersNewRoute: typeof ProtectedAdminUsersNewRoute
   ProtectedAdminCustomersIndexRoute: typeof ProtectedAdminCustomersIndexRoute
@@ -214,6 +256,8 @@ interface ProtectedAdminRouteChildren {
 }
 
 const ProtectedAdminRouteChildren: ProtectedAdminRouteChildren = {
+  ProtectedAdminCustomersIdRoute: ProtectedAdminCustomersIdRoute,
+  ProtectedAdminCustomersNewRoute: ProtectedAdminCustomersNewRoute,
   ProtectedAdminUsersIdRoute: ProtectedAdminUsersIdRoute,
   ProtectedAdminUsersNewRoute: ProtectedAdminUsersNewRoute,
   ProtectedAdminCustomersIndexRoute: ProtectedAdminCustomersIndexRoute,

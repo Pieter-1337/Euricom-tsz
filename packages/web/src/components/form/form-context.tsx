@@ -1,10 +1,13 @@
 import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
-import type { ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { Input } from '#/components/ui/input';
 import { Label } from '#/components/ui/label';
 import { Textarea } from '#/components/ui/textarea';
 import { Checkbox } from '#/components/ui/checkbox';
 import { Button } from '#/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '#/components/ui/select';
+import { Combobox, type ComboboxOption } from '#/components/ui/combobox';
 import { FieldError } from '#/components/form/field-error';
 import { hasFormError } from '#/lib/form-utils';
 
@@ -46,25 +49,104 @@ function TextField({ label, type }: { label: string; type?: string }) {
   );
 }
 
-function NumberField({ label, suffix, min }: { label: ReactNode; suffix?: string; min?: number }) {
+function NumberField({
+  label,
+  suffix,
+  min,
+  max,
+  step = 1,
+}: {
+  label: ReactNode;
+  suffix?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+}) {
   const field = useFieldContext<number>();
+  const [text, setText] = useState<string>(() => String(field.state.value));
+  const lastValueRef = useRef(field.state.value);
+
+  // Resync display when the form value changes from outside (reset, external update).
+  if (field.state.value !== lastValueRef.current) {
+    setText(String(field.state.value));
+    lastValueRef.current = field.state.value;
+  }
+
+  const fallback = min ?? 0;
+  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+
+  const stepBy = (delta: number) => {
+    const current = Number(text);
+    const base = Number.isFinite(current) ? current : fallback;
+    let next = base + delta;
+    if (min !== undefined && next < min) next = min;
+    if (max !== undefined && next > max) next = max;
+    setText(String(next));
+    lastValueRef.current = next;
+    clearServerErrorFor(field);
+    field.handleChange(next);
+  };
+
+  const current = Number(text);
+  const isAtMin = min !== undefined && Number.isFinite(current) && current <= min;
+  const isAtMax = max !== undefined && Number.isFinite(current) && current >= max;
+
   return (
     <div className="grid gap-2">
       <Label htmlFor={field.name}>{label}</Label>
       <div className="flex items-center gap-2">
-        <Input
-          id={field.name}
-          name={field.name}
-          type="number"
-          min={min}
-          value={field.state.value}
-          aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
-          onBlur={field.handleBlur}
-          onChange={(e) => {
-            clearServerErrorFor(field);
-            field.handleChange(Number(e.target.value));
-          }}
-        />
+        <div className="relative flex-1">
+          <Input
+            id={field.name}
+            name={field.name}
+            type="number"
+            min={min}
+            max={max}
+            step={step}
+            value={text}
+            aria-invalid={hasError ? true : undefined}
+            className="pr-9 [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
+            onBlur={() => {
+              if (text === '' || Number.isNaN(Number(text))) {
+                setText(String(field.state.value));
+              }
+              field.handleBlur();
+            }}
+            onChange={(e) => {
+              const raw = e.target.value;
+              setText(raw);
+              clearServerErrorFor(field);
+              const n = raw === '' ? fallback : Number(raw);
+              if (!Number.isNaN(n)) {
+                lastValueRef.current = n;
+                field.handleChange(n);
+              }
+            }}
+          />
+          <div className="absolute inset-y-0 right-0 flex flex-col border-l border-input">
+            <button
+              type="button"
+              tabIndex={-1}
+              disabled={isAtMax}
+              aria-label="Increase"
+              onClick={() => stepBy(step)}
+              className="flex flex-1 items-center justify-center px-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronUpIcon className="size-3" />
+            </button>
+            <div className="h-px bg-input" />
+            <button
+              type="button"
+              tabIndex={-1}
+              disabled={isAtMin}
+              aria-label="Decrease"
+              onClick={() => stepBy(-step)}
+              className="flex flex-1 items-center justify-center px-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronDownIcon className="size-3" />
+            </button>
+          </div>
+        </div>
         {suffix && <span className="text-sm text-muted-foreground">{suffix}</span>}
       </div>
       <FieldError field={field} />
@@ -74,26 +156,113 @@ function NumberField({ label, suffix, min }: { label: ReactNode; suffix?: string
 
 function SelectField<T extends string>({ label, options }: { label: string; options: readonly T[] }) {
   const field = useFieldContext<T>();
+  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
   return (
     <div className="grid gap-2">
       <Label htmlFor={field.name}>{label}</Label>
-      <select
+      <Select
+        value={field.state.value}
+        onValueChange={(value) => {
+          clearServerErrorFor(field);
+          field.handleChange(value as T);
+        }}
+      >
+        <SelectTrigger
+          id={field.name}
+          name={field.name}
+          onBlur={field.handleBlur}
+          aria-invalid={hasError ? true : undefined}
+          className="w-full"
+        >
+          <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FieldError field={field} />
+    </div>
+  );
+}
+
+function SelectFieldKV({
+  label,
+  options,
+}: {
+  label: string;
+  options: readonly { value: string; label: string }[];
+}) {
+  const field = useFieldContext<string>();
+  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Select
+        value={field.state.value}
+        onValueChange={(value) => {
+          clearServerErrorFor(field);
+          field.handleChange(value);
+        }}
+      >
+        <SelectTrigger
+          id={field.name}
+          name={field.name}
+          onBlur={field.handleBlur}
+          aria-invalid={hasError ? true : undefined}
+          className="w-full"
+        >
+          <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FieldError field={field} />
+    </div>
+  );
+}
+
+function ComboboxField({
+  label,
+  options,
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
+}: {
+  label: string;
+  options: readonly ComboboxOption[];
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+}) {
+  const field = useFieldContext<string>();
+  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Combobox
         id={field.name}
         name={field.name}
         value={field.state.value}
-        onBlur={field.handleBlur}
-        onChange={(e) => {
+        onValueChange={(value) => {
           clearServerErrorFor(field);
-          field.handleChange(e.target.value as T);
+          field.handleChange(value);
         }}
-        className="border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
-      >
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
+        onBlur={field.handleBlur}
+        aria-invalid={hasError ? true : undefined}
+        options={options}
+        placeholder={placeholder ?? `Select ${label.toLowerCase()}`}
+        searchPlaceholder={searchPlaceholder ?? `Search ${label.toLowerCase()}…`}
+        emptyMessage={emptyMessage}
+      />
       <FieldError field={field} />
     </div>
   );
@@ -247,6 +416,8 @@ export const { useAppForm, withForm } = createFormHook({
     TextField,
     NumberField,
     SelectField,
+    SelectFieldKV,
+    ComboboxField,
     TextareaField,
     CheckboxField,
     DateField,

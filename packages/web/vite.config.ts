@@ -15,9 +15,6 @@ const config = defineConfig({
       cert: fs.readFileSync('../../certs/local-cert.pem'),
     },
   },
-  lint: {
-    ignorePatterns: [],
-  },
   fmt: {
     singleQuote: true,
     printWidth: 120,

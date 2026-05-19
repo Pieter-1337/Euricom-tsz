@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "perf": "warn",
+    "suspicious": "warn"
+  },
+  "jsPlugins": [
+    "eslint-plugin-no-unsanitized",
+    "eslint-plugin-no-secrets",
+    "eslint-plugin-security",
+    "eslint-plugin-better-tailwindcss"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "no-underscore-dangle": "off",
+    "no-unsanitized/method": "error",
+    "no-unsanitized/property": "error",
+    "no-secrets/no-secrets": ["error", { "tolerance": 4.2 }],
+    "security/detect-child-process": "error",
+    "security/detect-eval-with-expression": "error",
+    "security/detect-non-literal-fs-filename": "warn",
+    "security/detect-non-literal-regexp": "warn",
+    "security/detect-non-literal-require": "error",
+    "security/detect-object-injection": "off",
+    "security/detect-possible-timing-attacks": "error",
+    "security/detect-pseudoRandomBytes": "error",
+    "security/detect-unsafe-regex": "error"
+  },
+  "ignorePatterns": ["dist", "poc", "node_modules", ".tanstack", ".output", ".nitro", "src/routeTree.gen.ts"]
+}

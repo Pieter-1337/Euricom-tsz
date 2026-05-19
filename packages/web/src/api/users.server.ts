@@ -27,6 +27,8 @@ export const getCurrentUser = async (): Promise<User | null> => {
     return resp.data ?? null;
   } catch (e) {
     if (e instanceof ApiRequestError && e.status === 404) return null;
+    // eslint-disable-next-line no-console
+    console.error('[getCurrentUser] fetch error', e, (e as { cause?: unknown })?.cause);
     throw e;
   }
 };

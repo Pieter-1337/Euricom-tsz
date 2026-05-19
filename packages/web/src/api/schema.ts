@@ -320,8 +320,129 @@ export interface paths {
       };
     };
     put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateCustomerCommand'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/customers/paged': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
+          deletedOnly?: boolean;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['KeysetPageOfCustomerDto'];
+          };
+        };
+      };
+    };
+    put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/customers/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['GetCustomerById'];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateCustomerCommand'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -331,9 +452,24 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    AddressDto: {
+      street: null | string;
+      zip: null | string;
+      city: null | string;
+      country: null | string;
+    };
     AnonymousTypeOfstringAndstring: {
       name: null | string;
       version: null | string;
+    };
+    ContactPersonDto: {
+      name: null | string;
+      email: string;
+    };
+    CreateCustomerCommand: {
+      name: string;
+      contactPerson: components['schemas']['ContactPersonDto'];
+      address: null | components['schemas']['AddressDto'];
     };
     CreateUserCommand: {
       firstName: string;
@@ -344,7 +480,17 @@ export interface components {
     CustomerDto: {
       /** Format: uuid */
       id: string;
+      /** Format: int32 */
+      number: number;
       name: string;
+      address: components['schemas']['AddressDto'];
+      contactPerson: components['schemas']['ContactPersonDto'];
+    };
+    KeysetPageOfCustomerDto: {
+      items: components['schemas']['CustomerDto'][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
     };
     KeysetPageOfUserDto: {
       items: components['schemas']['UserDto'][];
@@ -354,6 +500,13 @@ export interface components {
     };
     /** @enum {unknown} */
     LeaveAllowed: 'NotAllowed' | 'Limited' | 'Unlimited';
+    UpdateCustomerCommand: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      contactPerson: components['schemas']['ContactPersonDto'];
+      address: null | components['schemas']['AddressDto'];
+    };
     UpdateUserCommand: {
       /** Format: uuid */
       id: string;
@@ -408,6 +561,26 @@ export interface components {
 export type $defs = Record<string, never>;
 export interface operations {
   GetUserById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  GetCustomerById: {
     parameters: {
       query?: never;
       header?: never;

@@ -2,9 +2,6 @@ import { defineConfig } from 'vite-plus';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
-  lint: {
-    ignorePatterns: ['dist/**', 'node_modules/**', 'packages/api/**'],
-  },
   fmt: {
     singleQuote: true,
     printWidth: 120,

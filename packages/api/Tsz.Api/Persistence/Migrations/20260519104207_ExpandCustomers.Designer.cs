@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tsz.Api.Persistence;
 
@@ -10,9 +11,11 @@ using Tsz.Api.Persistence;
 namespace Tsz.Api.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519104207_ExpandCustomers")]
+    partial class ExpandCustomers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -204,7 +207,7 @@ namespace Tsz.Api.Persistence.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers", (string)null);
+                            b1.ToTable("Customers");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
@@ -228,7 +231,7 @@ namespace Tsz.Api.Persistence.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers", (string)null);
+                            b1.ToTable("Customers");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
