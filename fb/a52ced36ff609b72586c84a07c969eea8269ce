@@ -1,0 +1,57 @@
+packages/web/src/hooks/use-list-query.ts
+  1cbc50f66eb46bd4 17,41
+packages/web/src/components/form/form-context.tsx
+  1cbc50f66eb46bd4 228
+packages/web/src/components/list/infinite-table.tsx
+  1cbc50f66eb46bd4 9,58,93
+CHANGELOG.md
+  s_1cbc50f66eb46b::t_559d51c295bae6 14-18
+packages/web/src/styles.css
+  1cbc50f66eb46bd4 56-61,66-68,74
+packages/web/docs/DESIGN.md
+  1cbc50f66eb46bd4 12-13,31-37,74-78,97-101,111,118,124,131,139,141,143-144,148-149,176
+packages/web/src/components/list/list-shell.tsx
+  1cbc50f66eb46bd4 52
+packages/web/src/api/users.server.ts
+  1cbc50f66eb46bd4 8
+packages/web/src/lib/form-utils.ts
+  1cbc50f66eb46bd4 6
+packages/web/src/features/users/server-fns.ts
+  1cbc50f66eb46bd4 18
+packages/web/src/components/list/list-toolbar.tsx
+  1cbc50f66eb46bd4 29,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "fba52ced36ff609b72586c84a07c969eea8269ce",
+  "prompts": {
+    "1cbc50f66eb46bd4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e056019b-7aff-4b63-8825-f16bf096f5a4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>",
+      "total_additions": 61,
+      "total_deletions": 80,
+      "accepted_lines": 688,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  },
+  "sessions": {
+    "s_1cbc50f66eb46b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e056019b-7aff-4b63-8825-f16bf096f5a4",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": null
+    }
+  }
+}
