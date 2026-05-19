@@ -1,0 +1,58 @@
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  1cbc50f66eb46bd4 20-35
+packages/api/Tsz.Api/Modules/Customers/Features/GetCustomers.cs
+  1cbc50f66eb46bd4 1-15
+packages/api/Tsz.Api/Modules/Customers/CustomerEndpoints.cs
+  1cbc50f66eb46bd4 1-18
+packages/web/src/routes/_protected/admin/customers/index.tsx
+  1cbc50f66eb46bd4 1-6
+packages/web/src/routes/_protected.tsx
+  1cbc50f66eb46bd4 3,85,94,120,231,250,277
+packages/api/Tsz.Api/Modules/Customers/CustomerDto.cs
+  1cbc50f66eb46bd4 1-14
+packages/web/src/api/customers.ts
+  1cbc50f66eb46bd4 1-3
+packages/web/src/routeTree.gen.ts
+  1cbc50f66eb46bd4 18,52-57,76,86,98,110,120,131,185-191,212,219
+packages/api/Tsz.Api/Extensions/EndpointExtensions.cs
+  1cbc50f66eb46bd4 6,28
+packages/web/src/features/customers/components/customers-list.tsx
+  1cbc50f66eb46bd4 1-55
+packages/web/src/api/schema.ts
+  1cbc50f66eb46bd4 7-12,14-30,32-63,65,67-98,100-112,114-121,123,125-146,148-161,163,165-186,188-192,194-201,203-211,213-222,224,226-241,243-245,247-258,260-267,269-273,275-284,286-318,320-347,349-406,410-424,426-427,429
+packages/api/Tsz.Api/Modules/Customers/CustomerConfiguration.cs
+  1cbc50f66eb46bd4 1-18
+packages/api/Tsz.Api/Persistence/Migrations/20260519092345_AddCustomers.Designer.cs
+  1cbc50f66eb46bd4 1-188
+packages/web/src/features/customers/server-fns.ts
+  1cbc50f66eb46bd4 1-7
+packages/web/src/api/customers.server.ts
+  1cbc50f66eb46bd4 1-7
+packages/api/Tsz.Api/Modules/Customers/Customer.cs
+  1cbc50f66eb46bd4 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "21ab37d384c207e5cabeecf22ca870c15396217d",
+  "prompts": {
+    "1cbc50f66eb46bd4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e056019b-7aff-4b63-8825-f16bf096f5a4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke",
+      "messages": [],
+      "total_additions": 2399,
+      "total_deletions": 515,
+      "accepted_lines": 1878,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  }
+}
