@@ -1,0 +1,25 @@
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerValidatorTests.cs
+  s_6998d7b4ed3320::t_2e7c27dde7953a 5-8,29-37
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerValidatorTests.cs
+  s_6998d7b4ed3320::t_2e7c27dde7953a 3-6,14-19,22
+packages/api/Tsz.Api.Tests/Modules/Users/Features/DeleteUserValidatorTests.cs
+  s_6998d7b4ed3320::t_2e7c27dde7953a 6-10,28-33
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserValidatorTests.cs
+  s_6998d7b4ed3320::t_2e7c27dde7953a 6-10,28-33,104-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "983df08d4ae2138cf3b9d120c5864f33e8d8cf15",
+  "prompts": {},
+  "sessions": {
+    "s_6998d7b4ed3320": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ace6b359-cad8-426b-812c-baded9d6e406",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
