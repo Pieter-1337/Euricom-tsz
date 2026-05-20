@@ -1,0 +1,64 @@
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj
+  s_3f718ff5f21237::t_b6f0655c46877c 12
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerValidatorTests.cs
+  s_3f718ff5f21237::t_da6561504e7251 6,14-16,18-19,22
+packages/api/Modules/Users/Tsz.Modules.Users/CrossModule/UsersAccessModule.cs
+  s_3f718ff5f21237::t_1abd7a2c9d3734 1-14
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Queries/IsUserReferencedAsClientManagerQuery.cs
+  s_3f718ff5f21237::t_6e04eb921f7cf3 1-5
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/UpdateCustomer.cs
+  s_3f718ff5f21237::t_dd5e7d4ff27ad7 69,72
+  s_3f718ff5f21237::t_6071e854e54b34 5,21,23,26
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj
+  s_3f718ff5f21237::t_a83059a414e84c 12
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/CreateCustomer.cs
+  s_3f718ff5f21237::t_dec4ff494b28be 5,19,21,23,58,61
+packages/api/Modules/Users/Tsz.Modules.Users/Features/UpdateUser.cs
+  s_3f718ff5f21237::t_52bf37d9c95840 53
+  s_3f718ff5f21237::t_7eb2b06a0fb7a9 5,16,18,21
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerValidatorTests.cs
+  s_3f718ff5f21237::t_8fbdeb8677bad0 8,29-31,33-34,37
+packages/api/Tsz.Api.Tests/Modules/Users/Features/DeleteUserValidatorTests.cs
+  s_3f718ff5f21237::t_ddcea46369e073 7,28-30,33
+packages/api/Modules/Users/Tsz.Modules.Users/CrossModule/UserHasRoleQueryHandler.cs
+  s_3f718ff5f21237::t_f328b889b3f53d 1-11
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/IUsersAccessModule.cs
+  s_3f718ff5f21237::t_0a8992a19880a1 1-9
+packages/api/Modules/Users/Tsz.Modules.Users/Features/DeleteUser.cs
+  s_3f718ff5f21237::t_d0473dc00db4ae 6,16,18,21
+  s_3f718ff5f21237::t_82c42072ee9a62 42
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Queries/UserHasRoleQuery.cs
+  s_3f718ff5f21237::t_f7fcca8ef1aa37 1-5
+packages/api/Modules/Customers/Tsz.Modules.Customers/CrossModule/CustomersAccessModule.cs
+  s_3f718ff5f21237::t_a28c1752d84323 1-14
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserValidatorTests.cs
+  s_3f718ff5f21237::t_c42d8d757845c3 7,28-30,33
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Queries/UserExistsQuery.cs
+  s_3f718ff5f21237::t_e1cdde167c4441 1-5
+packages/api/Modules/Users/Tsz.Modules.Users/CrossModule/UserExistsQueryHandler.cs
+  s_3f718ff5f21237::t_9d8f665e33f1e9 1-10
+packages/api/Modules/Users/Tsz.Modules.Users/UsersModule.cs
+  s_3f718ff5f21237::t_8e4d1e95bc0936 8,19
+packages/api/Modules/Customers/Tsz.Modules.Customers/CustomersModule.cs
+  s_3f718ff5f21237::t_05b4ae65950704 6,16
+packages/api/Modules/Customers/Tsz.Modules.Customers/CrossModule/IsUserReferencedAsClientManagerQueryHandler.cs
+  s_3f718ff5f21237::t_4e886870eb0c51 1-11
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/ICustomersAccessModule.cs
+  s_3f718ff5f21237::t_a1e30958db8db8 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "9da4c979fcbde29b1647bbe062e0171ee06be530",
+  "prompts": {},
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
