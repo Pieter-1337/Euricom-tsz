@@ -51,6 +51,19 @@ No schema migrations needed; existing migrations remain in Tsz.Api.
 
 Tests: 159 unit tests pass, 61 integration tests pass.
 
+refactor: implement universal soft-delete with named query filters
+
+Make soft-delete a universal convention: IEntityBase extends ISoftDeletable,
+so all entities have a DeletedAt property by default. Entities that don't use
+soft-delete explicitly Ignore the property in EF configuration.
+
+Name the soft-delete query filter "SoftDelete" to allow selective ignoring.
+The paging repository now bypasses only this named filter when DeletedOnly is
+set, instead of toggling all query filters.
+
+Delete the RepositoryPaginationExtensions helper; paging logic is now
+unified in EfCoreRepository.GetPagedAsync.
+
 ## 2026-05-19
 
 feat: add client manager support to customers
