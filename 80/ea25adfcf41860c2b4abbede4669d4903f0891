@@ -1,0 +1,54 @@
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/CustomerConfiguration.cs
+  s_0b31058427e723::t_25542172b9db0c 42
+docs/agents/conventions-csharp.md
+  s_0b31058427e723::t_ad53fe23925730 17-18
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/UserLeave.cs
+  s_0b31058427e723::t_886145595737a0 12
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersPagedHandlerTests.cs
+  s_0b31058427e723::t_afd479ecf59896 309-311,313
+  s_0b31058427e723::t_b88cba41f08686 281
+  s_0b31058427e723::t_50dfe49124786c 308,317
+  s_0b31058427e723::t_4e1391dbc4132b 312,314-316
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/GetCustomersPagedHandlerTests.cs
+  s_0b31058427e723::t_a6476d18a3aeff 117,119-120
+  s_0b31058427e723::t_097de8db9f70b6 1-116,118,121-307
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/User.cs
+  s_0b31058427e723::t_3beb6901d8a1a1 6
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/UserConfiguration.cs
+  s_0b31058427e723::t_90ba9f70a45c49 45
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/LeaveTypes/LeaveType.cs
+  s_0b31058427e723::t_d67d9896a9de74 12
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/UserLeaveConfiguration.cs
+  s_0b31058427e723::t_e2d5f71718afbe 31-32
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/Customer.cs
+  s_0b31058427e723::t_a4397b8525e64b 5
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetUsersPaged.cs
+  s_0b31058427e723::t_324120fcd85b74 41
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/LeaveTypes/LeaveTypeConfiguration.cs
+  s_0b31058427e723::t_7246576b5ec6cf 35-36
+packages/api/Tsz.Infrastructure/Persistence/EfCoreRepository.cs
+  s_0b31058427e723::t_a214c5f7311bb7 105,107-109
+  s_0b31058427e723::t_f4fa1ab48d3c65 101,110
+  s_0b31058427e723::t_08f13ec7860314 100
+  s_0b31058427e723::t_c7f9cdcb5fd77b 102-104,106
+packages/api/Tsz.Infrastructure/Abstractions/IEntityBase.cs
+  s_0b31058427e723::t_343dfee27ce693 1,3
+packages/api/Tsz.Infrastructure/Abstractions/ISoftDeletable.cs
+  s_0b31058427e723::t_37f8eafeef3475 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "80ea25adfcf41860c2b4abbede4669d4903f0891",
+  "prompts": {},
+  "sessions": {
+    "s_0b31058427e723": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d9173979-3ebe-42a2-bc8e-cf9221e8c8ec",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
