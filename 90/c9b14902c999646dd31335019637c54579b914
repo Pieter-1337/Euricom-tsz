@@ -1,0 +1,27 @@
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts.csproj
+  s_3f718ff5f21237::t_c61b02f1c24903 1-19
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts.csproj
+  s_3f718ff5f21237::t_97d290c411bbc3 1-19
+packages/api/Modules/Users/Tsz.Modules.Users.csproj
+  s_3f718ff5f21237::t_58b67dd8486ba3 1-36
+packages/api/Tsz.SharedKernel/Countries.cs
+  s_3f718ff5f21237::t_53de33a03f3d7b 1-3
+packages/api/Modules/Customers/Tsz.Modules.Customers.csproj
+  s_3f718ff5f21237::t_ad94078de06f7e 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "90c9b14902c999646dd31335019637c54579b914",
+  "prompts": {},
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
