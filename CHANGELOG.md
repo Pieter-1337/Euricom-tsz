@@ -777,3 +777,15 @@ Reformat OpenAPI schema with single quotes
 updated settings.json schema
 Add startup database seeding for animals
 Initial commit
+
+## 2026-05-20
+
+refactor: extract soft-delete paging into ISoftDeletable seam
+
+Add ISoftDeletable interface (DateTimeOffset? DeletedAt) for domain
+entities. Implement soft-delete-aware GetPagedAsync extension that
+auto-applies the DeletedOnly filter and ignoreQueryFilters toggle.
+
+Handler boilerplate drops from 8 lines to 1 call. Soft-delete
+semantics concentrate in one place, testable as a contract.
+Tests pass unchanged (159 unit, 61 integration).
