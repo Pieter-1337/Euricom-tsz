@@ -1,0 +1,31 @@
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/GetCustomersPaged.cs
+  s_0b31058427e723::t_06d3560a46fb0c 42
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetUsersPaged.cs
+  s_0b31058427e723::t_1636b4970fa86a 41
+docs/agents/conventions-csharp.md
+  s_0b31058427e723::t_3eaf591c6963de 15-20
+packages/api/Tsz.Infrastructure/Abstractions/ISoftDeletable.cs
+  s_0b31058427e723::t_35a9df831e6d81 1-6
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/User.cs
+  s_0b31058427e723::t_6eef5eb87d6c81 6
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/Customer.cs
+  s_0b31058427e723::t_046f2193522a6f 5
+packages/api/Tsz.Infrastructure/Common/Pagination/RepositoryPaginationExtensions.cs
+  s_0b31058427e723::t_27507c4c6f677a 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "f6600113dccd3e52991909417a57741b90a0544b",
+  "prompts": {},
+  "sessions": {
+    "s_0b31058427e723": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d9173979-3ebe-42a2-bc8e-cf9221e8c8ec",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
