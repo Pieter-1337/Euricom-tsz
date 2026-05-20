@@ -1,11 +1,13 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Api.Modules.Customers;
-using Tsz.Api.Modules.Users;
-using Tsz.Api.Modules.Users.Features;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Errors;
+using Tsz.Modules.Customers.Contracts;
+using Tsz.Modules.Customers.Contracts.Queries;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Users;
+using Tsz.Modules.Users.Features;
 
 namespace Tsz.Api.Tests.Modules.Users.Features;
 
@@ -20,16 +22,15 @@ public class DeleteUserValidatorTests
             .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<CancellationToken>(), It.IsAny<bool>()))
             .ReturnsAsync(userExists);
 
-        var custRepo = new Mock<IRepository<Customer>>();
-        custRepo
-            .Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Customer, bool>>>(), It.IsAny<CancellationToken>(), It.IsAny<bool>()))
-            .ReturnsAsync(customerLinked);
-
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<User>()).Returns(userRepo.Object);
-        uow.Setup(u => u.RepositoryFor<Customer>()).Returns(custRepo.Object);
 
-        return new DeleteUserValidator(uow.Object);
+        var customers = new Mock<ICustomersAccessModule>();
+        customers
+            .Setup(m => m.ExecuteQueryAsync(It.IsAny<IsUserReferencedAsClientManagerQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(customerLinked);
+
+        return new DeleteUserValidator(uow.Object, customers.Object);
     }
 
     [Fact]

@@ -1,9 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Tsz.Api.Modules.Customers;
-using Tsz.Api.Modules.Customers.Features;
-using Tsz.Api.Modules.Users;
+using Tsz.Modules.Customers.Domain.Customers;
+using Tsz.Modules.Customers.Features;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Users;
 using Tsz.Api.Tests.Integration.TestAuth;
 using Tsz.Infrastructure.Common.Pagination;
 

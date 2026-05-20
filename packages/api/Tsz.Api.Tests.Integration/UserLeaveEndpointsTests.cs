@@ -1,8 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Tsz.Api.Modules.Users;
-using Tsz.Api.Modules.Users.Features;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Leaves;
+using Tsz.Modules.Users.Domain.LeaveTypes;
+using Tsz.Modules.Users.Domain.Users;
+using Tsz.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
 
 namespace Tsz.Api.Tests.Integration;

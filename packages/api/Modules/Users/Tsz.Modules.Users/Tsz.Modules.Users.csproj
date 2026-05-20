@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Tsz.Api.Tests" />
+    <InternalsVisibleTo Include="Tsz.Api.Tests.Integration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tsz.Modules.Users.Contracts\Tsz.Modules.Users.Contracts.csproj" />
+    <ProjectReference Include="..\..\Customers\Tsz.Modules.Customers.Contracts\Tsz.Modules.Customers.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Tsz.Infrastructure\Tsz.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

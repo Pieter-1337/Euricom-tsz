@@ -15,6 +15,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tsz.Infrastructure\Tsz.Infrastructure.csproj" />
+    <ProjectReference Include="..\Tsz.SharedKernel\Tsz.SharedKernel.csproj" />
+    <ProjectReference Include="..\Modules\Users\Tsz.Modules.Users\Tsz.Modules.Users.csproj" />
+    <ProjectReference Include="..\Modules\Customers\Tsz.Modules.Customers\Tsz.Modules.Customers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

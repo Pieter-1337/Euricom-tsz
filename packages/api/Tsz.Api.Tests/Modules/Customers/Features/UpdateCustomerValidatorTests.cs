@@ -1,10 +1,11 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Api.Modules.Customers;
-using Tsz.Api.Modules.Customers.Features;
-using Tsz.Api.Modules.Users;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Modules.Customers.Domain.Customers;
+using Tsz.Modules.Customers.Features;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Contracts.Queries;
 
 namespace Tsz.Api.Tests.Modules.Customers.Features;
 
@@ -22,19 +23,18 @@ public class UpdateCustomerValidatorTests
                 It.IsAny<bool>()))
             .ReturnsAsync(exists);
 
-        var userRepo = new Mock<IRepository<User>>();
-        userRepo.SetupSequence(r => r.ExistsAsync(
-                It.IsAny<Expression<Func<User, bool>>>(),
-                It.IsAny<CancellationToken>(),
-                It.IsAny<bool>()))
-            .ReturnsAsync(userExists)
-            .ReturnsAsync(userIsClientManager);
-
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<Customer>()).Returns(custRepo.Object);
-        uow.Setup(u => u.RepositoryFor<User>()).Returns(userRepo.Object);
 
-        return new UpdateCustomerValidator(uow.Object);
+        var users = new Mock<IUsersAccessModule>();
+        users
+            .Setup(m => m.ExecuteQueryAsync(It.IsAny<UserExistsQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(userExists);
+        users
+            .Setup(m => m.ExecuteQueryAsync(It.IsAny<UserHasRoleQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(userIsClientManager);
+
+        return new UpdateCustomerValidator(uow.Object, users.Object);
     }
 
     [Fact]

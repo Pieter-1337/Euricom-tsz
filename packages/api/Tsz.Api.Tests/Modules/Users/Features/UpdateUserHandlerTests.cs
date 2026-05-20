@@ -1,7 +1,8 @@
 using Moq;
 using Shouldly;
-using Tsz.Api.Modules.Users;
-using Tsz.Api.Modules.Users.Features;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Users;
+using Tsz.Modules.Users.Features;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 

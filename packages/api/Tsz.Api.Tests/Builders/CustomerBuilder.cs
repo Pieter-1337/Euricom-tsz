@@ -1,4 +1,4 @@
-using Tsz.Api.Modules.Customers;
+using Tsz.Modules.Customers.Domain.Customers;
 
 namespace Tsz.Api.Tests.Builders;
 

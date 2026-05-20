@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Api.Modules.Users;
-using Tsz.Api.Modules.Users.Features;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Users;
+using Tsz.Modules.Users.Features;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Errors;
 

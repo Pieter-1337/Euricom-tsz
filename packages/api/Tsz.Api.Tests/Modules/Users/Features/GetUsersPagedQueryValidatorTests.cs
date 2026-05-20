@@ -1,6 +1,6 @@
 using Shouldly;
-using Tsz.Api.Modules.Users;
-using Tsz.Api.Modules.Users.Features;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Features;
 using Tsz.Infrastructure.Common.Pagination;
 using SortDir = Tsz.Infrastructure.Common.Pagination.SortDirection;
 

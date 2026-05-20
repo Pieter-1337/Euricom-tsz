@@ -9,6 +9,7 @@ description: >
   Always use this skill when a PLAN.md exists and the user says they're ready to start.
 context: fork
 model: sonnet
+disable-model-invocation: true
 ---
 
 # Implement

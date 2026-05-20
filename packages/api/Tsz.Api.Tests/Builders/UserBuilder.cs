@@ -1,5 +1,6 @@
 using FizzWare.NBuilder.Generators;
-using Tsz.Api.Modules.Users;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Users;
 
 namespace Tsz.Api.Tests.Builders;
 

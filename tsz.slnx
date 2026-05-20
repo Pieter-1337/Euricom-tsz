@@ -2,7 +2,14 @@
   <Folder Name="/api/">
     <Project Path="packages/api/Tsz.Api/Tsz.Api.csproj" />
     <Project Path="packages/api/Tsz.Infrastructure/Tsz.Infrastructure.csproj" />
+    <Project Path="packages/api/Tsz.SharedKernel/Tsz.SharedKernel.csproj" />
     <Project Path="packages/api/Tsz.Api.Tests/Tsz.Api.Tests.csproj" />
     <Project Path="packages/api/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj" />
+  </Folder>
+  <Folder Name="/api/Modules/">
+    <Project Path="packages/api/Modules/Users/Tsz.Modules.Users/Tsz.Modules.Users.csproj" />
+    <Project Path="packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj" />
+    <Project Path="packages/api/Modules/Customers/Tsz.Modules.Customers/Tsz.Modules.Customers.csproj" />
+    <Project Path="packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj" />
   </Folder>
 </Solution>

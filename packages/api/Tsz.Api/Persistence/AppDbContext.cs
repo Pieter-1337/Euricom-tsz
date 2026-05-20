@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Tsz.Modules.Customers;
+using Tsz.Modules.Users;
 
 namespace Tsz.Api.Persistence;
 
@@ -10,6 +12,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UsersModule).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomersModule).Assembly);
     }
 }

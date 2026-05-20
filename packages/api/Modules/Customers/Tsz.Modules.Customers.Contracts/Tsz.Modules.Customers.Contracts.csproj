@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Tsz.SharedKernel\Tsz.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Tsz.Infrastructure\Tsz.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

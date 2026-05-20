@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-05-20
+
+refactor: extract domain modules to separate assemblies with boundary enforcement
+
+Restructure packages/api from a monolithic single-assembly layout to a
+modular monolith with csproj-enforced module boundaries. Single API host,
+single DB context, and single schema remain unchanged; only code organization
+evolves.
+
+Key changes:
+- Create Tsz.SharedKernel for value types (Countries enum)
+- Create Tsz.Modules.Users (impl) + Tsz.Modules.Users.Contracts (public surface)
+- Create Tsz.Modules.Customers (impl) + Tsz.Modules.Customers.Contracts (public)
+- Move Users/Customers domain logic into their respective assemblies
+- Add IModule abstraction for consistent registration and endpoint routing
+- Refactor cross-module coupling: UpdateUserValidator now injects
+  ICustomerDirectory instead of querying RepositoryFor<Customer>;
+  CreateCustomerValidator now injects IUserDirectory instead of
+  RepositoryFor<User>. Both directory interfaces provide minimal,
+  stable contracts for cross-module checks.
+- Update AppDbContext.OnModelCreating to apply configs from both module
+  assemblies via ApplyConfigurationsFromAssembly
+- Refactor Program.cs to instantiate modules explicitly and call their
+  RegisterServices + MapEndpoints methods
+- Update all test files to reference new module namespaces
+- Fix malformed appsettings.json (missing comma and brace)
+
+No schema migrations needed; existing migrations remain in Tsz.Api.
+
+Tests: 159 unit tests pass, 61 integration tests pass.
+
 ## 2026-05-19
 
 feat: add client manager support to customers

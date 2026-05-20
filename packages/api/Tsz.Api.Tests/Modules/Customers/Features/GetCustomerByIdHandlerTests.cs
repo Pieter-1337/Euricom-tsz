@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Api.Modules.Customers;
-using Tsz.Api.Modules.Customers.Features;
+using Tsz.Modules.Customers.Domain.Customers;
+using Tsz.Modules.Customers.Features;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Tests.Modules.Customers.Features;

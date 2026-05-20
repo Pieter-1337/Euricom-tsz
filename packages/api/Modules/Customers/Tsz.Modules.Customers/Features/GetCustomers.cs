@@ -1,0 +1,16 @@
+using Tsz.Infrastructure.Abstractions;
+using Tsz.Modules.Customers.Domain.Customers;
+
+namespace Tsz.Modules.Customers.Features;
+
+public sealed record GetCustomersQuery : IQuery<IReadOnlyList<CustomerDto>>;
+
+public sealed class GetCustomersHandler(IUnitOfWork uow)
+    : IQueryHandler<GetCustomersQuery, IReadOnlyList<CustomerDto>>
+{
+    public async Task<IReadOnlyList<CustomerDto>> HandleAsync(GetCustomersQuery query, CancellationToken ct = default)
+    {
+        var customers = await uow.RepositoryFor<Customer>().GetAllAsDtosAsync<CustomerDto>(ct: ct);
+        return customers.ToList();
+    }
+}
