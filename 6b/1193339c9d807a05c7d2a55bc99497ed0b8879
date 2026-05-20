@@ -1,0 +1,65 @@
+.claude/skills/tsz-backend-slice/SKILL.md
+  s_3f718ff5f21237::t_ffc43c123e2920 172-202
+  s_3f718ff5f21237::t_9ba2fcc365021f 20
+  s_3f718ff5f21237::t_aac9319c63832e 99-101
+  s_3f718ff5f21237::t_14d0e659c43da4 51-53
+  s_3f718ff5f21237::t_5073908cd679f0 118-119,121-124,126-127,129-130,132-141,143-149
+  s_3f718ff5f21237::t_f75a7aee3df69d 205-212,215-226,229-238
+packages/api/Tsz.Api.Tests/Modules/Users/Features/DeleteUserValidatorTests.cs
+  s_6998d7b4ed3320::t_98d9e18b06d78e 7
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerValidatorTests.cs
+  s_6998d7b4ed3320::t_93bc97936c991b 8
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Queries/IsUserReferencedAsClientManagerQuery.cs
+  s_6998d7b4ed3320::t_9432aed9db9248 1-5
+packages/api/Modules/Users/Tsz.Modules.Users/CrossModule/UserExistsQueryHandler.cs
+  s_6998d7b4ed3320::t_33b4204b983a59 1-11
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerValidatorTests.cs
+  s_6998d7b4ed3320::t_9c2e6607701c3f 6
+packages/api/Modules/Customers/Tsz.Modules.Customers/CrossModule/IsUserReferencedAsClientManagerQueryHandler.cs
+  s_6998d7b4ed3320::t_d974246935beea 1-12
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/CreateCustomer.cs
+  s_6998d7b4ed3320::t_9fb1a3aa2853d8 6
+packages/api/Modules/Users/Tsz.Modules.Users/Features/UpdateUser.cs
+  s_6998d7b4ed3320::t_a1da5fc71df262 5
+packages/api/Modules/Users/Tsz.Modules.Users/Features/DeleteUser.cs
+  s_6998d7b4ed3320::t_f78b1b4c5f9093 6
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Queries/UserExistsQuery.cs
+  s_6998d7b4ed3320::t_43a1509e2b468d 1-5
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserValidatorTests.cs
+  s_6998d7b4ed3320::t_180c5053dc0e93 7
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Queries/UserHasRoleQuery.cs
+  s_6998d7b4ed3320::t_c8927b29865135 1-5
+packages/api/Modules/Users/Tsz.Modules.Users/CrossModule/UserHasRoleQueryHandler.cs
+  s_6998d7b4ed3320::t_df1dc3bf2cd767 1-13
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/UpdateCustomer.cs
+  s_6998d7b4ed3320::t_8c64b4f420c961 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "6b1193339c9d807a05c7d2a55bc99497ed0b8879",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_6998d7b4ed3320": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ace6b359-cad8-426b-812c-baded9d6e406",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
