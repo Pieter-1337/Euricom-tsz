@@ -1,0 +1,155 @@
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerHandlerTests.cs
+  s_3f718ff5f21237::t_35cde9a3091c04 4
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetCurrentUserHandlerTests.cs
+  s_3f718ff5f21237::t_022c4a6451b9a0 3,5
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/UserRoleAssignment.cs
+  s_3f718ff5f21237::t_015f49ba2a2e10 1-8
+packages/api/Tsz.Api.Tests/Modules/Users/Features/DeleteUserHandlerTests.cs
+  s_3f718ff5f21237::t_26612ab0ebd679 4
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerValidatorTests.cs
+  s_3f718ff5f21237::t_278ffd49a24ab4 3
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetCurrentUser.cs
+  s_3f718ff5f21237::t_b2fe20d4892b57 2-3
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/Address.cs
+  s_3f718ff5f21237::t_cb4818659c25fa 1-24
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerHandlerTests.cs
+  s_3f718ff5f21237::t_752da23ff88095 3
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/UserDto.cs
+  s_3f718ff5f21237::t_fdcde0d2f7c60c 1-20
+packages/api/Tsz.Api.Tests/Builders/CustomerBuilder.cs
+  s_3f718ff5f21237::t_a5731992564c8c 1
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/DeleteCustomer.cs
+  s_3f718ff5f21237::t_065547196031f6 5
+packages/api/Tsz.Api.Tests/Builders/UserLeaveBuilder.cs
+  s_3f718ff5f21237::t_9c9a92a924bc8a 1
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/DeleteCustomerHandlerTests.cs
+  s_3f718ff5f21237::t_f3e2a3c9c5049f 3
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/ContactPerson.cs
+  s_3f718ff5f21237::t_38bdca20ef23f5 1-15
+packages/api/Tsz.Api.Tests/Builders/LeaveTypeBuilder.cs
+  s_3f718ff5f21237::t_b02d54c71a8cc3 1-2
+packages/api/Modules/Users/Tsz.Modules.Users/Endpoints/UserEndpoints.cs
+  s_3f718ff5f21237::t_7748da9fb3ae41 1-115
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetUserLeaves.cs
+  s_3f718ff5f21237::t_9b2b67579a73d4 2-3
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/GetCustomersPaged.cs
+  s_3f718ff5f21237::t_26062285b12bd7 4
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserLeavesValidatorTests.cs
+  s_3f718ff5f21237::t_36cf5fab816f4b 5-6
+packages/api/Modules/Users/Tsz.Modules.Users/UsersModule.cs
+  s_3f718ff5f21237::t_ccedccc1ae1871 7,9-10
+packages/api/Tsz.Api.Tests.Integration/CustomerEndpointsTests.cs
+  s_3f718ff5f21237::t_20f66c82be58d6 4,7
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/LeaveTypes/LeaveTypeConfiguration.cs
+  s_3f718ff5f21237::t_cbb87c5ed2c1e0 1-42
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUserLeavesHandlerTests.cs
+  s_3f718ff5f21237::t_e499d5b369ead5 5-6
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerValidatorTests.cs
+  s_3f718ff5f21237::t_5244f43205e251 5
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserLeavesHandlerTests.cs
+  s_3f718ff5f21237::t_1e871d076ac7f6 5-6
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/UserLeaveConfiguration.cs
+  s_3f718ff5f21237::t_4cafcd70388b06 1-32
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/CustomerConfiguration.cs
+  s_3f718ff5f21237::t_db00dfaff25fe4 1-44
+packages/api/Tsz.Api.Tests/Modules/Users/Features/DeleteUserValidatorTests.cs
+  s_3f718ff5f21237::t_4832d879bce83e 9
+packages/api/Tsz.Api.Tests.Integration/UserLeaveEndpointsTests.cs
+  s_3f718ff5f21237::t_7d996ca2c6f211 5-7
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/GetCustomerById.cs
+  s_3f718ff5f21237::t_fed70d08690560 2
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/GetCustomerByIdHandlerTests.cs
+  s_3f718ff5f21237::t_700fb42b583749 4
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUserByIdHandlerTests.cs
+  s_3f718ff5f21237::t_c21f9cd09f22d6 5
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersPagedHandlerTests.cs
+  s_3f718ff5f21237::t_70b33e79965e1b 6
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/UserLeaveErrors.cs
+  s_3f718ff5f21237::t_1fbba7a1693ccd 1-17
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/CurrentUserResolver.cs
+  s_3f718ff5f21237::t_3784fbd8ad879b 1-52
+packages/api/Tsz.Api.Tests/Modules/Users/Features/CreateUserHandlerTests.cs
+  s_3f718ff5f21237::t_005a7beb96a764 5-7
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/LeaveTypes/LeaveType.cs
+  s_3f718ff5f21237::t_9e8730f0ee788b 1-22
+packages/api/Modules/Users/Tsz.Modules.Users/Features/DeleteUser.cs
+  s_3f718ff5f21237::t_9015b4971de602 8
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/IsUserReferencedAsClientManagerQueryHandler.cs
+  s_3f718ff5f21237::t_e07f27153f3a6f 3
+packages/api/Tsz.Api.Tests/Modules/Users/Features/CreateUserValidatorTests.cs
+  s_3f718ff5f21237::t_873eac487b61ea 5
+packages/api/Modules/Users/Tsz.Modules.Users/Features/CreateUser.cs
+  s_3f718ff5f21237::t_46fd12f7ebb592 5-7
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetUserById.cs
+  s_3f718ff5f21237::t_650fe5ac4a6269 2
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/CustomerDto.cs
+  s_3f718ff5f21237::t_f8eb72442a1088 1-36
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/User.cs
+  s_3f718ff5f21237::t_65c8333c094e7f 1-67
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/Customer.cs
+  s_3f718ff5f21237::t_f23cb3ef3d75b6 1-37
+packages/api/Modules/Users/Tsz.Modules.Users/Features/UserExistsQueryHandler.cs
+  s_3f718ff5f21237::t_072c60e2873ed4 3
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserValidatorTests.cs
+  s_3f718ff5f21237::t_14a8f51281f376 9
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/GetCustomers.cs
+  s_3f718ff5f21237::t_48cb17a92789c7 2
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/CustomerErrors.cs
+  s_3f718ff5f21237::t_937aa36bb2ec19 1-22
+packages/api/Modules/Users/Tsz.Modules.Users/Features/UpdateUser.cs
+  s_3f718ff5f21237::t_f3e4cc358cfc0a 7
+packages/api/Modules/Users/Tsz.Modules.Users/Features/UpdateUserLeaves.cs
+  s_3f718ff5f21237::t_123819976cdfef 5-6
+packages/api/Modules/Customers/Tsz.Modules.Customers/Endpoints/CustomerEndpoints.cs
+  s_3f718ff5f21237::t_1a3198a21eb480 1-74
+packages/api/Tsz.Api.Tests/Modules/Users/Features/UpdateUserHandlerTests.cs
+  s_3f718ff5f21237::t_0ce03da42f73a5 4
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/UserLeave.cs
+  s_3f718ff5f21237::t_6f046190202c8c 1-25
+packages/api/Modules/Customers/Tsz.Modules.Customers/CustomersModule.cs
+  s_3f718ff5f21237::t_e73373c00d7613 6
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/LeaveAllowed.cs
+  s_3f718ff5f21237::t_94092fdc0d8fd3 1-8
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/RequireAdminAuthorizationHandler.cs
+  s_3f718ff5f21237::t_07b47f4868c54a 1-19
+packages/api/Modules/Users/Tsz.Modules.Users/Seeding/UserSeeder.cs
+  s_3f718ff5f21237::t_0a18ad1414fb9a 1-46
+packages/api/Modules/Users/Tsz.Modules.Users/Features/UserHasRoleQueryHandler.cs
+  s_3f718ff5f21237::t_492740bff65d50 3
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Users/UserConfiguration.cs
+  s_3f718ff5f21237::t_d50ec5bf5a6a17 1-47
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetUsersPaged.cs
+  s_3f718ff5f21237::t_e8373bde60abc0 5
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/UpdateCustomer.cs
+  s_3f718ff5f21237::t_64b8e5dc519ec6 4
+packages/api/Tsz.Api.Tests/Builders/UserBuilder.cs
+  s_3f718ff5f21237::t_f0380aa00e7451 3
+packages/api/Tsz.Api.Tests.Integration/UserEndpointsTests.cs
+  s_3f718ff5f21237::t_ec46bec0b108e3 4,7-8
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetUsers.cs
+  s_3f718ff5f21237::t_345ac00aea77c3 4
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/CreateCustomer.cs
+  s_3f718ff5f21237::t_e0f8456c46b939 4
+packages/api/Modules/Users/Tsz.Modules.Users/Domain/Leaves/UserLeaveDto.cs
+  s_3f718ff5f21237::t_47210069c2fe08 1-33
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersHandlerTests.cs
+  s_3f718ff5f21237::t_a151fdaf0b6b6e 5
+packages/api/Tsz.Api/Program.cs
+  s_3f718ff5f21237::t_c1707f3f4ba0ce 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "bd415792ce3a13f59f0f9bbaa67809949c54e717",
+  "prompts": {},
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
