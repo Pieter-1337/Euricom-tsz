@@ -1,0 +1,87 @@
+using FluentValidation;
+using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Validation;
+using Tsz.Modules.Customers.Domain.Customers;
+using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Contracts.Queries;
+using Tsz.SharedKernel;
+
+namespace Tsz.Modules.Customers.Features;
+
+public sealed record CreateCustomerCommand(
+    string Name,
+    ContactPersonDto ContactPerson,
+    AddressDto? Address,
+    Guid? ClientManagerId)
+    : ICommand<CustomerDto>;
+
+public sealed class CreateCustomerValidator : AbstractValidator<CreateCustomerCommand>
+{
+    private readonly IUsersAccessModule _users;
+
+    public CreateCustomerValidator(IUsersAccessModule users)
+    {
+        _users = users;
+
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
+
+        RuleFor(x => x.ContactPerson).NotNull();
+        When(x => x.ContactPerson is not null, () =>
+        {
+            RuleFor(x => x.ContactPerson.Email)
+                .NotEmpty()
+                .EmailAddress()
+                .MaximumLength(256);
+            RuleFor(x => x.ContactPerson.Name).MaximumLength(256);
+        });
+
+        When(x => x.Address is not null, () =>
+        {
+            RuleFor(x => x.Address!.Street).MaximumLength(256);
+            RuleFor(x => x.Address!.Zip).MaximumLength(32);
+            RuleFor(x => x.Address!.City).MaximumLength(128);
+            RuleFor(x => x.Address!.Country)
+                .Must(c => string.IsNullOrEmpty(c) || Countries.IsValid(c))
+                .WithMessage("Country must be a valid ISO 3166-1 alpha-2 code.");
+        });
+
+        When(x => x.ClientManagerId is not null, () =>
+        {
+            RuleFor(x => x.ClientManagerId!.Value)
+                .MustAsync(UserExists)
+                    .WithError(CustomerErrors.ClientManagerNotFound)
+                .MustAsync(UserHasClientManagerRole)
+                    .WithError(CustomerErrors.ClientManagerMissingRole);
+        });
+    }
+
+    private Task<bool> UserExists(Guid id, CancellationToken ct) =>
+        _users.ExecuteQueryAsync(new UserExistsQuery(id), ct);
+
+    private Task<bool> UserHasClientManagerRole(Guid id, CancellationToken ct) =>
+        _users.ExecuteQueryAsync(new UserHasRoleQuery(id, UserRole.ClientManager), ct);
+}
+
+public sealed class CreateCustomerHandler(IUnitOfWork uow)
+    : ICommandHandler<CreateCustomerCommand, CustomerDto>
+{
+    public async Task<CustomerDto> HandleAsync(CreateCustomerCommand command, CancellationToken ct = default)
+    {
+        var repo = uow.RepositoryFor<Customer>();
+
+        var existing = await repo.GetAllAsListAsync(ct: ct, ignoreQueryFilters: true);
+        var nextNumber = existing.Count() == 0 ? 1 : existing.Max(c => c.Number) + 1;
+
+        var address = command.Address is null
+            ? Address.Empty
+            : Address.Create(command.Address.Street, command.Address.Zip, command.Address.City, command.Address.Country);
+
+        var contact = ContactPerson.Create(command.ContactPerson.Name, command.ContactPerson.Email);
+
+        var customer = Customer.Create(nextNumber, command.Name.Trim(), contact, address, command.ClientManagerId);
+        repo.Add(customer);
+
+        await uow.SaveChangesAsync(ct);
+        return CustomerDto.ToDto(customer);
+    }
+}
