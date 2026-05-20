@@ -1,0 +1,19 @@
+CHANGELOG.md
+  s_0b31058427e723::t_3989fe8c6c928d 783-791
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "f129698345f4ec32f676c8109d9ffebce0b9acce",
+  "prompts": {},
+  "sessions": {
+    "s_0b31058427e723": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d9173979-3ebe-42a2-bc8e-cf9221e8c8ec",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
