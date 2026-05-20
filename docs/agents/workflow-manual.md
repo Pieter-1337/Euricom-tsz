@@ -14,7 +14,7 @@ Step-by-step chain from idea to commit. Use when you want a human in the loop at
 ```
 PLAN SIDE
   /matt-grill-me           interview-style planning
-  /matt-to-prd             publish PRD to issue tracker
+  /matt-to-prd             publish PRD as draft issue to tracker
   human review
   /matt-to-issues          break PRD into tracer-bullet issues
   /matt-triage             (optional) move issues through ready states
@@ -39,10 +39,10 @@ Interview-style discovery. The skill asks questions one at a time, walking down 
 User-invocable only — won't trigger automatically. Run when you know you need to think a change through before touching code.
 
 ### 2. `/matt-to-prd`
-Compacts the grill session into a PRD and publishes it as an issue on the tracker. Use the PRD's URL as the source of truth for the rest of the chain.
+Compacts the grill session into a PRD and publishes it as a **draft issue** on the tracker. The tracker is the review surface — the PRD lives there as a living document while it's being sharpened. Use the issue's URL as the source of truth for the rest of the chain.
 
 ### 3. Human review
-Read the PRD. Sharpen, redirect, or kill scope here before it becomes issues.
+Read the PRD on the tracker. Sharpen, redirect, or kill scope here — directly via comments/edits on the issue — before it becomes implementation issues.
 
 ### 4. `/matt-to-issues`
 Splits the PRD into independently-grabbable issues using tracer-bullet vertical slices. Each issue should be small enough that one session can finish it.

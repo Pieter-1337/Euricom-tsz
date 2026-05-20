@@ -2,6 +2,26 @@
 
 ## 2026-05-20
 
+docs: configure GitHub as issue tracker for matt-* skills
+
+Wire Pieter-1337/Euricom-tsz up as the issue tracker used by the
+matt-to-prd, matt-to-issues, and matt-triage skills, replacing the
+missing /setup-matt-pocock-skills bootstrap step.
+
+- Add docs/agents/tracker.md documenting the tracker repo, gh
+  commands, and the canonical->GitHub label mapping (1:1, no
+  translation needed)
+- Reference tracker.md from CLAUDE.md so skills pick it up
+- Clarify in workflow-manual.md that /matt-to-prd publishes a
+  draft issue and that the tracker itself is the review surface
+- Allow `gh label create*` in .claude/settings.json so the
+  triage labels can be provisioned without re-prompting
+- Fix app-do-work SKILL frontmatter name to match its skill name
+
+The four missing triage labels (needs-triage, needs-info,
+ready-for-agent, ready-for-human) were created on the GitHub repo
+outside this commit.
+
 refactor: extract domain modules to separate assemblies with boundary enforcement
 
 Restructure packages/api from a monolithic single-assembly layout to a

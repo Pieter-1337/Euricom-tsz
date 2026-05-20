@@ -9,3 +9,4 @@ This is a monorepo with TypeScript and C#
 - This project follows the Euricom Tech Tribes design system. Read `packages/web/docs/DESIGN.md` before styling any new component or page.
 - When reporting back be concise and sacrifice grammar for conciseness
 - Spawn subagents if needed keep context as lean as possible (important!)
+- For the `matt-*` skills (`matt-to-prd`, `matt-to-issues`, `matt-triage`), the issue tracker and label vocabulary are documented in `docs/agents/tracker.md` — read it instead of running `/setup-matt-pocock-skills`

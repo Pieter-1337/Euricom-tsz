@@ -1,5 +1,5 @@
 ---
-name: do-work
+name: app-do-work
 description: Execute a unit of work end-to-end: plan, implement, validate with typecheck and tests, then commit. Use when user wants to do work, build a feature, fix a bug, or implement a phase from a plan.
 argument-hint: '[issue-file] — path to an issue markdown file.'
 disable-model-invocation: true
