@@ -38,12 +38,5 @@ public sealed class GetUsersPagedHandler(IUnitOfWork uow)
     ];
 
     public Task<KeysetPage<UserDto>> HandleAsync(GetUsersPagedQuery query, CancellationToken ct = default) =>
-        uow.RepositoryFor<User>().GetPagedAsync(
-            query,
-            Sort,
-            Searchable,
-            UserDto.Project,
-            filter: query.DeletedOnly ? u => u.DeletedAt != null : null,
-            ct: ct,
-            ignoreQueryFilters: query.DeletedOnly);
+        uow.RepositoryFor<User>().GetPagedAsync(query, Sort, Searchable, UserDto.Project, ct);
 }

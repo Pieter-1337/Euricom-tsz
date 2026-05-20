@@ -2,7 +2,7 @@ using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Modules.Customers.Domain.Customers;
 
-public class Customer : IEntityBase
+public class Customer : ISoftDeletable
 {
     public Guid Id { get; set; }
     public int Number { get; private set; }
