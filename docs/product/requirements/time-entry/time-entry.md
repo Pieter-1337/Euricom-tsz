@@ -16,7 +16,8 @@
 - You can submit the week for approval (week will be marked as 'approved)
 
 **Out of Scope:**
+
 - Add km
 - Comments
 
-<img src="../images/user-time-entries.png" alt="Time Entry" width="600">
+<img src="../../images/user-time-entries.png" alt="Time Entry" width="600">

@@ -1,6 +1,6 @@
 # Leave Overview
 
-<img src="../images/user-leave-overview.png" alt="Leave Overview" width="600">
+<img src="../../images/user-leave-overview.png" alt="Leave Overview" width="600">
 
 **Prio 1:**
 
@@ -9,5 +9,6 @@
 - Indication of the current date, weekend
 
 **Prio 2**
+
 - Indication of the school & work holidays (auto retrieved via https://www.openholidaysapi.org/en/)
 - When clicking on a day, the time entry page is opened for that week

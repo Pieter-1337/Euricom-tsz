@@ -138,6 +138,36 @@ public class GetUsersPagedHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task Search_MatchesRoleName_FindsClientManager()
+    {
+        var manager = User.Create("Alice", "Smith", "alice@x.com", [UserRole.ClientManager]);
+        var regular = User.Create("Bob", "Jones", "bob@x.com", [UserRole.User]);
+        var admin = User.Create("Carol", "Doe", "carol@x.com", [UserRole.Admin]);
+        var handler = BuildHandler([manager, regular, admin]);
+
+        var page = await handler.HandleAsync(PagedQuery(search: "client"));
+
+        page.Items.Count.ShouldBe(1);
+        page.Items[0].Email.ShouldBe("alice@x.com");
+    }
+
+    [Fact]
+    public async Task Search_MatchesRoleName_OrsWithColumnMatches()
+    {
+        var matchByRole = User.Create("Zelda", "Ng", "z@x.com", [UserRole.ClientManager]);
+        var matchByEmail = User.Create("Sam", "Yu", "client.support@x.com", [UserRole.User]);
+        var noMatch = User.Create("Bob", "Jones", "bob@x.com", [UserRole.User]);
+        var handler = BuildHandler([matchByRole, matchByEmail, noMatch]);
+
+        var page = await handler.HandleAsync(PagedQuery(search: "client"));
+
+        // "client" matches both ClientManager (role) and the email column.
+        page.Items.Count.ShouldBe(2);
+        page.Items.Select(u => u.Email).ShouldContain("z@x.com");
+        page.Items.Select(u => u.Email).ShouldContain("client.support@x.com");
+    }
+
+    [Fact]
     public async Task Sort_ByEmailDesc_OrderIsCorrect()
     {
         var a = User.Create("A", "A", "aaa@example.com", [UserRole.User]);
@@ -269,13 +299,13 @@ public class GetUsersPagedHandlerTests : IDisposable
         public Task<KeysetPage<TDto>> GetPagedAsync<TDto>(
             KeysetQueryOptions options,
             SortMap<User> sortMap,
-            Expression<Func<User, string>>[] searchableColumns,
+            SearchableField<User>[] searchableFields,
             Expression<Func<User, TDto>> projection,
             Expression<Func<User, bool>>? filter = null,
             CancellationToken ct = default,
             bool ignoreQueryFilters = false)
             => GetAll(filter, ignoreQueryFilters)
-                .ToKeysetPageAsync(options, sortMap, searchableColumns, projection, ct);
+                .ToKeysetPageAsync(options, sortMap, searchableFields, projection, ct);
 
         public Task<IEnumerable<User>> GetAllAsListAsync(Expression<Func<User, bool>>? filter = null, CancellationToken ct = default, bool ignoreQueryFilters = false) => throw new NotImplementedException();
         public Task<IEnumerable<TDto>> GetAllAsDtosAsync<TDto>(Expression<Func<User, bool>>? filter = null, CancellationToken ct = default, bool ignoreQueryFilters = false) where TDto : class, IEntityDto<User, TDto> => throw new NotImplementedException();

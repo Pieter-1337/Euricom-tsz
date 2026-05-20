@@ -29,11 +29,12 @@ public sealed class GetUsersPagedHandler(IUnitOfWork uow)
         new SortColumn<User>("name", (Expression<Func<User, string>>)(u => u.FirstName), typeof(string)),
         new SortColumn<User>("email", (Expression<Func<User, string>>)(u => u.Email), typeof(string)));
 
-    private static readonly Expression<Func<User, string>>[] Searchable =
+    private static readonly SearchableField<User>[] Searchable =
     [
-        u => u.FirstName,
-        u => u.LastName,
-        u => u.Email,
+        SearchableField<User>.Column(u => u.FirstName),
+        SearchableField<User>.Column(u => u.LastName),
+        SearchableField<User>.Column(u => u.Email),
+        SearchableField<User>.Column<UserRole>(u => u.RoleAssignments.Select(r => r.Role)),
     ];
 
     public Task<KeysetPage<UserDto>> HandleAsync(GetUsersPagedQuery query, CancellationToken ct = default) =>

@@ -29,12 +29,12 @@ public sealed class GetCustomersPagedHandler(IUnitOfWork uow)
         new SortColumn<Customer>("city", (Expression<Func<Customer, string?>>)(c => c.Address.City), typeof(string)),
         new SortColumn<Customer>("contactEmail", (Expression<Func<Customer, string>>)(c => c.ContactPerson.Email), typeof(string)));
 
-    private static readonly Expression<Func<Customer, string>>[] Searchable =
+    private static readonly SearchableField<Customer>[] Searchable =
     [
-        c => c.Name,
-        c => c.ContactPerson.Email,
-        c => c.ContactPerson.Name!,
-        c => c.Address.City!,
+        SearchableField<Customer>.Column(c => c.Name),
+        SearchableField<Customer>.Column(c => c.ContactPerson.Email),
+        SearchableField<Customer>.Column(c => c.ContactPerson.Name!),
+        SearchableField<Customer>.Column(c => c.Address.City!),
     ];
 
     public Task<KeysetPage<CustomerDto>> HandleAsync(GetCustomersPagedQuery query, CancellationToken ct = default) =>

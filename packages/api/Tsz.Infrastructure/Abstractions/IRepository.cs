@@ -62,7 +62,7 @@ public interface IRepository<TEntity> where TEntity : class, IEntityBase
     Task<KeysetPage<TDto>> GetPagedAsync<TDto>(
         KeysetQueryOptions options,
         SortMap<TEntity> sortMap,
-        Expression<Func<TEntity, string>>[] searchableColumns,
+        SearchableField<TEntity>[] searchableFields,
         Expression<Func<TEntity, TDto>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         CancellationToken ct = default,

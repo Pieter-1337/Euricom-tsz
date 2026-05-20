@@ -9,7 +9,7 @@ public static class KeysetQueryableExtensions
         this IQueryable<TEntity> baseQuery,
         KeysetQueryOptions opts,
         SortMap<TEntity> sortMap,
-        Expression<Func<TEntity, string>>[] searchableColumns,
+        SearchableField<TEntity>[] searchableFields,
         Expression<Func<TEntity, TDto>> projection,
         CancellationToken ct = default)
     {
@@ -18,7 +18,7 @@ public static class KeysetQueryableExtensions
             throw new ArgumentException($"Unknown sort key '{opts.SortBy}'.", nameof(opts));
 
         // Step 2: Apply search predicate.
-        var filteredQuery = ApplySearch(baseQuery, opts.Search, searchableColumns);
+        var filteredQuery = ApplySearch(baseQuery, opts.Search, searchableFields);
 
         // Step 7: Kick off count in parallel — filtered query, no cursor / order / take.
         var countTask = filteredQuery.CountAsync(ct);
@@ -69,31 +69,22 @@ public static class KeysetQueryableExtensions
     private static IQueryable<TEntity> ApplySearch<TEntity>(
         IQueryable<TEntity> query,
         string? search,
-        Expression<Func<TEntity, string>>[] columns)
+        SearchableField<TEntity>[] fields)
     {
-        if (string.IsNullOrWhiteSpace(search) || columns.Length == 0)
+        if (string.IsNullOrWhiteSpace(search) || fields.Length == 0)
             return query;
 
         var term = search.ToLower();
-        var param = Expression.Parameter(typeof(TEntity), "e");
-        Expression? predicate = null;
+        var predicate = PredicateBuilder.BaseOr<TEntity>();
 
-        var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
-        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), [typeof(string)])!;
-
-        foreach (var col in columns)
+        foreach (var field in fields)
         {
-            var rebound = RebindParameter(col.Body, col.Parameters[0], param);
-            var lower = Expression.Call(rebound, toLowerMethod);
-            var contains = Expression.Call(lower, containsMethod, Expression.Constant(term));
-
-            predicate = predicate is null ? contains : Expression.OrElse(predicate, contains);
+            var lambda = field.Build(term);
+            if (lambda is null) continue;
+            predicate = predicate.Or(lambda);
         }
 
-        if (predicate is null)
-            return query;
-
-        return query.Where(Expression.Lambda<Func<TEntity, bool>>(predicate, param));
+        return predicate.EqualsBaseOr() ? query : query.Where(predicate);
     }
 
     // ── Cursor predicate ──────────────────────────────────────────────────────
@@ -105,7 +96,7 @@ public static class KeysetQueryableExtensions
         SortDirection dir)
     {
         var param = Expression.Parameter(typeof(TEntity), "e");
-        var sortBody = RebindParameter(sortCol.Selector.Body, sortCol.Selector.Parameters[0], param);
+        var sortBody = sortCol.Selector.Body.Replace(sortCol.Selector.Parameters[0], param);
         var idProp = Expression.Property(param, "Id");
 
         var sortValue = DeserializeSortValue(cursor.SortValue, sortCol.ClrType);
@@ -153,7 +144,7 @@ public static class KeysetQueryableExtensions
         SortDirection dir)
     {
         var param = Expression.Parameter(typeof(TEntity), "e");
-        var sortBody = RebindParameter(sortCol.Selector.Body, sortCol.Selector.Parameters[0], param);
+        var sortBody = sortCol.Selector.Body.Replace(sortCol.Selector.Parameters[0], param);
         var idProp = Expression.Property(param, "Id");
         var sortLambda = Expression.Lambda(sortBody, param);
         var idLambda = Expression.Lambda<Func<TEntity, Guid>>(idProp, param);
@@ -190,7 +181,7 @@ public static class KeysetQueryableExtensions
         SortColumn<TEntity> sortCol)
     {
         var param = Expression.Parameter(typeof(TEntity), "e");
-        var sortBody = RebindParameter(sortCol.Selector.Body, sortCol.Selector.Parameters[0], param);
+        var sortBody = sortCol.Selector.Body.Replace(sortCol.Selector.Parameters[0], param);
         var idProp = Expression.Property(param, "Id");
 
         // Box the sort value to object so one projection type covers all column types.
@@ -203,19 +194,6 @@ public static class KeysetQueryableExtensions
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private static Expression RebindParameter(
-        Expression body,
-        ParameterExpression oldParam,
-        ParameterExpression newParam)
-        => new ParameterRebinder(oldParam, newParam).Visit(body);
-
-    private sealed class ParameterRebinder(ParameterExpression oldParam, ParameterExpression newParam)
-        : ExpressionVisitor
-    {
-        protected override Expression VisitParameter(ParameterExpression node)
-            => node == oldParam ? newParam : base.VisitParameter(node);
-    }
 
     private static object? DeserializeSortValue(JsonElement element, Type clrType)
     {

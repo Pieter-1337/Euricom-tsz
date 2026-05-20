@@ -3,6 +3,7 @@
 A list of a users
 
 Fields:
+
 - Name
 - Email
 - Role (Admin, User, Client Manager)
@@ -18,14 +19,14 @@ Fields:
 
 **User list**
 
-<img src="../images/admin-user-list.png" alt="Users" width="600">
+<img src="../../images/admin-user-list.png" alt="Users" width="600">
 
 **User Settings**
 
-<img src="../images/admin-user-setting.png" alt="Users" width="600">
+<img src="../../images/admin-user-setting.png" alt="Users" width="600">
 
 **Leave**
 
-<img src="../images/admin-user-leave-sickness.png" alt="Settings" width="300">
+<img src="../../images/admin-user-leave-sickness.png" alt="Settings" width="300">
 
-<img src="../images/admin-user-leave.png" alt="Settings" width="300">
+<img src="../../images/admin-user-leave.png" alt="Settings" width="300">

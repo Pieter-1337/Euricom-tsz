@@ -33,8 +33,8 @@ internal static class WidgetSortMap
     public static readonly Expression<Func<Widget, WidgetDto>> Projection =
         w => new WidgetDto(w.Id, w.Name, w.Score);
 
-    public static readonly Expression<Func<Widget, string>>[] SearchColumns =
-        [(Expression<Func<Widget, string>>)(w => w.Name)];
+    public static readonly SearchableField<Widget>[] SearchColumns =
+        [SearchableField<Widget>.Column(w => w.Name)];
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────

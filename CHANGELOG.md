@@ -2,6 +2,13 @@
 
 ## 2026-05-19
 
+feat: add client manager support to customers
+
+Add optional ClientManagerId field to customers to track the assigned
+client manager. Updates Customer entity, EF configuration, API
+endpoints, and UI forms to support managing the client manager
+assignment. Includes migration and comprehensive tests.
+
 feat: support multiple roles per user
 
 Refactor user model from single role to role collection. Update handlers,
@@ -54,6 +61,20 @@ style: apply linter formatting to web files
 
 Reformat ~10 web files for line length and collapsing (printWidth 120).
 Changes are purely formatting: no behavior change.
+
+feat: add search field filtering to keyset pagination
+
+Introduce PredicateBuilder and SearchableField abstractions to enable
+flexible, type-safe search term filtering across EF Core queries. Users
+can define searchable columns (string with Contains, or enums with name
+matching) without rebuilding predicates manually.
+
+Update KeysetQueryableExtensions to accept optional filter predicates.
+Refactor GetUsersPaged and GetCustomersPaged endpoints to leverage
+searchable fields for user-driven filtering. Add comprehensive tests
+for keyset paging with search terms.
+
+Also update product requirement docs to reflect search capability.
 
 ## 2026-05-18
 
