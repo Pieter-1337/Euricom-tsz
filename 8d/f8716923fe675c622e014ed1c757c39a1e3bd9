@@ -1,0 +1,28 @@
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj
+  s_3f718ff5f21237::t_5a04a50efe41af 11
+packages/api/Tsz.SharedKernel/Countries.cs
+  s_3f718ff5f21237::t_53de33a03f3d7b 1-3
+packages/api/Modules/Customers/Tsz.Modules.Customers/Tsz.Modules.Customers.csproj
+  s_3f718ff5f21237::t_5ca2b5dd22b981 1-26,31-33
+  s_3f718ff5f21237::t_40cec75a8dda74 27-30
+packages/api/Modules/Users/Tsz.Modules.Users/Tsz.Modules.Users.csproj
+  s_3f718ff5f21237::t_e4f09c8f383bbb 27-29
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj
+  s_3f718ff5f21237::t_10b7afb338a77f 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "8df8716923fe675c622e014ed1c757c39a1e3bd9",
+  "prompts": {},
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
