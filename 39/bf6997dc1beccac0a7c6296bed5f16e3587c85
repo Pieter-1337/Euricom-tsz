@@ -1,0 +1,76 @@
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj.nuget.dgspec.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-736
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users/project.nuget.cache
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-15
+packages/api/Tsz.Api/Tsz.Api.csproj
+  s_3f718ff5f21237::t_d4402c6dc4926d 18-19
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts.csproj
+  s_3f718ff5f21237::t_c61b02f1c24903 1-19
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj.nuget.g.props
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-16
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj.nuget.g.props
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-16
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users/Tsz.Modules.Users.csproj.nuget.g.props
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-19
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users/Tsz.Modules.Users.csproj.nuget.g.targets
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-2
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers/Tsz.Modules.Customers.csproj.nuget.g.props
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-19
+packages/api/Tsz.Api.Tests/Tsz.Api.Tests.csproj
+  s_3f718ff5f21237::t_c0ae7b48a28e6e 29-32
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers/Tsz.Modules.Customers.csproj.nuget.dgspec.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-2164
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj.nuget.g.targets
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-2
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj.nuget.dgspec.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-736
+packages/api/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj
+  s_3f718ff5f21237::t_6a519fd1beb268 26-29
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers/project.nuget.cache
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-15
+packages/api/Modules/Directory.Build.props
+  s_3f718ff5f21237::t_748f8da8ad5ed6 6-8
+  s_3f718ff5f21237::t_1d9cc174e07191 1-5,9-10
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers/project.assets.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-822
+packages/api/Modules/Customers/Tsz.Modules.Customers.csproj
+  s_3f718ff5f21237::t_ad94078de06f7e 1-37
+tsz.slnx
+  s_3f718ff5f21237::t_a66f1ea8acab6d 5,9-13
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users.Contracts/project.assets.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-399
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts.csproj
+  s_3f718ff5f21237::t_97d290c411bbc3 1-19
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users/project.assets.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-818
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users/Tsz.Modules.Users.csproj.nuget.dgspec.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-2161
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers.Contracts/project.assets.json
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-399
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers.Contracts/project.nuget.cache
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-8
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users.Contracts/project.nuget.cache
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-8
+packages/api/Modules/Users/Tsz.Modules.Users.csproj
+  s_3f718ff5f21237::t_58b67dd8486ba3 1-36
+packages/api/Modules/Users/.msbuild/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj.nuget.g.targets
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-2
+packages/api/Modules/Customers/.msbuild/Tsz.Modules.Customers/Tsz.Modules.Customers.csproj.nuget.g.targets
+  s_3f718ff5f21237::t_ff0b7f7057b311 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "39bf6997dc1beccac0a7c6296bed5f16e3587c85",
+  "prompts": {},
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
