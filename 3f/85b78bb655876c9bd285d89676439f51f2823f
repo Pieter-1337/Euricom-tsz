@@ -1,0 +1,34 @@
+packages/api/Tsz.Api/Tsz.Api.csproj
+  s_3f718ff5f21237::t_2aa7e4d52bb87f 19-20
+packages/api/Tsz.Api.Tests/Tsz.Api.Tests.csproj
+  s_3f718ff5f21237::t_a5540b50291092 29-32
+packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj
+  s_3f718ff5f21237::t_10b7afb338a77f 11
+tsz.slnx
+  s_3f718ff5f21237::t_c9f2e9c6e6dbc4 10-13
+packages/api/Modules/Customers/Tsz.Modules.Customers/Tsz.Modules.Customers.csproj
+  s_3f718ff5f21237::t_5ca2b5dd22b981 1-26,31-33
+  s_3f718ff5f21237::t_40cec75a8dda74 27-30
+packages/api/Modules/Users/Tsz.Modules.Users/Tsz.Modules.Users.csproj
+  s_3f718ff5f21237::t_e4f09c8f383bbb 27-29
+packages/api/Modules/Users/Tsz.Modules.Users.Contracts/Tsz.Modules.Users.Contracts.csproj
+  s_3f718ff5f21237::t_5a04a50efe41af 11
+packages/api/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj
+  s_3f718ff5f21237::t_58014dbda40b74 26-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "3f85b78bb655876c9bd285d89676439f51f2823f",
+  "prompts": {},
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
