@@ -1,0 +1,88 @@
+packages/api/Tsz.Api.Tests/Common/Pagination/KeysetQueryableExtensionsTests.cs
+  s_e2d395f959a7d1::t_970d24479307ee 36-37
+docs/product/requirements/leave-types/leave-types.md
+  h_9ef4f126c6bd1c 3
+docs/product/requirements/users/users.md
+  h_9ef4f126c6bd1c 6,22,26,30,32
+CHANGELOG.md
+  s_3f718ff5f21237::t_41cc2a9af53ea4 65-78
+  s_a6b2cdf70414a3::t_034b7dc92d2341 5-11
+packages/api/Tsz.Infrastructure/Persistence/EfCoreRepository.cs
+  s_e2d395f959a7d1::t_9c752faa07b373 96,102
+docs/product/requirements/customers/customers.md
+  h_9ef4f126c6bd1c 6,13,18
+packages/api/Tsz.Api/Modules/Users/Features/GetUsersPaged.cs
+  s_e2d395f959a7d1::t_7fb07c46c0010b 37
+  s_e2d395f959a7d1::t_e8eb2960530765 32,34-36
+docs/product/requirements/timesheets/timesheets.md
+  h_9ef4f126c6bd1c 11,18
+docs/product/requirements/leave-overview/leave-overview.md
+  h_9ef4f126c6bd1c 3,12
+packages/api/Tsz.Api/Modules/Customers/Features/GetCustomersPaged.cs
+  s_e2d395f959a7d1::t_31e4646b8c5f5a 32,34-37
+docs/product/requirements/time-entry/time-entry.md
+  h_9ef4f126c6bd1c 19,23
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetUsersPagedHandlerTests.cs
+  s_e2d395f959a7d1::t_f13b0d3f5f61d9 302,308
+  s_e2d395f959a7d1::t_8b1b64d0ffc4aa 141-157,159,161,163,165-166,168-169
+  s_e2d395f959a7d1::t_17faf8da81d0a4 158,160,162,164,167
+packages/api/Tsz.Infrastructure/Abstractions/IRepository.cs
+  s_e2d395f959a7d1::t_cbde4cde6362fe 65
+packages/api/Tsz.Infrastructure/Common/Pagination/SearchableField.cs
+  s_e2d395f959a7d1::t_aced687172b99a 1-3,8-11,13,17,20,66
+  s_e2d395f959a7d1::t_09a3ea564d7c06 4-7,12,14-16,18-19,21-25,27-47,49-65
+  s_e2d395f959a7d1::t_9db63a990d08c8 26,48
+packages/api/Tsz.Infrastructure/Common/Pagination/PredicateBuilder.cs
+  s_e2d395f959a7d1::t_15e68bb2d9857b 49
+  s_e2d395f959a7d1::t_ce365620bf6164 1-48,50-56
+packages/api/Tsz.Infrastructure/Common/Pagination/KeysetQueryableExtensions.cs
+  s_e2d395f959a7d1::t_55f720ddf4e000 99
+  s_e2d395f959a7d1::t_5dc8e38f467d8c 72,74,80
+  s_e2d395f959a7d1::t_8a9194459c3c26 82-83
+  s_e2d395f959a7d1::t_eca608b0d99272 147
+  s_e2d395f959a7d1::t_5990d19c4c0e5a 184
+  s_e2d395f959a7d1::t_4dcea8d19f8908 78,84,87
+  s_e2d395f959a7d1::t_d010194f1a3f99 12,21
+docs/product/requirements/contracts/contracts.md
+  h_9ef4f126c6bd1c 6,15,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "9fc530f8c23aae8b7355704cb9e1a85a17cdc550",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "h_d13f68990042ff": {
+      "author": "Pieter Bracke"
+    }
+  },
+  "sessions": {
+    "s_3f718ff5f21237": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f01cf59-4a12-4d01-b790-3abe8d1a33aa",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_a6b2cdf70414a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae6c54a-7bd3-42dc-8f13-7d361d736171",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_e2d395f959a7d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84402d80-41b1-4d35-9a3d-58521f274062",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
