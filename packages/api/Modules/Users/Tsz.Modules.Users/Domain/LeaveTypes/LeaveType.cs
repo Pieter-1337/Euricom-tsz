@@ -9,6 +9,7 @@ public class LeaveType : IEntityBase
     public string Name { get; private set; } = string.Empty;
     public decimal? DefaultDays { get; private set; }
     public LeaveAllowed DefaultAllowed { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     private LeaveType() { }
 

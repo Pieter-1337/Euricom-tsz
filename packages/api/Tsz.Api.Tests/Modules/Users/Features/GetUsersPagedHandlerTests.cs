@@ -278,7 +278,7 @@ public class GetUsersPagedHandlerTests : IDisposable
                     ra.Property(r => r.Role).HasConversion<string>();
                     ra.HasKey("UserId", nameof(UserRoleAssignment.Role));
                 });
-                b.HasQueryFilter(u => u.DeletedAt == null);
+                b.HasQueryFilter("SoftDelete", u => u.DeletedAt == null);
             });
         }
     }
@@ -305,8 +305,16 @@ public class GetUsersPagedHandlerTests : IDisposable
             Expression<Func<User, bool>>? filter = null,
             CancellationToken ct = default,
             bool ignoreQueryFilters = false)
-            => GetAll(filter, ignoreQueryFilters)
-                .ToKeysetPageAsync(options, sortMap, searchableFields, projection, ct);
+        {
+            IQueryable<User> query = db.Users;
+            if (ignoreQueryFilters)
+                query = query.IgnoreQueryFilters();
+            if (options.DeletedOnly)
+                query = query.IgnoreQueryFilters(new[] { "SoftDelete" }).Where(u => u.DeletedAt != null);
+            if (filter is not null)
+                query = query.Where(filter);
+            return query.ToKeysetPageAsync(options, sortMap, searchableFields, projection, ct);
+        }
 
         public Task<IEnumerable<User>> GetAllAsListAsync(Expression<Func<User, bool>>? filter = null, CancellationToken ct = default, bool ignoreQueryFilters = false) => throw new NotImplementedException();
         public Task<IEnumerable<TDto>> GetAllAsDtosAsync<TDto>(Expression<Func<User, bool>>? filter = null, CancellationToken ct = default, bool ignoreQueryFilters = false) where TDto : class, IEntityDto<User, TDto> => throw new NotImplementedException();

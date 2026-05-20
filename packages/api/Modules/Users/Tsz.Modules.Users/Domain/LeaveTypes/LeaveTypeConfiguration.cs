@@ -32,6 +32,8 @@ public class LeaveTypeConfiguration : IEntityTypeConfiguration<LeaveType>
         builder.HasIndex(lt => lt.Name)
             .IsUnique();
 
+        builder.Ignore(lt => lt.DeletedAt);
+
         builder.HasData(
             new { Id = VerlofId,       Name = "Verlof",        DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)20m  },
             new { Id = AdvId,          Name = "ADV dagen",     DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)5m   },

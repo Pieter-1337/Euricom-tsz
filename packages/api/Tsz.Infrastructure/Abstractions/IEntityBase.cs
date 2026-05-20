@@ -1,6 +1,6 @@
-﻿namespace Tsz.Infrastructure.Abstractions;
+namespace Tsz.Infrastructure.Abstractions;
 
-public interface IEntityBase
+public interface IEntityBase : ISoftDeletable
 {
     Guid Id { get; set; }
 }

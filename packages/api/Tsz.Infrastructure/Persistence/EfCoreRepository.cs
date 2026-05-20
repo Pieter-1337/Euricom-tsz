@@ -97,9 +97,17 @@ public class EfCoreRepository<TContext, TEntity> : IRepository<TEntity>
         Expression<Func<TEntity, TDto>> projection,
         Expression<Func<TEntity, bool>>? filter = null,
         CancellationToken ct = default,
-        bool ignoreQueryFilters = false) =>
-        GetAll(filter, ignoreQueryFilters)
-            .ToKeysetPageAsync(options, sortMap, searchableFields, projection, ct);
+        bool ignoreQueryFilters = false)
+    {
+        IQueryable<TEntity> query = _dbSet;
+        if (ignoreQueryFilters)
+            query = query.IgnoreQueryFilters();
+        if (options.DeletedOnly)
+            query = query.IgnoreQueryFilters(new[] { "SoftDelete" }).Where(e => e.DeletedAt != null);
+        if (filter is not null)
+            query = query.Where(filter);
+        return query.ToKeysetPageAsync(options, sortMap, searchableFields, projection, ct);
+    }
 
     public void Add(TEntity entity) => _dbSet.Add(entity);
 

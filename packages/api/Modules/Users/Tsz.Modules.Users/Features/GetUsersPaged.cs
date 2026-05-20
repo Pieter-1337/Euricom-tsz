@@ -38,5 +38,5 @@ public sealed class GetUsersPagedHandler(IUnitOfWork uow)
     ];
 
     public Task<KeysetPage<UserDto>> HandleAsync(GetUsersPagedQuery query, CancellationToken ct = default) =>
-        uow.RepositoryFor<User>().GetPagedAsync(query, Sort, Searchable, UserDto.Project, ct);
+        uow.RepositoryFor<User>().GetPagedAsync(query, Sort, Searchable, UserDto.Project, ct: ct, ignoreQueryFilters: false);
 }

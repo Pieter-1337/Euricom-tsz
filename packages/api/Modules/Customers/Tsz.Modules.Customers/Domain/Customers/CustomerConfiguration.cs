@@ -39,6 +39,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsUnique()
             .HasFilter("\"DeletedAt\" IS NULL");
 
-        builder.HasQueryFilter(c => c.DeletedAt == null);
+        builder.HasQueryFilter("SoftDelete", c => c.DeletedAt == null);
     }
 }

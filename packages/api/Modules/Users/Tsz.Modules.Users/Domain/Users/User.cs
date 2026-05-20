@@ -3,7 +3,7 @@ using Tsz.Modules.Users.Contracts;
 
 namespace Tsz.Modules.Users.Domain.Users;
 
-public class User : ISoftDeletable
+public class User : IEntityBase
 {
     public Guid Id { get; set; }
     public string? EntraOid { get; private set; }

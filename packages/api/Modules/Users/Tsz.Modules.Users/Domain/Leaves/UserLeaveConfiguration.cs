@@ -28,5 +28,7 @@ public class UserLeaveConfiguration : IEntityTypeConfiguration<UserLeave>
 
         builder.HasIndex(ul => new { ul.UserId, ul.LeaveTypeId, ul.Year })
             .IsUnique();
+
+        builder.Ignore(ul => ul.DeletedAt);
     }
 }

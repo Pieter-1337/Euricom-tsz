@@ -1,6 +1,6 @@
 namespace Tsz.Infrastructure.Abstractions;
 
-public interface ISoftDeletable : IEntityBase
+public interface ISoftDeletable
 {
     DateTimeOffset? DeletedAt { get; }
 }

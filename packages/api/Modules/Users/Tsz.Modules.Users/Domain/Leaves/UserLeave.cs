@@ -9,6 +9,7 @@ public class UserLeave : IEntityBase
     public Guid LeaveTypeId { get; private set; }
     public int Year { get; private set; }
     public decimal? TotalDays { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     private UserLeave() { }
 

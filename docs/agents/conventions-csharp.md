@@ -14,9 +14,8 @@
 
 ## Soft-delete
 
-- Aggregate entities that support soft-delete implement `ISoftDeletable` (extends `IEntityBase`) with `DateTimeOffset? DeletedAt`. The entity exposes a `SoftDelete(DateTimeOffset at)` mutator and the EF configuration adds `HasQueryFilter(e => e.DeletedAt == null)`.
-- Paged queries on soft-deletable entities call the constrained `repo.GetPagedAsync(opts, sortMap, searchable, projection, ct)` extension (in `Tsz.Infrastructure.Common.Pagination`). It reads `opts.DeletedOnly`, applies the soft-delete predicate, and toggles `ignoreQueryFilters` automatically.
-- Non-soft-deletable paging falls back to the underlying `IRepository.GetPagedAsync(...)` instance method, which accepts an explicit `filter` and `ignoreQueryFilters`.
+- Every entity is soft-deletable by convention: `IEntityBase` extends `ISoftDeletable` (`DateTimeOffset? DeletedAt`). Aggregates that actually use soft-delete add a `SoftDelete(DateTimeOffset at)` mutator and a **named** EF query filter: `builder.HasQueryFilter("SoftDelete", e => e.DeletedAt == null)`. The name `"SoftDelete"` is the project-wide convention. Entities that don't soft-delete (e.g., child rows like `UserLeave`, reference data like `LeaveType`) declare the property but call `builder.Ignore(e => e.DeletedAt)` so EF doesn't try to map a column.
+- Paged queries call `repo.GetPagedAsync(opts, sortMap, searchable, projection, filter, ct, ignoreQueryFilters)`. The repo reads `opts.DeletedOnly` and internally bypasses only the `"SoftDelete"` filter via `IgnoreQueryFilters(new[] { "SoftDelete" })`, then applies `Where(e => e.DeletedAt != null)`. The caller's `ignoreQueryFilters` flag is independent — it bypasses *all* global filters (escape hatch for genuinely unrelated reads). Optional `filter` is AND-composed on top.
 
 ## General
 

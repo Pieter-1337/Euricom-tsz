@@ -42,6 +42,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsUnique()
             .HasFilter("\"DeletedAt\" IS NULL");
 
-        builder.HasQueryFilter(u => u.DeletedAt == null);
+        builder.HasQueryFilter("SoftDelete", u => u.DeletedAt == null);
     }
 }
