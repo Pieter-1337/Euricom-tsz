@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-21
+
+chore: update app-do-work and validate skills for tracker issues
+
+Updated both skills to accept tracker issue references (#N) in addition
+to local file paths. Enhanced documentation to clarify resolution of
+parent issues (e.g. PRDs) that carry constraints and context.
+
 ## 2026-05-20
 
 docs: configure GitHub as issue tracker for matt-* skills
