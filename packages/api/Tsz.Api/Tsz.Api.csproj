@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Tsz.SharedKernel\Tsz.SharedKernel.csproj" />
     <ProjectReference Include="..\Modules\Users\Tsz.Modules.Users\Tsz.Modules.Users.csproj" />
     <ProjectReference Include="..\Modules\Customers\Tsz.Modules.Customers\Tsz.Modules.Customers.csproj" />
+    <ProjectReference Include="..\Modules\Contracts\Tsz.Modules.Contracts\Tsz.Modules.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

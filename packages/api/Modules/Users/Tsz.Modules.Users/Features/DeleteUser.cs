@@ -2,6 +2,8 @@ using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Validation;
+using Tsz.Modules.Contracts.Contracts;
+using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.Customers.Contracts;
 using Tsz.Modules.Customers.Contracts.Queries;
 using Tsz.Modules.Users.Contracts;
@@ -15,11 +17,13 @@ public sealed class DeleteUserValidator : AbstractValidator<DeleteUserCommand>
 {
     private readonly IUnitOfWork _uow;
     private readonly ICustomersAccessModule _customers;
+    private readonly IContractsAccessModule _contracts;
 
-    public DeleteUserValidator(IUnitOfWork uow, ICustomersAccessModule customers)
+    public DeleteUserValidator(IUnitOfWork uow, ICustomersAccessModule customers, IContractsAccessModule contracts)
     {
         _uow = uow;
         _customers = customers;
+        _contracts = contracts;
 
         RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Id)
@@ -40,8 +44,11 @@ public sealed class DeleteUserValidator : AbstractValidator<DeleteUserCommand>
             u => u.Id == id && u.RoleAssignments.Any(r => r.Role == UserRole.ClientManager), ct);
         if (!hasRole) return true;
 
-        var stillLinked = await _customers.ExecuteQueryAsync(new IsUserReferencedAsClientManagerQuery(id), ct);
-        return !stillLinked;
+        var linkedToCustomer = await _customers.ExecuteQueryAsync(new IsUserReferencedAsClientManagerQuery(id), ct);
+        if (linkedToCustomer) return false;
+
+        var linkedToContract = await _contracts.ExecuteQueryAsync(new IsUserReferencedAsClientManagerOnContractQuery(id), ct);
+        return !linkedToContract;
     }
 }
 

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Tsz.Modules.Contracts;
 using Tsz.Modules.Customers;
 using Tsz.Modules.Users;
 
@@ -14,5 +15,6 @@ public class AppDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(UsersModule).Assembly);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomersModule).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContractsModule).Assembly);
     }
 }

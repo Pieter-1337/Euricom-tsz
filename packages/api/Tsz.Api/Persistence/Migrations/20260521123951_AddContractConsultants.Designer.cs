@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tsz.Api.Persistence;
 
@@ -10,9 +11,11 @@ using Tsz.Api.Persistence;
 namespace Tsz.Api.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260521123951_AddContractConsultants")]
+    partial class AddContractConsultants
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -23,7 +26,7 @@ namespace Tsz.Api.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ClientManagerId")
+                    b.Property<Guid>("ClientManagerId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("CustomerId")
@@ -230,39 +233,7 @@ namespace Tsz.Api.Persistence.Migrations
                                 .HasForeignKey("ContractId");
                         });
 
-                    b.OwnsMany("Tsz.Modules.Contracts.Domain.Contracts.ContractTask", "Tasks", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .ValueGeneratedNever()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<Guid>("ContractId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<DateTimeOffset?>("DeletedAt")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasMaxLength(256)
-                                .HasColumnType("TEXT");
-
-                            b1.Property<decimal>("Rate")
-                                .HasColumnType("decimal(18,4)");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("ContractId");
-
-                            b1.ToTable("ContractTasks", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("ContractId");
-                        });
-
                     b.Navigation("Consultants");
-
-                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Tsz.Modules.Customers.Domain.Customers.Customer", b =>
