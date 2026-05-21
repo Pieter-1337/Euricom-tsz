@@ -1,0 +1,245 @@
+packages/web/src/components/ui/textarea.tsx
+  s_8d500da4ec2e4f::t_04ba6c9eff0609 5,8
+packages/web/src/features/contracts/components/contract-task-subform.tsx
+  s_39e625d093c7b2::t_129fe8e5f2d5a0 93
+  s_39e625d093c7b2::t_e83549ac9bc479 21,23-30
+  s_39e625d093c7b2::t_3ee7d035386d00 22
+  s_67acdd3a3bb644::t_1919c4acdee5b0 10,99
+  s_39e625d093c7b2::t_3f18f4b5ddc324 1,5-6
+  s_67acdd3a3bb644::t_03f54494985146 9,38
+  s_67acdd3a3bb644::t_9b0292135b7eca 2-3,7,12-13,19,32,34-37,40-43,50,55,57,67-72,79-92,94-98,100-115
+  s_39e625d093c7b2::t_8695a4348818b0 58-60,62-65
+  s_67acdd3a3bb644::t_db947a69792c09 4,8,11,14-18,20,31,33,39,73-78
+  s_39e625d093c7b2::t_09014345fb3c64 44-49,51-54,56,61,66
+packages/web/src/features/contracts/components/contract-create-form.tsx
+  s_36661491b9100b::t_69019927213983 28
+  s_67acdd3a3bb644::t_1919c4acdee5b0 5
+  s_711c400334a77d::t_2c1d773f0d7194 1-4,6-8,10-27,30-87
+  s_226bb34b84232c::t_f85d6c477139c2 9
+  s_67acdd3a3bb644::t_85aef53486fa8f 29
+packages/web/src/routes/_protected/admin/contracts/$contractId.tsx
+  s_2a9aff9b5568f3::t_20a64fdbca6307 1-22
+packages/web/src/components/ui/calendar.tsx
+  s_4802d90871acb4::t_ed723a5a114227 40,46
+  s_4802d90871acb4::t_c777c19b1a3a5d 1-39,41-45,47-63
+packages/web/src/routeTree.gen.ts
+  s_711c400334a77d::t_9d329ba12c49f0 19,24,63-68,91-94,110,115,125,130,142,147,159,164,174,179,190,195,257-263,292-296,311,316,324,329
+  s_2a9aff9b5568f3::t_e3e5dc95cf86c9 25,97-102,109,124,141,158,173,189,297-305,310,322-323
+packages/web/src/components/form/field-error.tsx
+  s_4802d90871acb4::t_59236a18360eac 11-22
+packages/web/src/features/contracts/schemas.ts
+  s_2a9aff9b5568f3::t_c2c02d120f9fab 5,17,56-60
+  s_67acdd3a3bb644::t_ba951c8b3fb3ec 18-25,34,43-53
+  s_226bb34b84232c::t_a751f0c3f0cd8e 30
+  s_3723c2766d685b::t_53de9375d44976 14-15
+  s_36661491b9100b::t_e24e61ab820591 39-42
+  s_4802d90871acb4::t_2e268666293f9e 3-4,6-13,16
+  s_711c400334a77d::t_10fa82b498c476 1-2,26-29,31-32,35-38,54-55
+  s_36661491b9100b::t_21815acd1c1c77 33
+packages/web/src/features/customers/server-fns.ts
+  s_711c400334a77d::t_5bef94e8d4f410 52-55
+  s_711c400334a77d::t_dbe87ef763b46f 5
+packages/web/src/hooks/use-list-query.ts
+  s_3723c2766d685b::t_3fc797f2cca6b7 29,36,38
+  s_3723c2766d685b::t_3d6b1966edba4d 7,9,12,14
+packages/web/src/components/form/form-context.tsx
+  s_4802d90871acb4::t_2c47ebc24858b7 13
+  s_4802d90871acb4::t_2ea2818e9b5672 301
+  s_39e625d093c7b2::t_1857d77f01b6e1 104,111,117-119
+  s_39e625d093c7b2::t_85a198ba694634 12
+  s_39e625d093c7b2::t_8f006c428e7ef2 98-103,105-110,112-116,120-142
+  s_4802d90871acb4::t_5fb570b8e7f2e5 299,307,309
+  s_39e625d093c7b2::t_98b1ef5fb482f8 33,37-39
+  s_39e625d093c7b2::t_329b19c492a420 400
+IMPLEMENTATION.md
+  s_3723c2766d685b::t_f23347a649c29d 1
+  s_3723c2766d685b::t_86ffaf21597566 11-22,26-49,51-74,78-80,84-85,89
+packages/web/src/api/schema.ts
+  s_226bb34b84232c::t_dff457e4707236 605
+  s_67acdd3a3bb644::t_1919c4acdee5b0 453-577,596-604,606-647,672-677,692-696,698-711,814-833
+  s_226bb34b84232c::t_a3f4894f3a103c 697
+packages/web/src/routes/_protected/admin/contracts/index.tsx
+  s_711c400334a77d::t_39e06e4a4c0847 3-4,6
+  s_4802d90871acb4::t_82320c4695a35d 1-2,5
+packages/web/src/components/ui/decimal-input.tsx
+  s_39e625d093c7b2::t_51659f9071970c 1-85
+packages/web/src/features/users/server-fns.ts
+  s_39e625d093c7b2::t_b0794e08e71d6d 25-28
+docs/agents/workflow-manual.md
+  h_9ef4f126c6bd1c 37,43,47,51,54-55,59,63,71,75,77,84,89-90,94
+.claude/settings.json
+  h_9ef4f126c6bd1c 17-20
+  s_496d756a094349::t_40a03f4bf7d46d 3
+packages/web/src/api/contracts.server.ts
+  s_4802d90871acb4::t_e0b28dcd510dbb 52-55
+  s_711c400334a77d::t_64585e9c45688b 1,32-34,50-51
+  s_2a9aff9b5568f3::t_33a4f8d108e5b3 2,35-49
+  s_3723c2766d685b::t_11f1f6699a9197 3-10,14,25-26
+  s_4802d90871acb4::t_372b7718d62693 11-13,15-24,27-31
+packages/web/src/features/contracts/server-fns.ts
+  s_4802d90871acb4::t_c55ee44ee51474 73-82
+  s_2a9aff9b5568f3::t_d8772e1bd1665e 17-19,21-22,24,29-35,42,50-52,59-68
+  s_36661491b9100b::t_c3b74489b2ab45 39
+  s_4802d90871acb4::t_c5dd39fc1d7a87 43-46,48-49
+  s_4802d90871acb4::t_334dd16e6d3125 2-8,15,20,23
+  s_4802d90871acb4::t_576f603f0df0a8 25
+  s_67acdd3a3bb644::t_c485bcfa88c9df 40
+  s_711c400334a77d::t_dc4012886bcf86 1,16,26-28,37-38,41,53-58,69-72
+  s_226bb34b84232c::t_48f5b7ece75401 36
+  s_3723c2766d685b::t_b809fb9f6c519d 47
+  s_3723c2766d685b::t_887ed3aed49e6f 9-14
+packages/web/src/routes/_protected.tsx
+  s_3723c2766d685b::t_9c66f1d6ca322f 122
+  s_3723c2766d685b::t_7da76c48abde54 6
+packages/web/package.json
+  s_4802d90871acb4::t_f678d1b9f7b762 35,41
+packages/web/src/features/contracts/components/contract-edit-form.tsx
+  s_226bb34b84232c::t_ee3ab1ce3816af 129
+  s_39e625d093c7b2::t_76c1c18ed8f1b8 12
+  s_2a9aff9b5568f3::t_c098ba3b99e0d7 1-5,7-10,13,15,25-32,37-41,46-47,57,61-64,66-67,70-76,78-89,106-128,130-141,156-157,160-165
+  s_39e625d093c7b2::t_8251591435919a 34-35
+  s_67acdd3a3bb644::t_0522bf27f03458 58-60
+  s_226bb34b84232c::t_7947a2e0781b6b 65
+  s_67acdd3a3bb644::t_40bfbe9af762e9 69
+  s_226bb34b84232c::t_0d363c3467e334 42-45
+  s_39e625d093c7b2::t_92bb6c88f61699 77
+  s_36661491b9100b::t_916748e5b8525f 16-22,24,33,36,48-56,68,142-155
+  s_4802d90871acb4::t_e7b6530a905418 90-105
+  s_4802d90871acb4::t_65af263e787ce9 6,11
+  s_67acdd3a3bb644::t_8fe202a7c49c21 158-159
+  s_67acdd3a3bb644::t_59fc173127dff7 14,23
+CHANGELOG.md
+  s_f7a44e3cc827e8::t_99210e39977fd3 5-20
+packages/web/src/routes/_protected/admin/contracts/new.tsx
+  s_711c400334a77d::t_6372bd533108de 1-6
+packages/web/src/hooks/use-form-server-errors.ts
+  s_39e625d093c7b2::t_f982858116e1d0 33
+packages/web/src/styles.css
+  s_39e625d093c7b2::t_b52c86dd029daf 160-165,169
+  s_8d500da4ec2e4f::t_9e4c02dcf4ffca 157-159,166-168
+packages/web/src/components/ui/input.tsx
+  s_8d500da4ec2e4f::t_c3bab7aa3b70a9 5,9
+packages/web/src/features/contracts/components/contracts-list.tsx
+  s_2a9aff9b5568f3::t_6f841a2bea4b8f 28
+  s_3723c2766d685b::t_cba30615dc8b54 85-95
+  s_4802d90871acb4::t_f7ecdd2abc82ad 13
+  s_4802d90871acb4::t_7050684d0a6360 121
+  s_39e625d093c7b2::t_ba2f974dde285d 160
+  s_4802d90871acb4::t_36fb54673a5206 8
+  s_4802d90871acb4::t_1a56fafb869c0b 115-120,122-148
+  s_4802d90871acb4::t_90a2aa766344e1 2
+  s_3723c2766d685b::t_cc6422582366a3 3,5,7,9
+  s_39e625d093c7b2::t_a51ecb0a357903 20
+  s_3723c2766d685b::t_87271b9957314d 21-23,29-32,34-42,46,48-53
+  s_39e625d093c7b2::t_ef55f2e5d5eb0f 1
+  s_4802d90871acb4::t_1b2ecdda849d4c 4,6,10-12,14-19,24-27,33,43-45,47,54-84,96-114,149-159,161-165
+packages/web/src/components/ui/date-picker.tsx
+  s_4802d90871acb4::t_7ed7026e80d3b5 23-84
+packages/web/src/api/contracts.ts
+  s_3723c2766d685b::t_069e4701025f04 9-15
+  s_67acdd3a3bb644::t_98db29fe7c107f 5,8
+  s_4802d90871acb4::t_e50b2ebf50dfba 4
+  s_2a9aff9b5568f3::t_b8bb89bdd7b859 7
+  s_711c400334a77d::t_26b60b0fc51215 1-3,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "0fe56733489755aad70e6c947cb42f85271c9ef1",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_226bb34b84232c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27e8b9e2-98d4-4596-9ed3-820665e5ca74",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_2a9aff9b5568f3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5e272d24-74e9-4fe2-98d0-4cdfcfe7c125",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_36661491b9100b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "de164ec9-7793-4ec2-80ee-30fb82b0dafc",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_3723c2766d685b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d3e1e749-f292-48ab-9173-d74c08344b60",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_39e625d093c7b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "743354a9-0ab1-4cd6-bfbf-9341c7976544",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_4802d90871acb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3884c65-04d2-4398-9523-ca68808ae3fd",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_496d756a094349": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "53cade5a-5546-4d25-a8f2-80f52dfe4fcf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_67acdd3a3bb644": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ba94af5-07d7-4ca8-9c20-4265689586e8",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_711c400334a77d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7816d3b4-066d-4a6b-8ef9-a04e1f94a1ac",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_8d500da4ec2e4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c08147b0-6d5c-46b7-9ae1-475e01f44597",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_f7a44e3cc827e8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "185d8de2-4857-4c55-82aa-a03f9f62bd63",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
