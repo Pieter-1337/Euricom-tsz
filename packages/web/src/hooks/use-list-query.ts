@@ -4,13 +4,14 @@ import type { OnChangeFn, SortingState } from '@tanstack/react-table';
 import type { KeysetPage, KeysetQueryParams, SortDir } from '#/api/pagination.ts';
 import { useInfiniteScrollSentinel } from '#/hooks/use-infinite-scroll-sentinel';
 
-export function useListQuery<TItem, TSortKey extends string>(opts: {
+export function useListQuery<TItem, TSortKey extends string, TExtras extends object = object>(opts: {
   queryKey: readonly unknown[];
-  fetcher: (params: KeysetQueryParams<TSortKey>) => Promise<KeysetPage<TItem>>;
+  fetcher: (params: KeysetQueryParams<TSortKey> & TExtras) => Promise<KeysetPage<TItem>>;
   defaultSort: { by: TSortKey; dir: SortDir };
   pageSize?: number;
+  extraParams?: TExtras;
 }) {
-  const { queryKey, fetcher, defaultSort, pageSize } = opts;
+  const { queryKey, fetcher, defaultSort, pageSize, extraParams } = opts;
 
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -25,15 +26,16 @@ export function useListQuery<TItem, TSortKey extends string>(opts: {
   const sortBy = (sorting[0]?.id ?? defaultSort.by) as TSortKey;
   const sortDir: SortDir = sorting[0]?.desc ? 'desc' : 'asc';
 
-  const params: KeysetQueryParams<TSortKey> = useMemo(
+  const params: KeysetQueryParams<TSortKey> & TExtras = useMemo(
     () => ({
       search: debouncedSearch || undefined,
       sortBy,
       sortDir,
       pageSize,
       deletedOnly,
+      ...(extraParams ?? ({} as TExtras)),
     }),
-    [debouncedSearch, sortBy, sortDir, pageSize, deletedOnly],
+    [debouncedSearch, sortBy, sortDir, pageSize, deletedOnly, extraParams],
   );
 
   const query = useInfiniteQuery({

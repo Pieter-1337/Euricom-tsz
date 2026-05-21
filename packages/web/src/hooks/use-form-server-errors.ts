@@ -30,7 +30,7 @@ export function useFormServerErrors(form: FormWithSetFieldMeta, fieldNames: read
     for (const field of fieldNames) {
       form.setFieldMeta(field as never, (prev) => ({
         ...prev,
-        errorMap: { ...prev.errorMap, onServer: undefined },
+        errorMap: { ...(prev?.errorMap ?? {}), onServer: undefined },
       }));
     }
   }

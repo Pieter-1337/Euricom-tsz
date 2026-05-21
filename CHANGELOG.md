@@ -2,6 +2,51 @@
 
 ## 2026-05-21
 
+feat: contracts API — CRUD endpoints, domain model, persistence
+
+- Add Contracts module with endpoints for create, get, update, delete,
+  and list operations with paging and search
+- Implement Contract aggregate with ContractTask and ContractConsultant
+  owned collections; Contract.ApplyTasks handles task reconciliation
+  including resurrect-by-name
+- Add validators for contract and task operations; reject empty task
+  names, invalid rates, duplicate active names, and stale references
+- Create migrations for Contracts, ContractConsultants, and ContractTasks
+  tables with soft-delete support
+- Wire module into IoC and API; expose cross-module queries for
+  contract existence checks and client manager resolution
+- Add comprehensive tests for handlers, validators, domain logic,
+  and cross-module query handlers
+
+feat: manage contract tasks (#9) — add, edit, remove, resurrect-by-name
+
+- Admins can manage the task list on a contract end-to-end: add a
+  task, edit its name and rate, remove it (soft-delete), and re-add
+  a task with a previously-removed name (case-insensitive) to
+  resurrect the archived row in place with the new rate and casing
+- `ContractTask` owned collection persisted to a new `ContractTasks`
+  table; `Contract.ApplyTasks` aggregate mutator implements the
+  five reconciliation cases including resurrect-by-name
+- `UpdateContractCommand` extended with an optional `tasks` array;
+  validator rejects empty names, names over 256 chars, non-positive
+  rates, duplicate active names, and unknown payload ids
+- `ContractDto.tasks` now lists both active and archived rows;
+  `ContractSummaryDto.activeTaskCount` reflects the live count
+- Frontend contract edit page has a Tasks subform with an editable
+  Active section and a read-only Archived section with a
+  "Bring back" affordance to resurrect by name
+
+feat: contracts list page with paged search & filters
+
+- Admins can open the Contracts page and browse a paged table of
+  contracts with subject, customer, period, and live task /
+  consultant counts (both 0 until later slices populate them)
+- Free-text search matches both contract subject and customer name
+- New filters let admins narrow contracts by an "active on" date or
+  a specific customer; clear-all chip resets them
+- Soft-deleted contracts are excluded from the default view; toggle
+  to view only deleted
+
 chore: update app-do-work and validate skills for tracker issues
 
 Updated both skills to accept tracker issue references (#N) in addition

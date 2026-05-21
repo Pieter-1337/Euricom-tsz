@@ -450,6 +450,131 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/contracts': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
+          deletedOnly?: boolean;
+          activeOnDate?: string;
+          customerId?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['KeysetPageOfContractSummaryDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateContractCommand'];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ContractDto'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/contracts/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['GetContractById'];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateContractCommand'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -467,6 +592,58 @@ export interface components {
     ContactPersonDto: {
       name: null | string;
       email: string;
+    };
+    ContractDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int32 */
+      number: number;
+      subject: string;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: uuid */
+      clientManagerId: null | string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+      tasks: components['schemas']['ContractTaskDto'][];
+      consultantIds: string[];
+    };
+    ContractSummaryDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int32 */
+      number: number;
+      subject: string;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+      /** Format: int32 */
+      activeTaskCount: number;
+      /** Format: int32 */
+      consultantCount: number;
+    };
+    ContractTaskDto: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: double */
+      rate: number;
+      /** Format: date-time */
+      deletedAt: null | string;
+    };
+    CreateContractCommand: {
+      subject: string;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
     };
     CreateCustomerCommand: {
       name: string;
@@ -492,6 +669,12 @@ export interface components {
       /** Format: uuid */
       clientManagerId: null | string;
     };
+    KeysetPageOfContractSummaryDto: {
+      items: components['schemas']['ContractSummaryDto'][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
+    };
     KeysetPageOfCustomerDto: {
       items: components['schemas']['CustomerDto'][];
       nextCursor: null | string;
@@ -506,6 +689,26 @@ export interface components {
     };
     /** @enum {unknown} */
     LeaveAllowed: 'NotAllowed' | 'Limited' | 'Unlimited';
+    UpdateContractCommand: {
+      /** Format: uuid */
+      id: string;
+      subject: string;
+      /** Format: uuid */
+      clientManagerId: null | string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+      consultantIds: string[];
+      tasks?: null | components['schemas']['UpdateContractTaskDto'][];
+    };
+    UpdateContractTaskDto: {
+      /** Format: uuid */
+      id: null | string;
+      name: string;
+      /** Format: double */
+      rate: number;
+    };
     UpdateCustomerCommand: {
       /** Format: uuid */
       id: string;
@@ -589,6 +792,26 @@ export interface operations {
     };
   };
   GetCustomerById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  GetContractById: {
     parameters: {
       query?: never;
       header?: never;

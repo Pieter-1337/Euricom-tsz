@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import {
   createCustomer,
   getCustomerById,
+  getCustomers,
   getCustomersPaged,
   removeCustomer,
   updateCustomer,
@@ -47,6 +48,10 @@ export const fetchCustomersPaged = createServerFn({ method: 'GET' })
   .handler(
     async ({ data }): Promise<KeysetPage<Customer>> => getCustomersPaged(data as KeysetQueryParams<CustomerSortKey>),
   );
+
+export const fetchAllCustomers = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<Customer[]> => getCustomers(),
+);
 
 export const fetchCustomer = createServerFn({ method: 'GET' })
   .inputValidator(customerIdSchema)

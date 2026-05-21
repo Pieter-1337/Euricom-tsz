@@ -9,7 +9,8 @@ import { SelectInput, type SelectOption } from '#/components/ui/select-input';
 import { Combobox, type ComboboxOption } from '#/components/ui/combobox';
 import { MultiCombobox, type MultiComboboxOption } from '#/components/ui/multi-combobox';
 import { NumberInput } from '#/components/ui/number-input';
-import { DateInput } from '#/components/ui/date-input';
+import { DecimalInput } from '#/components/ui/decimal-input';
+import { DatePicker } from '#/components/ui/date-picker';
 import { FieldError } from '#/components/form/field-error';
 import { hasFormError } from '#/lib/form-utils';
 
@@ -29,11 +30,13 @@ function clearServerErrorFor(field: FieldWithForm) {
   });
 }
 
-function TextField({ label, type }: { label: string; type?: string }) {
+function TextField({ label, type, hideLabel }: { label: string; type?: string; hideLabel?: boolean }) {
   const field = useFieldContext<string>();
   return (
     <div className="grid gap-2">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={hideLabel ? 'sr-only' : undefined}>
+        {label}
+      </Label>
       <Input
         id={field.name}
         name={field.name}
@@ -77,6 +80,51 @@ function NumberField({
           min={min}
           max={max}
           step={step}
+          aria-invalid={hasError ? true : undefined}
+          className="flex-1"
+          onBlur={field.handleBlur}
+          onChange={(n) => {
+            clearServerErrorFor(field);
+            field.handleChange(n);
+          }}
+        />
+        {suffix && <span className="text-sm text-muted-foreground">{suffix}</span>}
+      </div>
+      <FieldError field={field} />
+    </div>
+  );
+}
+
+function DecimalField({
+  label,
+  suffix,
+  min,
+  max,
+  decimals,
+  hideLabel,
+}: {
+  label: ReactNode;
+  suffix?: string;
+  min?: number;
+  max?: number;
+  decimals?: number;
+  hideLabel?: boolean;
+}) {
+  const field = useFieldContext<number>();
+  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={field.name} className={hideLabel ? 'sr-only' : undefined}>
+        {label}
+      </Label>
+      <div className="flex items-center gap-2">
+        <DecimalInput
+          id={field.name}
+          name={field.name}
+          value={field.state.value}
+          min={min}
+          max={max}
+          decimals={decimals}
           aria-invalid={hasError ? true : undefined}
           className="flex-1"
           onBlur={field.handleBlur}
@@ -248,17 +296,17 @@ function CheckboxField({ label }: { label: string }) {
 function DateField({ label }: { label: string }) {
   const field = useFieldContext<string>();
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-2 self-start">
       <Label htmlFor={field.name}>{label}</Label>
-      <DateInput
+      <DatePicker
         id={field.name}
         name={field.name}
         value={field.state.value}
         aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
         onBlur={field.handleBlur}
-        onChange={(e) => {
+        onChange={(value) => {
           clearServerErrorFor(field);
-          field.handleChange(e.target.value);
+          field.handleChange(value);
         }}
       />
       <FieldError field={field} />
@@ -349,6 +397,7 @@ export const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     TextField,
     NumberField,
+    DecimalField,
     SelectField,
     ComboboxField,
     MultiSelectField,

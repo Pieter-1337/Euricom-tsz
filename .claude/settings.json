@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "allow": ["bash(gh label create*)"]
+    "allow": ["Bash(gh label create*)"]
   },
   "hooks": {
     "PostToolUse": [
@@ -14,5 +14,9 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "csharp-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   }
 }

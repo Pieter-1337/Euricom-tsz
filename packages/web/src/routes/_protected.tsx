@@ -3,6 +3,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  FileText,
   Home as HomeIcon,
   User as UserIcon,
   Users as UsersIcon,
@@ -118,6 +119,7 @@ function Sidebar({ collapsed, onToggle, isAdmin }: { collapsed: boolean; onToggl
           <NavSection eyebrow="Admin" collapsed={collapsed}>
             <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />
             <NavLink to="/admin/customers" icon={Building2} label="Customers" collapsed={collapsed} />
+            <NavLink to="/admin/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />
           </NavSection>
         )}
       </nav>
