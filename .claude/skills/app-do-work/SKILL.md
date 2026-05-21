@@ -1,7 +1,7 @@
 ---
 name: app-do-work
 description: Execute a unit of work end-to-end: plan, implement, validate with typecheck and tests, then commit. Use when user wants to do work, build a feature, fix a bug, or implement a phase from a plan.
-argument-hint: '[issue-file] — path to an issue markdown file.'
+argument-hint: '[issue] — either an issue tracker reference (e.g. `#42` or a full issue URL) or a path to a local issue markdown file.'
 disable-model-invocation: true
 ---
 
@@ -13,11 +13,15 @@ Execute a complete unit of work: plan it, build it, validate it, commit it.
 
 ### 1. Understand the task
 
-If an issue file was passed as an argument, read it first — it is the source of truth for scope, acceptance criteria, and any references. Otherwise, abort the skill and ask the user to provide an issue file.
+The argument is the source of truth for scope, acceptance criteria, and any references. Resolve it before doing anything else:
+
+- **Tracker reference** — if the argument looks like `#<digits>`, a full issue URL, or otherwise refers to the project issue tracker: fetch the issue body via the tracker CLI configured in `docs/agents/tracker.md` (e.g. `gh issue view <N> --repo <repo> --json title,body,comments,labels,state`). Use the `title`, `body`, and any review `comments` as the source. If the issue body references a parent issue (e.g. a PRD via `## Parent`), fetch that too — it carries decisions and constraints the child issue depends on.
+- **Local file path** — if the argument resolves to an existing markdown file, read it directly.
+- **Neither** — abort the skill and ask the user to clarify.
 
 Then explore the codebase to understand the relevant files, patterns, and conventions. Delegate codebase exploration beyond ~3 greps to the built-in `Explore` agent to keep context light.
 
-If the task is ambiguous, ask the user to clarify scope before proceeding.
+If the task is ambiguous after reading the source, ask the user to clarify scope before proceeding.
 
 ### 2. Implement
 
