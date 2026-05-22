@@ -12,6 +12,7 @@ type DecimalInputProps = {
   max?: number;
   decimals?: number;
   className?: string;
+  disabled?: boolean;
   'aria-invalid'?: boolean | undefined;
 };
 
@@ -36,6 +37,7 @@ function DecimalInput({
   max,
   decimals = 2,
   className,
+  disabled,
   'aria-invalid': ariaInvalid,
 }: DecimalInputProps) {
   const [text, setText] = useState<string>(() => formatNumber(value, decimals));
@@ -53,6 +55,7 @@ function DecimalInput({
       type="text"
       inputMode="decimal"
       value={text}
+      disabled={disabled}
       aria-invalid={ariaInvalid}
       className={cn(className)}
       onBlur={() => {

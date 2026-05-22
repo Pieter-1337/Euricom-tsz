@@ -21,7 +21,7 @@ type ArrayFieldApi = {
 };
 
 type AnyFieldComponents = {
-  TextField: (props: { label: string; hideLabel?: boolean }) => React.ReactElement;
+  TextField: (props: { label: string; hideLabel?: boolean; disabled?: boolean }) => React.ReactElement;
   NumberField: (props: { label: string; step?: number; min?: number; suffix?: string }) => React.ReactElement;
   DecimalField: (props: {
     label: string;
@@ -30,10 +30,19 @@ type AnyFieldComponents = {
     decimals?: number;
     suffix?: string;
     hideLabel?: boolean;
+    disabled?: boolean;
   }) => React.ReactElement;
 };
 
-export function ContractTaskSubform({ form, archived }: { form: AppForm; archived: ContractTask[] }) {
+export function ContractTaskSubform({
+  form,
+  archived,
+  disabled,
+}: {
+  form: AppForm;
+  archived: ContractTask[];
+  disabled?: boolean;
+}) {
   return (
     <section className="grid gap-4">
       <h2 className="text-lg font-semibold">Tasks</h2>
@@ -65,16 +74,17 @@ export function ContractTaskSubform({ form, archived }: { form: AppForm; archive
                   {field.state.value.map((_task, i) => (
                     <div key={i} className="grid grid-cols-[1fr_140px_36px] items-start gap-3">
                       <form.AppField name={`tasks[${i}].name`}>
-                        {(f) => <f.TextField label="Name" hideLabel />}
+                        {(f) => <f.TextField label="Name" hideLabel disabled={disabled} />}
                       </form.AppField>
                       <form.AppField name={`tasks[${i}].rate`}>
-                        {(f) => <f.DecimalField label="Rate €" min={0} decimals={2} hideLabel />}
+                        {(f) => <f.DecimalField label="Rate €" min={0} decimals={2} hideLabel disabled={disabled} />}
                       </form.AppField>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
                         aria-label="Remove task"
+                        disabled={disabled}
                         onClick={() => field.removeValue(i)}
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                       >
@@ -84,16 +94,18 @@ export function ContractTaskSubform({ form, archived }: { form: AppForm; archive
                   ))}
                 </div>
               )}
-              <div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => field.pushValue({ id: null, name: '', rate: 0 })}
-                >
-                  Add task
-                </Button>
-              </div>
+              {!disabled && (
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => field.pushValue({ id: null, name: '', rate: 0 })}
+                  >
+                    Add task
+                  </Button>
+                </div>
+              )}
 
               {visibleArchived.length > 0 && (
                 <div className="grid gap-2 border-t pt-4">
@@ -107,7 +119,7 @@ export function ContractTaskSubform({ form, archived }: { form: AppForm; archive
                           type="button"
                           variant="ghost"
                           size="sm"
-                          disabled={broughtBackIds.has(t.id)}
+                          disabled={disabled || broughtBackIds.has(t.id)}
                           onClick={() =>
                             field.pushValue({ id: null, name: t.name, rate: t.rate, originalArchivedId: t.id })
                           }

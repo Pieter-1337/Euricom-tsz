@@ -22,10 +22,7 @@ public static class UserEndpoints
             return user is not null ? Results.Ok(user) : Results.NotFound();
         });
 
-        var adminGroup = group.MapGroup("")
-            .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
-
-        adminGroup.MapGet("/", async (
+        group.MapGet("/", async (
             IDispatcher dispatcher,
             CancellationToken ct,
             string? role = null) =>
@@ -34,7 +31,10 @@ public static class UserEndpoints
                 ? parsed
                 : null;
             return TypedResults.Ok(await dispatcher.SendAsync(new GetUsersQuery(roleFilter), ct));
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdminOrAnyClientManager);
+
+        var adminGroup = group.MapGroup("")
+            .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
         adminGroup.MapGet("/paged", async (
             IDispatcher dispatcher,

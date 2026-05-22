@@ -14,7 +14,7 @@ public static class ContractEndpoints
     public static void Map(IEndpointRouteBuilder app)
     {
         var group = app.MapApiGroup("contracts")
-            .RequireAuthorization(AuthorizationPolicies.RequireClientManager);
+            .RequireAuthorization(AuthorizationPolicies.RequireAdminOrAnyClientManager);
 
         group.MapGet("/", async (
             IDispatcher dispatcher,
@@ -48,7 +48,7 @@ public static class ContractEndpoints
         {
             var dto = await dispatcher.SendAsync(command, ct);
             return TypedResults.Created($"/api/contracts/{dto.Id}", dto);
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
         group.MapPut("/{id:guid}", async (
             Guid id,
@@ -70,6 +70,6 @@ public static class ContractEndpoints
         {
             await dispatcher.SendAsync(new DeleteContractCommand(id), ct);
             return Results.NoContent();
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
     }
 }

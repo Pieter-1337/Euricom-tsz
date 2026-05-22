@@ -70,6 +70,20 @@ public class ContractEndpointsTests : IntegrationTestBase, IAsyncLifetime
         return id;
     }
 
+    private async Task<Guid> SeedClientManagerAsCallerAsync(string email = "caller-cm@test.com")
+    {
+        var id = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Caller", "Manager", email, [UserRole.ClientManager]);
+            user.Id = id;
+            user.LinkEntraOid(TestOid);
+            uow.RepositoryFor<User>().Add(user);
+            await uow.SaveChangesAsync();
+        });
+        return id;
+    }
+
     [Fact]
     public async Task CreateContract_AsAdmin_Valid_ReturnsCreated_AndAssignsNumber()
     {
@@ -1115,6 +1129,206 @@ public class ContractEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.Single(dto.Tasks);
         Assert.Equal("Build", dto.Tasks.Single().Name);
         Assert.Null(dto.Tasks.Single().DeletedAt);
+    }
+
+    [Fact]
+    public async Task GetContractById_AsAssignedClientManager_Returns200()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+
+        var response = await Client.GetAsync($"/api/contracts/{contract.Id}");
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<ContractDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(contract.Id, dto.Id);
+    }
+
+    [Fact]
+    public async Task GetContractById_AsUnassignedClientManager_Returns200()
+    {
+        var callerId = await SeedClientManagerAsCallerAsync();
+        var otherCmId = await SeedClientManagerAsync("other-cm@test.com");
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, otherCmId);
+
+        var response = await Client.GetAsync($"/api/contracts/{contract.Id}");
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<ContractDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(contract.Id, dto.Id);
+    }
+
+    [Fact]
+    public async Task GetContracts_AsClientManager_ReturnsAllContracts()
+    {
+        var callerId = await SeedClientManagerAsCallerAsync();
+        var otherCmId = await SeedClientManagerAsync("other-cm@test.com");
+        var customerId = await SeedCustomerAsync();
+        await SeedContractDirectAsync(customerId, callerId, 1, "Mine", new DateOnly(2026, 1, 1), null);
+        await SeedContractDirectAsync(customerId, otherCmId, 2, "Theirs", new DateOnly(2026, 1, 1), null);
+
+        var response = await Client.GetAsync("/api/contracts");
+
+        response.EnsureSuccessStatusCode();
+        var page = await response.Content.ReadFromJsonAsync<KeysetPage<ContractSummaryDto>>(Json);
+        Assert.NotNull(page);
+        Assert.Equal(2, page.Items.Count);
+    }
+
+    [Fact]
+    public async Task CreateContract_AsClientManager_Returns403()
+    {
+        await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+
+        var response = await Client.PostAsJsonAsync("/api/contracts", new CreateContractCommand(
+            Subject: "Engagement",
+            CustomerId: customerId,
+            Start: new DateOnly(2026, 1, 1),
+            End: null));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteContract_AsClientManager_Returns403()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+
+        var response = await Client.DeleteAsync($"/api/contracts/{contract.Id}");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateContract_AsAssignedClientManager_Zone2Edits_Returns200()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+        var consultant = await SeedConsultantAsync("c1@test.com");
+
+        var response = await Client.PutAsJsonAsync($"/api/contracts/{contract.Id}", new UpdateContractCommand(
+            Id: contract.Id,
+            Subject: contract.Subject,
+            ClientManagerId: contract.ClientManagerId,
+            Start: contract.Start,
+            End: contract.End,
+            ConsultantIds: [consultant],
+            Tasks: [new UpdateContractTaskDto(null, "Build", 100m)]));
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<ContractDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(new[] { consultant }, dto.ConsultantIds);
+        Assert.Single(dto.Tasks);
+        Assert.Equal("Build", dto.Tasks.Single().Name);
+    }
+
+    [Fact]
+    public async Task UpdateContract_AsAssignedClientManager_UnchangedZone1_Returns200()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+
+        var response = await Client.PutAsJsonAsync($"/api/contracts/{contract.Id}", new UpdateContractCommand(
+            Id: contract.Id,
+            Subject: contract.Subject,
+            ClientManagerId: contract.ClientManagerId,
+            Start: contract.Start,
+            End: contract.End,
+            ConsultantIds: []));
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task UpdateContract_AsAssignedClientManager_ChangedSubject_Returns403()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+
+        var response = await Client.PutAsJsonAsync($"/api/contracts/{contract.Id}", new UpdateContractCommand(
+            Id: contract.Id,
+            Subject: "Renamed by CM",
+            ClientManagerId: contract.ClientManagerId,
+            Start: contract.Start,
+            End: contract.End,
+            ConsultantIds: []));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_CONTRACT_ZONE1_FIELD_NOT_EDITABLE", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task UpdateContract_AsAssignedClientManager_ChangedClientManager_Returns403()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var otherCmId = await SeedClientManagerAsync("other-cm@test.com");
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+
+        var response = await Client.PutAsJsonAsync($"/api/contracts/{contract.Id}", new UpdateContractCommand(
+            Id: contract.Id,
+            Subject: contract.Subject,
+            ClientManagerId: otherCmId,
+            Start: contract.Start,
+            End: contract.End,
+            ConsultantIds: []));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_CONTRACT_ZONE1_FIELD_NOT_EDITABLE", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task UpdateContract_AsAssignedClientManager_ChangedDates_Returns403()
+    {
+        var cmId = await SeedClientManagerAsCallerAsync();
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, cmId);
+
+        var response = await Client.PutAsJsonAsync($"/api/contracts/{contract.Id}", new UpdateContractCommand(
+            Id: contract.Id,
+            Subject: contract.Subject,
+            ClientManagerId: contract.ClientManagerId,
+            Start: contract.Start.AddDays(7),
+            End: contract.End,
+            ConsultantIds: []));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_CONTRACT_ZONE1_FIELD_NOT_EDITABLE", body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task UpdateContract_AsUnassignedClientManager_Returns403_WithEditNotAuthorized()
+    {
+        var callerId = await SeedClientManagerAsCallerAsync();
+        var otherCmId = await SeedClientManagerAsync("other-cm@test.com");
+        var customerId = await SeedCustomerAsync();
+        var contract = await SeedContractAsync(customerId, otherCmId);
+
+        var response = await Client.PutAsJsonAsync($"/api/contracts/{contract.Id}", new UpdateContractCommand(
+            Id: contract.Id,
+            Subject: contract.Subject,
+            ClientManagerId: contract.ClientManagerId,
+            Start: contract.Start,
+            End: contract.End,
+            ConsultantIds: []));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
+        Assert.Equal("ERR_CONTRACT_EDIT_NOT_AUTHORIZED", body.GetProperty("code").GetString());
     }
 
     [Fact]

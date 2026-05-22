@@ -35,7 +35,7 @@ public sealed class GetContractsPagedHandler(
 {
     internal static readonly OwnershipPolicy<Contract> ScopePolicy = new(
         OwnerEquals: userId => c => c.ClientManagerId == userId,
-        FullAccessRoles: [nameof(UserRole.Admin)]);
+        FullAccessRoles: [nameof(UserRole.Admin), nameof(UserRole.ClientManager)]);
 
     internal static readonly SortMap<Contract> Sort = new(
         new SortColumn<Contract>("number", (Expression<Func<Contract, int>>)(c => c.Number), typeof(int)),

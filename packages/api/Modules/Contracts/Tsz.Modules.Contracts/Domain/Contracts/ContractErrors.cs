@@ -69,4 +69,14 @@ public sealed class ContractErrors : ErrorCodeBase<ContractErrors>
         new("ERR_CONTRACT_CLIENT_MANAGER_REASSIGNMENT_FORBIDDEN",
             "Non-admin users may only assign contracts to themselves.",
             ErrorCategory.Forbidden);
+
+    public static readonly ContractErrors EditNotAuthorized =
+        new("ERR_CONTRACT_EDIT_NOT_AUTHORIZED",
+            "You are not authorized to edit this contract.",
+            ErrorCategory.Forbidden);
+
+    public static readonly ContractErrors Zone1FieldNotEditable =
+        new("ERR_CONTRACT_ZONE1_FIELD_NOT_EDITABLE",
+            "Only administrators can change engagement fields (subject, dates, client manager).",
+            ErrorCategory.Forbidden);
 }
