@@ -2,6 +2,14 @@
 
 ## 2026-05-22
 
+refactor: support admin or any client manager zone authorization
+
+- Replace RequireClientManagerAuthorizationHandler with
+  RequireAdminOrAnyClientManagerAuthorizationHandler to enable admin and
+  any client manager (not just zone-specific) to access contracts and
+  customer resources. Updates API endpoints, tests, and web UI forms to
+  reflect new authorization semantics.
+
 refactor: extract scoped-filter composition, resurrect contract task UX
 
 - Consolidates repeated ownership-check logic in handlers and validators
