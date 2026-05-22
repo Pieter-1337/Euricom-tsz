@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
-using Tsz.Infrastructure.Common.Pagination;
+using Tsz.Infrastructure.Auth.Validation;
 using Tsz.Modules.Contracts.Domain.Contracts;
 
 namespace Tsz.Modules.Contracts.Features;
@@ -13,12 +12,7 @@ public sealed class GetContractByIdHandler(IUnitOfWork uow, IDataScopeAccessor s
 {
     public async Task<ContractDto?> HandleAsync(GetContractByIdQuery query, CancellationToken ct = default)
     {
-        var ownership = await scope.OwnershipFilterAsync(GetContractsPagedHandler.ScopePolicy, ct);
-        Expression<Func<Contract, bool>> filter = ownership is null
-            ? c => c.Id == query.Id
-            : ownership.And(c => c.Id == query.Id);
-
-        return await uow.RepositoryFor<Contract>()
-            .FirstOrDefaultAsDtoAsync<ContractDto>(filter, ct);
+        var filter = await ScopedFilter.ComposeAsync(scope, GetContractsPagedHandler.ScopePolicy, c => c.Id == query.Id, ct);
+        return await uow.RepositoryFor<Contract>().FirstOrDefaultAsDtoAsync<ContractDto>(filter, ct);
     }
 }

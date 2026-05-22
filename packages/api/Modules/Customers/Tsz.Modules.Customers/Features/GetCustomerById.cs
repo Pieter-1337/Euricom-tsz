@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
-using Tsz.Infrastructure.Common.Pagination;
+using Tsz.Infrastructure.Auth.Validation;
 using Tsz.Modules.Customers.Domain.Customers;
 
 namespace Tsz.Modules.Customers.Features;
@@ -13,12 +12,7 @@ public sealed class GetCustomerByIdHandler(IUnitOfWork uow, IDataScopeAccessor s
 {
     public async Task<CustomerDto?> HandleAsync(GetCustomerByIdQuery query, CancellationToken ct = default)
     {
-        var ownership = await scope.OwnershipFilterAsync(GetCustomersPagedHandler.ScopePolicy, ct);
-        Expression<Func<Customer, bool>> filter = ownership is null
-            ? c => c.Id == query.Id
-            : ownership.And(c => c.Id == query.Id);
-
-        return await uow.RepositoryFor<Customer>()
-            .FirstOrDefaultAsDtoAsync<CustomerDto>(filter, ct);
+        var filter = await ScopedFilter.ComposeAsync(scope, GetCustomersPagedHandler.ScopePolicy, c => c.Id == query.Id, ct);
+        return await uow.RepositoryFor<Customer>().FirstOrDefaultAsDtoAsync<CustomerDto>(filter, ct);
     }
 }

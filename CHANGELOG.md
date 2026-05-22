@@ -28,6 +28,36 @@ refactor: extract scoped-filter composition, resurrect contract task UX
 - Update 9 test files for new constructor/base-class shapes.
 - All 252 unit + 107 integration tests pass.
 
+refactor: eliminate expression-tree construction in ownership filters
+
+- Reshape OwnershipPolicy<T> to hold a Func<Guid, Expression<Func<T, bool>>>
+  factory instead of an Expression<Func<T, Guid?>> selector. This moves
+  equality-expression construction from runtime (Expression.Equal /
+  Expression.Lambda in DataScopeAccessor) to compile-time (normal C# lambda
+  at policy declaration sites), eliminating reflection-adjacent code and
+  gaining full type safety.
+- DataScopeAccessor.OwnershipFilterAsync: drop Expression.* calls, invoke
+  factory directly. Simplified from ~10 lines to 3.
+- GetCustomersPagedHandler.ScopePolicy, GetContractsPagedHandler.ScopePolicy:
+  declare factory as `userId => c => c.ClientManagerId == userId`.
+- Add AuthorizationPolicies.AdminRoleName = "Admin" constant (used by new
+  ScopedRequestValidator).
+- Add Tsz.Infrastructure.Auth.Validation.ScopedFilter: static ComposeAsync
+  helper (compose ownership filter with additional predicate).
+- Add Tsz.Infrastructure.Auth.Validation.ScopedRequestValidator<TRequest>:
+  abstract base class for owned-entity + self-assignment rules.
+  RuleForOwnedEntity now takes Func<Guid, Expression<Func<TEntity, bool>>>
+  (no runtime expression construction).
+- Migrate 3 query handlers (GetCustomerById, GetContractById,
+  CustomerExistsQueryHandler) to use ScopedFilter.ComposeAsync.
+- Migrate 4 validators (DeleteCustomer, DeleteContract, UpdateCustomer,
+  UpdateContract) to inherit ScopedRequestValidator and use
+  RuleForOwnedEntity + RuleForSelfAssignedManager.
+- Add ScopedFilterTests and ScopedRequestValidatorTests (unit tests for new
+  helpers).
+- Update DeleteContractValidatorTests fixture for new base-class constructor.
+- All 262 unit (252 + 10 new) + 107 integration tests pass.
+
 ## 2026-05-21
 
 feat: contracts API — CRUD endpoints, domain model, persistence

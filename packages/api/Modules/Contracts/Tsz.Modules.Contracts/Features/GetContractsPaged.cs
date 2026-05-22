@@ -34,7 +34,7 @@ public sealed class GetContractsPagedHandler(
     : IQueryHandler<GetContractsPagedQuery, KeysetPage<ContractSummaryDto>>
 {
     internal static readonly OwnershipPolicy<Contract> ScopePolicy = new(
-        OwnerIdSelector: c => c.ClientManagerId,
+        OwnerEquals: userId => c => c.ClientManagerId == userId,
         FullAccessRoles: [nameof(UserRole.Admin)]);
 
     internal static readonly SortMap<Contract> Sort = new(

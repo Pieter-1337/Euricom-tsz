@@ -1,8 +1,6 @@
-using System.Linq.Expressions;
-using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
-using Tsz.Infrastructure.Common.Pagination;
+using Tsz.Infrastructure.Auth.Validation;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Customers.Domain.Customers;
@@ -11,29 +9,15 @@ namespace Tsz.Modules.Customers.Features;
 
 public sealed record DeleteCustomerCommand(Guid Id) : ICommand<Unit>;
 
-public sealed class DeleteCustomerValidator : AbstractValidator<DeleteCustomerCommand>
+public sealed class DeleteCustomerValidator : ScopedRequestValidator<DeleteCustomerCommand>
 {
-    private readonly IUnitOfWork _uow;
-    private readonly IDataScopeAccessor _scope;
-
-    public DeleteCustomerValidator(IUnitOfWork uow, IDataScopeAccessor scope)
+    public DeleteCustomerValidator(IUnitOfWork uow, IDataScopeAccessor scope, ICurrentUserResolver currentUser)
+        : base(uow, scope, currentUser)
     {
-        _uow = uow;
-        _scope = scope;
-
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Id)
-            .MustAsync(CustomerExistsAndAccessible).WithError(CustomerErrors.NotFound)
+        RuleForOwnedEntity(x => x.Id, GetCustomersPagedHandler.ScopePolicy, id => c => c.Id == id)
+            .WithError(CustomerErrors.NotFound)
             .When(x => x.Id != Guid.Empty);
-    }
-
-    private async Task<bool> CustomerExistsAndAccessible(Guid id, CancellationToken ct)
-    {
-        var ownership = await _scope.OwnershipFilterAsync(GetCustomersPagedHandler.ScopePolicy, ct);
-        Expression<Func<Customer, bool>> filter = ownership is null
-            ? c => c.Id == id
-            : ownership.And(c => c.Id == id);
-        return await _uow.RepositoryFor<Customer>().ExistsAsync(filter, ct);
     }
 }
 

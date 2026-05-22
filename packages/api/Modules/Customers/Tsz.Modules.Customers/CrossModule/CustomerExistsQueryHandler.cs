@@ -1,7 +1,6 @@
-using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
-using Tsz.Infrastructure.Common.Pagination;
+using Tsz.Infrastructure.Auth.Validation;
 using Tsz.Modules.Customers.Contracts.Queries;
 using Tsz.Modules.Customers.Domain.Customers;
 using Tsz.Modules.Customers.Features;
@@ -13,10 +12,7 @@ internal sealed class CustomerExistsQueryHandler(IUnitOfWork uow, IDataScopeAcce
 {
     public async Task<bool> HandleAsync(CustomerExistsQuery q, CancellationToken ct)
     {
-        var ownership = await scope.OwnershipFilterAsync(GetCustomersPagedHandler.ScopePolicy, ct);
-        Expression<Func<Customer, bool>> filter = ownership is null
-            ? c => c.Id == q.CustomerId
-            : ownership.And(c => c.Id == q.CustomerId);
+        var filter = await ScopedFilter.ComposeAsync(scope, GetCustomersPagedHandler.ScopePolicy, c => c.Id == q.CustomerId, ct);
         return await uow.RepositoryFor<Customer>().ExistsAsync(filter, ct);
     }
 }

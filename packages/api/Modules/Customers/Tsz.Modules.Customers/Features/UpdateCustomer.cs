@@ -1,8 +1,6 @@
-using System.Linq.Expressions;
-using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
-using Tsz.Infrastructure.Common.Pagination;
+using Tsz.Infrastructure.Auth.Validation;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Customers.Domain.Customers;
 using Tsz.Modules.Users.Contracts;
@@ -19,23 +17,18 @@ public sealed record UpdateCustomerCommand(
     Guid? ClientManagerId)
     : ICommand<CustomerDto>;
 
-public sealed class UpdateCustomerValidator : AbstractValidator<UpdateCustomerCommand>
+public sealed class UpdateCustomerValidator : ScopedRequestValidator<UpdateCustomerCommand>
 {
-    private readonly IUnitOfWork _uow;
     private readonly IUsersAccessModule _users;
-    private readonly IDataScopeAccessor _scope;
-    private readonly ICurrentUserResolver _currentUser;
 
     public UpdateCustomerValidator(
         IUnitOfWork uow,
         IUsersAccessModule users,
         IDataScopeAccessor scope,
         ICurrentUserResolver currentUser)
+        : base(uow, scope, currentUser)
     {
-        _uow = uow;
         _users = users;
-        _scope = scope;
-        _currentUser = currentUser;
 
         RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
@@ -69,31 +62,12 @@ public sealed class UpdateCustomerValidator : AbstractValidator<UpdateCustomerCo
                     .WithError(CustomerErrors.ClientManagerMissingRole);
         });
 
-        RuleFor(x => x)
-            .MustAsync(NonAdminCannotReassignManager)
-                .WithError(CustomerErrors.ClientManagerReassignmentForbidden);
+        RuleForSelfAssignedManager(x => x.ClientManagerId)
+            .WithError(CustomerErrors.ClientManagerReassignmentForbidden);
 
-        RuleFor(x => x.Id)
-            .MustAsync(CustomerExistsAndAccessible).WithError(CustomerErrors.NotFound)
+        RuleForOwnedEntity(x => x.Id, GetCustomersPagedHandler.ScopePolicy, id => c => c.Id == id)
+            .WithError(CustomerErrors.NotFound)
             .When(x => x.Id != Guid.Empty);
-    }
-
-    private async Task<bool> CustomerExistsAndAccessible(Guid id, CancellationToken ct)
-    {
-        var ownership = await _scope.OwnershipFilterAsync(GetCustomersPagedHandler.ScopePolicy, ct);
-        Expression<Func<Customer, bool>> filter = ownership is null
-            ? c => c.Id == id
-            : ownership.And(c => c.Id == id);
-        return await _uow.RepositoryFor<Customer>().ExistsAsync(filter, ct);
-    }
-
-    private async Task<bool> NonAdminCannotReassignManager(UpdateCustomerCommand cmd, CancellationToken ct)
-    {
-        var user = await _currentUser.ResolveAsync(ct);
-        if (user is null) return false;
-        if (user.HasRole(nameof(UserRole.Admin))) return true;
-        // Non-admin: the target ClientManagerId must remain themselves.
-        return cmd.ClientManagerId == user.Id;
     }
 
     private Task<bool> UserExists(Guid id, CancellationToken ct) =>

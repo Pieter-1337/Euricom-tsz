@@ -27,7 +27,7 @@ public sealed class GetCustomersPagedHandler(IUnitOfWork uow, IDataScopeAccessor
     : IQueryHandler<GetCustomersPagedQuery, KeysetPage<CustomerDto>>
 {
     internal static readonly OwnershipPolicy<Customer> ScopePolicy = new(
-        OwnerIdSelector: c => c.ClientManagerId,
+        OwnerEquals: userId => c => c.ClientManagerId == userId,
         FullAccessRoles: [nameof(UserRole.Admin)]);
 
     internal static readonly SortMap<Customer> Sort = new(

@@ -26,7 +26,9 @@ public class DeleteContractValidatorTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((Expression<Func<Contract, bool>>?)null);
 
-        return new DeleteContractValidator(uow.Object, scope.Object);
+        var resolver = new Mock<ICurrentUserResolver>();
+
+        return new DeleteContractValidator(uow.Object, scope.Object, resolver.Object);
     }
 
     [Fact]

@@ -53,7 +53,7 @@ return await repo.<Method>(filter, ct);
 
 ### Existing static `ScopePolicy` per entity
 
-These are already in place and become the canonical declarations referenced by handlers, validators, and (in this plan) the new helpers:
+Currently shaped around an `Expression<Func<T, Guid?>>` selector that `DataScopeAccessor` rewrites into an equality expression at runtime:
 
 ```csharp
 // GetCustomersPagedHandler
@@ -63,6 +63,8 @@ internal static readonly OwnershipPolicy<Customer> ScopePolicy = new(
 
 // GetContractsPagedHandler — same shape, against Contract.ClientManagerId
 ```
+
+**This refactor reshapes them to delegate factories** (see *Prerequisite* in "What to add" below) so no `Expression.Equal` / `Expression.Lambda` construction happens at runtime.
 
 ---
 
@@ -80,6 +82,44 @@ Non-goals:
 ---
 
 ## What to add
+
+### Prerequisite — reshape `OwnershipPolicy<T>` + `DataScopeAccessor` to use a delegate factory
+
+The current shape forces `DataScopeAccessor` to compose `selector == userId` via `Expression.Equal` + `Expression.Lambda` at runtime. Move the equality construction into the policy declaration itself — the compiler then emits the expression tree from a normal C# lambda at the call site, and `DataScopeAccessor` becomes a one-liner that simply invokes the factory.
+
+**`Tsz.Infrastructure.Auth/OwnershipPolicy.cs`:**
+
+```csharp
+public record OwnershipPolicy<T>(
+    Func<Guid, Expression<Func<T, bool>>> OwnerEquals,
+    IReadOnlyCollection<string> FullAccessRoles);
+```
+
+**`Tsz.Modules.Users.Auth/DataScopeAccessor.cs`** — drop the `Expression.Equal` / `Expression.Lambda` block:
+
+```csharp
+public async Task<Expression<Func<T, bool>>?> OwnershipFilterAsync<T>(
+    OwnershipPolicy<T> policy, CancellationToken ct)
+{
+    var user = await currentUser.ResolveAsync(ct);
+    if (user is null) return _ => false;
+    if (policy.FullAccessRoles.Any(user.HasRole)) return null;
+    return policy.OwnerEquals(user.Id);
+}
+```
+
+**Paged-handler `ScopePolicy` declarations** become:
+
+```csharp
+// GetCustomersPagedHandler
+internal static readonly OwnershipPolicy<Customer> ScopePolicy = new(
+    OwnerEquals: userId => c => c.ClientManagerId == userId,
+    FullAccessRoles: [nameof(UserRole.Admin)]);
+
+// GetContractsPagedHandler — same shape, against Contract.ClientManagerId
+```
+
+Trade-off: one extra `userId =>` per policy declaration, zero runtime expression construction, full compile-time type-checking of the predicate.
 
 ### 1. `Tsz.Infrastructure.Auth.Validation/ScopedFilter.cs`
 
@@ -128,20 +168,17 @@ public abstract class ScopedRequestValidator<TRequest>(
 
     /// Validates that the property's value identifies an existing row of <typeparamref name="TEntity"/>
     /// that is accessible to the caller per <paramref name="policy"/>.
+    /// <paramref name="idEqualsFactory"/> constructs `e => e.Id == id` (or equivalent) for the entity
+    /// — written as a normal C# lambda at the call site, no runtime expression building.
     protected IRuleBuilderOptions<TRequest, Guid> RuleForOwnedEntity<TEntity>(
         Expression<Func<TRequest, Guid>> property,
         OwnershipPolicy<TEntity> policy,
-        Expression<Func<TEntity, Guid>> idSelector)
+        Func<Guid, Expression<Func<TEntity, bool>>> idEqualsFactory)
         where TEntity : class
     {
         return RuleFor(property).MustAsync(async (id, ct) =>
         {
-            // Build a Customer-typed expression: e => idSelector(e) == id
-            var param = idSelector.Parameters[0];
-            var body = Expression.Equal(idSelector.Body, Expression.Constant(id, typeof(Guid)));
-            var idEquals = Expression.Lambda<Func<TEntity, bool>>(body, param);
-
-            var filter = await ScopedFilter.ComposeAsync(Scope, policy, idEquals, ct);
+            var filter = await ScopedFilter.ComposeAsync(Scope, policy, idEqualsFactory(id), ct);
             return await Uow.RepositoryFor<TEntity>().ExistsAsync(filter, ct);
         });
     }
@@ -183,6 +220,12 @@ The two paged handlers (`GetCustomersPaged`, `GetContractsPaged`) keep their dir
 
 For each of the four validators below, change the base class and replace the inline private method with `RuleForOwnedEntity`. Existing constructor-injected deps that the base class now owns (`IUnitOfWork`, `IDataScopeAccessor`, `ICurrentUserResolver`) get forwarded via `: base(uow, scope, currentUser)`. Subclass-only deps (`IUsersAccessModule`) stay on the subclass.
 
+Call-site shape (note `id => c => c.Id == id` is a plain C# lambda — the compiler builds the expression tree):
+
+```csharp
+RuleForOwnedEntity(x => x.Id, GetCustomersPagedHandler.ScopePolicy, id => c => c.Id == id);
+```
+
 - `Modules/Customers/.../Features/UpdateCustomer.cs` — inherits base; uses `RuleForOwnedEntity` for existence; uses `RuleForSelfAssignedManager` for the non-admin-reassign rule.
 - `Modules/Customers/.../Features/DeleteCustomer.cs` — inherits base; uses `RuleForOwnedEntity`. No other rules need scope.
 - `Modules/Contracts/.../Features/UpdateContract.cs` — same pattern as UpdateCustomer.
@@ -192,10 +235,17 @@ For each of the four validators below, change the base class and replace the inl
 
 **Optional decision point:** if you'd rather have *every* customer/contract validator inherit `ScopedRequestValidator` for marker-class consistency (even when only `RuleForSelfAssignedManager` is used), accept that `CreateCustomerValidator` ends up injecting `IUnitOfWork` + `IDataScopeAccessor` it doesn't use. My call would be: don't. The base class earns its place by collapsing real duplication, not by being decorative.
 
+### Reshape of already-shipped files (per *Prerequisite* above)
+
+- `Tsz.Infrastructure/Auth/OwnershipPolicy.cs` — `OwnerIdSelector` → `OwnerEquals` (factory).
+- `Modules/Users/.../Auth/DataScopeAccessor.cs` — drop the `Expression.Equal` block; invoke factory.
+- `Modules/Customers/.../Features/GetCustomersPaged.cs` — `ScopePolicy` declaration updated to factory form.
+- `Modules/Contracts/.../Features/GetContractsPaged.cs` — same.
+
 ### What does **not** change
 
 - DI registrations in `UsersModule.cs` — `IDataScopeAccessor` and `ICurrentUserResolver` are already registered; subclasses pull them through normal DI.
-- `OwnershipPolicy<Customer>` / `OwnershipPolicy<Contract>` declarations on the paged handlers — they remain the canonical definitions, referenced by name from validators and detail handlers.
+- The location of `ScopePolicy` declarations — they stay on the paged handlers as canonical definitions, referenced by name from validators and detail handlers. Only their *shape* changes.
 - The Users module's `RequireAdmin` / `RequireClientManager` authorization handlers — those operate at the endpoint pipeline level, unrelated to this refactor.
 
 ---
@@ -233,15 +283,16 @@ Add two small test files:
 
 Sequential; each step buildable + testable independently.
 
-1. **Add `ScopedFilter.ComposeAsync`** in a new file under `Tsz.Infrastructure/Auth/Validation/`. Build runs green; no consumers yet.
-2. **Migrate the three query handlers** (`GetCustomerById`, `GetContractById`, `CustomerExistsQueryHandler`) to use `ScopedFilter.ComposeAsync`. Run unit tests; existing tests should pass unchanged (the helper produces equivalent expressions).
-3. **Add `ScopedRequestValidator<TRequest>`** base class. Build green; no consumers yet.
-4. **Migrate `DeleteCustomerValidator`** first — simplest case (one rule, no other concerns). Validate the inheritance shape works.
-5. **Migrate `DeleteContractValidator`** — copy of (4) against the Contract entity.
-6. **Migrate `UpdateCustomerValidator` and `UpdateContractValidator`** — they additionally need `RuleForSelfAssignedManager`.
-7. **Migrate `CreateCustomerValidator`** to use `RuleForSelfAssignedManager` (no inheritance — see decision point above).
-8. **Add new tests** for `ScopedFilter` and `ScopedRequestValidator`.
-9. **Run full test suite** (`dotnet test Tsz.Api.Tests` and `Tsz.Api.Tests.Integration`) — expect 252 + new + 107 all green.
+1. **Reshape `OwnershipPolicy<T>`** — switch `OwnerIdSelector` to `OwnerEquals` factory. Update both paged-handler `ScopePolicy` declarations in the same step (the type change forces it). Simplify `DataScopeAccessor.OwnershipFilterAsync` to invoke the factory. Run tests — all should still pass; the resulting expression tree is shape-equivalent to what `Expression.Equal` produced.
+2. **Add `ScopedFilter.ComposeAsync`** in a new file under `Tsz.Infrastructure/Auth/Validation/`. Build runs green; no consumers yet.
+3. **Migrate the three query handlers** (`GetCustomerById`, `GetContractById`, `CustomerExistsQueryHandler`) to use `ScopedFilter.ComposeAsync`. Run unit tests; existing tests should pass unchanged.
+4. **Add `ScopedRequestValidator<TRequest>`** base class. Build green; no consumers yet.
+5. **Migrate `DeleteCustomerValidator`** first — simplest case (one rule, no other concerns). Validate the inheritance shape works.
+6. **Migrate `DeleteContractValidator`** — copy of (5) against the Contract entity.
+7. **Migrate `UpdateCustomerValidator` and `UpdateContractValidator`** — they additionally need `RuleForSelfAssignedManager`.
+8. **Migrate `CreateCustomerValidator`** to use `RuleForSelfAssignedManager` (no inheritance — see decision point above).
+9. **Add new tests** for `ScopedFilter` and `ScopedRequestValidator`.
+10. **Run full test suite** (`dotnet test Tsz.Api.Tests` and `Tsz.Api.Tests.Integration`) — expect 252 + new + 107 all green.
 
 Each step is a candidate commit boundary.
 
