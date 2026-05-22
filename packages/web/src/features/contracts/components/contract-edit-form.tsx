@@ -137,7 +137,7 @@ export function ContractEditForm({ contract }: { contract: Contract }) {
             <h2 className="text-lg font-semibold">Period</h2>
             <div className="grid grid-cols-2 gap-4">
               <form.AppField name="start">{(field) => <field.DateField label="Start" />}</form.AppField>
-              <form.AppField name="end">{(field) => <field.DateField label="End (optional)" />}</form.AppField>
+              <form.AppField name="end">{(field) => <field.DateField label="End" />}</form.AppField>
             </div>
           </section>
 

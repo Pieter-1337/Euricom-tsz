@@ -38,6 +38,8 @@ function ProtectedLayout() {
     currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
   };
   const isAdmin = currentUser.roles.includes(UserRole.Admin);
+  const isClientManager = currentUser.roles.includes(UserRole.ClientManager);
+  const canManageClients = isAdmin || isClientManager;
   const firstName = currentUser.firstName;
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
@@ -83,7 +85,12 @@ function ProtectedLayout() {
       </header>
 
       <div className="relative flex min-h-0 flex-1">
-        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} isAdmin={isAdmin} />
+        <Sidebar
+          collapsed={collapsed}
+          onToggle={() => setCollapsed((c) => !c)}
+          isAdmin={isAdmin}
+          canManageClients={canManageClients}
+        />
         <Main />
       </div>
     </div>
@@ -92,7 +99,17 @@ function ProtectedLayout() {
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
-function Sidebar({ collapsed, onToggle, isAdmin }: { collapsed: boolean; onToggle: () => void; isAdmin: boolean }) {
+function Sidebar({
+  collapsed,
+  onToggle,
+  isAdmin,
+  canManageClients,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+  isAdmin: boolean;
+  canManageClients: boolean;
+}) {
   return (
     <aside
       aria-label="Primary navigation"
@@ -115,9 +132,9 @@ function Sidebar({ collapsed, onToggle, isAdmin }: { collapsed: boolean; onToggl
           <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
         </NavSection>
 
-        {isAdmin && (
+        {canManageClients && (
           <NavSection eyebrow="Admin" collapsed={collapsed}>
-            <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />
+            {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
             <NavLink to="/admin/customers" icon={Building2} label="Customers" collapsed={collapsed} />
             <NavLink to="/admin/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />
           </NavSection>

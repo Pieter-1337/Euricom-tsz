@@ -14,10 +14,10 @@ public class GetCurrentUserHandlerTests
     public async Task HandleAsync_UserFound_ReturnsDto()
     {
         var user = UserBuilder.Build().WithName("Jane", "Doe").WithRoles(UserRole.Admin);
-        var resolver = new Mock<ICurrentUserResolver>();
-        resolver.Setup(r => r.ResolveAsync(It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        var account = new Mock<ICurrentUserAccount>();
+        account.Setup(a => a.GetAsync(It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
-        var handler = new GetCurrentUserHandler(resolver.Object);
+        var handler = new GetCurrentUserHandler(account.Object);
 
         var result = await handler.HandleAsync(new GetCurrentUserQuery());
 
@@ -31,10 +31,10 @@ public class GetCurrentUserHandlerTests
     [Fact]
     public async Task HandleAsync_UserMissing_ReturnsNull()
     {
-        var resolver = new Mock<ICurrentUserResolver>();
-        resolver.Setup(r => r.ResolveAsync(It.IsAny<CancellationToken>())).ReturnsAsync((User?)null);
+        var account = new Mock<ICurrentUserAccount>();
+        account.Setup(a => a.GetAsync(It.IsAny<CancellationToken>())).ReturnsAsync((User?)null);
 
-        var handler = new GetCurrentUserHandler(resolver.Object);
+        var handler = new GetCurrentUserHandler(account.Object);
 
         var result = await handler.HandleAsync(new GetCurrentUserQuery());
 

@@ -2,11 +2,13 @@ import { Link, useRouter } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
+import { FileText } from 'lucide-react';
 import type { ContractSortKey, ContractSummary, ContractsListExtraParams } from '#/api/contracts';
 import { Button } from '#/components/ui/button';
 import { Combobox } from '#/components/ui/combobox';
 import { DatePicker } from '#/components/ui/date-picker';
 import { Label } from '#/components/ui/label';
+import { EmptyState } from '#/components/list/empty-state';
 import { ListShell } from '#/components/list/list-shell';
 import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
 import { useListQuery } from '#/hooks/use-list-query';
@@ -51,6 +53,35 @@ export function ContractsList() {
     setActiveOnDate('');
     setCustomerId('');
   };
+  const hasAnyFilter = hasExtraFilters || list.search.trim() !== '' || list.deletedOnly;
+  const clearAll = () => {
+    clearFilters();
+    list.setSearch('');
+    list.setDeletedOnly(false);
+  };
+  const emptyState = hasAnyFilter ? (
+    <EmptyState
+      icon={FileText}
+      title="No matches"
+      description="No contracts match your filters. Try a different search or clear the filters."
+      action={
+        <Button variant="outline" size="sm" onClick={clearAll}>
+          Clear filters
+        </Button>
+      }
+    />
+  ) : (
+    <EmptyState
+      icon={FileText}
+      title="No contracts yet"
+      description="Create a contract once you have at least one customer."
+      action={
+        <Button asChild size="sm">
+          <Link to="/admin/contracts/new">New contract</Link>
+        </Button>
+      }
+    />
+  );
 
   const columns = useMemo<ColumnDef<ContractSummary, unknown>[]>(
     () => [
@@ -155,7 +186,7 @@ export function ContractsList() {
           isLoading: list.isLoading,
           isFetchingNextPage: list.isFetchingNextPage,
           error: list.error,
-          emptyState: 'No contracts found.',
+          emptyState,
           sentinelRef: list.sentinelRef,
           onRowClick: (c) => void router.navigate({ to: '/admin/contracts/$contractId', params: { contractId: c.id } }),
         }}

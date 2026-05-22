@@ -7,6 +7,7 @@ using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Contracts.Features;
+using Tsz.Infrastructure.Auth;
 using Tsz.Modules.Customers.Contracts;
 using Tsz.Modules.Customers.Contracts.Queries;
 using SortDir = Tsz.Infrastructure.Common.Pagination.SortDirection;
@@ -29,7 +30,8 @@ public class GetContractsPagedHandlerTests : IDisposable
 
     private GetContractsPagedHandler BuildHandler(
         IEnumerable<Contract>? seed = null,
-        IReadOnlyList<Guid>? customerNameMatches = null)
+        IReadOnlyList<Guid>? customerNameMatches = null,
+        Guid? clientManagerScopeId = null)
     {
         if (seed is not null)
         {
@@ -45,7 +47,17 @@ public class GetContractsPagedHandlerTests : IDisposable
             .Setup(c => c.ExecuteQueryAsync(It.IsAny<FindCustomerIdsBySearchQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(customerNameMatches ?? Array.Empty<Guid>());
 
-        return new GetContractsPagedHandler(uow.Object, customers.Object);
+        var scope = new Mock<IDataScopeAccessor>();
+        Expression<Func<Contract, bool>>? filter = clientManagerScopeId is { } id
+            ? c => c.ClientManagerId == id
+            : null;
+        scope
+            .Setup(s => s.OwnershipFilterAsync(
+                It.IsAny<OwnershipPolicy<Contract>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filter);
+
+        return new GetContractsPagedHandler(uow.Object, customers.Object, scope.Object);
     }
 
     private static GetContractsPagedQuery PagedQuery(
@@ -190,6 +202,36 @@ public class GetContractsPagedHandlerTests : IDisposable
         page.Items.Count.ShouldBe(1);
         page.Items[0].Subject.ShouldBe("Active");
         page.Total.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task ClientManager_OnlySeesAssignedContracts()
+    {
+        var managerId = Guid.NewGuid();
+        var mine = ContractBuilder.Build(1).WithSubject("Mine").WithClientManager(managerId);
+        var theirs = ContractBuilder.Build(2).WithSubject("Theirs").WithClientManager(Guid.NewGuid());
+        var unassigned = ContractBuilder.Build(3).WithSubject("Unassigned");
+        var handler = BuildHandler([mine, theirs, unassigned], clientManagerScopeId: managerId);
+
+        var page = await handler.HandleAsync(PagedQuery());
+
+        page.Items.Count.ShouldBe(1);
+        page.Items[0].Subject.ShouldBe("Mine");
+        page.Total.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Admin_SeesAllContracts()
+    {
+        var mine = ContractBuilder.Build(1).WithSubject("Mine").WithClientManager(Guid.NewGuid());
+        var theirs = ContractBuilder.Build(2).WithSubject("Theirs").WithClientManager(Guid.NewGuid());
+        var unassigned = ContractBuilder.Build(3).WithSubject("Unassigned");
+        var handler = BuildHandler([mine, theirs, unassigned]);
+
+        var page = await handler.HandleAsync(PagedQuery());
+
+        page.Items.Count.ShouldBe(3);
+        page.Total.ShouldBe(3);
     }
 
     [Fact]

@@ -1,12 +1,10 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { UserRole, type User } from '#/api/users';
 
-export const Route = createFileRoute('/_protected/admin')({
+export const Route = createFileRoute('/_protected/admin/users')({
   beforeLoad: ({ context }) => {
     const currentUser = (context as any).currentUser as User | undefined;
-    const roles = currentUser?.roles ?? [];
-    const hasAccess = roles.includes(UserRole.Admin) || roles.includes(UserRole.ClientManager);
-    if (!hasAccess) throw redirect({ to: '/' });
+    if (!currentUser?.roles?.includes(UserRole.Admin)) throw redirect({ to: '/' });
   },
   component: () => <Outlet />,
 });

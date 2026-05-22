@@ -1,5 +1,6 @@
 using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Customers.Domain.Customers;
 using Tsz.Modules.Users.Contracts;
@@ -18,10 +19,12 @@ public sealed record CreateCustomerCommand(
 public sealed class CreateCustomerValidator : AbstractValidator<CreateCustomerCommand>
 {
     private readonly IUsersAccessModule _users;
+    private readonly ICurrentUserResolver _currentUser;
 
-    public CreateCustomerValidator(IUsersAccessModule users)
+    public CreateCustomerValidator(IUsersAccessModule users, ICurrentUserResolver currentUser)
     {
         _users = users;
+        _currentUser = currentUser;
 
         RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
 
@@ -53,6 +56,18 @@ public sealed class CreateCustomerValidator : AbstractValidator<CreateCustomerCo
                 .MustAsync(UserHasClientManagerRole)
                     .WithError(CustomerErrors.ClientManagerMissingRole);
         });
+
+        RuleFor(x => x.ClientManagerId)
+            .MustAsync(NonAdminAssignsSelf)
+                .WithError(CustomerErrors.ClientManagerReassignmentForbidden);
+    }
+
+    private async Task<bool> NonAdminAssignsSelf(Guid? clientManagerId, CancellationToken ct)
+    {
+        var user = await _currentUser.ResolveAsync(ct);
+        if (user is null) return false;
+        if (user.HasRole(nameof(UserRole.Admin))) return true;
+        return clientManagerId == user.Id;
     }
 
     private Task<bool> UserExists(Guid id, CancellationToken ct) =>

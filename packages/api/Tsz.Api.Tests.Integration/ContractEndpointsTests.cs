@@ -941,6 +941,35 @@ public class ContractEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
+    public async Task GetContractById_AfterSoftDeleteTask_IncludesArchivedTaskInDto()
+    {
+        await SeedAdminAsync();
+        var customerId = await SeedCustomerAsync();
+        var managerId = await SeedClientManagerAsync();
+        var seeded = await SeedContractAsync(customerId, managerId);
+
+        var added = await Client.PutAsJsonAsync($"/api/contracts/{seeded.Id}", new UpdateContractCommand(
+            seeded.Id, seeded.Subject, managerId, seeded.Start, seeded.End,
+            ConsultantIds: [],
+            Tasks: [new UpdateContractTaskDto(null, "Build", 100m)]));
+        var addedDto = (await added.Content.ReadFromJsonAsync<ContractDto>(Json))!;
+        var taskId = addedDto.Tasks.Single().Id;
+
+        await Client.PutAsJsonAsync($"/api/contracts/{seeded.Id}", new UpdateContractCommand(
+            seeded.Id, seeded.Subject, managerId, seeded.Start, seeded.End,
+            ConsultantIds: [],
+            Tasks: []));
+
+        var getResponse = await Client.GetAsync($"/api/contracts/{seeded.Id}");
+        getResponse.EnsureSuccessStatusCode();
+        var dto = (await getResponse.Content.ReadFromJsonAsync<ContractDto>(Json))!;
+        Assert.Single(dto.Tasks);
+        var archived = dto.Tasks.Single();
+        Assert.Equal(taskId, archived.Id);
+        Assert.NotNull(archived.DeletedAt);
+    }
+
+    [Fact]
     public async Task UpdateContract_ResurrectByName_PreservesId_OverwritesCasingAndRate()
     {
         await SeedAdminAsync();

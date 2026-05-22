@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Moq;
 using Shouldly;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Contracts.Features;
 
@@ -19,7 +20,13 @@ public class DeleteContractValidatorTests
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<Contract>()).Returns(repo.Object);
 
-        return new DeleteContractValidator(uow.Object);
+        var scope = new Mock<IDataScopeAccessor>();
+        scope.Setup(s => s.OwnershipFilterAsync(
+                It.IsAny<OwnershipPolicy<Contract>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Expression<Func<Contract, bool>>?)null);
+
+        return new DeleteContractValidator(uow.Object, scope.Object);
     }
 
     [Fact]

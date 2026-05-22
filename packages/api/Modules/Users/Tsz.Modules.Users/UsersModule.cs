@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tsz.Infrastructure;
+using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Extensions;
 using Tsz.Modules.Users.Auth;
 using Tsz.Modules.Users.Contracts;
@@ -17,9 +18,13 @@ public sealed class UsersModule : IModule
     {
         services.AddHandlersFromAssembly(typeof(UsersModule).Assembly);
         services.AddValidatorsFromAssembly(typeof(UsersModule).Assembly);
-        services.AddScoped<ICurrentUserResolver, CurrentUserResolver>();
+        services.AddScoped<CurrentUserResolver>();
+        services.AddScoped<ICurrentUserResolver>(sp => sp.GetRequiredService<CurrentUserResolver>());
+        services.AddScoped<ICurrentUserAccount>(sp => sp.GetRequiredService<CurrentUserResolver>());
         services.AddScoped<IUsersAccessModule, UsersAccessModule>();
+        services.AddScoped<IDataScopeAccessor, DataScopeAccessor>();
         services.AddScoped<IAuthorizationHandler, RequireAdminAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, RequireClientManagerAuthorizationHandler>();
         services.AddScoped<UserSeeder>();
     }
 

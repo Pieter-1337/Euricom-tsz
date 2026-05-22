@@ -1,9 +1,11 @@
 using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Customers.Contracts;
 using Tsz.Modules.Customers.Contracts.Queries;
+using Tsz.Modules.Users.Contracts;
 
 namespace Tsz.Modules.Contracts.Features;
 
@@ -25,9 +27,16 @@ public sealed class GetContractsPagedQueryValidator
     public GetContractsPagedQueryValidator() : base(GetContractsPagedHandler.Sort) { }
 }
 
-public sealed class GetContractsPagedHandler(IUnitOfWork uow, ICustomersAccessModule customers)
+public sealed class GetContractsPagedHandler(
+    IUnitOfWork uow,
+    ICustomersAccessModule customers,
+    IDataScopeAccessor scope)
     : IQueryHandler<GetContractsPagedQuery, KeysetPage<ContractSummaryDto>>
 {
+    internal static readonly OwnershipPolicy<Contract> ScopePolicy = new(
+        OwnerIdSelector: c => c.ClientManagerId,
+        FullAccessRoles: [nameof(UserRole.Admin)]);
+
     internal static readonly SortMap<Contract> Sort = new(
         new SortColumn<Contract>("number", (Expression<Func<Contract, int>>)(c => c.Number), typeof(int)),
         new SortColumn<Contract>("subject", (Expression<Func<Contract, string>>)(c => c.Subject), typeof(string)),
@@ -35,7 +44,8 @@ public sealed class GetContractsPagedHandler(IUnitOfWork uow, ICustomersAccessMo
 
     public async Task<KeysetPage<ContractSummaryDto>> HandleAsync(GetContractsPagedQuery query, CancellationToken ct = default)
     {
-        var filter = await BuildFilterAsync(query, ct);
+        var ownership = await scope.OwnershipFilterAsync(ScopePolicy, ct);
+        var filter = await BuildFilterAsync(query, ownership, ct);
         return await uow.RepositoryFor<Contract>().GetPagedAsync(
             query,
             Sort,
@@ -45,10 +55,19 @@ public sealed class GetContractsPagedHandler(IUnitOfWork uow, ICustomersAccessMo
             ct: ct);
     }
 
-    private async Task<Expression<Func<Contract, bool>>?> BuildFilterAsync(GetContractsPagedQuery query, CancellationToken ct)
+    private async Task<Expression<Func<Contract, bool>>?> BuildFilterAsync(
+        GetContractsPagedQuery query,
+        Expression<Func<Contract, bool>>? ownership,
+        CancellationToken ct)
     {
         var predicate = PredicateBuilder.BaseAnd<Contract>();
         var touched = false;
+
+        if (ownership is not null)
+        {
+            predicate = predicate.And(ownership);
+            touched = true;
+        }
 
         if (query.CustomerId is { } customerId)
         {

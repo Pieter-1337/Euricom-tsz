@@ -4,17 +4,29 @@ using Tsz.Modules.Users.Domain.Users;
 
 namespace Tsz.Modules.Users.Auth;
 
-public interface ICurrentUserResolver
+/// Users-module-internal view of the current caller as the full <see cref="User"/> aggregate.
+/// Use this when a handler needs more than identity (e.g. to project a UserDto).
+/// For authorization decisions, prefer <see cref="ICurrentUserResolver"/>.
+public interface ICurrentUserAccount
 {
-    Task<User?> ResolveAsync(CancellationToken ct = default);
+    Task<User?> GetAsync(CancellationToken ct = default);
 }
 
-public sealed class CurrentUserResolver(ICurrentUser currentUser, IUnitOfWork uow) : ICurrentUserResolver
+public sealed class CurrentUserResolver(ICurrentUser currentUser, IUnitOfWork uow)
+    : ICurrentUserResolver, ICurrentUserAccount
 {
     private User? _cached;
     private bool _loaded;
 
-    public async Task<User?> ResolveAsync(CancellationToken ct = default)
+    async Task<ResolvedUser?> ICurrentUserResolver.ResolveAsync(CancellationToken ct)
+    {
+        var user = await GetAsync(ct);
+        return user is null
+            ? null
+            : new ResolvedUser(user.Id, user.Roles.Select(r => r.ToString()).ToArray());
+    }
+
+    public async Task<User?> GetAsync(CancellationToken ct = default)
     {
         if (_loaded) return _cached;
 

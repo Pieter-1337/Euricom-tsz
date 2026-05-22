@@ -2,9 +2,11 @@ import { Link, useRouter } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
+import { Building2 } from 'lucide-react';
 import type { Customer } from '#/api/customers';
 import { UserRole } from '#/api/users';
 import { Button } from '#/components/ui/button';
+import { EmptyState } from '#/components/list/empty-state';
 import { ListShell } from '#/components/list/list-shell';
 import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
 import { useListQuery } from '#/hooks/use-list-query';
@@ -76,6 +78,35 @@ export function CustomersList() {
     defaultSort: { by: 'number', dir: 'asc' },
   });
 
+  const hasFilter = search.trim() !== '' || deletedOnly;
+  const emptyState = hasFilter ? (
+    <EmptyState
+      icon={Building2}
+      title="No matches"
+      description={
+        deletedOnly && !search.trim()
+          ? 'No deleted customers to show.'
+          : 'No customers match your filters. Try a different search or clear the filters.'
+      }
+      action={
+        <Button variant="outline" size="sm" onClick={() => { setSearch(''); setDeletedOnly(false); }}>
+          Clear filters
+        </Button>
+      }
+    />
+  ) : (
+    <EmptyState
+      icon={Building2}
+      title="No customers yet"
+      description="Add your first customer to get started."
+      action={
+        <Button asChild size="sm">
+          <Link to="/admin/customers/new">New customer</Link>
+        </Button>
+      }
+    />
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -100,7 +131,7 @@ export function CustomersList() {
           isLoading,
           isFetchingNextPage,
           error,
-          emptyState: 'No customers found.',
+          emptyState,
           sentinelRef,
           onRowClick: (c) => void router.navigate({ to: '/admin/customers/$id', params: { id: c.id } }),
         }}

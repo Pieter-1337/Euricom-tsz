@@ -5,6 +5,7 @@ using Shouldly;
 using Tsz.Modules.Customers.Domain.Customers;
 using Tsz.Modules.Customers.Features;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Api.Tests.Builders;
 using SortDir = Tsz.Infrastructure.Common.Pagination.SortDirection;
@@ -31,7 +32,9 @@ public class GetCustomersPagedHandlerTests : IDisposable
 
     // ── helpers ──────────────────────────────────────────────────────────────
 
-    private GetCustomersPagedHandler BuildHandler(IEnumerable<Customer>? seed = null)
+    private GetCustomersPagedHandler BuildHandler(
+        IEnumerable<Customer>? seed = null,
+        Guid? clientManagerScopeId = null)
     {
         if (seed is not null)
         {
@@ -41,7 +44,18 @@ public class GetCustomersPagedHandlerTests : IDisposable
         var repo = new InMemoryCustomerRepository(_db);
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<Customer>()).Returns(repo);
-        return new GetCustomersPagedHandler(uow.Object);
+
+        var scope = new Mock<IDataScopeAccessor>();
+        Expression<Func<Customer, bool>>? filter = clientManagerScopeId is { } id
+            ? c => c.ClientManagerId == id
+            : null;
+        scope
+            .Setup(s => s.OwnershipFilterAsync(
+                It.IsAny<OwnershipPolicy<Customer>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filter);
+
+        return new GetCustomersPagedHandler(uow.Object, scope.Object);
     }
 
     private static GetCustomersPagedQuery PagedQuery(
@@ -217,6 +231,36 @@ public class GetCustomersPagedHandlerTests : IDisposable
         page.Items.Count.ShouldBe(1);
         page.Items[0].Name.ShouldBe("Deleted");
         page.Total.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task ClientManager_OnlySeesAssignedCustomers()
+    {
+        var managerId = Guid.NewGuid();
+        var mine = CustomerBuilder.Build(1).WithName("Mine").WithClientManager(managerId);
+        var theirs = CustomerBuilder.Build(2).WithName("Theirs").WithClientManager(Guid.NewGuid());
+        var unassigned = CustomerBuilder.Build(3).WithName("Unassigned");
+        var handler = BuildHandler([mine, theirs, unassigned], clientManagerScopeId: managerId);
+
+        var page = await handler.HandleAsync(PagedQuery());
+
+        page.Items.Count.ShouldBe(1);
+        page.Items[0].Name.ShouldBe("Mine");
+        page.Total.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Admin_SeesAllCustomers()
+    {
+        var mine = CustomerBuilder.Build(1).WithName("Mine").WithClientManager(Guid.NewGuid());
+        var theirs = CustomerBuilder.Build(2).WithName("Theirs").WithClientManager(Guid.NewGuid());
+        var unassigned = CustomerBuilder.Build(3).WithName("Unassigned");
+        var handler = BuildHandler([mine, theirs, unassigned]);
+
+        var page = await handler.HandleAsync(PagedQuery());
+
+        page.Items.Count.ShouldBe(3);
+        page.Total.ShouldBe(3);
     }
 
     [Fact]

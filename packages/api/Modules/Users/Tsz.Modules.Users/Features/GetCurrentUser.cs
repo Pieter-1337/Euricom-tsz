@@ -6,12 +6,12 @@ namespace Tsz.Modules.Users.Features;
 
 public sealed record GetCurrentUserQuery : IQuery<UserDto?>;
 
-public sealed class GetCurrentUserHandler(ICurrentUserResolver resolver)
+public sealed class GetCurrentUserHandler(ICurrentUserAccount account)
     : IQueryHandler<GetCurrentUserQuery, UserDto?>
 {
     public async Task<UserDto?> HandleAsync(GetCurrentUserQuery query, CancellationToken ct = default)
     {
-        var user = await resolver.ResolveAsync(ct);
+        var user = await account.GetAsync(ct);
         return user is null ? null : UserDto.ToDto(user);
     }
 }

@@ -6,6 +6,7 @@ import {
   type OnChangeFn,
   type SortingState,
 } from '@tanstack/react-table';
+import { type ReactNode } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table.tsx';
 
 export interface InfiniteTableProps<TItem> {
@@ -17,7 +18,7 @@ export interface InfiniteTableProps<TItem> {
   isLoading: boolean;
   isFetchingNextPage: boolean;
   error: unknown;
-  emptyState: string;
+  emptyState: ReactNode;
   sentinelRef: (node: HTMLElement | null) => void;
   onRowClick?: (item: TItem) => void;
 }
@@ -65,8 +66,8 @@ export function InfiniteTable<TItem>(props: InfiniteTableProps<TItem>) {
           </TableRow>
         )}
         {!props.isLoading && props.error == null && props.items.length === 0 && (
-          <TableRow>
-            <TableCell colSpan={colSpan} className="text-center text-muted-foreground">
+          <TableRow className="hover:bg-transparent">
+            <TableCell colSpan={colSpan} className="py-10">
               {props.emptyState}
             </TableCell>
           </TableRow>

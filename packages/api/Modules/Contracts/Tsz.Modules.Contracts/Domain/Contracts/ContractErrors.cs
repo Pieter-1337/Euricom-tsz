@@ -64,4 +64,9 @@ public sealed class ContractErrors : ErrorCodeBase<ContractErrors>
         new("ERR_CONTRACT_TASK_RATE_NON_POSITIVE",
             "Task rate must be greater than zero.",
             ErrorCategory.Validation);
+
+    public static readonly ContractErrors ClientManagerReassignmentForbidden =
+        new("ERR_CONTRACT_CLIENT_MANAGER_REASSIGNMENT_FORBIDDEN",
+            "Non-admin users may only assign contracts to themselves.",
+            ErrorCategory.Forbidden);
 }

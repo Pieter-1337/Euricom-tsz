@@ -19,6 +19,7 @@ export const contractTaskFormSchema = z.object({
   id: z.string().nullable(),
   name: z.string().min(1, 'Task name is required').max(256),
   rate: z.number().positive('Rate must be greater than 0'),
+  originalArchivedId: z.string().optional(), // INTERNAL — stripped before submit
 });
 
 export type ContractTaskFormValue = z.infer<typeof contractTaskFormSchema>;

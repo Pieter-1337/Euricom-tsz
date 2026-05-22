@@ -12,7 +12,7 @@ public static class CustomerEndpoints
     public static void Map(IEndpointRouteBuilder app)
     {
         var group = app.MapApiGroup("customers")
-            .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
+            .RequireAuthorization(AuthorizationPolicies.RequireClientManager);
 
         group.MapGet("/", async (IDispatcher dispatcher, CancellationToken ct) =>
             TypedResults.Ok(await dispatcher.SendAsync(new GetCustomersQuery(), ct)));

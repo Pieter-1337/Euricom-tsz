@@ -1,5 +1,6 @@
 using Moq;
 using Shouldly;
+using Tsz.Infrastructure.Auth;
 using Tsz.Modules.Customers.Domain.Customers;
 using Tsz.Modules.Customers.Features;
 using Tsz.Modules.Users.Contracts;
@@ -19,7 +20,13 @@ public class CreateCustomerValidatorTests
             .Setup(m => m.ExecuteQueryAsync(It.IsAny<UserHasRoleQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(userIsClientManager);
 
-        return new CreateCustomerValidator(users.Object);
+        // Default to Admin caller so non-admin self-assignment rule passes for existing tests.
+        var resolver = new Mock<ICurrentUserResolver>();
+        resolver
+            .Setup(r => r.ResolveAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ResolvedUser(Guid.NewGuid(), [nameof(UserRole.Admin)]));
+
+        return new CreateCustomerValidator(users.Object, resolver.Object);
     }
 
     [Fact]

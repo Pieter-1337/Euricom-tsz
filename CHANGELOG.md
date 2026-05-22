@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-05-22
+
+refactor: extract scoped-filter composition, resurrect contract task UX
+
+- Consolidates repeated ownership-check logic in handlers and validators
+  into ScopedFilter.ComposeAsync and ScopedRequestValidator<T> base class.
+  Migrates 9 validation sites (3 query handlers, 4 update/delete validators,
+  1 create validator) to use the shared helpers, eliminating 4-line duplicate
+  blocks per location.
+- Extends contract task subform to drive archived filtering from form state.
+  Bring back / X / Reset / Save now cohere without server round-tripping until
+  save. originalArchivedId field tracks resurrections; stripped before submit.
+- Add Tsz.Infrastructure.Auth.Validation.ScopedFilter (static helper).
+- Add Tsz.Infrastructure.Auth.Validation.ScopedRequestValidator<T> base
+  (RuleForOwnedEntity, RuleForSelfAssignedManager extension methods).
+- Migrate GetCustomerById, GetContractById, CustomerExistsQueryHandler
+  to use ScopedFilter.ComposeAsync.
+- Migrate DeleteCustomerValidator, DeleteContractValidator,
+  UpdateCustomerValidator, UpdateContractValidator to inherit base class.
+- Migrate CreateCustomerValidator.NonAdminAssignsSelf to use
+  RuleForSelfAssignedManager.
+- Extend contractTaskFormSchema with optional originalArchivedId.
+- Rewrite contract-task-subform.tsx: archived list derived from form state,
+  Bring back button disabled when id already brought back.
+- Strip originalArchivedId in toUpdateRequest before backend submit.
+- Update 9 test files for new constructor/base-class shapes.
+- All 252 unit + 107 integration tests pass.
+
 ## 2026-05-21
 
 feat: contracts API — CRUD endpoints, domain model, persistence

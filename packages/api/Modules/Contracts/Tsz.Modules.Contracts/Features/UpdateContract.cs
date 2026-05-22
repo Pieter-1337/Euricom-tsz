@@ -1,5 +1,8 @@
+using System.Linq.Expressions;
 using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
+using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Users.Contracts;
@@ -22,11 +25,19 @@ public sealed class UpdateContractValidator : AbstractValidator<UpdateContractCo
 {
     private readonly IUnitOfWork _uow;
     private readonly IUsersAccessModule _users;
+    private readonly IDataScopeAccessor _scope;
+    private readonly ICurrentUserResolver _currentUser;
 
-    public UpdateContractValidator(IUnitOfWork uow, IUsersAccessModule users)
+    public UpdateContractValidator(
+        IUnitOfWork uow,
+        IUsersAccessModule users,
+        IDataScopeAccessor scope,
+        ICurrentUserResolver currentUser)
     {
         _uow = uow;
         _users = users;
+        _scope = scope;
+        _currentUser = currentUser;
 
         RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Subject).NotEmpty().MaximumLength(256);
@@ -56,8 +67,12 @@ public sealed class UpdateContractValidator : AbstractValidator<UpdateContractCo
             .When(x => x.Id != Guid.Empty && x.ConsultantIds is { Count: > 0 }
                        && x.ConsultantIds.Distinct().Count() == x.ConsultantIds.Count);
 
+        RuleFor(x => x)
+            .MustAsync(NonAdminCannotReassignManager)
+                .WithError(ContractErrors.ClientManagerReassignmentForbidden);
+
         RuleFor(x => x.Id)
-            .MustAsync(ContractExists).WithError(ContractErrors.NotFound)
+            .MustAsync(ContractExistsAndAccessible).WithError(ContractErrors.NotFound)
             .When(x => x.Id != Guid.Empty);
 
         When(x => x.Tasks is not null, () =>
@@ -85,8 +100,22 @@ public sealed class UpdateContractValidator : AbstractValidator<UpdateContractCo
         });
     }
 
-    private Task<bool> ContractExists(Guid id, CancellationToken ct) =>
-        _uow.RepositoryFor<Contract>().ExistsAsync(c => c.Id == id, ct);
+    private async Task<bool> ContractExistsAndAccessible(Guid id, CancellationToken ct)
+    {
+        var ownership = await _scope.OwnershipFilterAsync(GetContractsPagedHandler.ScopePolicy, ct);
+        Expression<Func<Contract, bool>> filter = ownership is null
+            ? c => c.Id == id
+            : ownership.And(c => c.Id == id);
+        return await _uow.RepositoryFor<Contract>().ExistsAsync(filter, ct);
+    }
+
+    private async Task<bool> NonAdminCannotReassignManager(UpdateContractCommand cmd, CancellationToken ct)
+    {
+        var user = await _currentUser.ResolveAsync(ct);
+        if (user is null) return false;
+        if (user.HasRole(nameof(UserRole.Admin))) return true;
+        return cmd.ClientManagerId == user.Id;
+    }
 
     private Task<bool> UserExists(Guid id, CancellationToken ct) =>
         _users.ExecuteQueryAsync(new UserExistsQuery(id), ct);

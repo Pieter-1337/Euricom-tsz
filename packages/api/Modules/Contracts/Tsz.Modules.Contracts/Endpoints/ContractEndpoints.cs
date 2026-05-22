@@ -14,7 +14,7 @@ public static class ContractEndpoints
     public static void Map(IEndpointRouteBuilder app)
     {
         var group = app.MapApiGroup("contracts")
-            .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
+            .RequireAuthorization(AuthorizationPolicies.RequireClientManager);
 
         group.MapGet("/", async (
             IDispatcher dispatcher,

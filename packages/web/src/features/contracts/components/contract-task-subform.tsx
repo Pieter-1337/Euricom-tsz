@@ -12,7 +12,10 @@ type AppForm = {
 };
 
 type ArrayFieldApi = {
-  state: { value: ContractTaskFormValue[] };
+  state: {
+    value: ContractTaskFormValue[];
+    meta: { errors: Array<unknown> };
+  };
   pushValue: (value: ContractTaskFormValue) => void;
   removeValue: (index: number) => void;
 };
@@ -36,80 +39,90 @@ export function ContractTaskSubform({ form, archived }: { form: AppForm; archive
       <h2 className="text-lg font-semibold">Tasks</h2>
 
       <form.Field name="tasks">
-        {(field) => (
-          <div className="grid gap-3">
-            {field.state.value.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No tasks yet.</p>
-            ) : (
-              <div className="grid gap-2">
-                <div className="grid grid-cols-[1fr_140px_36px] items-center gap-3 text-sm font-medium">
-                  <span>Name</span>
-                  <span>Rate €</span>
-                  <span />
-                </div>
-                {field.state.value.map((_task, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_140px_36px] items-start gap-3">
-                    <form.AppField name={`tasks[${i}].name`}>
-                      {(f) => <f.TextField label="Name" hideLabel />}
-                    </form.AppField>
-                    <form.AppField name={`tasks[${i}].rate`}>
-                      {(f) => <f.DecimalField label="Rate €" min={0} decimals={2} hideLabel />}
-                    </form.AppField>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Remove task"
-                      onClick={() => field.removeValue(i)}
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <XIcon className="size-5" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => field.pushValue({ id: null, name: '', rate: 0 })}
-              >
-                Add task
-              </Button>
-            </div>
-          </div>
-        )}
-      </form.Field>
+        {(field) => {
+          const broughtBackIds = new Set(field.state.value.map((t) => t.originalArchivedId).filter(Boolean));
+          const visibleArchived = archived.filter((t) => !broughtBackIds.has(t.id));
+          const arrayErrors = field.state.meta.errors
+            .map((err) => (typeof err === 'string' ? err : (err as { message?: string })?.message))
+            .filter((m): m is string => Boolean(m));
 
-      {archived.length > 0 && (
-        <div className="grid gap-2 border-t pt-4">
-          <h3 className="text-sm font-medium text-muted-foreground">Archived</h3>
-          <ul className="grid gap-1 text-sm">
-            {archived.map((t) => (
-              <li key={t.id} className="grid grid-cols-[1fr_120px_140px_auto] items-center gap-3">
-                <span>{t.name}</span>
-                <span className="text-muted-foreground">{rateFmt.format(t.rate)} €</span>
-                <span className="text-muted-foreground">{formatDate(t.deletedAt)}</span>
+          return (
+            <div className="grid gap-3">
+              {arrayErrors.length > 0 && (
+                <p className="text-sm text-destructive" aria-live="polite">
+                  {arrayErrors.join(', ')}
+                </p>
+              )}
+              {field.state.value.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No tasks yet.</p>
+              ) : (
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-[1fr_140px_36px] items-center gap-3 text-sm font-medium">
+                    <span>Name</span>
+                    <span>Rate €</span>
+                    <span />
+                  </div>
+                  {field.state.value.map((_task, i) => (
+                    <div key={i} className="grid grid-cols-[1fr_140px_36px] items-start gap-3">
+                      <form.AppField name={`tasks[${i}].name`}>
+                        {(f) => <f.TextField label="Name" hideLabel />}
+                      </form.AppField>
+                      <form.AppField name={`tasks[${i}].rate`}>
+                        {(f) => <f.DecimalField label="Rate €" min={0} decimals={2} hideLabel />}
+                      </form.AppField>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Remove task"
+                        onClick={() => field.removeValue(i)}
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <XIcon className="size-5" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div>
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => form.pushFieldValue('tasks', { id: null, name: t.name, rate: t.rate })}
+                  onClick={() => field.pushValue({ id: null, name: '', rate: 0 })}
                 >
-                  Bring back
+                  Add task
                 </Button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+              </div>
+
+              {visibleArchived.length > 0 && (
+                <div className="grid gap-2 border-t pt-4">
+                  <h3 className="text-sm font-medium text-muted-foreground">Archived</h3>
+                  <ul className="grid gap-1 text-sm">
+                    {visibleArchived.map((t) => (
+                      <li key={t.id} className="grid grid-cols-[1fr_120px_140px_auto] items-center gap-3">
+                        <span>{t.name}</span>
+                        <span className="text-muted-foreground">{rateFmt.format(t.rate)} €</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          disabled={broughtBackIds.has(t.id)}
+                          onClick={() =>
+                            field.pushValue({ id: null, name: t.name, rate: t.rate, originalArchivedId: t.id })
+                          }
+                        >
+                          Bring back
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
+        }}
+      </form.Field>
     </section>
   );
-}
-
-function formatDate(iso: string | null): string {
-  if (!iso) return '';
-  return iso.slice(0, 10);
 }

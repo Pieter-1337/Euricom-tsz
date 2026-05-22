@@ -1,7 +1,9 @@
 using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Modules.Customers.Domain.Customers;
+using Tsz.Modules.Users.Contracts;
 
 namespace Tsz.Modules.Customers.Features;
 
@@ -21,9 +23,13 @@ public sealed class GetCustomersPagedQueryValidator
     public GetCustomersPagedQueryValidator() : base(GetCustomersPagedHandler.Sort) { }
 }
 
-public sealed class GetCustomersPagedHandler(IUnitOfWork uow)
+public sealed class GetCustomersPagedHandler(IUnitOfWork uow, IDataScopeAccessor scope)
     : IQueryHandler<GetCustomersPagedQuery, KeysetPage<CustomerDto>>
 {
+    internal static readonly OwnershipPolicy<Customer> ScopePolicy = new(
+        OwnerIdSelector: c => c.ClientManagerId,
+        FullAccessRoles: [nameof(UserRole.Admin)]);
+
     internal static readonly SortMap<Customer> Sort = new(
         new SortColumn<Customer>("number", (Expression<Func<Customer, int>>)(c => c.Number), typeof(int)),
         new SortColumn<Customer>("name", (Expression<Func<Customer, string>>)(c => c.Name), typeof(string)),
@@ -38,6 +44,10 @@ public sealed class GetCustomersPagedHandler(IUnitOfWork uow)
         SearchableField<Customer>.Column(c => c.Address.City!),
     ];
 
-    public Task<KeysetPage<CustomerDto>> HandleAsync(GetCustomersPagedQuery query, CancellationToken ct = default) =>
-        uow.RepositoryFor<Customer>().GetPagedAsync(query, Sort, Searchable, CustomerDto.Project, ct: ct, ignoreQueryFilters: false);
+    public async Task<KeysetPage<CustomerDto>> HandleAsync(GetCustomersPagedQuery query, CancellationToken ct = default)
+    {
+        var filter = await scope.OwnershipFilterAsync(ScopePolicy, ct);
+        return await uow.RepositoryFor<Customer>().GetPagedAsync(
+            query, Sort, Searchable, CustomerDto.Project, filter: filter, ct: ct, ignoreQueryFilters: false);
+    }
 }

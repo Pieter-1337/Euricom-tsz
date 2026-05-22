@@ -37,7 +37,7 @@ const toUpdateRequest = (id: string, form: ContractFormValues): UpdateContractRe
   start: form.start,
   end: form.end === '' ? null : form.end,
   consultantIds: form.consultantIds,
-  tasks: form.tasks.map((t) => ({ id: t.id, name: t.name.trim(), rate: t.rate })),
+  tasks: form.tasks.map(({ originalArchivedId: _drop, ...t }) => ({ id: t.id, name: t.name.trim(), rate: t.rate })),
 });
 
 export const fetchContractsPaged = createServerFn({ method: 'GET' })

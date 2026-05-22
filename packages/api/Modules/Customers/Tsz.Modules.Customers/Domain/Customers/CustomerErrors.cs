@@ -19,4 +19,9 @@ public sealed class CustomerErrors : ErrorCodeBase<CustomerErrors>
         new("ERR_CUSTOMER_CLIENT_MANAGER_MISSING_ROLE",
             "The assigned user does not have the ClientManager role.",
             ErrorCategory.Validation);
+
+    public static readonly CustomerErrors ClientManagerReassignmentForbidden =
+        new("ERR_CUSTOMER_CLIENT_MANAGER_REASSIGNMENT_FORBIDDEN",
+            "Non-admin users may only assign customers to themselves.",
+            ErrorCategory.Forbidden);
 }

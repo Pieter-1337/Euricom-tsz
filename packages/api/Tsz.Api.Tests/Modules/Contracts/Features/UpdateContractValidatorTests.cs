@@ -3,6 +3,7 @@ using Moq;
 using Shouldly;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Infrastructure.Auth;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Contracts.Features;
 using Tsz.Modules.Users.Contracts;
@@ -42,7 +43,17 @@ public class UpdateContractValidatorTests
             .Setup(m => m.ExecuteQueryAsync(It.IsAny<UserHasRoleQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(userIsClientManager);
 
-        return new UpdateContractValidator(uow.Object, users.Object);
+        var scope = new Mock<IDataScopeAccessor>();
+        scope.Setup(s => s.OwnershipFilterAsync(
+                It.IsAny<OwnershipPolicy<Contract>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Expression<Func<Contract, bool>>?)null);
+
+        var resolver = new Mock<ICurrentUserResolver>();
+        resolver.Setup(r => r.ResolveAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ResolvedUser(Guid.NewGuid(), [nameof(UserRole.Admin)]));
+
+        return new UpdateContractValidator(uow.Object, users.Object, scope.Object, resolver.Object);
     }
 
     private static UpdateContractCommand ValidCmd(

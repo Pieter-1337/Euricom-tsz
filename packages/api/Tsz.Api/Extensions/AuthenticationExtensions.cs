@@ -34,6 +34,12 @@ public static class AuthenticationExtensions
                 policy.RequireAuthenticatedUser();
                 policy.Requirements.Add(new RequireAdminRequirement());
             });
+
+            options.AddPolicy(AuthorizationPolicies.RequireClientManager, policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.Requirements.Add(new RequireClientManagerRequirement());
+            });
         });
 
         return services;
