@@ -1,0 +1,184 @@
+packages/web/src/features/users/components/users-list.tsx
+  s_9b92a44041f212::t_3aa922b0c4f63d 102
+  s_9b92a44041f212::t_d5e9a5ff227bf9 3,7
+  s_9b92a44041f212::t_feae213a4644e6 49-77
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Features/DeleteContract.cs
+  s_9b92a44041f212::t_57e6bbc6a81f3a 1,4-5,17,19,22,26,30-37
+packages/web/src/features/contracts/components/contract-edit-form.tsx
+  s_39e625d093c7b2::t_8ca00f0f263cce 140
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Features/UpdateContract.cs
+  s_9b92a44041f212::t_1a82f5e9b9313f 28-35,39-40
+  s_9b92a44041f212::t_4c90e1d2e94774 70-73,75
+  s_9b92a44041f212::t_07b2e7564a8048 1,4-5
+  s_9b92a44041f212::t_6e1239cfbe1721 103-118
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/UpdateCustomerValidatorTests.cs
+  s_9b92a44041f212::t_f78a5b1c95a134 38-48
+  s_9b92a44041f212::t_05af5d756a2cad 5
+PLAN-TASKS-RESURRECT-UX.md
+  s_39e625d093c7b2::t_4edfeed8888ecf 1-86
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/RequireClientManagerAuthorizationHandler.cs
+  s_9b92a44041f212::t_16c4a6102fd7cb 1-15,17-19
+  s_9b92a44041f212::t_5cf6e6493bf689 16
+packages/api/Tsz.Api.Tests/Modules/Contracts/Features/UpdateContractValidatorTests.cs
+  s_9b92a44041f212::t_daef91fcc7c754 46-56
+  s_9b92a44041f212::t_83ee449867c14f 6
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/GetCustomerById.cs
+  s_9b92a44041f212::t_95457c637a7c96 1,17-18
+  s_9b92a44041f212::t_cabf32c15c0f7f 4,19,22
+  s_9b92a44041f212::t_c15085a1f69436 3,11,14-16,20-21,23
+packages/web/src/components/list/infinite-table.tsx
+  s_9b92a44041f212::t_dae795b90e49e2 9,21
+  s_9b92a44041f212::t_74432e3653afce 69-70
+packages/api/Tsz.Api/Extensions/AuthenticationExtensions.cs
+  s_9b92a44041f212::t_8998c91898af09 37-42
+packages/api/Modules/Customers/Tsz.Modules.Customers/Endpoints/CustomerEndpoints.cs
+  s_9b92a44041f212::t_cea3520077ea46 15
+packages/web/src/routes/_protected.tsx
+  s_9b92a44041f212::t_da2cacfcfa5271 88-93
+  s_9b92a44041f212::t_1c96bb6b8c3ab0 102-112
+  s_9b92a44041f212::t_45ecb7781954b2 41-42
+  s_9b92a44041f212::t_a2031d6e156fd3 135,137
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/GetCustomersPagedHandlerTests.cs
+  s_9b92a44041f212::t_350b7544dbdc47 37,48-56,58
+  s_9b92a44041f212::t_a0d82a130d6e4f 237-242,244-257,259-265
+  s_9b92a44041f212::t_0f62f6c8b58551 8
+  s_9b92a44041f212::t_cd36436e9a5f5b 243,258
+  s_9b92a44041f212::t_3e955d852b217a 35-36,47,57
+packages/web/src/features/contracts/schemas.ts
+  s_058c186a38f72d::t_e2498994b8dd10 22
+packages/api/Tsz.Infrastructure/Auth/AuthorizationPolicies.cs
+  s_9b92a44041f212::t_f11fa9b64365af 6
+packages/api/Tsz.Infrastructure/Auth/ICurrentUserResolver.cs
+  s_9b92a44041f212::t_048f967f103287 1-9
+packages/web/src/routes/_protected/admin.tsx
+  s_9b92a44041f212::t_2eae23a9eca067 7-9
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/GetCustomerByIdHandlerTests.cs
+  s_9b92a44041f212::t_3a5ddf337627ad 99-106
+  s_9b92a44041f212::t_78d94548cf1760 4
+  s_9b92a44041f212::t_029dcd93b49515 8,14-34,52,71,77-78,80-82,84-88,90-97
+  s_9b92a44041f212::t_b0a3225c9997b0 79,83,89,98
+packages/web/src/features/contracts/components/contract-task-subform.tsx
+  s_058c186a38f72d::t_f5155be4eddc19 42-44,49-50,56-87,90,92,94,96-125
+  s_058c186a38f72d::t_3bd30c9ff7f7d9 45-47,51-55
+  s_058c186a38f72d::t_2e89cc33738613 15-18
+packages/web/src/routes/_protected/admin/users.tsx
+  s_9b92a44041f212::t_230e80bd01b6cf 1-10
+packages/api/Modules/Customers/Tsz.Modules.Customers/Domain/Customers/CustomerErrors.cs
+  s_9b92a44041f212::t_673b266c070d22 22-26
+packages/api/Tsz.Api.Tests/Modules/Customers/Features/CreateCustomerValidatorTests.cs
+  s_9b92a44041f212::t_dd77042e5a5331 23-29
+  s_9b92a44041f212::t_405007caa1cbab 3
+IMPLEMENTATION.md
+  s_058c186a38f72d::t_487674688ea48d 1,11-14,18-20,24-26,30-31,35
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Features/GetContractsPaged.cs
+  s_9b92a44041f212::t_0ad2177baeb9a0 3,33,36-39,47-48,60,66,68
+  s_9b92a44041f212::t_e4e7c05666bcad 8
+  s_9b92a44041f212::t_69f48e71d7b178 30-32,58-59,61,67,69-70
+packages/web/src/features/contracts/components/contract-create-form.tsx
+  s_39e625d093c7b2::t_f679f320580e8e 78
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/UpdateCustomer.cs
+  s_9b92a44041f212::t_afe6121f6b73b8 1,4-5,26-27,29-33,37-38,72-75,77,81-97
+packages/api/Tsz.Api.Tests/Modules/Contracts/Features/GetContractByIdHandlerTests.cs
+  s_9b92a44041f212::t_7a45e483d132db 6,22-42,57,73,78-96
+  s_9b92a44041f212::t_d757f6b9320cde 4
+  s_9b92a44041f212::t_8c9b24d3630294 97-104
+packages/web/src/features/customers/components/customers-list.tsx
+  s_9b92a44041f212::t_d78fdc8501fa88 81-109
+  s_9b92a44041f212::t_87952bc14d777e 134
+  s_9b92a44041f212::t_9137e6953f1eea 5,9
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Features/GetContractById.cs
+  s_9b92a44041f212::t_5c922ec2356492 1,3-4,11,14-23
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetCurrentUser.cs
+  s_9b92a44041f212::t_bfbf6c9ef35c10 9,14
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Domain/Contracts/ContractErrors.cs
+  s_9b92a44041f212::t_bfcbd69a26b2ed 67-71
+packages/api/Modules/Users/Tsz.Modules.Users/UsersModule.cs
+  s_9b92a44041f212::t_21af547ed0d62b 21-23,25
+  s_9b92a44041f212::t_ffc9ce9d65704c 27
+  s_9b92a44041f212::t_6465605ad47e18 6
+packages/api/Tsz.Infrastructure/Auth/RequireClientManagerRequirement.cs
+  s_9b92a44041f212::t_283462dc6f7b2c 1-5
+packages/web/src/components/list/empty-state.tsx
+  s_9b92a44041f212::t_14b53703140acd 1-34
+packages/web/src/features/contracts/components/contracts-list.tsx
+  s_9b92a44041f212::t_a113523b1918a0 189
+  s_9b92a44041f212::t_0150a1cc8d5289 5,11
+  s_9b92a44041f212::t_f1ece91c9604bf 56-84
+packages/api/Tsz.Infrastructure/Auth/IDataScopeAccessor.cs
+  s_9b92a44041f212::t_15bfc870357153 1-19
+packages/api/Modules/Customers/Tsz.Modules.Customers/CrossModule/CustomerExistsQueryHandler.cs
+  s_9b92a44041f212::t_c11c1673dcca17 1,3-4,7,11,14-21
+packages/api/Tsz.Api.Tests/Modules/Contracts/Features/DeleteContractValidatorTests.cs
+  s_9b92a44041f212::t_5586d6cd788cf7 5
+  s_9b92a44041f212::t_bd97ddb098f65b 23-29
+packages/api/Tsz.Infrastructure/Auth/OwnershipPolicy.cs
+  s_9b92a44041f212::t_3b00766f5c24b2 1-10
+packages/api/Tsz.Infrastructure/Auth/ResolvedUser.cs
+  s_9b92a44041f212::t_dd524b0ad219c9 1-8
+PLAN-SCOPED-FILTER-EXTRACTION.md
+  s_9b92a44041f212::t_1b72c8cbbb8ab9 1-282
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/CreateCustomer.cs
+  s_9b92a44041f212::t_b23a02d5fc1c3d 3,22,24,27,59-70
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/GetCustomersPaged.cs
+  s_9b92a44041f212::t_a1d161e0c0fb80 3,6,26,29-32,47-52
+packages/web/src/features/contracts/server-fns.ts
+  s_058c186a38f72d::t_aecf68e9b8a4c0 40
+packages/api/Tsz.Api.Tests/Modules/Users/Features/GetCurrentUserHandlerTests.cs
+  s_9b92a44041f212::t_a5a0ff39ce49af 17-18,20,34-35,37
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Endpoints/ContractEndpoints.cs
+  s_9b92a44041f212::t_83c7bbce308d13 17
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/DataScopeAccessor.cs
+  s_9b92a44041f212::t_4495e253695dbb 1-14,16-35
+  s_9b92a44041f212::t_86a1bc3a51227b 15
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/RequireAdminAuthorizationHandler.cs
+  s_9b92a44041f212::t_3a7d16c8c8ca7c 15
+packages/api/Tsz.Api.Tests/Modules/Contracts/Features/GetContractsPagedHandlerTests.cs
+  s_9b92a44041f212::t_2dd528dd02fc1f 214,229
+  s_9b92a44041f212::t_9f2d332a1813a7 10
+  s_9b92a44041f212::t_3fcd6a5f7ff0e9 34,50-58,60
+  s_9b92a44041f212::t_8416af6907228a 33,59
+  s_9b92a44041f212::t_9b8084d67e6e6a 208-213,215-228,230-236
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/CurrentUserResolver.cs
+  s_9b92a44041f212::t_45dd70a3662e7f 7-10,12,15-16,21-29
+packages/api/Modules/Customers/Tsz.Modules.Customers/Features/DeleteCustomer.cs
+  s_9b92a44041f212::t_723755a6b78ea7 1,4-5,17,19,22,26,30-37
+packages/api/Tsz.Api.Tests.Integration/ContractEndpointsTests.cs
+  s_39e625d093c7b2::t_ef779ffd99b77a 944-971
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "143bb8be3743dc69e4fed3427b3ad289e395051c",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_058c186a38f72d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "faadd201-7c87-421f-8ddb-462aa0f11dbc",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_39e625d093c7b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "743354a9-0ab1-4cd6-bfbf-9341c7976544",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_9b92a44041f212": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "df09e6fb-e9f8-4020-9634-b2c25e12430b",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
