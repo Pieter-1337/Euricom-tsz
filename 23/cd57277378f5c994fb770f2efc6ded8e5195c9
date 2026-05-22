@@ -1,0 +1,90 @@
+packages/api/Modules/Users/Tsz.Modules.Users/UsersModule.cs
+  s_312cb8507e1d01::t_f65b166284f642 27
+packages/api/Tsz.Infrastructure/Auth/AuthorizationPolicies.cs
+  s_312cb8507e1d01::t_b5263263266178 6
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Domain/Contracts/ContractErrors.cs
+  s_312cb8507e1d01::t_dd9891ae7de660 72-81
+packages/web/src/components/ui/decimal-input.tsx
+  s_312cb8507e1d01::t_4fdcc8d5206c09 15
+  s_312cb8507e1d01::t_b181448979aac6 58
+  s_312cb8507e1d01::t_0338c6ae621487 40
+packages/web/src/features/contracts/components/contracts-list.tsx
+  s_312cb8507e1d01::t_b429daf71ff6f2 21
+  s_312cb8507e1d01::t_7b07af640abfee 79-83
+  s_312cb8507e1d01::t_ce4eafd1e06712 137-141
+packages/web/src/routes/_protected/admin/customers/index.tsx
+  s_312cb8507e1d01::t_9613062443e025 3-4,7,9-14
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Endpoints/ContractEndpoints.cs
+  s_312cb8507e1d01::t_0010437f7a2afd 17
+  s_312cb8507e1d01::t_935ec452dddba0 73
+  s_312cb8507e1d01::t_5114860e85ea96 51
+packages/web/src/routes/_protected/admin/customers/new.tsx
+  s_312cb8507e1d01::t_7bb6dcf798341f 1,3-4,7-10
+packages/web/src/routes/_protected/admin/customers/$id.tsx
+  s_312cb8507e1d01::t_734dd879525eea 4,13,25
+packages/web/src/features/contracts/components/contract-edit-form.tsx
+  s_312cb8507e1d01::t_a5ee6151816c7d 4,27,30-33,95-112,126-128,140,149-154,167,173,175
+packages/api/Tsz.Infrastructure/Auth/RequireAdminOrAnyClientManagerRequirement.cs
+  s_312cb8507e1d01::t_386af06028006d 1-5
+packages/web/src/components/form/form-context.tsx
+  s_312cb8507e1d01::t_290a8c8acd316e 195,202,218
+  s_312cb8507e1d01::t_12a0295f32dfc7 33-43,55
+  s_312cb8507e1d01::t_0d46e24993e9d7 316,325
+  s_312cb8507e1d01::t_14fbe53e2f6511 116,124,141
+  s_312cb8507e1d01::t_6b779b00d47f76 236,243,262
+packages/web/src/routes/_protected/admin/contracts/$contractId.tsx
+  s_312cb8507e1d01::t_aa7abb56aad9d4 4,13,23
+packages/api/Modules/Customers/Tsz.Modules.Customers/Endpoints/CustomerEndpoints.cs
+  s_312cb8507e1d01::t_173bb6b6afc7dc 50,63,72
+  s_312cb8507e1d01::t_2a38a8035f07d8 15
+packages/api/Tsz.Api.Tests/Modules/Contracts/Features/UpdateContractHandlerTests.cs
+  s_312cb8507e1d01::t_484c75351d2d76 245-269
+  s_312cb8507e1d01::t_ecb4841efb3e2f 8
+  s_312cb8507e1d01::t_86a1e9c79e1b77 5,14-15,23-27,30-35,37,47-48,70,77-78,92,100-101,116,125-126,140,146-147,164,171-172,192,198-199,213-244,270-403
+packages/web/src/features/customers/components/customer-edit-card.tsx
+  s_312cb8507e1d01::t_6404f6659d5fb5 4,27,30-32,72-89,108-110,115-117,119,128,136-138,140-145,148,152
+packages/web/src/features/contracts/components/contract-task-subform.tsx
+  s_312cb8507e1d01::t_734bf60b2f8477 24,33,37-45,77,80,87,97-108,122
+packages/web/src/routes/_protected/admin/contracts/new.tsx
+  s_312cb8507e1d01::t_fe55f2c5902bc0 1,3-4,7-10
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Features/GetContractsPaged.cs
+  s_312cb8507e1d01::t_93fc75ab1361c8 38
+packages/api/Tsz.Api.Tests.Integration/CustomerEndpointsTests.cs
+  s_312cb8507e1d01::t_fbe7f745f2fd9b 267-323
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Features/UpdateContract.cs
+  s_312cb8507e1d01::t_9224303688bb63 1,5,140,147-153,155,162-168,178-187
+  s_312cb8507e1d01::t_b4dbd08f173255 154,156-161,170
+packages/api/Tsz.Api.Tests.Integration/ContractEndpointsTests.cs
+  s_312cb8507e1d01::t_7d3d71295eefb1 73-86,1134
+  s_312cb8507e1d01::t_5e174b3f093923 1135-1333
+packages/api/Modules/Users/Tsz.Modules.Users/Endpoints/UserEndpoints.cs
+  s_312cb8507e1d01::t_19fa6f18c56117 25,34-37
+packages/api/Tsz.Api.Tests.Integration/UserEndpointsTests.cs
+  s_312cb8507e1d01::t_71936c48fb7f46 106-128
+packages/web/src/routes/_protected/admin/contracts/index.tsx
+  s_312cb8507e1d01::t_d1a3a73e48e6ca 3-4,7,9-14
+packages/web/src/features/customers/components/customers-list.tsx
+  s_312cb8507e1d01::t_946f08b9b8a53f 17
+  s_312cb8507e1d01::t_7f067e5f6b3283 103-107
+  s_312cb8507e1d01::t_4322c173f2a337 116-120
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/RequireAdminOrAnyClientManagerAuthorizationHandler.cs
+  s_312cb8507e1d01::t_3dd3c5e62c6cc5 1-19
+packages/api/Tsz.Api/Extensions/AuthenticationExtensions.cs
+  s_312cb8507e1d01::t_c3089290394af6 38,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "23cd57277378f5c994fb770f2efc6ded8e5195c9",
+  "prompts": {},
+  "sessions": {
+    "s_312cb8507e1d01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ef7d2fef-9ffc-40d0-90a2-4da4b61f8dc4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
