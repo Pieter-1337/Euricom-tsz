@@ -104,6 +104,29 @@ public class UserEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
+    public async Task GetUsers_AsClientManager_ReturnsOk()
+    {
+        await SeedUserAsync(TestEmail, UserRole.ClientManager, oid: TestOid);
+
+        var response = await Client.GetAsync("/api/users");
+
+        response.EnsureSuccessStatusCode();
+        var list = await response.Content.ReadFromJsonAsync<List<UserDto>>(Json);
+        Assert.NotNull(list);
+        Assert.Contains(list, u => u.Email == TestEmail);
+    }
+
+    [Fact]
+    public async Task GetUsersPaged_AsClientManager_ReturnsForbidden()
+    {
+        await SeedUserAsync(TestEmail, UserRole.ClientManager, oid: TestOid);
+
+        var response = await Client.GetAsync("/api/users/paged");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
     public async Task CreateUser_AsAdmin_Valid_ReturnsCreated()
     {
         await SeedUserAsync(TestEmail, UserRole.Admin, oid: TestOid);

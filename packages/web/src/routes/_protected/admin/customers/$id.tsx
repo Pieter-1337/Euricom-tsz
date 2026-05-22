@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { fetchCustomer } from '#/features/customers/server-fns';
 import { CustomerEditCard } from '#/features/customers/components/customer-edit-card';
+import type { CurrentUser } from '#/server/current-user';
 
 export const Route = createFileRoute('/_protected/admin/customers/$id')({
   loader: ({ params }) => fetchCustomer({ data: params.id }),
@@ -9,6 +10,7 @@ export const Route = createFileRoute('/_protected/admin/customers/$id')({
 
 function EditCustomerPage() {
   const customer = Route.useLoaderData();
+  const { currentUser } = Route.useRouteContext() as { currentUser: CurrentUser };
 
   if (!customer) {
     return (
@@ -20,7 +22,7 @@ function EditCustomerPage() {
 
   return (
     <main>
-      <CustomerEditCard customer={customer} />
+      <CustomerEditCard customer={customer} currentUser={currentUser} />
     </main>
   );
 }

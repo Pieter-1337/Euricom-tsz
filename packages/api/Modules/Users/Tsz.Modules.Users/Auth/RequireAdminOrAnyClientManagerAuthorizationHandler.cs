@@ -4,12 +4,12 @@ using Tsz.Modules.Users.Contracts;
 
 namespace Tsz.Modules.Users.Auth;
 
-public sealed class RequireClientManagerAuthorizationHandler(ICurrentUserResolver resolver)
-    : AuthorizationHandler<RequireClientManagerRequirement>
+public sealed class RequireAdminOrAnyClientManagerAuthorizationHandler(ICurrentUserResolver resolver)
+    : AuthorizationHandler<RequireAdminOrAnyClientManagerRequirement>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        RequireClientManagerRequirement requirement)
+        RequireAdminOrAnyClientManagerRequirement requirement)
     {
         var user = await resolver.ResolveAsync();
         if (user is null) return;

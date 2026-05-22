@@ -12,7 +12,7 @@ public static class CustomerEndpoints
     public static void Map(IEndpointRouteBuilder app)
     {
         var group = app.MapApiGroup("customers")
-            .RequireAuthorization(AuthorizationPolicies.RequireClientManager);
+            .RequireAuthorization(AuthorizationPolicies.RequireAdminOrAnyClientManager);
 
         group.MapGet("/", async (IDispatcher dispatcher, CancellationToken ct) =>
             TypedResults.Ok(await dispatcher.SendAsync(new GetCustomersQuery(), ct)));
@@ -47,7 +47,7 @@ public static class CustomerEndpoints
         {
             var dto = await dispatcher.SendAsync(command, ct);
             return Results.CreatedAtRoute("GetCustomerById", new { id = dto.Id }, dto);
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
         group.MapPut("/{id:guid}", async (
             Guid id,
@@ -60,7 +60,7 @@ public static class CustomerEndpoints
 
             var dto = await dispatcher.SendAsync(command, ct);
             return Results.Ok(dto);
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
         group.MapDelete("/{id:guid}", async (
             Guid id,
@@ -69,6 +69,6 @@ public static class CustomerEndpoints
         {
             await dispatcher.SendAsync(new DeleteCustomerCommand(id), ct);
             return Results.NoContent();
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
     }
 }

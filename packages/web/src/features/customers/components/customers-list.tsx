@@ -14,7 +14,7 @@ import { fetchCustomersPaged } from '#/features/customers/server-fns';
 import { fetchUsersByRole } from '#/features/users/server-fns';
 import type { CustomerSortKey } from '#/features/customers/schemas';
 
-export function CustomersList() {
+export function CustomersList({ canCreate }: { canCreate: boolean }) {
   const router = useRouter();
 
   const { data: managers = [] } = useQuery({
@@ -100,9 +100,11 @@ export function CustomersList() {
       title="No customers yet"
       description="Add your first customer to get started."
       action={
-        <Button asChild size="sm">
-          <Link to="/admin/customers/new">New customer</Link>
-        </Button>
+        canCreate ? (
+          <Button asChild size="sm">
+            <Link to="/admin/customers/new">New customer</Link>
+          </Button>
+        ) : undefined
       }
     />
   );
@@ -111,9 +113,11 @@ export function CustomersList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Customers</h1>
-        <Button asChild>
-          <Link to="/admin/customers/new">New customer</Link>
-        </Button>
+        {canCreate && (
+          <Button asChild>
+            <Link to="/admin/customers/new">New customer</Link>
+          </Button>
+        )}
       </div>
       <ListShell
         toolbar={{

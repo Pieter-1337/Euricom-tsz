@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import type { Contract } from '#/api/contracts';
+import type { CurrentUser } from '#/server/current-user';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
 import { Button } from '#/components/ui/button';
@@ -23,8 +24,12 @@ const FIELD_PATHS: (keyof ContractFormValues)[] = [
   'tasks',
 ];
 
-export function ContractEditForm({ contract }: { contract: Contract }) {
+export function ContractEditForm({ contract, currentUser }: { contract: Contract; currentUser: CurrentUser }) {
   const router = useRouter();
+
+  const isAdmin = currentUser.roles.includes(UserRole.Admin);
+  const canEditZone1 = isAdmin;
+  const canEditZone2 = isAdmin || currentUser.id === contract.clientManagerId;
 
   const { data: managers = [] } = useQuery({
     queryKey: ['client-managers'],
@@ -87,22 +92,24 @@ export function ContractEditForm({ contract }: { contract: Contract }) {
     <main>
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Contract #{contract.number}</h1>
-        <Button
-          type="button"
-          variant="destructive"
-          size="sm"
-          onClick={async () => {
-            if (!confirm(`Delete contract #${contract.number} — ${contract.subject}?`)) return;
-            try {
-              await deleteContract({ data: contract.id });
-              router.navigate({ to: '/admin/contracts' });
-            } catch (e) {
-              handleApiError(e);
-            }
-          }}
-        >
-          Delete
-        </Button>
+        {isAdmin && (
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={async () => {
+              if (!confirm(`Delete contract #${contract.number} — ${contract.subject}?`)) return;
+              try {
+                await deleteContract({ data: contract.id });
+                router.navigate({ to: '/admin/contracts' });
+              } catch (e) {
+                handleApiError(e);
+              }
+            }}
+          >
+            Delete
+          </Button>
+        )}
       </div>
       <form.AppForm>
         <form.FormErrorBanner message={serverError} />
@@ -116,7 +123,9 @@ export function ContractEditForm({ contract }: { contract: Contract }) {
         >
           <section className="grid gap-4">
             <h2 className="text-lg font-semibold">General</h2>
-            <form.AppField name="subject">{(field) => <field.TextField label="Subject" />}</form.AppField>
+            <form.AppField name="subject">
+              {(field) => <field.TextField label="Subject" disabled={!canEditZone1} />}
+            </form.AppField>
             <div className="grid gap-2">
               <Label htmlFor="customer">Customer</Label>
               <Input id="customer" value={customerLabel} disabled />
@@ -128,6 +137,7 @@ export function ContractEditForm({ contract }: { contract: Contract }) {
                   options={managerOptions}
                   placeholder="(none)"
                   emptyMessage="No client managers found."
+                  disabled={!canEditZone1}
                 />
               )}
             </form.AppField>
@@ -136,8 +146,12 @@ export function ContractEditForm({ contract }: { contract: Contract }) {
           <section className="grid gap-4">
             <h2 className="text-lg font-semibold">Period</h2>
             <div className="grid grid-cols-2 gap-4">
-              <form.AppField name="start">{(field) => <field.DateField label="Start" />}</form.AppField>
-              <form.AppField name="end">{(field) => <field.DateField label="End" />}</form.AppField>
+              <form.AppField name="start">
+                {(field) => <field.DateField label="Start" disabled={!canEditZone1} />}
+              </form.AppField>
+              <form.AppField name="end">
+                {(field) => <field.DateField label="End" disabled={!canEditZone1} />}
+              </form.AppField>
             </div>
           </section>
 
@@ -150,14 +164,15 @@ export function ContractEditForm({ contract }: { contract: Contract }) {
                   options={consultantOptions}
                   placeholder="Select consultants"
                   emptyMessage="No users found."
+                  disabled={!canEditZone2}
                 />
               )}
             </form.AppField>
           </section>
 
-          <ContractTaskSubform form={form as never} archived={archivedTasks} />
+          <ContractTaskSubform form={form as never} archived={archivedTasks} disabled={!canEditZone2} />
 
-          <form.FormActions cancel />
+          {(canEditZone1 || canEditZone2) && <form.FormActions cancel />}
         </form>
       </form.AppForm>
     </main>

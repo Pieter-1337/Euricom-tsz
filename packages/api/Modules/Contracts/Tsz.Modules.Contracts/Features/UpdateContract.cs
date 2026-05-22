@@ -1,6 +1,8 @@
+using FluentValidation.Results;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Auth.Validation;
+using Tsz.Infrastructure.Errors;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Users.Contracts;
@@ -59,9 +61,6 @@ public sealed class UpdateContractValidator : ScopedRequestValidator<UpdateContr
             .WithError(ContractErrors.ConsultantNotFound)
             .When(x => x.Id != Guid.Empty && x.ConsultantIds is { Count: > 0 }
                        && x.ConsultantIds.Distinct().Count() == x.ConsultantIds.Count);
-
-        RuleForSelfAssignedManager(x => x.ClientManagerId)
-            .WithError(ContractErrors.ClientManagerReassignmentForbidden);
 
         RuleForOwnedEntity(x => x.Id, GetContractsPagedHandler.ScopePolicy, id => c => c.Id == id)
             .WithError(ContractErrors.NotFound)
@@ -138,17 +137,37 @@ public sealed class UpdateContractValidator : ScopedRequestValidator<UpdateContr
     }
 }
 
-public sealed class UpdateContractHandler(IUnitOfWork uow)
+public sealed class UpdateContractHandler(IUnitOfWork uow, ICurrentUserResolver currentUser)
     : ICommandHandler<UpdateContractCommand, ContractDto>
 {
     public async Task<ContractDto> HandleAsync(UpdateContractCommand command, CancellationToken ct = default)
     {
         var contract = await uow.RepositoryFor<Contract>().GetByIdAsync(command.Id, ct);
 
-        contract!.Rename(command.Subject.Trim());
-        contract.AssignClientManager(command.ClientManagerId);
-        contract.UpdatePeriod(command.Start, command.End);
-        contract.ReplaceConsultants(command.ConsultantIds);
+        var caller = await currentUser.ResolveAsync(ct);
+        var isAdmin = caller?.HasRole(AuthorizationPolicies.AdminRoleName) ?? false;
+        var isContractCm = caller is not null && contract!.ClientManagerId == caller.Id;
+
+        if (!isAdmin && !isContractCm)
+            throw Forbidden(ContractErrors.EditNotAuthorized);
+
+        if (isAdmin)
+        {
+            contract!.Rename(command.Subject.Trim());
+            contract.AssignClientManager(command.ClientManagerId);
+            contract.UpdatePeriod(command.Start, command.End);
+        }
+        else
+        {
+            var subjectChanged = (command.Subject?.Trim() ?? string.Empty) != contract!.Subject.Trim();
+            var managerChanged = command.ClientManagerId != contract.ClientManagerId;
+            var startChanged = command.Start != contract.Start;
+            var endChanged = command.End != contract.End;
+            if (subjectChanged || managerChanged || startChanged || endChanged)
+                throw Forbidden(ContractErrors.Zone1FieldNotEditable);
+        }
+
+        contract!.ReplaceConsultants(command.ConsultantIds);
 
         if (command.Tasks is not null)
             contract.ApplyTasks(command.Tasks, DateTimeOffset.UtcNow);
@@ -156,4 +175,14 @@ public sealed class UpdateContractHandler(IUnitOfWork uow)
         await uow.SaveChangesAsync(ct);
         return ContractDto.ToDto(contract);
     }
+
+    private static FluentValidation.ValidationException Forbidden(IErrorCode code) =>
+        new(new[]
+        {
+            new ValidationFailure(string.Empty, code.Message)
+            {
+                ErrorCode = code.Code,
+                CustomState = code,
+            },
+        });
 }

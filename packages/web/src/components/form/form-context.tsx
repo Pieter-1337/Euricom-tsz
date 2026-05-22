@@ -30,7 +30,17 @@ function clearServerErrorFor(field: FieldWithForm) {
   });
 }
 
-function TextField({ label, type, hideLabel }: { label: string; type?: string; hideLabel?: boolean }) {
+function TextField({
+  label,
+  type,
+  hideLabel,
+  disabled,
+}: {
+  label: string;
+  type?: string;
+  hideLabel?: boolean;
+  disabled?: boolean;
+}) {
   const field = useFieldContext<string>();
   return (
     <div className="grid gap-2">
@@ -42,6 +52,7 @@ function TextField({ label, type, hideLabel }: { label: string; type?: string; h
         name={field.name}
         type={type}
         value={field.state.value}
+        disabled={disabled}
         aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
         onBlur={field.handleBlur}
         onChange={(e) => {
@@ -102,6 +113,7 @@ function DecimalField({
   max,
   decimals,
   hideLabel,
+  disabled,
 }: {
   label: ReactNode;
   suffix?: string;
@@ -109,6 +121,7 @@ function DecimalField({
   max?: number;
   decimals?: number;
   hideLabel?: boolean;
+  disabled?: boolean;
 }) {
   const field = useFieldContext<number>();
   const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
@@ -125,6 +138,7 @@ function DecimalField({
           min={min}
           max={max}
           decimals={decimals}
+          disabled={disabled}
           aria-invalid={hasError ? true : undefined}
           className="flex-1"
           onBlur={field.handleBlur}
@@ -178,12 +192,14 @@ function ComboboxField({
   placeholder,
   searchPlaceholder,
   emptyMessage,
+  disabled,
 }: {
   label: string;
   options: readonly ComboboxOption[];
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
+  disabled?: boolean;
 }) {
   const field = useFieldContext<string>();
   const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
@@ -199,6 +215,7 @@ function ComboboxField({
           field.handleChange(value);
         }}
         onBlur={field.handleBlur}
+        disabled={disabled}
         aria-invalid={hasError ? true : undefined}
         options={options}
         placeholder={placeholder ?? `Select ${label.toLowerCase()}`}
@@ -216,12 +233,14 @@ function MultiSelectField<T extends string>({
   placeholder,
   searchPlaceholder,
   emptyMessage,
+  disabled,
 }: {
   label: string;
   options: readonly MultiComboboxOption[] | readonly T[];
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
+  disabled?: boolean;
 }) {
   const field = useFieldContext<T[]>();
   const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
@@ -240,6 +259,7 @@ function MultiSelectField<T extends string>({
           field.handleChange(next as T[]);
         }}
         onBlur={field.handleBlur}
+        disabled={disabled}
         aria-invalid={hasError ? true : undefined}
         options={normalizedOptions}
         placeholder={placeholder ?? `Select ${label.toLowerCase()}`}
@@ -293,7 +313,7 @@ function CheckboxField({ label }: { label: string }) {
   );
 }
 
-function DateField({ label }: { label: string }) {
+function DateField({ label, disabled }: { label: string; disabled?: boolean }) {
   const field = useFieldContext<string>();
   return (
     <div className="grid gap-2 self-start">
@@ -302,6 +322,7 @@ function DateField({ label }: { label: string }) {
         id={field.name}
         name={field.name}
         value={field.state.value}
+        disabled={disabled}
         aria-invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0 ? true : undefined}
         onBlur={field.handleBlur}
         onChange={(value) => {

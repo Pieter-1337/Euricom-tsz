@@ -18,7 +18,7 @@ import { fetchAllCustomers } from '#/features/customers/server-fns';
 const dateFmt = new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
 const formatDate = (iso: string | null) => (iso ? dateFmt.format(new Date(iso)) : '');
 
-export function ContractsList() {
+export function ContractsList({ canCreate }: { canCreate: boolean }) {
   const router = useRouter();
   const [activeOnDate, setActiveOnDate] = useState('');
   const [customerId, setCustomerId] = useState('');
@@ -76,9 +76,11 @@ export function ContractsList() {
       title="No contracts yet"
       description="Create a contract once you have at least one customer."
       action={
-        <Button asChild size="sm">
-          <Link to="/admin/contracts/new">New contract</Link>
-        </Button>
+        canCreate ? (
+          <Button asChild size="sm">
+            <Link to="/admin/contracts/new">New contract</Link>
+          </Button>
+        ) : undefined
       }
     />
   );
@@ -132,9 +134,11 @@ export function ContractsList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Contracts</h1>
-        <Button asChild>
-          <Link to="/admin/contracts/new">New contract</Link>
-        </Button>
+        {canCreate && (
+          <Button asChild>
+            <Link to="/admin/contracts/new">New contract</Link>
+          </Button>
+        )}
       </div>
       <ListShell
         toolbar={{

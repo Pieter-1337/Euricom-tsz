@@ -264,6 +264,63 @@ public class CustomerEndpointsTests : IntegrationTestBase, IAsyncLifetime
         return id;
     }
 
+    private async Task<Guid> SeedClientManagerAsCallerAsync(string email = "caller-cm@test.com")
+    {
+        var id = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Caller", "Manager", email, [UserRole.ClientManager]);
+            user.Id = id;
+            user.LinkEntraOid(TestOid);
+            uow.RepositoryFor<User>().Add(user);
+            await uow.SaveChangesAsync();
+        });
+        return id;
+    }
+
+    [Fact]
+    public async Task CreateCustomer_AsClientManager_Returns403()
+    {
+        await SeedClientManagerAsCallerAsync();
+
+        var response = await Client.PostAsJsonAsync("/api/customers",
+            new CreateCustomerCommand("Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: null));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateCustomer_AsClientManager_Returns403()
+    {
+        await SeedClientManagerAsCallerAsync();
+        var id = Guid.NewGuid();
+
+        var response = await Client.PutAsJsonAsync($"/api/customers/{id}",
+            new UpdateCustomerCommand(id, "Acme", new ContactPersonDto(null, "a@x.com"), null, ClientManagerId: null));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteCustomer_AsClientManager_Returns403()
+    {
+        await SeedClientManagerAsCallerAsync();
+
+        var response = await Client.DeleteAsync($"/api/customers/{Guid.NewGuid()}");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCustomers_AsClientManager_Returns200()
+    {
+        await SeedClientManagerAsCallerAsync();
+
+        var response = await Client.GetAsync("/api/customers");
+
+        response.EnsureSuccessStatusCode();
+    }
+
     [Fact]
     public async Task CreateCustomer_WithValidClientManager_PersistsAssignment()
     {

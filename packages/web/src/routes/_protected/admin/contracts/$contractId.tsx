@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { fetchContract } from '#/features/contracts/server-fns';
 import { ContractEditForm } from '#/features/contracts/components/contract-edit-form';
+import type { CurrentUser } from '#/server/current-user';
 
 export const Route = createFileRoute('/_protected/admin/contracts/$contractId')({
   loader: ({ params }) => fetchContract({ data: params.contractId }),
@@ -9,6 +10,7 @@ export const Route = createFileRoute('/_protected/admin/contracts/$contractId')(
 
 function EditContractPage() {
   const contract = Route.useLoaderData();
+  const { currentUser } = Route.useRouteContext() as { currentUser: CurrentUser };
 
   if (!contract) {
     return (
@@ -18,5 +20,5 @@ function EditContractPage() {
     );
   }
 
-  return <ContractEditForm contract={contract} />;
+  return <ContractEditForm contract={contract} currentUser={currentUser} />;
 }
