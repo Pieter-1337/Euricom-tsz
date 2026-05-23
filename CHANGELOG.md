@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-05-24
+
+### Timesheets — weekly time-entry grid
+
+- Consultants can now navigate to `/timesheets/week/{year}/{week}` to record their working hours per contract task for any week.
+- The grid shows one row per contract task, with editable cells per day (Mon–Sun). Weekend and public-holiday cells are read-only.
+- Cell hotkeys: `d` sets 8 h, `h` sets 4 h, `Del` clears the cell. Values are validated to 15-minute increments (0.25–8.00 h).
+- Per-row and per-day totals are computed client-side; the week total is shown in the bottom-right corner.
+- Add a task row via the "Add task row" picker — the list is filtered to contract tasks active for the logged-in consultant in the selected week.
+- Changes are automatically flushed as Draft to the backend when navigating away from the week or closing the tab — no explicit save button.
+- Week navigation: prev / next arrow buttons, a "Today" shortcut, and a calendar picker to jump directly to any week.
+- A stubbed "Submit" button is visible (no-op until the Submit/Approve slice lands).
+- New module pair `Tsz.Modules.Timesheets` + `Tsz.Modules.Timesheets.Contracts` with `TimesheetWeek` aggregate, `TimeEntry` children, and EF migration `AddTimesheets`.
+- Endpoints: `GET /api/timesheet-weeks/{userId}/{year}/{week}` (returns empty Draft when no record exists) and `PUT /api/timesheet-weeks/{userId}/{year}/{week}/bookings` (whole-week desired state, server-side diff).
+- Bulk PUT validates: dates inside the requested week, business days only, eligible contract tasks, valid duration increments, and Draft status.
+
 ## 2026-05-23
 
 ### Leave Types module

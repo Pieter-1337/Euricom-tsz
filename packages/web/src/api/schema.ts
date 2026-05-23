@@ -230,70 +230,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/users/{userId}/leaves': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          year?: number;
-        };
-        header?: never;
-        path: {
-          userId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['UserLeaveDto'][];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          userId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          'application/json': components['schemas']['UpdateUserLeavesBody'];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['UserLeaveDto'][];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/customers': {
     parameters: {
       query?: never;
@@ -575,6 +511,185 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/users/{userId}/leaves': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          year?: number;
+        };
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserLeaveDto'][];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateUserLeavesBody'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserLeaveDto'][];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}/bookings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['ApplyBookingsRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-selectable-tasks/{userId}/{year}/{week}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -588,6 +703,62 @@ export interface components {
     AnonymousTypeOfstringAndstring: {
       name: null | string;
       version: null | string;
+    };
+    ApplyBookingsRequest: {
+      bookings: components['schemas']['BookingInputDto'][];
+    };
+    BookingInputDto: {
+      /** Format: uuid */
+      contractTaskId: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    DayInfoDto: {
+      /** Format: date */
+      date: string;
+      isBusinessDay: boolean;
+    };
+    SelectableContractTaskDto: {
+      /** Format: uuid */
+      contractTaskId: string;
+      taskName: string;
+      /** Format: uuid */
+      contractId: string;
+      contractSubject: string;
+      /** Format: uuid */
+      customerId: string;
+    };
+    TimeEntryDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      contractTaskId: string;
+      taskName: string;
+      /** Format: uuid */
+      contractId: string;
+      contractSubject: string;
+      /** Format: uuid */
+      customerId: string;
+      customerName: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimesheetWeekDto: {
+      /** Format: uuid */
+      id: null | string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: int32 */
+      isoYear: number;
+      /** Format: int32 */
+      isoWeek: number;
+      status: string;
+      days: components['schemas']['DayInfoDto'][];
+      timeEntries: components['schemas']['TimeEntryDto'][];
     };
     ContactPersonDto: {
       name: null | string;

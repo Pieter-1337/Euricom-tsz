@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as NoAccessRouteImport } from './routes/no-access'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
+import { Route as ProtectedTimesheetsRouteImport } from './routes/_protected/timesheets'
 import { Route as ProtectedAdminRouteImport } from './routes/_protected/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedAdminUsersRouteImport } from './routes/_protected/admin/users'
@@ -24,6 +25,7 @@ import { Route as ProtectedAdminCustomersNewRouteImport } from './routes/_protec
 import { Route as ProtectedAdminCustomersIdRouteImport } from './routes/_protected/admin/customers/$id'
 import { Route as ProtectedAdminContractsNewRouteImport } from './routes/_protected/admin/contracts/new'
 import { Route as ProtectedAdminContractsContractIdRouteImport } from './routes/_protected/admin/contracts/$contractId'
+import { Route as ProtectedTimesheetsWeekYearWeekRouteImport } from './routes/_protected/timesheets/week/$year/$week'
 
 const NoAccessRoute = NoAccessRouteImport.update({
   id: '/no-access',
@@ -37,6 +39,11 @@ const ProtectedRoute = ProtectedRouteImport.update({
 const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedTimesheetsRoute = ProtectedTimesheetsRouteImport.update({
+  id: '/timesheets',
+  path: '/timesheets',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedAdminRoute = ProtectedAdminRouteImport.update({
@@ -106,11 +113,18 @@ const ProtectedAdminContractsContractIdRoute =
     path: '/contracts/$contractId',
     getParentRoute: () => ProtectedAdminRoute,
   } as any)
+const ProtectedTimesheetsWeekYearWeekRoute =
+  ProtectedTimesheetsWeekYearWeekRouteImport.update({
+    id: '/week/$year/$week',
+    path: '/week/$year/$week',
+    getParentRoute: () => ProtectedTimesheetsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
   '/no-access': typeof NoAccessRoute
   '/admin': typeof ProtectedAdminRouteWithChildren
+  '/timesheets': typeof ProtectedTimesheetsRouteWithChildren
   '/admin/users': typeof ProtectedAdminUsersRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/contracts/$contractId': typeof ProtectedAdminContractsContractIdRoute
@@ -122,10 +136,12 @@ export interface FileRoutesByFullPath {
   '/admin/contracts/': typeof ProtectedAdminContractsIndexRoute
   '/admin/customers/': typeof ProtectedAdminCustomersIndexRoute
   '/admin/users/': typeof ProtectedAdminUsersIndexRoute
+  '/timesheets/week/$year/$week': typeof ProtectedTimesheetsWeekYearWeekRoute
 }
 export interface FileRoutesByTo {
   '/no-access': typeof NoAccessRoute
   '/admin': typeof ProtectedAdminRouteWithChildren
+  '/timesheets': typeof ProtectedTimesheetsRouteWithChildren
   '/': typeof ProtectedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/contracts/$contractId': typeof ProtectedAdminContractsContractIdRoute
@@ -137,12 +153,14 @@ export interface FileRoutesByTo {
   '/admin/contracts': typeof ProtectedAdminContractsIndexRoute
   '/admin/customers': typeof ProtectedAdminCustomersIndexRoute
   '/admin/users': typeof ProtectedAdminUsersIndexRoute
+  '/timesheets/week/$year/$week': typeof ProtectedTimesheetsWeekYearWeekRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteWithChildren
   '/no-access': typeof NoAccessRoute
   '/_protected/admin': typeof ProtectedAdminRouteWithChildren
+  '/_protected/timesheets': typeof ProtectedTimesheetsRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
   '/_protected/admin/users': typeof ProtectedAdminUsersRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -155,6 +173,7 @@ export interface FileRoutesById {
   '/_protected/admin/contracts/': typeof ProtectedAdminContractsIndexRoute
   '/_protected/admin/customers/': typeof ProtectedAdminCustomersIndexRoute
   '/_protected/admin/users/': typeof ProtectedAdminUsersIndexRoute
+  '/_protected/timesheets/week/$year/$week': typeof ProtectedTimesheetsWeekYearWeekRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -162,6 +181,7 @@ export interface FileRouteTypes {
     | '/'
     | '/no-access'
     | '/admin'
+    | '/timesheets'
     | '/admin/users'
     | '/api/auth/$'
     | '/admin/contracts/$contractId'
@@ -173,10 +193,12 @@ export interface FileRouteTypes {
     | '/admin/contracts/'
     | '/admin/customers/'
     | '/admin/users/'
+    | '/timesheets/week/$year/$week'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/no-access'
     | '/admin'
+    | '/timesheets'
     | '/'
     | '/api/auth/$'
     | '/admin/contracts/$contractId'
@@ -188,11 +210,13 @@ export interface FileRouteTypes {
     | '/admin/contracts'
     | '/admin/customers'
     | '/admin/users'
+    | '/timesheets/week/$year/$week'
   id:
     | '__root__'
     | '/_protected'
     | '/no-access'
     | '/_protected/admin'
+    | '/_protected/timesheets'
     | '/_protected/'
     | '/_protected/admin/users'
     | '/api/auth/$'
@@ -205,6 +229,7 @@ export interface FileRouteTypes {
     | '/_protected/admin/contracts/'
     | '/_protected/admin/customers/'
     | '/_protected/admin/users/'
+    | '/_protected/timesheets/week/$year/$week'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -234,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof ProtectedIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/timesheets': {
+      id: '/_protected/timesheets'
+      path: '/timesheets'
+      fullPath: '/timesheets'
+      preLoaderRoute: typeof ProtectedTimesheetsRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/admin': {
@@ -320,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAdminContractsContractIdRouteImport
       parentRoute: typeof ProtectedAdminRoute
     }
+    '/_protected/timesheets/week/$year/$week': {
+      id: '/_protected/timesheets/week/$year/$week'
+      path: '/week/$year/$week'
+      fullPath: '/timesheets/week/$year/$week'
+      preLoaderRoute: typeof ProtectedTimesheetsWeekYearWeekRouteImport
+      parentRoute: typeof ProtectedTimesheetsRoute
+    }
   }
 }
 
@@ -363,13 +402,26 @@ const ProtectedAdminRouteWithChildren = ProtectedAdminRoute._addFileChildren(
   ProtectedAdminRouteChildren,
 )
 
+interface ProtectedTimesheetsRouteChildren {
+  ProtectedTimesheetsWeekYearWeekRoute: typeof ProtectedTimesheetsWeekYearWeekRoute
+}
+
+const ProtectedTimesheetsRouteChildren: ProtectedTimesheetsRouteChildren = {
+  ProtectedTimesheetsWeekYearWeekRoute: ProtectedTimesheetsWeekYearWeekRoute,
+}
+
+const ProtectedTimesheetsRouteWithChildren =
+  ProtectedTimesheetsRoute._addFileChildren(ProtectedTimesheetsRouteChildren)
+
 interface ProtectedRouteChildren {
   ProtectedAdminRoute: typeof ProtectedAdminRouteWithChildren
+  ProtectedTimesheetsRoute: typeof ProtectedTimesheetsRouteWithChildren
   ProtectedIndexRoute: typeof ProtectedIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedAdminRoute: ProtectedAdminRouteWithChildren,
+  ProtectedTimesheetsRoute: ProtectedTimesheetsRouteWithChildren,
   ProtectedIndexRoute: ProtectedIndexRoute,
 }
 
