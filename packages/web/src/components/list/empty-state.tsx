@@ -13,12 +13,7 @@ export interface EmptyStateProps {
 
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div
-      className={cn(
-        'mx-auto flex max-w-sm flex-col items-center justify-center gap-3 text-center',
-        className,
-      )}
-    >
+    <div className={cn('mx-auto flex max-w-sm flex-col items-center justify-center gap-3 text-center', className)}>
       {Icon && (
         <div className="bg-muted text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full">
           <Icon className="h-5 w-5" strokeWidth={1.75} />

@@ -1,5 +1,5 @@
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
 
 namespace Tsz.Api.Tests.Builders;
 

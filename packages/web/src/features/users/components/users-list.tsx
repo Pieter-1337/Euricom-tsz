@@ -57,7 +57,14 @@ export function UsersList() {
           : 'No users match your filters. Try a different search or clear the filters.'
       }
       action={
-        <Button variant="outline" size="sm" onClick={() => { props.setSearch(''); props.setDeletedOnly(false); }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            props.setSearch('');
+            props.setDeletedOnly(false);
+          }}
+        >
           Clear filters
         </Button>
       }

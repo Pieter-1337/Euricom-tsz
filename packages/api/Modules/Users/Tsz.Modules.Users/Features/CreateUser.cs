@@ -1,9 +1,8 @@
 using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Validation;
+using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
 using Tsz.Modules.Users.Domain.Users;
 
 namespace Tsz.Modules.Users.Features;
@@ -41,7 +40,7 @@ public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
     }
 }
 
-public sealed class CreateUserHandler(IUnitOfWork uow, TimeProvider timeProvider)
+public sealed class CreateUserHandler(IUnitOfWork uow, TimeProvider timeProvider, ILeaveTypesAccessModule leaveTypes)
     : ICommandHandler<CreateUserCommand, UserDto>
 {
     public async Task<UserDto> HandleAsync(CreateUserCommand command, CancellationToken ct = default)
@@ -49,13 +48,8 @@ public sealed class CreateUserHandler(IUnitOfWork uow, TimeProvider timeProvider
         var user = User.Create(command.FirstName, command.LastName, command.Email, command.Roles);
         uow.RepositoryFor<User>().Add(user);
 
-        var leaveTypes = await uow.RepositoryFor<LeaveType>().GetAllAsListAsync(ct: ct);
         var year = timeProvider.GetUtcNow().Year;
-        var leaveRepo = uow.RepositoryFor<UserLeave>();
-        foreach (var lt in leaveTypes)
-        {
-            leaveRepo.Add(UserLeave.Create(user.Id, lt.Id, year, lt.DefaultDays));
-        }
+        await leaveTypes.SeedUserLeavesAsync(user.Id, year, ct);
 
         await uow.SaveChangesAsync(ct);
         return UserDto.ToDto(user);

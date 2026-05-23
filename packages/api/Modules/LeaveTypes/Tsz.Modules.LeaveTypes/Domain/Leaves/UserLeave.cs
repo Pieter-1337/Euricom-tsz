@@ -1,6 +1,6 @@
 using Tsz.Infrastructure.Abstractions;
 
-namespace Tsz.Modules.Users.Domain.Leaves;
+namespace Tsz.Modules.LeaveTypes.Domain.Leaves;
 
 public class UserLeave : IEntityBase
 {

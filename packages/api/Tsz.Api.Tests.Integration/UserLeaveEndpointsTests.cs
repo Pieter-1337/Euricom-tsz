@@ -1,11 +1,12 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
+using Tsz.Modules.LeaveTypes.Features;
 using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
 using Tsz.Modules.Users.Domain.Users;
-using Tsz.Modules.Users.Features;
 using Tsz.Api.Tests.Integration.TestAuth;
 
 namespace Tsz.Api.Tests.Integration;
@@ -281,11 +282,6 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task BulkPut_NonAdmin_Returns403()
     {
-        // The test auth handler always authenticates as admin (OID matches seeded user).
-        // To test non-admin, seed a user WITHOUT the RequireAdmin policy satisfied.
-        // The factory wires RequireAdmin via the RequireAdminAuthorizationHandler which
-        // checks that the current user's role == Admin. We seed no user, so the lookup
-        // returns null → the handler denies.
         var userId = Guid.NewGuid();
         var body = new UpdateUserLeavesBody(CurrentYear,
             [new UpdateUserLeavesItem(Guid.NewGuid(), 10m)]);
@@ -300,8 +296,6 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
     public async Task Get_SoftDeletedUser_Returns200Empty()
     {
         await SeedAdminAsync();
-        // Soft-deleted user has DeletedAt set; query filter excludes them.
-        // GET leaves for a userId that doesn't exist → empty list (no rows).
         var userId = Guid.NewGuid();
 
         var response = await Client.GetAsync($"/api/users/{userId}/leaves");

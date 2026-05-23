@@ -1,12 +1,11 @@
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
 using Tsz.Modules.Users.Domain.Users;
 
 namespace Tsz.Modules.Users.Seeding;
 
-public class UserSeeder(IUnitOfWork uow, TimeProvider timeProvider)
+public class UserSeeder(IUnitOfWork uow, TimeProvider timeProvider, ILeaveTypesAccessModule leaveTypes)
 {
     private const string AdminEmail = "pieter.bracke@euri.com";
 
@@ -18,6 +17,7 @@ public class UserSeeder(IUnitOfWork uow, TimeProvider timeProvider)
         {
             admin = User.Create(firstName: "Pieter", lastName: "Bracke", email: AdminEmail, roles: [UserRole.Admin]);
             userRepo.Add(admin);
+            await leaveTypes.SeedUserLeavesAsync(admin.Id, timeProvider.GetUtcNow().Year, ct);
             await uow.SaveChangesAsync(ct);
         }
         else if (string.IsNullOrEmpty(admin.FirstName) || string.IsNullOrEmpty(admin.LastName))
@@ -25,22 +25,5 @@ public class UserSeeder(IUnitOfWork uow, TimeProvider timeProvider)
             admin.Rename("Pieter", "Bracke");
             await uow.SaveChangesAsync(ct);
         }
-
-        var year = timeProvider.GetUtcNow().Year;
-        var leaveRepo = uow.RepositoryFor<UserLeave>();
-        var existing = (await leaveRepo.GetAllAsListAsync(
-            ul => ul.UserId == admin.Id && ul.Year == year, ct))
-            .Select(ul => ul.LeaveTypeId)
-            .ToHashSet();
-
-        var leaveTypes = await uow.RepositoryFor<LeaveType>().GetAllAsListAsync(ct: ct);
-        var added = false;
-        foreach (var lt in leaveTypes)
-        {
-            if (existing.Contains(lt.Id)) continue;
-            leaveRepo.Add(UserLeave.Create(admin.Id, lt.Id, year, lt.DefaultDays));
-            added = true;
-        }
-        if (added) await uow.SaveChangesAsync(ct);
     }
 }

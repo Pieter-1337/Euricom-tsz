@@ -22,9 +22,7 @@ export const fetchUsersByRole = createServerFn({ method: 'GET' })
   .inputValidator(z.enum(USER_ROLES))
   .handler(async ({ data: role }): Promise<User[]> => getUsers(role));
 
-export const fetchAllUsers = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<User[]> => getUsers(),
-);
+export const fetchAllUsers = createServerFn({ method: 'GET' }).handler(async (): Promise<User[]> => getUsers());
 
 export const submitCreateUser = createServerFn({ method: 'POST' })
   .inputValidator(createUserSchema)

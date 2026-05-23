@@ -1,7 +1,8 @@
 using System.Linq.Expressions;
 using Tsz.Infrastructure.Abstractions;
+using Tsz.Modules.LeaveTypes.Contracts;
 
-namespace Tsz.Modules.Users.Domain.Leaves;
+namespace Tsz.Modules.LeaveTypes.Domain.Leaves;
 
 public sealed record UserLeaveDto(
     Guid Id,

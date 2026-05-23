@@ -1,6 +1,6 @@
 using Tsz.Infrastructure.Errors;
 
-namespace Tsz.Modules.Users.Domain.Leaves;
+namespace Tsz.Modules.LeaveTypes.Domain.Leaves;
 
 public sealed class UserLeaveErrors : ErrorCodeBase<UserLeaveErrors>
 {

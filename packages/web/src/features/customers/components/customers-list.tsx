@@ -89,7 +89,14 @@ export function CustomersList({ canCreate }: { canCreate: boolean }) {
           : 'No customers match your filters. Try a different search or clear the filters.'
       }
       action={
-        <Button variant="outline" size="sm" onClick={() => { setSearch(''); setDeletedOnly(false); }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setSearch('');
+            setDeletedOnly(false);
+          }}
+        >
           Clear filters
         </Button>
       }
