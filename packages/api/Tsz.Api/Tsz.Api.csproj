@@ -21,6 +21,7 @@
     <ProjectReference Include="..\Modules\Contracts\Tsz.Modules.Contracts\Tsz.Modules.Contracts.csproj" />
     <ProjectReference Include="..\Modules\LeaveTypes\Tsz.Modules.LeaveTypes\Tsz.Modules.LeaveTypes.csproj" />
     <ProjectReference Include="..\Modules\Workdays\Tsz.Modules.Workdays\Tsz.Modules.Workdays.csproj" />
+    <ProjectReference Include="..\Modules\Timesheets\Tsz.Modules.Timesheets\Tsz.Modules.Timesheets.csproj" />
   </ItemGroup>
 
   <ItemGroup>

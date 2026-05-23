@@ -13,6 +13,7 @@ using Tsz.Infrastructure.Extensions;
 using Tsz.Modules.Contracts;
 using Tsz.Modules.Customers;
 using Tsz.Modules.LeaveTypes;
+using Tsz.Modules.Timesheets;
 using Tsz.Modules.Users;
 using Tsz.Modules.Users.Seeding;
 using Tsz.Modules.Workdays;
@@ -46,7 +47,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
-IReadOnlyList<IModule> modules = [new UsersModule(), new CustomersModule(), new ContractsModule(), new LeaveTypesModule(), new WorkdaysModule()];
+IReadOnlyList<IModule> modules = [new UsersModule(), new CustomersModule(), new ContractsModule(), new LeaveTypesModule(), new WorkdaysModule(), new TimesheetsModule()];
 foreach (var m in modules) m.RegisterServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
