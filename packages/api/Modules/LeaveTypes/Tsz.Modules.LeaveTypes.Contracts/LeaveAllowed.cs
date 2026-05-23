@@ -1,4 +1,4 @@
-namespace Tsz.Modules.Users.Domain.Leaves;
+namespace Tsz.Modules.LeaveTypes.Contracts;
 
 public enum LeaveAllowed
 {

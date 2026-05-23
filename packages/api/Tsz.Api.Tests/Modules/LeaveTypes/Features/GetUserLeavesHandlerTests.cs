@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
-using Tsz.Modules.Users.Features;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
+using Tsz.Modules.LeaveTypes.Features;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 
-namespace Tsz.Api.Tests.Modules.Users.Features;
+namespace Tsz.Api.Tests.Modules.LeaveTypes.Features;
 
 public class GetUserLeavesHandlerTests
 {

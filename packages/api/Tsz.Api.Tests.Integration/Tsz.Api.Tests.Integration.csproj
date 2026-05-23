@@ -29,6 +29,8 @@
     <ProjectReference Include="..\Modules\Customers\Tsz.Modules.Customers.Contracts\Tsz.Modules.Customers.Contracts.csproj" />
     <ProjectReference Include="..\Modules\Contracts\Tsz.Modules.Contracts\Tsz.Modules.Contracts.csproj" />
     <ProjectReference Include="..\Modules\Contracts\Tsz.Modules.Contracts.Contracts\Tsz.Modules.Contracts.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\LeaveTypes\Tsz.Modules.LeaveTypes\Tsz.Modules.LeaveTypes.csproj" />
+    <ProjectReference Include="..\Modules\LeaveTypes\Tsz.Modules.LeaveTypes.Contracts\Tsz.Modules.LeaveTypes.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

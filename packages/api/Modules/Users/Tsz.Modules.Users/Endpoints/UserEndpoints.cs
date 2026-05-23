@@ -5,7 +5,6 @@ using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
 using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
 using Tsz.Modules.Users.Features;
 
 namespace Tsz.Modules.Users.Endpoints;
@@ -88,28 +87,6 @@ public static class UserEndpoints
         {
             await dispatcher.SendAsync(new DeleteUserCommand(id), ct);
             return Results.NoContent();
-        });
-
-        adminGroup.MapGet("/{userId:guid}/leaves", async (
-            Guid userId,
-            int? year,
-            TimeProvider timeProvider,
-            IDispatcher dispatcher,
-            CancellationToken ct) =>
-        {
-            var resolvedYear = year ?? timeProvider.GetUtcNow().Year;
-            return TypedResults.Ok(await dispatcher.SendAsync(new GetUserLeavesQuery(userId, resolvedYear), ct));
-        });
-
-        adminGroup.MapPut("/{userId:guid}/leaves", async Task<Ok<IReadOnlyList<UserLeaveDto>>> (
-            Guid userId,
-            UpdateUserLeavesBody body,
-            IDispatcher dispatcher,
-            CancellationToken ct) =>
-        {
-            var command = new UpdateUserLeavesCommand(userId, body.Year, body.Items);
-            var dtos = await dispatcher.SendAsync(command, ct);
-            return TypedResults.Ok(dtos);
         });
     }
 }

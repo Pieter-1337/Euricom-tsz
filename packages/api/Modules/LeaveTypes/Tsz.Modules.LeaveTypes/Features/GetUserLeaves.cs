@@ -1,8 +1,9 @@
 using Tsz.Infrastructure.Abstractions;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
 
-namespace Tsz.Modules.Users.Features;
+namespace Tsz.Modules.LeaveTypes.Features;
 
 public sealed record GetUserLeavesQuery(Guid UserId, int Year) : IQuery<IReadOnlyList<UserLeaveDto>>;
 

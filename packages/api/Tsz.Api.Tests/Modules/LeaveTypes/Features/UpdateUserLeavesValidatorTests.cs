@@ -1,15 +1,14 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
-using Tsz.Modules.Users.Features;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
+using Tsz.Modules.LeaveTypes.Features;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Errors;
 
-namespace Tsz.Api.Tests.Modules.Users.Features;
+namespace Tsz.Api.Tests.Modules.LeaveTypes.Features;
 
 public class UpdateUserLeavesValidatorTests
 {
@@ -43,11 +42,6 @@ public class UpdateUserLeavesValidatorTests
 
         return new UpdateUserLeavesValidator(uow.Object);
     }
-
-    private UpdateUserLeavesCommand ValidCommand(Guid userId, int year, params UpdateUserLeavesItem[] items) =>
-        new(userId, year, items);
-
-    // ── Top-level shape ──────────────────────────────────────────────────────
 
     [Fact]
     public async Task EmptyUserId_Fails_WithRequired()
@@ -112,8 +106,6 @@ public class UpdateUserLeavesValidatorTests
             e.ErrorCode == CommonErrors.Invalid.Code);
     }
 
-    // ── Per-item shape ───────────────────────────────────────────────────────
-
     [Fact]
     public async Task EmptyItemId_Fails_WithRequired()
     {
@@ -143,8 +135,6 @@ public class UpdateUserLeavesValidatorTests
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorCode == CommonErrors.Invalid.Code);
     }
-
-    // ── DB checks ────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task ItemIdNotFound_Fails_WithNotFound()

@@ -2,6 +2,14 @@
 
 ## 2026-05-23
 
+### Leave Types module
+
+- Leave types and per-user leave allowances now live in their own `LeaveTypes` module, separate from the Users module.
+- Creating a user still automatically assigns a leave balance row for each active leave type — behaviour is identical to before.
+- The User admin form's leave management endpoints (`GET/PUT /api/users/{userId}/leaves`) work identically; request and response shapes are unchanged.
+- Internal code that previously referenced leave types directly through the Users module now goes through the new `ILeaveTypesAccessModule` facade.
+
+
 docs: capture Timesheets grill — CONTEXT.md, ADR-0002, plan.md
 
 - Plan-side output of the matt-grill-with-docs session for the

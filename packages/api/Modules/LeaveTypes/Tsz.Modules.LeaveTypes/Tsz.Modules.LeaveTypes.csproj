@@ -24,10 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tsz.Modules.Users.Contracts\Tsz.Modules.Users.Contracts.csproj" />
-    <ProjectReference Include="..\..\Customers\Tsz.Modules.Customers.Contracts\Tsz.Modules.Customers.Contracts.csproj" />
-    <ProjectReference Include="..\..\Contracts\Tsz.Modules.Contracts.Contracts\Tsz.Modules.Contracts.Contracts.csproj" />
-    <ProjectReference Include="..\..\LeaveTypes\Tsz.Modules.LeaveTypes.Contracts\Tsz.Modules.LeaveTypes.Contracts.csproj" />
+    <ProjectReference Include="..\Tsz.Modules.LeaveTypes.Contracts\Tsz.Modules.LeaveTypes.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Tsz.Infrastructure\Tsz.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -1,43 +1,37 @@
-using System.Linq.Expressions;
 using Moq;
 using Shouldly;
+using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
 using Tsz.Modules.Users.Domain.Users;
 using Tsz.Modules.Users.Features;
-using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Tests.Modules.Users.Features;
 
 public class CreateUserHandlerTests
 {
-    private static (Mock<IUnitOfWork> uow, Mock<IRepository<User>> userRepo, Mock<IRepository<LeaveType>> leaveTypeRepo, Mock<IRepository<UserLeave>> userLeaveRepo)
-        BuildMocks(IEnumerable<LeaveType>? leaveTypes = null)
+    private static (Mock<IUnitOfWork> uow, Mock<IRepository<User>> userRepo, Mock<ILeaveTypesAccessModule> leaveTypesFacade)
+        BuildMocks()
     {
         var userRepo = new Mock<IRepository<User>>();
 
-        var leaveTypeRepo = new Mock<IRepository<LeaveType>>();
-        leaveTypeRepo.Setup(r => r.GetAllAsListAsync(null, It.IsAny<CancellationToken>(), false))
-            .ReturnsAsync(leaveTypes?.ToList() ?? []);
-
-        var userLeaveRepo = new Mock<IRepository<UserLeave>>();
-
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<User>()).Returns(userRepo.Object);
-        uow.Setup(u => u.RepositoryFor<LeaveType>()).Returns(leaveTypeRepo.Object);
-        uow.Setup(u => u.RepositoryFor<UserLeave>()).Returns(userLeaveRepo.Object);
 
-        return (uow, userRepo, leaveTypeRepo, userLeaveRepo);
+        var leaveTypesFacade = new Mock<ILeaveTypesAccessModule>();
+        leaveTypesFacade
+            .Setup(m => m.SeedUserLeavesAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        return (uow, userRepo, leaveTypesFacade);
     }
 
     [Fact]
-    public async Task HandleAsync_NoLeaveTypes_AddsUserAndReturnsDto()
+    public async Task HandleAsync_CreatesUserAndSeedsLeaves()
     {
-        var (uow, userRepo, _, userLeaveRepo) = BuildMocks();
+        var (uow, userRepo, leaveTypesFacade) = BuildMocks();
         var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero));
-        var handler = new CreateUserHandler(uow.Object, timeProvider);
+        var handler = new CreateUserHandler(uow.Object, timeProvider, leaveTypesFacade.Object);
 
         var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]));
 
@@ -49,36 +43,30 @@ public class CreateUserHandlerTests
 
         userRepo.Verify(r => r.Add(It.Is<User>(u =>
             u.FirstName == "Jane" && u.LastName == "Doe" && u.Email == "jane@example.com" && u.Roles.Contains(UserRole.User))), Times.Once);
-        userLeaveRepo.Verify(r => r.Add(It.IsAny<UserLeave>()), Times.Never);
+        leaveTypesFacade.Verify(m => m.SeedUserLeavesAsync(
+            It.IsAny<Guid>(), 2026, It.IsAny<CancellationToken>()), Times.Once);
         uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task HandleAsync_WithLeaveTypes_SeedsOneUserLeaveRowPerLeaveType()
+    public async Task HandleAsync_SeedCalledBeforeSave_SingleTransaction()
     {
-        var fixedDate = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero);
-        var timeProvider = new FakeTimeProvider(fixedDate);
-        var verlof = LeaveTypeBuilder.Limited("Verlof", 20m);
-        var ziekte = LeaveTypeBuilder.Unlimited("Ziekte");
-        var (uow, _, _, userLeaveRepo) = BuildMocks(leaveTypes: [verlof, ziekte]);
+        var callOrder = new List<string>();
+        var (uow, userRepo, leaveTypesFacade) = BuildMocks();
+        leaveTypesFacade
+            .Setup(m => m.SeedUserLeavesAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("seed"))
+            .Returns(Task.CompletedTask);
+        uow.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .Callback(() => callOrder.Add("save"))
+            .ReturnsAsync(0);
 
-        var handler = new CreateUserHandler(uow.Object, timeProvider);
+        var timeProvider = new FakeTimeProvider(new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero));
+        var handler = new CreateUserHandler(uow.Object, timeProvider, leaveTypesFacade.Object);
 
-        var dto = await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]));
+        await handler.HandleAsync(new CreateUserCommand("Jane", "Doe", "jane@example.com", [UserRole.User]));
 
-        dto.ShouldNotBeNull();
-
-        userLeaveRepo.Verify(r => r.Add(It.Is<UserLeave>(ul =>
-            ul.LeaveTypeId == verlof.Id &&
-            ul.TotalDays == 20m &&
-            ul.Year == 2026)), Times.Once);
-
-        userLeaveRepo.Verify(r => r.Add(It.Is<UserLeave>(ul =>
-            ul.LeaveTypeId == ziekte.Id &&
-            ul.TotalDays == null &&
-            ul.Year == 2026)), Times.Once);
-
-        uow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        callOrder.ShouldBe(["seed", "save"]);
     }
 
     private sealed class FakeTimeProvider(DateTimeOffset utcNow) : TimeProvider

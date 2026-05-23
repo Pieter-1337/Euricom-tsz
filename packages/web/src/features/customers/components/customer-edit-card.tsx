@@ -105,9 +105,7 @@ export function CustomerEditCard({ customer, currentUser }: { customer: Customer
               <Label htmlFor="number">Customer number</Label>
               <Input id="number" value={customer.number} disabled />
             </div>
-            <form.AppField name="name">
-              {(field) => <field.TextField label="Name" disabled={readOnly} />}
-            </form.AppField>
+            <form.AppField name="name">{(field) => <field.TextField label="Name" disabled={readOnly} />}</form.AppField>
           </section>
 
           <section className="grid gap-4">
@@ -137,9 +135,7 @@ export function CustomerEditCard({ customer, currentUser }: { customer: Customer
               {(field) => <field.TextField label="Street" disabled={readOnly} />}
             </form.AppField>
             <div className="grid grid-cols-2 gap-4">
-              <form.AppField name="zip">
-                {(field) => <field.TextField label="Zip" disabled={readOnly} />}
-              </form.AppField>
+              <form.AppField name="zip">{(field) => <field.TextField label="Zip" disabled={readOnly} />}</form.AppField>
               <form.AppField name="city">
                 {(field) => <field.TextField label="City" disabled={readOnly} />}
               </form.AppField>

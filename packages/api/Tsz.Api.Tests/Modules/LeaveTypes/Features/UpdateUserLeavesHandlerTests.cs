@@ -1,14 +1,14 @@
 using System.Linq.Expressions;
 using Moq;
 using Shouldly;
-using Tsz.Modules.Users.Contracts;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
-using Tsz.Modules.Users.Features;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
+using Tsz.Modules.LeaveTypes.Features;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 
-namespace Tsz.Api.Tests.Modules.Users.Features;
+namespace Tsz.Api.Tests.Modules.LeaveTypes.Features;
 
 public class UpdateUserLeavesHandlerTests
 {
@@ -20,7 +20,6 @@ public class UpdateUserLeavesHandlerTests
     {
         var repo = new Mock<IRepository<UserLeave>>();
 
-        // First call (load by ids): return filtered rows matching the id set
         repo.SetupSequence(r => r.GetAllAsListAsync(
                 It.IsAny<Expression<Func<UserLeave, bool>>>(),
                 It.IsAny<CancellationToken>(),
@@ -99,14 +98,13 @@ public class UpdateUserLeavesHandlerTests
         var leaveVerlof = UserLeaveBuilder.Build(_userId, ltVerlof.Id, Year, 20m);
         var leaveAdv = UserLeaveBuilder.Build(_userId, ltAdv.Id, Year, 5m);
 
-        // Handler loads subset for the update, then all rows for the response
         var repo = new Mock<IRepository<UserLeave>>();
         repo.SetupSequence(r => r.GetAllAsListAsync(
                 It.IsAny<Expression<Func<UserLeave, bool>>>(),
                 It.IsAny<CancellationToken>(),
                 false))
-            .ReturnsAsync([leaveVerlof])           // first call: only the item being updated
-            .ReturnsAsync([leaveVerlof, leaveAdv]); // second call: full year set
+            .ReturnsAsync([leaveVerlof])
+            .ReturnsAsync([leaveVerlof, leaveAdv]);
 
         var ltRepo = new Mock<IRepository<LeaveType>>();
         ltRepo.Setup(r => r.GetAllAsListAsync(null, It.IsAny<CancellationToken>(), false))

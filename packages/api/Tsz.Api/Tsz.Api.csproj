@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Modules\Users\Tsz.Modules.Users\Tsz.Modules.Users.csproj" />
     <ProjectReference Include="..\Modules\Customers\Tsz.Modules.Customers\Tsz.Modules.Customers.csproj" />
     <ProjectReference Include="..\Modules\Contracts\Tsz.Modules.Contracts\Tsz.Modules.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\LeaveTypes\Tsz.Modules.LeaveTypes\Tsz.Modules.LeaveTypes.csproj" />
   </ItemGroup>
 
   <ItemGroup>

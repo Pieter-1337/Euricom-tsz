@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Tsz.Modules.Users.Domain.Leaves;
+using Tsz.Modules.LeaveTypes.Contracts;
 
-namespace Tsz.Modules.Users.Domain.LeaveTypes;
+namespace Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
 
 public class LeaveTypeConfiguration : IEntityTypeConfiguration<LeaveType>
 {

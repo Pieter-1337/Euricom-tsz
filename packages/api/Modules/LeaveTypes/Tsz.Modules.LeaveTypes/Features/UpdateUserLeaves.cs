@@ -2,10 +2,11 @@ using FluentValidation;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Errors;
 using Tsz.Infrastructure.Validation;
-using Tsz.Modules.Users.Domain.Leaves;
-using Tsz.Modules.Users.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
 
-namespace Tsz.Modules.Users.Features;
+namespace Tsz.Modules.LeaveTypes.Features;
 
 public sealed record UpdateUserLeavesCommand(Guid UserId, int Year, IReadOnlyList<UpdateUserLeavesItem> Items)
     : ICommand<IReadOnlyList<UserLeaveDto>>;
