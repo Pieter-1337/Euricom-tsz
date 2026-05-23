@@ -1,0 +1,38 @@
+packages/web/src/routes/_protected/timesheets/week/$year/$week.tsx
+  s_6772ed77e38b51::t_e236a06be04b4e 1-37
+CHANGELOG.md
+  s_6772ed77e38b51::t_d222c926b88974 7-17
+packages/web/src/routes/_protected/timesheets.tsx
+  s_6772ed77e38b51::t_f1bdb61c8f0bbe 2-5
+  s_6772ed77e38b51::t_07b2c3cf674fb6 1
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_6772ed77e38b51::t_2199520da1adf2 3,5-6,9-17
+  s_6772ed77e38b51::t_e092e5f2a032d2 55
+  s_6772ed77e38b51::t_9aa9279ada9067 83-87,89
+  s_6772ed77e38b51::t_d5a153fb61d924 217-237
+  s_6772ed77e38b51::t_441084436019c9 88
+  s_6772ed77e38b51::t_57df259458c361 1-2,4,7-8,18,20,22-28,30-32,34-42,44-50,52-54,56-57,59-61,63-81,90,92-98,100-113,115-132,134-143,145-162,164-169,171-173,175-178,180-188,190,192-193,195-216,238,240-247,249-260,262-315,317-390,392-398,400-427
+  s_6772ed77e38b51::t_14f451cc46518f 19,21,29,33,43,51,58,62,82,91,99,114,133,144,163,170,174,179,189,191,194,239,248,261,316,391,399
+packages/web/src/api/timesheets.server.ts
+  s_6772ed77e38b51::t_bf00d589f0b59b 12,25
+  s_6772ed77e38b51::t_78a5c4756cf04b 1-11,13-24,26-33
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_6772ed77e38b51::t_7175a2df20c647 2-23,25-37,39-52,54-58
+  s_6772ed77e38b51::t_097eefcc38bce0 1,24,38,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "e735bebc89c49fab418196bbe1ad3c7c40301370",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": null
+    }
+  }
+}
