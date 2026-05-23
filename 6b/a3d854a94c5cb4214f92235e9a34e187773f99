@@ -1,0 +1,110 @@
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/LeaveTypesModule.cs
+  s_6772ed77e38b51::t_2ad24893d0c09f 1-23
+packages/api/Tsz.Api.Tests/Builders/LeaveTypeBuilder.cs
+  s_6772ed77e38b51::t_55844cbffac4f5 1-2
+packages/api/Tsz.Api.Tests/Modules/LeaveTypes/Features/GetUserLeavesHandlerTests.cs
+  s_6772ed77e38b51::t_ad5ba0f7e6e4e4 1-97
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/CrossModule/GetUserLeaveAllowanceQueryHandler.cs
+  s_6772ed77e38b51::t_ff633bd4926141 1-20
+packages/web/src/features/users/components/users-list.tsx
+  s_6772ed77e38b51::t_b00b7f959a3108 60-67
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Features/GetUserLeaves.cs
+  s_6772ed77e38b51::t_b55de493e23fa0 1-35
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/GlobalUsings.cs
+  s_6772ed77e38b51::t_a621d89b19862c 1-4
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/Leaves/UserLeaveErrors.cs
+  s_6772ed77e38b51::t_4a4919565d149d 1-17
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/ILeaveTypesAccessModule.cs
+  s_6772ed77e38b51::t_c3c77409c79899 1-16
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/Leaves/UserLeaveConfiguration.cs
+  s_6772ed77e38b51::t_c6b6f9afa21895 1-28
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Tsz.Modules.LeaveTypes.csproj
+  s_6772ed77e38b51::t_1f88613a5ae7b0 1-31
+packages/api/Modules/Users/Tsz.Modules.Users/Tsz.Modules.Users.csproj
+  s_6772ed77e38b51::t_18e7cbda97c02a 30
+packages/api/Tsz.Api.Tests/Builders/UserLeaveBuilder.cs
+  s_6772ed77e38b51::t_80fc2364d50a9c 1
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/LeaveTypes/LeaveType.cs
+  s_6772ed77e38b51::t_4db88a529127b2 1-23
+packages/api/Tsz.Api.Tests/Modules/Users/Features/CreateUserHandlerTests.cs
+  s_6772ed77e38b51::t_f05bc9c78d49d1 3,13-14,21-26,30,32,34,46-47,52,54-62,64-65,67,69
+packages/api/Tsz.Api.Tests.Integration/UserLeaveEndpointsTests.cs
+  s_6772ed77e38b51::t_58191c7fb0d951 4-7
+packages/web/src/features/users/server-fns.ts
+  s_6772ed77e38b51::t_b00b7f959a3108 25
+packages/api/Modules/Users/Tsz.Modules.Users/Features/CreateUser.cs
+  s_6772ed77e38b51::t_5cef3eae44c5cf 4,43,52
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/Leaves/UserLeave.cs
+  s_6772ed77e38b51::t_c912538d3efc90 1-26
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/Leaves/UserLeaveDto.cs
+  s_6772ed77e38b51::t_59643bbb47d9aa 1-34
+packages/api/Tsz.Api.Tests/Modules/LeaveTypes/Features/UpdateUserLeavesHandlerTests.cs
+  s_6772ed77e38b51::t_0e71c5343bf58a 1-127
+packages/api/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj
+  s_6772ed77e38b51::t_b1d49e514ee3d5 32-33
+packages/web/src/features/customers/components/customers-list.tsx
+  s_6772ed77e38b51::t_b00b7f959a3108 92-99
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/LeaveAllowed.cs
+  s_6772ed77e38b51::t_0169c3848113f8 1-8
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/Queries/GetActiveLeaveTypesQuery.cs
+  s_6772ed77e38b51::t_197abef7355576 2
+  s_6772ed77e38b51::t_ab631a9e85d54b 1,3-8
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Endpoints/LeaveTypeEndpoints.cs
+  s_6772ed77e38b51::t_8e94e61960d9b2 1-41
+packages/web/src/components/list/empty-state.tsx
+  s_6772ed77e38b51::t_b00b7f959a3108 16
+CHANGELOG.md
+  s_6772ed77e38b51::t_4fd002e24f0eab 5-12
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/LeaveTypes/LeaveTypeConfiguration.cs
+  s_6772ed77e38b51::t_a5cce0248d90a9 1-44
+packages/web/src/features/customers/components/customer-edit-card.tsx
+  s_6772ed77e38b51::t_b00b7f959a3108 108,138
+packages/api/Tsz.Api.Tests.Integration/UserEndpointsTests.cs
+  s_6772ed77e38b51::t_fd3fc617574eb5 6
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/Queries/LeaveTypeExistsQuery.cs
+  s_6772ed77e38b51::t_381f36637f93f6 1-5
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/CrossModule/GetActiveLeaveTypesQueryHandler.cs
+  s_6772ed77e38b51::t_62a03b03808af1 1-18
+packages/api/Modules/Users/Tsz.Modules.Users/Seeding/UserSeeder.cs
+  s_6772ed77e38b51::t_7165e52429fea0 8,20
+  s_6772ed77e38b51::t_44cba418b80a59 2
+packages/api/Tsz.Api.Tests/Modules/LeaveTypes/Features/UpdateUserLeavesValidatorTests.cs
+  s_6772ed77e38b51::t_da1e25a1f27f7c 1-213
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/CrossModule/LeaveTypeExistsQueryHandler.cs
+  s_6772ed77e38b51::t_0159c3c80951cb 1-12
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/Tsz.Modules.LeaveTypes.Contracts.csproj
+  s_6772ed77e38b51::t_9604a70a141838 1-15
+packages/api/Tsz.Api/Persistence/AppDbContext.cs
+  s_6772ed77e38b51::t_829b8def16fefa 4,20
+packages/api/Tsz.Api/Tsz.Api.csproj
+  s_6772ed77e38b51::t_8e30976be66149 22
+packages/api/Tsz.Api.Tests/Tsz.Api.Tests.csproj
+  s_6772ed77e38b51::t_72ef4fd5420e58 35-36
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/Queries/GetUserLeaveAllowanceQuery.cs
+  s_6772ed77e38b51::t_baa528148c2049 1-5
+packages/web/src/hooks/use-form-server-errors.ts
+  s_6772ed77e38b51::t_b00b7f959a3108 33
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/LeaveTypesAccessModule.cs
+  s_6772ed77e38b51::t_0f80eae4e96fff 1-30
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Features/UpdateUserLeaves.cs
+  s_6772ed77e38b51::t_dfef525cc810af 1-118
+packages/api/Tsz.Api/Program.cs
+  s_6772ed77e38b51::t_273cc653cd024d 15
+  s_6772ed77e38b51::t_aaf3871132724d 48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "6ba3d854a94c5cb4214f92235e9a34e187773f99",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
