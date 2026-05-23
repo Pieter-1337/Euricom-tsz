@@ -1,0 +1,25 @@
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/Domain/Holidays/HolidayConfiguration.cs
+  s_6772ed77e38b51::t_9b2c305577c23f 2-35,37,40-47,49,52-59,61,64-74
+packages/api/Tsz.Api/Persistence/Migrations/20260523212259_AddHolidays.Designer.cs
+  s_6772ed77e38b51::t_8e92498a38a55c 1-258,260-274,276-282,284-338,340-354,356-362,364-418,420-434,436-442,444-647
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  s_6772ed77e38b51::t_895a80cd925082 214-255,257-271,273-279,281-335,337-351,353-359,361-415,417-431,433-439,441-485
+packages/api/Tsz.Api/Persistence/Migrations/20260523212259_AddHolidays.cs
+  s_6772ed77e38b51::t_8e92498a38a55c 1-36,38,41-46,48,51-56,58,61-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "af478c580eece51eabcba7b947366800959c76bc",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}

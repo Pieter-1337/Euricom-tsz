@@ -1,0 +1,59 @@
+packages/api/Tsz.Api/Persistence/Migrations/20260523212259_AddHolidays.Designer.cs
+  s_6772ed77e38b51::t_8e92498a38a55c 1-258,260-274,276-282,284-338,340-354,356-362,364-418,420-434,436-442,444-647
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/Tsz.Modules.Workdays.csproj
+  s_6772ed77e38b51::t_3db8677c76721b 1-32
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/Domain/Holidays/Holiday.cs
+  s_6772ed77e38b51::t_8fab11b1118c38 1-25
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  s_6772ed77e38b51::t_895a80cd925082 214-255,257-271,273-279,281-335,337-351,353-359,361-415,417-431,433-439,441-485
+packages/api/Modules/Workdays/Tsz.Modules.Workdays.Contracts/HolidayType.cs
+  s_6772ed77e38b51::t_f8aefcdb3ad9bc 1-7
+packages/api/Tsz.Api/Persistence/Migrations/20260523212259_AddHolidays.cs
+  s_6772ed77e38b51::t_8e92498a38a55c 1-36,38,41-46,48,51-56,58,61-82
+packages/api/Tsz.Api/Program.cs
+  s_6772ed77e38b51::t_895a80cd925082 18
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/WorkdaysAccessModule.cs
+  s_6772ed77e38b51::t_c7bec82df5b31d 1-14,16-18,20-21
+  s_6772ed77e38b51::t_40e35718047514 15,19
+packages/api/Tsz.Api.Tests/Builders/HolidayBuilder.cs
+  s_6772ed77e38b51::t_2b4d4add2fa4e1 1-24
+packages/api/Tsz.Api/Persistence/AppDbContext.cs
+  s_6772ed77e38b51::t_895a80cd925082 6,22
+packages/api/Modules/Workdays/Tsz.Modules.Workdays.Contracts/IWorkdaysAccessModule.cs
+  s_6772ed77e38b51::t_43e30dbf4b0d5f 1-6
+CHANGELOG.md
+  s_6772ed77e38b51::t_921f2d283eaff9 6,18
+packages/api/Tsz.Api/Tsz.Api.csproj
+  s_6772ed77e38b51::t_895a80cd925082 23
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/WorkdaysModule.cs
+  s_6772ed77e38b51::t_37b495be045a9d 1-19
+packages/api/Tsz.Api.Tests/Tsz.Api.Tests.csproj
+  s_6772ed77e38b51::t_895a80cd925082 37-38
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/Domain/Holidays/HolidayConfiguration.cs
+  s_6772ed77e38b51::t_9b2c305577c23f 2-35,37,40-47,49,52-59,61,64-74
+packages/api/Modules/Workdays/Tsz.Modules.Workdays.Contracts/Tsz.Modules.Workdays.Contracts.csproj
+  s_6772ed77e38b51::t_f36e18d5f1c332 1-10
+packages/api/Tsz.Api.Tests.Integration/Tsz.Api.Tests.Integration.csproj
+  s_6772ed77e38b51::t_895a80cd925082 34-35
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/GlobalUsings.cs
+  s_6772ed77e38b51::t_e01a1452f80d9a 1-4
+packages/api/Tsz.Api.Tests/Modules/Workdays/WorkdaysAccessModuleTests.cs
+  s_6772ed77e38b51::t_c6985bb6be8761 1-76,78-81
+  s_6772ed77e38b51::t_7a2c7d4bfaf34b 77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "a5cb440d9986a9ed15ca1225293c46149cf72852",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
