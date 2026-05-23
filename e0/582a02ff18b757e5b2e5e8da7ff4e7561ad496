@@ -1,0 +1,103 @@
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetSelectableLeaveTypes.cs
+  s_6772ed77e38b51::t_8e44520b3d5393 1-27
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Domain/TimesheetWeekTests.cs
+  s_6772ed77e38b51::t_9fb99273759f03 121-169,171-211,213-232
+  s_6772ed77e38b51::t_270d3230e04a0c 212
+  s_6772ed77e38b51::t_fac0597026e5d7 170
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_6772ed77e38b51::t_818b34524e14b2 92-106,110-112
+  s_6772ed77e38b51::t_edb2f1f4cc1cd4 42-77
+  s_6772ed77e38b51::t_c3f95c1342a0af 3
+  s_6772ed77e38b51::t_45e1cdc1cc79b8 37
+packages/web/src/features/timesheets/server-fns.ts
+  s_6772ed77e38b51::t_81ea441af7441b 3-7,11,21-32,34-35,46-49,54-57
+  s_6772ed77e38b51::t_efd6903cc215ad 8-10
+  s_6772ed77e38b51::t_fce479cb9df1d4 63-92
+packages/web/src/api/timesheets.ts
+  s_6772ed77e38b51::t_91a5053992df73 5,8,11
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ApplyTimesheetWeekBookings.cs
+  s_6772ed77e38b51::t_e57781b65e839f 166,169
+  s_6772ed77e38b51::t_f1daf6f0ada46c 3,8,19-23,28-29,35-36,40-41,43,61,74,84,98,106-165,167-168,170-216,220-224,248-251,266-272,274
+packages/web/src/api/schema.ts
+  s_6772ed77e38b51::t_e0568eabc8510a 603-605
+  s_6772ed77e38b51::t_0f3dc0f4ebf85a 660-764
+  s_6772ed77e38b51::t_d0cd095504898f 935
+  s_6772ed77e38b51::t_a97ae17daef782 647-649,653-659,765-792,796
+  s_6772ed77e38b51::t_aa1ef8a743cd65 650-652,856-857,867-890
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_6772ed77e38b51::t_27f4813c4dd372 7-8,28,85-118,136,165,177,197,202,209,224,240,254,270,308-415
+packages/api/Tsz.Api.Tests.Integration/TimesheetLifecycleTests.cs
+  s_6772ed77e38b51::t_c7e66358551d36 1-104,107-247
+  s_6772ed77e38b51::t_c65bcfc89adea9 105-106
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ReopenTimesheetWeek.cs
+  s_6772ed77e38b51::t_a06492b29ac52f 4,38-39,55-56
+  s_6772ed77e38b51::t_a51a832cfa4115 1-3,5-37,40-54,57-58
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Domain/TimesheetWeekLeaveTests.cs
+  s_6772ed77e38b51::t_3e8d124eb830f9 1-117
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetWeekConfiguration.cs
+  s_6772ed77e38b51::t_3912ee74643159 28
+  s_6772ed77e38b51::t_aeb26f41f27b30 43-55
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Tsz.Modules.Timesheets.csproj
+  s_6772ed77e38b51::t_d7896f26126301 30
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetTimesheetWeek.cs
+  s_6772ed77e38b51::t_7f294944747ab8 5-6,21-22,56,58-64,79-85,95-96,110-111,116-117,128,140-150
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/SubmitTimesheetWeekValidatorTests.cs
+  s_6772ed77e38b51::t_454e97a8dfa8a6 1-57
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetErrors.cs
+  s_6772ed77e38b51::t_bca45bb1ca38a7 48
+  s_6772ed77e38b51::t_0a0de2dc9e9a5e 34-47
+  s_6772ed77e38b51::t_c09076fe114d60 49-58
+packages/web/src/routes/_protected/timesheets/week/$year/$week.tsx
+  s_6772ed77e38b51::t_3154e4d33fd61a 4-8,19,22,42
+  s_6772ed77e38b51::t_f905eaae359853 2,16,24,30,37
+packages/web/src/api/timesheets.server.ts
+  s_6772ed77e38b51::t_940565e9d32d0f 2-5,7,39-45
+  s_6772ed77e38b51::t_7052f6f8fd41a6 50-70
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/ApproveTimesheetWeekValidatorTests.cs
+  s_6772ed77e38b51::t_8dda54f02eaddf 1-81
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/ApplyTimesheetWeekBookingsValidatorTests.cs
+  s_6772ed77e38b51::t_935c53dcdb83c2 3,6,37-41,57-63,67
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/ApplyTimesheetWeekLeaveBookingsValidatorTests.cs
+  s_6772ed77e38b51::t_91d629155aa818 1-37,39-40,42-84,86-130,141-146,150-155,158-165,167,170-173,175,179,186,193,198-202,205,207-217,219-233,235-242,244-246
+  s_6772ed77e38b51::t_616a3d91a026a6 38,41,85,131-140,147-149,156-157,166,168-169,174,176-178,180-185,187-192,194-197,203-204,206,218,234,243
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/SubmitTimesheetWeek.cs
+  s_6772ed77e38b51::t_cc29a50992140a 5,36-37,60-61
+  s_6772ed77e38b51::t_bf4bb450daec2e 44-45,49,51-55,57
+  s_6772ed77e38b51::t_86c308a6a0204c 1-4,6-35,38-43,46-48,50,56,58-59,62-63
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ApproveTimesheetWeek.cs
+  s_6772ed77e38b51::t_1b54d300196e95 4,37-38,54-55
+  s_6772ed77e38b51::t_a339858c999ba6 1-3,5-36,39-53,56-57
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/ReopenTimesheetWeekValidatorTests.cs
+  s_6772ed77e38b51::t_1939b54f9c8c08 1-80
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/LeaveBooking.cs
+  s_6772ed77e38b51::t_9926acb88aee4c 1-21
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetWeek.cs
+  s_6772ed77e38b51::t_0a9d61bf874081 16,19
+  s_6772ed77e38b51::t_c0898a4d825357 56-79
+  s_6772ed77e38b51::t_982533f2d98b2c 80-90,92-99,101-103
+  s_6772ed77e38b51::t_277bb750f5aa0c 91,100,109
+  s_6772ed77e38b51::t_4609ec3818703c 117-121
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_6772ed77e38b51::t_2eb7d91d203b9e 32
+  s_6772ed77e38b51::t_7a23a9e4bc1a3e 8-14,26-28,37,40-41,44-49,51-56,58-60,62-70,83-90,94,98,107,109-112,114-120,122,125-129,133,152,155-170,172,182,184,187-188,191-196,200-230,233,237-256,259,261,264,268,285-291,301,306-309,317-368,437-443,450,472,475,479-480,482,485,495-496,498-522,524-544,553-559,595,597-632,634-667
+  s_6772ed77e38b51::t_7bc33aeae2cd9b 50
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/TimesheetWeekProjection.cs
+  s_6772ed77e38b51::t_062d159b0032b8 4,18,33,35-41
+  s_6772ed77e38b51::t_a4a30952dbd00e 1-3,5-17,19-32,34,42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "e0582a02ff18b757e5b2e5e8da7ff4e7561ad496",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
