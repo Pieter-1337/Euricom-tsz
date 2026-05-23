@@ -253,7 +253,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a1000002-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2026, 4, 5),
+                            Date = new DateOnly(2026, 4, 6),
                             Name = "Easter Monday",
                             Type = 0
                         },
@@ -269,7 +269,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a1000004-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2026, 5, 13),
+                            Date = new DateOnly(2026, 5, 14),
                             Name = "Ascension Day",
                             Type = 0
                         },
@@ -277,7 +277,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a1000005-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2026, 5, 24),
+                            Date = new DateOnly(2026, 5, 25),
                             Name = "Whit Monday",
                             Type = 0
                         },
@@ -333,7 +333,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a2000002-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2027, 3, 28),
+                            Date = new DateOnly(2027, 3, 29),
                             Name = "Easter Monday",
                             Type = 0
                         },
@@ -349,7 +349,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a2000004-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2027, 5, 5),
+                            Date = new DateOnly(2027, 5, 6),
                             Name = "Ascension Day",
                             Type = 0
                         },
@@ -357,7 +357,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a2000005-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2027, 5, 16),
+                            Date = new DateOnly(2027, 5, 17),
                             Name = "Whit Monday",
                             Type = 0
                         },
@@ -413,7 +413,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a3000002-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2028, 4, 16),
+                            Date = new DateOnly(2028, 4, 17),
                             Name = "Easter Monday",
                             Type = 0
                         },
@@ -429,7 +429,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a3000004-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2028, 5, 24),
+                            Date = new DateOnly(2028, 5, 25),
                             Name = "Ascension Day",
                             Type = 0
                         },
@@ -437,7 +437,7 @@ namespace Tsz.Api.Persistence.Migrations
                         {
                             Id = new Guid("a3000005-0000-0000-0000-000000000000"),
                             Country = "BE",
-                            Date = new DateOnly(2028, 6, 4),
+                            Date = new DateOnly(2028, 6, 5),
                             Name = "Whit Monday",
                             Type = 0
                         },
