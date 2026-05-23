@@ -2,6 +2,29 @@
 
 ## 2026-05-23
 
+docs: capture Timesheets grill — CONTEXT.md, ADR-0002, plan.md
+
+- Plan-side output of the matt-grill-with-docs session for the
+  Timesheets + Time Entry feature. The three new docs go in together
+  because they only make sense as one set.
+- CONTEXT.md (new, repo root) — first repo-wide glossary. Establishes
+  the booking-domain vocabulary (TimeEntry, LeaveBooking,
+  TimesheetWeek, Timesheet-as-view, LeaveType, UserLeave), the
+  relationships, and the flagged ambiguities the grill resolved
+  (notably: "WeekApproval" is not a separate entity; it is
+  TimesheetWeek.Status).
+- docs/adr/0002-promote-on-cross-module-reference.md — codifies the
+  rule "extract a sub-concept to its own module when a second consumer
+  shows up across a module boundary". First applied to LeaveType
+  (extracted from Users together with UserLeave); the same rule
+  justifies the new Workdays module planned in slice 2.
+- docs/product/requirements/timesheets/plan.md — full grill decision
+  history Q1–Q13, rejected alternatives kept so future readers do not
+  re-grill the same questions, and the rough 6-slice migration order.
+- Implementation work itself lives on the tracker, not in this commit:
+  PRD Pieter-1337/Euricom-tsz#12; six AFK slices issued as #13–#18,
+  each labelled enhancement + ready-for-agent.
+
 chore: remove temporary planning documents
 
 - Clean up planning and implementation notes that were used to track
