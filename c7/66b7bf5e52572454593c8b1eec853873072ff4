@@ -1,0 +1,40 @@
+CHANGELOG.md
+  s_69283dd0411d7b::t_0e26e9ec9c44cc 3-27
+docs/adr/0002-promote-on-cross-module-reference.md
+  s_69283dd0411d7b::t_81faa53ec32bb5 1-34
+docs/product/requirements/timesheets/plan.md
+  s_69283dd0411d7b::t_54fbf13ac5fa69 1-2,4-39,41-43,146,181-185,187,189,191,193-195,198-217,219
+  s_69283dd0411d7b::t_dbab127b7adab7 3
+  s_69283dd0411d7b::t_4706b1904a94a7 40,44-45,47,49
+  s_69283dd0411d7b::t_a50735461c58cd 46,48,50-60,127-145
+  s_69283dd0411d7b::t_2a32774c478eb6 61-90
+  s_69283dd0411d7b::t_1303b580c2c401 91-105
+  s_69283dd0411d7b::t_a5a9892f63dc23 106-109
+  s_69283dd0411d7b::t_a290ac116307c9 110-126
+  s_69283dd0411d7b::t_c6260a03b50a64 147-154
+  s_69283dd0411d7b::t_6cf3ee10c74a2f 155-160
+  s_69283dd0411d7b::t_4f804d1a658513 161-168
+  s_69283dd0411d7b::t_71b87f2189f680 169-180
+  s_69283dd0411d7b::t_bcde1de10216d8 186,188
+  s_69283dd0411d7b::t_6491a11b759259 190,192,196-197
+  s_69283dd0411d7b::t_3b8c8df4191f0e 218,220-225
+CONTEXT.md
+  s_69283dd0411d7b::t_2c0b3ee1ac3623 1-51,53-69
+  s_69283dd0411d7b::t_6514777bf8bcbb 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "c766b7bf5e52572454593c8b1eec853873072ff4",
+  "prompts": {},
+  "sessions": {
+    "s_69283dd0411d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c8d5ce4e-1aa6-4e1b-93f8-722f490ce4c4",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
