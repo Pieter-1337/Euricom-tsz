@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-23
+
+chore: remove temporary planning documents
+
+- Clean up planning and implementation notes that were used to track
+  the contract task subform restoration feature. These temporary
+  documents are no longer needed as the work is complete.
+
 ## 2026-05-22
 
 refactor: support admin or any client manager zone authorization
