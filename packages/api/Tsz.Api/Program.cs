@@ -15,6 +15,7 @@ using Tsz.Modules.Customers;
 using Tsz.Modules.LeaveTypes;
 using Tsz.Modules.Users;
 using Tsz.Modules.Users.Seeding;
+using Tsz.Modules.Workdays;
 
 JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
@@ -45,7 +46,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
-IReadOnlyList<IModule> modules = [new UsersModule(), new CustomersModule(), new ContractsModule(), new LeaveTypesModule()];
+IReadOnlyList<IModule> modules = [new UsersModule(), new CustomersModule(), new ContractsModule(), new LeaveTypesModule(), new WorkdaysModule()];
 foreach (var m in modules) m.RegisterServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();

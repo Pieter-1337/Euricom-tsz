@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tsz.Api.Persistence;
 
@@ -10,9 +11,11 @@ using Tsz.Api.Persistence;
 namespace Tsz.Api.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523212259_AddHolidays")]
+    partial class AddHolidays
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -84,7 +87,7 @@ namespace Tsz.Api.Persistence.Migrations
                     b.ToTable("Customers", (string)null);
                 });
 
-            modelBuilder.Entity("Tsz.Modules.LeaveTypes.Domain.LeaveTypes.LeaveType", b =>
+            modelBuilder.Entity("Tsz.Modules.Users.Domain.LeaveTypes.LeaveType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +144,7 @@ namespace Tsz.Api.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Tsz.Modules.LeaveTypes.Domain.Leaves.UserLeave", b =>
+            modelBuilder.Entity("Tsz.Modules.Users.Domain.Leaves.UserLeave", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -602,12 +605,18 @@ namespace Tsz.Api.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Tsz.Modules.LeaveTypes.Domain.Leaves.UserLeave", b =>
+            modelBuilder.Entity("Tsz.Modules.Users.Domain.Leaves.UserLeave", b =>
                 {
-                    b.HasOne("Tsz.Modules.LeaveTypes.Domain.LeaveTypes.LeaveType", null)
+                    b.HasOne("Tsz.Modules.Users.Domain.LeaveTypes.LeaveType", null)
                         .WithMany()
                         .HasForeignKey("LeaveTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tsz.Modules.Users.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

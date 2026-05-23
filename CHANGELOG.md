@@ -9,6 +9,12 @@
 - The User admin form's leave management endpoints (`GET/PUT /api/users/{userId}/leaves`) work identically; request and response shapes are unchanged.
 - Internal code that previously referenced leave types directly through the Users module now goes through the new `ILeaveTypesAccessModule` facade.
 
+### Workdays module
+
+- The backend now knows which dates are Belgian business days, enabling downstream Timesheets validation to reject submissions on weekends or public holidays.
+- New module pair `Tsz.Modules.Workdays` + `Tsz.Modules.Workdays.Contracts` exposes `IWorkdaysAccessModule.IsBusinessDay(DateOnly) → bool`.
+- Returns `false` for Saturday, Sunday, or any seeded BE `Holiday` row; `true` otherwise.
+- Migration `AddHolidays` creates the `Holiday` table with a unique index on `(Country, Date)` and `HasData`-seeds all 10 Belgian public holidays for 2026, 2027, and 2028 (no HTTP integration — the seeder is the cache for this slice).
 
 docs: capture Timesheets grill — CONTEXT.md, ADR-0002, plan.md
 

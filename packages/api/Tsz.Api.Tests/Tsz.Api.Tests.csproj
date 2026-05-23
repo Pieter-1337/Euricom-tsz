@@ -34,6 +34,8 @@
     <ProjectReference Include="..\Modules\Contracts\Tsz.Modules.Contracts.Contracts\Tsz.Modules.Contracts.Contracts.csproj" />
     <ProjectReference Include="..\Modules\LeaveTypes\Tsz.Modules.LeaveTypes\Tsz.Modules.LeaveTypes.csproj" />
     <ProjectReference Include="..\Modules\LeaveTypes\Tsz.Modules.LeaveTypes.Contracts\Tsz.Modules.LeaveTypes.Contracts.csproj" />
+    <ProjectReference Include="..\Modules\Workdays\Tsz.Modules.Workdays\Tsz.Modules.Workdays.csproj" />
+    <ProjectReference Include="..\Modules\Workdays\Tsz.Modules.Workdays.Contracts\Tsz.Modules.Workdays.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
