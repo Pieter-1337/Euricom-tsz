@@ -31,3 +31,21 @@ export const getSelectableContractTasks = async (
   });
   return resp.data ?? [];
 };
+
+export const submitTimesheetWeek = async (userId: string, year: number, week: number): Promise<void> => {
+  await client.POST('/api/timesheet-weeks/{userId}/{year}/{week}/submit', {
+    params: { path: { userId, year, week } },
+  });
+};
+
+export const approveTimesheetWeek = async (userId: string, year: number, week: number): Promise<void> => {
+  await client.POST('/api/timesheet-weeks/{userId}/{year}/{week}/approve', {
+    params: { path: { userId, year, week } },
+  });
+};
+
+export const reopenTimesheetWeek = async (userId: string, year: number, week: number): Promise<void> => {
+  await client.POST('/api/timesheet-weeks/{userId}/{year}/{week}/reopen', {
+    params: { path: { userId, year, week } },
+  });
+};

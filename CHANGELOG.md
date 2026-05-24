@@ -2,6 +2,16 @@
 
 ## 2026-05-24
 
+### Timesheets — submit / approve / reopen lifecycle
+
+- Consultants can now submit a Draft timesheet week. The Submit button in the grid header posts `POST /api/timesheet-weeks/{userId}/{year}/{week}/submit` and refreshes the page with the new Submitted status.
+- Admins see an Approve button when a week is Submitted and a Reopen button when a week is Submitted or Approved. These call `POST .../approve` and `POST .../reopen` respectively.
+- Non-owners receive 403 on submit; non-admins receive 403 on approve and reopen.
+- Attempting to approve a Draft week or reopen a Draft week returns 400 with a typed error code.
+- Bulk-PUT bookings against a non-Draft week returns 400 (`ERR_TIMESHEET_NOT_DRAFT`) — the grid cells are read-only when the status is Submitted or Approved.
+- The grid background is tinted green (light for Submitted, deeper for Approved) to visually signal the locked state.
+- A status badge (pill) is displayed above the grid when the status is non-Draft.
+
 ### Timesheets — weekly time-entry grid
 
 - Consultants can now navigate to `/timesheets/week/{year}/{week}` to record their working hours per contract task for any week.

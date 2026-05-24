@@ -51,6 +51,33 @@ public class TimesheetWeek : IEntityBase
         }
     }
 
+    public void Submit()
+    {
+        if (Status != TimesheetStatus.Draft)
+            throw new Tsz.Infrastructure.Errors.ValidationException(
+                [new ValidationFailure(string.Empty, TimesheetErrors.NotSubmittable.Message)
+                    { CustomState = TimesheetErrors.NotSubmittable }]);
+        Status = TimesheetStatus.Submitted;
+    }
+
+    public void Approve()
+    {
+        if (Status != TimesheetStatus.Submitted)
+            throw new Tsz.Infrastructure.Errors.ValidationException(
+                [new ValidationFailure(string.Empty, TimesheetErrors.NotApprovable.Message)
+                    { CustomState = TimesheetErrors.NotApprovable }]);
+        Status = TimesheetStatus.Approved;
+    }
+
+    public void Reopen()
+    {
+        if (Status != TimesheetStatus.Submitted && Status != TimesheetStatus.Approved)
+            throw new Tsz.Infrastructure.Errors.ValidationException(
+                [new ValidationFailure(string.Empty, TimesheetErrors.NotReopenable.Message)
+                    { CustomState = TimesheetErrors.NotReopenable }]);
+        Status = TimesheetStatus.Draft;
+    }
+
     private void EnsureDraft()
     {
         if (Status != TimesheetStatus.Draft)

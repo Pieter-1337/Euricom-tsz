@@ -31,4 +31,24 @@ public sealed class TimesheetErrors : ErrorCodeBase<TimesheetErrors>
         new("ERR_TIMESHEET_INVALID_DURATION_HOURS",
             "Duration hours must be a multiple of 0.25 between 0.25 and 8.00.",
             ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors NotFound =
+        new("ERR_TIMESHEET_NOT_FOUND",
+            "The timesheet week was not found.",
+            ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors NotSubmittable =
+        new("ERR_TIMESHEET_NOT_SUBMITTABLE",
+            "The timesheet week cannot be submitted because it is not in Draft status.",
+            ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors NotApprovable =
+        new("ERR_TIMESHEET_NOT_APPROVABLE",
+            "The timesheet week cannot be approved because it is not in Submitted status.",
+            ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors NotReopenable =
+        new("ERR_TIMESHEET_NOT_REOPENABLE",
+            "The timesheet week cannot be reopened because it is not in Submitted or Approved status.",
+            ErrorCategory.Validation);
 }
