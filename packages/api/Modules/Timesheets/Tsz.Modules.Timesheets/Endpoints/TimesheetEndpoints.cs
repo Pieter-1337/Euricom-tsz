@@ -80,6 +80,25 @@ public static class TimesheetEndpoints
             return TypedResults.Ok(dto);
         });
 
+        var monthGroup = app.MapApiGroup("timesheets")
+            .RequireAuthorization();
+
+        monthGroup.MapGet("/{userId:guid}/{year:int}/{month:int}", async (
+            Guid userId,
+            int year,
+            int month,
+            ICurrentUserResolver currentUserResolver,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            var caller = await currentUserResolver.ResolveAsync(ct);
+            if (caller is null || (caller.Id != userId && !caller.HasRole(AuthorizationPolicies.AdminRoleName)))
+                return Results.Forbid();
+
+            var dto = await dispatcher.SendAsync(new GetTimesheetMonthQuery(userId, year, month), ct);
+            return TypedResults.Ok(dto);
+        });
+
         var tasksGroup = app.MapApiGroup("timesheet-selectable-tasks")
             .RequireAuthorization();
 

@@ -2,6 +2,17 @@
 
 ## 2026-05-24
 
+### Timesheets — month overview
+
+Consultants and admins can now view a month overview of timesheets with daily totals, per-task and per-leave-type summaries, and week-status colour coding. Clicking a day jumps to that week's editing grid.
+
+- New route `/timesheets/month/{year}/{month}` displays a read-only month view.
+- Each ISO week whose Monday falls inside the calendar month is shown as a colour-coded card: light green for Submitted, dark green for Approved, neutral for Draft.
+- Each day cell shows its daily total hours; clicking a business-day cell navigates to the week editing grid for that day's ISO week.
+- Per-task and per-leave-type summaries are shown per week and aggregated in a monthly summary panel.
+- Month navigation (previous / next / today) buttons allow browsing any period.
+- Admin users can view any consultant's month; non-admin users are restricted to their own data (403 otherwise).
+
 ### Timesheets — leave rows + allowance enforcement
 
 Consultants can now record leave hours alongside work hours in the weekly grid; year-based allowance limits are enforced server-side and excess bookings are rejected with a clear error.

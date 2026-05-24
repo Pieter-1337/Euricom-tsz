@@ -764,6 +764,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/timesheets/{userId}/{year}/{month}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          month: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['TimesheetMonthDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/timesheet-selectable-tasks/{userId}/{year}/{week}': {
     parameters: {
       query?: never;
@@ -933,6 +972,63 @@ export interface components {
       days: components['schemas']['DayInfoDto'][];
       timeEntries: components['schemas']['TimeEntryDto'][];
       leaveBookings: components['schemas']['LeaveBookingEntryDto'][];
+    };
+    TimesheetMonthDto: {
+      /** Format: uuid */
+      userId: string;
+      /** Format: int32 */
+      year: number;
+      /** Format: int32 */
+      month: number;
+      weeks: components['schemas']['TimesheetMonthWeekDto'][];
+      /** Format: double */
+      monthTotalHours: number;
+    };
+    TimesheetMonthWeekDto: {
+      /** Format: int32 */
+      isoYear: number;
+      /** Format: int32 */
+      isoWeek: number;
+      status: string;
+      days: components['schemas']['TimesheetMonthDayDto'][];
+      perTaskSummary: components['schemas']['TimesheetMonthPerTaskSummaryDto'][];
+      perLeaveTypeSummary: components['schemas']['TimesheetMonthPerLeaveTypeSummaryDto'][];
+    };
+    TimesheetMonthDayDto: {
+      /** Format: date */
+      date: string;
+      isBusinessDay: boolean;
+      timeEntries: components['schemas']['TimesheetMonthTimeEntryDto'][];
+      leaveBookings: components['schemas']['TimesheetMonthLeaveBookingDto'][];
+      /** Format: double */
+      totalHours: number;
+    };
+    TimesheetMonthTimeEntryDto: {
+      /** Format: uuid */
+      taskId: string;
+      taskName: string;
+      contractName: string;
+      customerName: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimesheetMonthLeaveBookingDto: {
+      /** Format: uuid */
+      leaveTypeId: string;
+      leaveTypeName: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimesheetMonthPerTaskSummaryDto: {
+      contractName: string;
+      taskName: string;
+      /** Format: double */
+      totalHours: number;
+    };
+    TimesheetMonthPerLeaveTypeSummaryDto: {
+      leaveTypeName: string;
+      /** Format: double */
+      totalHours: number;
     };
     ContactPersonDto: {
       name: null | string;

@@ -615,4 +615,147 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.NotNull(leaveTypes);
         Assert.NotEmpty(leaveTypes);
     }
+
+    // --- Month endpoint tests ---
+
+    [Fact]
+    public async Task GetTimesheetMonth_NoWeeks_ReturnsEmptyMonth()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+
+        var response = await Client.GetAsync($"/api/timesheets/{userId}/2026/5");
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetMonthDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(userId, dto.UserId);
+        Assert.Equal(2026, dto.Year);
+        Assert.Equal(5, dto.Month);
+        Assert.Empty(dto.Weeks);
+        Assert.Equal(0m, dto.MonthTotalHours);
+    }
+
+    [Fact]
+    public async Task GetTimesheetMonth_WithTimeEntry_ReturnsCorrectTotals()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
+
+        // Put bookings into week 21 (Mon May 18 – Sun May 24 2026)
+        await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
+
+        var response = await Client.GetAsync($"/api/timesheets/{userId}/2026/5");
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetMonthDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Single(dto.Weeks);
+        Assert.Equal(8m, dto.MonthTotalHours);
+
+        var week = dto.Weeks[0];
+        Assert.Equal(21, week.IsoWeek);
+        Assert.Equal(7, week.Days.Count);
+
+        var monday = week.Days.First(d => d.Date == new DateOnly(2026, 5, 18));
+        Assert.Equal(8m, monday.TotalHours);
+        Assert.Single(monday.TimeEntries);
+    }
+
+    [Fact]
+    public async Task GetTimesheetMonth_MultipleWeeks_ReturnsAllWeeks()
+    {
+        // Seed as admin so we can access our own month view
+        var userId = await SeedCallerAsAsync(UserRole.Admin);
+
+        // Seed week 21 and week 22 for the same user (both Mondays are in May 2026)
+        await WithUowAsync(async uow =>
+        {
+            var week21 = TimesheetWeek.Create(userId, 2026, 21);
+            var week22 = TimesheetWeek.Create(userId, 2026, 22);
+            uow.RepositoryFor<TimesheetWeek>().Add(week21);
+            uow.RepositoryFor<TimesheetWeek>().Add(week22);
+            await uow.SaveChangesAsync();
+        });
+
+        var monthResp = await Client.GetAsync($"/api/timesheets/{userId}/2026/5");
+        monthResp.EnsureSuccessStatusCode();
+        var dto = await monthResp.Content.ReadFromJsonAsync<TimesheetMonthDto>(Json);
+        Assert.NotNull(dto);
+        // Both weeks 21 and 22 have Monday in May
+        Assert.Equal(2, dto.Weeks.Count);
+    }
+
+    [Fact]
+    public async Task GetTimesheetMonth_AsNonOwner_NonAdmin_Returns403()
+    {
+        var ownerId = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var owner = User.Create("Owner", "User", "owner@test.com", [UserRole.User]);
+            owner.Id = ownerId;
+            uow.RepositoryFor<User>().Add(owner);
+            await uow.SaveChangesAsync();
+        });
+
+        // Caller (TestAuthHandler) is not ownerId and not Admin
+        await SeedCallerAsAsync(UserRole.User);
+
+        var response = await Client.GetAsync($"/api/timesheets/{ownerId}/2026/5");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetTimesheetMonth_AsAdmin_AnyUser_Returns200()
+    {
+        var ownerId = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var owner = User.Create("Owner", "User", "owner2@test.com", [UserRole.User]);
+            owner.Id = ownerId;
+            uow.RepositoryFor<User>().Add(owner);
+            await uow.SaveChangesAsync();
+        });
+
+        // Seed caller as Admin (TestAuthHandler uses CallerOid)
+        await SeedCallerAsAsync(UserRole.Admin);
+
+        var response = await Client.GetAsync($"/api/timesheets/{ownerId}/2026/5");
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetMonthDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(ownerId, dto.UserId);
+    }
+
+    [Fact]
+    public async Task GetTimesheetMonth_PerTaskSummary_CorrectlyGrouped()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
+
+        // Two entries in week 21 for the same task
+        await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = new[]
+                {
+                    new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 },
+                    new { contractTaskId = taskId, date = "2026-05-19", durationHours = 4.00 }
+                },
+                leaveBookings = Array.Empty<object>()
+            });
+
+        var response = await Client.GetAsync($"/api/timesheets/{userId}/2026/5");
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetMonthDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Single(dto.Weeks[0].PerTaskSummary);
+        Assert.Equal(12m, dto.Weeks[0].PerTaskSummary[0].TotalHours);
+    }
 }
