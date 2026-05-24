@@ -1,0 +1,89 @@
+packages/web/src/routes/_protected/timesheets/week/$year/$week.tsx
+  s_6772ed77e38b51::t_fa9237374807b6 3-7
+  s_6772ed77e38b51::t_a60c17eed24eed 19,22,24,30,41
+packages/web/src/api/timesheets.server.ts
+  s_6772ed77e38b51::t_fa9237374807b6 2-7
+  s_6772ed77e38b51::t_2d2e378bdc4d03 40-42
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/TimesheetWeekDtoBuilder.cs
+  s_6772ed77e38b51::t_509453c103e687 4,18,34-37,39-40
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_6772ed77e38b51::t_c4b60e3b8320ea 37,97-109,113-115
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  s_6772ed77e38b51::t_2a08f79c2e7de6 643-669,697-698
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Tsz.Modules.Timesheets.csproj
+  s_6772ed77e38b51::t_05d6cbbf95154b 30
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ReopenTimesheetWeek.cs
+  s_6772ed77e38b51::t_868bb3fd2b0cae 6,35-36,53
+packages/web/src/features/timesheets/server-fns.ts
+  s_6772ed77e38b51::t_3f734c9099b13f 7,21-32,34-35,46-49,54-57
+CHANGELOG.md
+  s_6772ed77e38b51::t_b270ab1205b5d8 5-15
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetTimesheetWeek.cs
+  s_6772ed77e38b51::t_2418d041c94eb6 78-84,94-95,109-110,115-116,139-149
+  s_6772ed77e38b51::t_24c97f5d8f4c00 5,150
+  s_6772ed77e38b51::t_8c11ceb700aeff 21-22,56-59,61,63
+  s_6772ed77e38b51::t_e03146e7ae7809 6
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_6772ed77e38b51::t_fa9237374807b6 8-14,645-650
+  s_6772ed77e38b51::t_3120318d4490d2 30,32-34,42,46-51,60,65-67,69-77,90-97,102,106,115,117-120,122-128,130,133-137,141,160,163-178,180,190,192,195-196,199-231,233-234,237-238,241,245,248,251-258,269-275,283,295,307,322,327-330,338-343,424-430,465,468,472-473,475,478,488-489,530-532,544-615,641,643-644,651-653,655-713
+packages/web/src/api/timesheets.ts
+  s_6772ed77e38b51::t_6d7a9d66af61ac 5,8,10-11
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetSelectableLeaveTypes.cs
+  s_6772ed77e38b51::t_80c2da3fd90827 1-24
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/LeaveBooking.cs
+  s_6772ed77e38b51::t_11fc67f41a11d5 1-21
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ApproveTimesheetWeek.cs
+  s_6772ed77e38b51::t_cfd8474bb0a52a 6,35-36,53
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ApplyTimesheetWeekBookings.cs
+  s_6772ed77e38b51::t_71e67a9043122a 7,13,18-22,27-28,34-35,39-40,42-44,60-62,68,73-75,77-78,84-86,88,93,98-100,106-162,164-165,167-196,200-204,224,228-231,247-250,252-253
+  s_6772ed77e38b51::t_981f42f348ecd8 163,166
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetWeekConfiguration.cs
+  s_6772ed77e38b51::t_8368281191c0a8 28,43-55
+packages/api/Tsz.Api/Persistence/Migrations/20260524054620_AddLeaveBookings.cs
+  s_6772ed77e38b51::t_2a08f79c2e7de6 1-48
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/ApplyTimesheetWeekBookingsValidatorTests.cs
+  s_6772ed77e38b51::t_ed2ad0438c26b5 5,17,29-32,41-45,61-68,71-76,82,98,107,116,130,144,157,161-329
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Domain/TimesheetWeekTests.cs
+  s_6772ed77e38b51::t_1621053f101e79 124-190
+  s_6772ed77e38b51::t_471c343e30d8b9 15-16
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_6772ed77e38b51::t_708bed3bd52719 22-24,28
+  s_6772ed77e38b51::t_7523f591622390 171,177,185
+  s_6772ed77e38b51::t_490fb6d1a874a3 230
+  s_6772ed77e38b51::t_5b0d8196af797b 7-8,617
+  s_6772ed77e38b51::t_31291bc905652c 200
+  s_6772ed77e38b51::t_ea430181a5e1ec 216
+  s_6772ed77e38b51::t_15f6989ced8795 490,496-616
+  s_6772ed77e38b51::t_48b4cbec2aa5ff 246
+  s_6772ed77e38b51::t_32b9653c6082dc 150
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/SubmitTimesheetWeek.cs
+  s_6772ed77e38b51::t_41b32ac67aa7bf 6,35-36,53
+packages/api/Tsz.Api/Persistence/Migrations/20260524054620_AddLeaveBookings.Designer.cs
+  s_6772ed77e38b51::t_2a08f79c2e7de6 1-729
+packages/web/src/api/schema.ts
+  s_6772ed77e38b51::t_8876796bec30c9 856-857,859,867-890
+  s_6772ed77e38b51::t_515642fb09d74b 935
+  s_6772ed77e38b51::t_658c89562c5d04 804-840
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetWeek.cs
+  s_6772ed77e38b51::t_5c88f4be2959c3 120-124
+  s_6772ed77e38b51::t_61b3bce68bbb34 56-79
+  s_6772ed77e38b51::t_8359c2bf979c5b 16,19
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetErrors.cs
+  s_6772ed77e38b51::t_b4f012eda68c16 54-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "1277d36432d25e5547444af8a54f5d731f4c9447",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
