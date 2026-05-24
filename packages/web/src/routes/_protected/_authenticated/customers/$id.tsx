@@ -3,7 +3,7 @@ import { fetchCustomer } from '#/features/customers/server-fns';
 import { CustomerEditCard } from '#/features/customers/components/customer-edit-card';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/_authenticated/admin/customers/$id')({
+export const Route = createFileRoute('/_protected/_authenticated/customers/$id')({
   loader: ({ params }) => fetchCustomer({ data: params.id }),
   component: EditCustomerPage,
 });

@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { CustomersList } from '#/features/customers/components/customers-list';
+import { ContractsList } from '#/features/contracts/components/contracts-list';
 import { UserRole } from '#/api/users';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/_authenticated/admin/customers/')({
-  component: CustomersListPage,
+export const Route = createFileRoute('/_protected/_authenticated/contracts/')({
+  component: ContractsListPage,
 });
 
-function CustomersListPage() {
+function ContractsListPage() {
   const { currentUser } = Route.useRouteContext() as { currentUser: CurrentUser };
   const canCreate = currentUser.roles.includes(UserRole.Admin);
-  return <CustomersList canCreate={canCreate} />;
+  return <ContractsList canCreate={canCreate} />;
 }

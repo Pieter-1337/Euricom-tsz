@@ -3,10 +3,10 @@ import { ContractCreateForm } from '#/features/contracts/components/contract-cre
 import { UserRole } from '#/api/users';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/_authenticated/admin/contracts/new')({
+export const Route = createFileRoute('/_protected/_authenticated/contracts/new')({
   beforeLoad: ({ context }) => {
-    const { currentUser } = context as { currentUser: CurrentUser };
-    if (!currentUser.roles.includes(UserRole.Admin)) throw redirect({ to: '/admin/contracts' });
+    const currentUser = (context as { currentUser?: CurrentUser }).currentUser;
+    if (!currentUser?.roles.includes(UserRole.Admin)) throw redirect({ to: '/contracts' });
   },
   component: ContractCreateForm,
 });

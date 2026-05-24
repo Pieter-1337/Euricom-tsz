@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBlocker, useNavigate, useRouter } from '@tanstack/react-router';
-import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { Calendar as CalendarPicker } from '#/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '#/components/ui/popover';
@@ -135,6 +135,8 @@ export function TimesheetWeekGrid({
       const apiErr = parseServerError(e);
       if (apiErr?.problem?.code === 'ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED') {
         setFlushError(apiErr.problem.detail ?? 'Leave allowance exceeded.');
+      } else {
+        setFlushError(apiErr?.problem?.detail ?? 'Could not save changes — please try again');
       }
       return false;
     } finally {
@@ -275,6 +277,30 @@ export function TimesheetWeekGrid({
     setShowLeavePicker(false);
   };
 
+  const removeTaskRow = (taskId: string) => {
+    setTaskRows((prev) => prev.filter((r) => r.id !== taskId));
+    setTaskBookings((prev) => {
+      const next = new Map(prev);
+      for (const key of next.keys()) {
+        if (key.startsWith(`task:${taskId}:`)) next.delete(key);
+      }
+      return next;
+    });
+    setIsDirty(true);
+  };
+
+  const removeLeaveRow = (leaveTypeId: string) => {
+    setLeaveRows((prev) => prev.filter((r) => r.id !== leaveTypeId));
+    setLeaveBookings((prev) => {
+      const next = new Map(prev);
+      for (const key of next.keys()) {
+        if (key.startsWith(`leave:${leaveTypeId}:`)) next.delete(key);
+      }
+      return next;
+    });
+    setIsDirty(true);
+  };
+
   const handleSubmit = async () => {
     setIsLifecycleLoading(true);
     try {
@@ -321,7 +347,8 @@ export function TimesheetWeekGrid({
   const today = todayWeek();
 
   const navigateToWeek = async (y: number, w: number) => {
-    await flush();
+    const saved = await flush();
+    if (!saved) return;
     await navigate({ to: '/timesheets/week/$year/$week', params: { year: String(y), week: String(w) } });
   };
 
@@ -398,6 +425,16 @@ export function TimesheetWeekGrid({
           {isFlushing && <span className="text-xs text-[#6B7682]">Saving...</span>}
           {flushError && <span className="text-xs text-red-500">Could not save changes — please try again</span>}
           {isDraft && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!isDirty || isFlushing || isLifecycleLoading}
+              onClick={() => void flush()}
+            >
+              Save
+            </Button>
+          )}
+          {isDraft && (
             <Button size="sm" disabled={isLifecycleLoading} onClick={() => void handleSubmit()}>
               Submit
             </Button>
@@ -466,12 +503,13 @@ export function TimesheetWeekGrid({
               <th className="min-w-[60px] px-2 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6B7682] dark:text-white/40">
                 Total
               </th>
+              {isDraft && <th className="w-10" />}
             </tr>
           </thead>
           <tbody>
             {!hasRows && (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
+                <td colSpan={isDraft ? 10 : 9} className="px-4 py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
                   No tasks added. Use the buttons below to add a task or leave row.
                 </td>
               </tr>
@@ -545,6 +583,19 @@ export function TimesheetWeekGrid({
                   <td className="px-2 py-2 text-center font-semibold text-sm text-[#3A4651] dark:text-white/80">
                     {rowTotal > 0 ? rowTotal : ''}
                   </td>
+                  {isDraft && (
+                    <td className="px-1 py-2 text-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-[#6B7682] hover:text-red-600 dark:text-white/40 dark:hover:text-red-400"
+                        onClick={() => removeTaskRow(row.id)}
+                        title="Remove row"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -617,6 +668,19 @@ export function TimesheetWeekGrid({
                   <td className="px-2 py-2 text-center font-semibold text-sm text-amber-700 dark:text-amber-400">
                     {rowTotal > 0 ? rowTotal : ''}
                   </td>
+                  {isDraft && (
+                    <td className="px-1 py-2 text-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-[#6B7682] hover:text-red-600 dark:text-white/40 dark:hover:text-red-400"
+                        onClick={() => removeLeaveRow(row.id)}
+                        title="Remove row"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -640,6 +704,7 @@ export function TimesheetWeekGrid({
               <td className="px-2 py-2 text-center font-bold text-sm text-[#3A4651] dark:text-white">
                 {weekTotal > 0 ? weekTotal : ''}
               </td>
+              {isDraft && <td />}
             </tr>
           </tfoot>
         </table>
@@ -648,76 +713,68 @@ export function TimesheetWeekGrid({
       {/* Add task row / leave row buttons */}
       {isDraft && (
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-[13px]"
-              onClick={() => setShowTaskPicker((v) => !v)}
-            >
-              <Plus className="h-4 w-4" />
-              Add task row
-            </Button>
+          <Popover open={showTaskPicker} onOpenChange={setShowTaskPicker}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 text-[13px]">
+                <Plus className="h-4 w-4" />
+                Add task row
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-72 p-0">
+              {availableTasksToAdd.length === 0 ? (
+                <div className="px-4 py-3 text-sm text-[#6B7682] dark:text-white/40">
+                  No more tasks available for this week.
+                </div>
+              ) : (
+                <ul>
+                  {availableTasksToAdd.map((t) => (
+                    <li key={t.contractTaskId}>
+                      <button
+                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors duration-[120ms]"
+                        onClick={() => addTaskRow(t)}
+                      >
+                        <div className="font-medium text-[#3A4651] dark:text-white/90">{t.taskName}</div>
+                        <div className="text-xs text-[#6B7682] dark:text-white/40">{t.contractSubject}</div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </PopoverContent>
+          </Popover>
 
-            {showTaskPicker && (
-              <div className="absolute left-0 top-full z-10 mt-1 w-72 rounded-lg border border-black/[0.10] bg-white shadow-md dark:border-white/[0.10] dark:bg-[#232C35]">
-                {availableTasksToAdd.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-[#6B7682] dark:text-white/40">
-                    No more tasks available for this week.
-                  </div>
-                ) : (
-                  <ul>
-                    {availableTasksToAdd.map((t) => (
-                      <li key={t.contractTaskId}>
-                        <button
-                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors duration-[120ms]"
-                          onClick={() => addTaskRow(t)}
-                        >
-                          <div className="font-medium text-[#3A4651] dark:text-white/90">{t.taskName}</div>
-                          <div className="text-xs text-[#6B7682] dark:text-white/40">{t.contractSubject}</div>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-[13px] text-amber-700 hover:text-amber-800 dark:text-amber-400"
-              onClick={() => setShowLeavePicker((v) => !v)}
-            >
-              <Plus className="h-4 w-4" />
-              Add leave row
-            </Button>
-
-            {showLeavePicker && (
-              <div className="absolute left-0 top-full z-10 mt-1 w-64 rounded-lg border border-black/[0.10] bg-white shadow-md dark:border-white/[0.10] dark:bg-[#232C35]">
-                {availableLeaveToAdd.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-[#6B7682] dark:text-white/40">
-                    No more leave types available.
-                  </div>
-                ) : (
-                  <ul>
-                    {availableLeaveToAdd.map((lt) => (
-                      <li key={lt.id}>
-                        <button
-                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors duration-[120ms]"
-                          onClick={() => addLeaveRow(lt)}
-                        >
-                          <div className="font-medium text-amber-700 dark:text-amber-400">{lt.name}</div>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </div>
+          <Popover open={showLeavePicker} onOpenChange={setShowLeavePicker}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-[13px] text-amber-700 hover:text-amber-800 dark:text-amber-400"
+              >
+                <Plus className="h-4 w-4" />
+                Add leave row
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-64 p-0">
+              {availableLeaveToAdd.length === 0 ? (
+                <div className="px-4 py-3 text-sm text-[#6B7682] dark:text-white/40">
+                  No more leave types available.
+                </div>
+              ) : (
+                <ul>
+                  {availableLeaveToAdd.map((lt) => (
+                    <li key={lt.id}>
+                      <button
+                        className="w-full px-4 py-2.5 text-left text-sm hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors duration-[120ms]"
+                        onClick={() => addLeaveRow(lt)}
+                      >
+                        <div className="font-medium text-amber-700 dark:text-amber-400">{lt.name}</div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </PopoverContent>
+          </Popover>
         </div>
       )}
     </div>

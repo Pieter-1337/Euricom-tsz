@@ -34,7 +34,7 @@ export function ContractCreateForm() {
       try {
         await submitCreateContract({ data: value });
         await router.invalidate();
-        router.navigate({ to: '/admin/contracts' });
+        router.navigate({ to: '/contracts' });
       } catch (e) {
         handleApiError(e);
       }

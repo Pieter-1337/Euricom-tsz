@@ -1,9 +1,9 @@
 import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
 import {
   Building2,
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Clock,
   FileText,
   Home as HomeIcon,
   User as UserIcon,
@@ -13,7 +13,6 @@ import { useEffect, useState, type ComponentType, type SVGProps } from 'react';
 
 import { UserRole } from '#/api/users';
 import { ThemeToggle } from '#/components/theme-toggle';
-import { todayWeek } from '#/features/timesheets/iso-week';
 import { Button } from '#/components/ui/button';
 import { Separator } from '#/components/ui/separator';
 import { authClient } from '#/lib/auth-client';
@@ -112,8 +111,6 @@ function Sidebar({
   isAdmin: boolean;
   canManageClients: boolean;
 }) {
-  const { year: isoYear, week: isoWeek } = todayWeek();
-
   return (
     <aside
       aria-label="Primary navigation"
@@ -132,23 +129,17 @@ function Sidebar({
           collapsed ? 'gap-1 py-4' : 'gap-0 px-3 pt-[22px] pb-3',
         )}
       >
-        <NavSection eyebrow="Navigate" collapsed={collapsed}>
+        <div className={cn('flex flex-col', collapsed ? 'items-center gap-1' : 'gap-0.5')}>
           <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
-          <NavLink
-            to={`/timesheets/week/${isoYear}/${isoWeek}`}
-            icon={CalendarDays}
-            label="My Timesheet"
-            collapsed={collapsed}
-          />
-        </NavSection>
-
-        {canManageClients && (
-          <NavSection eyebrow="Admin" collapsed={collapsed}>
-            {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
-            <NavLink to="/admin/customers" icon={Building2} label="Customers" collapsed={collapsed} />
-            <NavLink to="/admin/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />
-          </NavSection>
-        )}
+          <NavLink to="/timesheets" icon={Clock} label="Timesheets" collapsed={collapsed} />
+          {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
+          {canManageClients && (
+            <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />
+          )}
+          {canManageClients && (
+            <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />
+          )}
+        </div>
       </nav>
 
       <div
@@ -183,44 +174,6 @@ function Sidebar({
         </Button>
       </div>
     </aside>
-  );
-}
-
-function NavSection({
-  eyebrow,
-  collapsed,
-  children,
-}: {
-  eyebrow: string;
-  collapsed: boolean;
-  children: React.ReactNode;
-}) {
-  if (collapsed) {
-    return (
-      <div
-        className={cn(
-          'flex flex-col items-center gap-1',
-          '[&:not(:first-child)]:mt-2 [&:not(:first-child)]:pt-2',
-          '[&:not(:first-child)]:border-t [&:not(:first-child)]:border-black/[0.10]',
-          'dark:[&:not(:first-child)]:border-white/[0.09]',
-        )}
-      >
-        {children}
-      </div>
-    );
-  }
-  return (
-    <div className="flex flex-col [&:not(:first-child)]:mt-7">
-      <div
-        className={cn(
-          'mb-2 px-3 text-[10.5px] font-medium uppercase tracking-[0.32em]',
-          'text-[#6B7682] dark:text-white/40',
-        )}
-      >
-        {eyebrow}
-      </div>
-      <div className="flex flex-col gap-0.5">{children}</div>
-    </div>
   );
 }
 

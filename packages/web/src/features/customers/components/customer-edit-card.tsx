@@ -78,7 +78,7 @@ export function CustomerEditCard({ customer, currentUser }: { customer: Customer
               if (!confirm(`Delete ${customer.name}?`)) return;
               try {
                 await deleteCustomer({ data: customer.id });
-                router.navigate({ to: '/admin/customers' });
+                router.navigate({ to: '/customers' });
               } catch (e) {
                 handleApiError(e);
               }

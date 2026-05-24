@@ -52,6 +52,10 @@ _Avoid_: LeaveCategory, AbsenceType
 Per-User × per-year allowance for a specific LeaveType ("Pieter has 20 Verlof days in 2026"). Edited via the User admin form. Stored in the LeaveTypes module (extracted from Users per ADR-0002). `TotalDays = null` means "unlimited" for v1.
 _Avoid_: LeaveBudget, LeaveBalance, LeaveQuota
 
+**WorkdayCapacity**:
+A consultant's daily working hours. v1 constant: `8.00` for everyone. Drives both the per-day booking cap ("Σ TimeEntry + LeaveBooking DurationHours per (User, Date) ≤ WorkdayCapacity") and the leave-day-equivalence arithmetic ("1 day deducted from a UserLeave allowance = WorkdayCapacity hours"). Forward-compat: becomes `User.WorkingPatternHoursPerDay` when part-time consultants land.
+_Avoid_: DefaultDayHours (implementation name), DailyBudget, DayTotalCap, MaxWorkdayHours — these describe only one use of the number and hide the connection.
+
 ## Relationships
 
 - A **Contract** has many **ContractTask**s and is assigned to one or more **User**s (consultants)

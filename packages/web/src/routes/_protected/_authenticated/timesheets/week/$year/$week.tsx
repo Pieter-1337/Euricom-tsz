@@ -32,6 +32,7 @@ function TimesheetWeekPage() {
     <main>
       <h1 className="mb-6 text-2xl font-bold">My Timesheet</h1>
       <TimesheetWeekGrid
+        key={`${year}-${week}`}
         userId={userId}
         year={year}
         week={week}
