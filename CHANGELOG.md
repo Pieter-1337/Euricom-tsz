@@ -2,6 +2,10 @@
 
 ## 2026-05-24
 
+### Nav — Add "My Timesheet" sidebar link
+
+Add a 'My Timesheet' sidebar link that opens the consultant's current-week timesheet, so the new timesheets feature is discoverable from the navigation.
+
 ### Refactor — centralize authenticated-route guard in `_authenticated` layout
 
 Centralize the authenticated-route guard in a single _authenticated layout so admin and timesheets routes no longer each need their own redirect-when-unauthenticated check. URL paths are unchanged; this is a code-quality refactor only.
