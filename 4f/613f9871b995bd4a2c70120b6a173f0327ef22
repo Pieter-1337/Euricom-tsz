@@ -1,0 +1,25 @@
+packages/web/src/routes/_protected/timesheets/month/$year/$month.tsx
+  s_6772ed77e38b51::t_2ab8818a5625b0 1
+  s_6772ed77e38b51::t_96078a261968e3 9
+CHANGELOG.md
+  s_6772ed77e38b51::t_a933b3355af2af 5-10
+packages/web/src/routes/_protected/timesheets/week/$year/$week.tsx
+  s_6772ed77e38b51::t_b90a0200ab6610 1
+  s_6772ed77e38b51::t_37edd21fb9ef1f 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "4f613f9871b995bd4a2c70120b6a173f0327ef22",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
