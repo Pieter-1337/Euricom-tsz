@@ -1,0 +1,53 @@
+packages/web/src/features/timesheets/server-fns.ts
+  s_6772ed77e38b51::t_470f0c32ff3161 11,94-103
+packages/web/src/features/timesheets/components/timesheet-month-grid.tsx
+  s_6772ed77e38b51::t_e2e9eb74a2864f 6,23,72-74,111-114,129-132,163,205,234-237
+  s_6772ed77e38b51::t_f732c44b36f89e 62
+  s_6772ed77e38b51::t_dca08abffe02c7 1-5,7-22,24-61,63-71,75-110,115-128,133-162,164-204,206-233,238-277
+packages/web/src/features/timesheets/iso-week.ts
+  s_6772ed77e38b51::t_470f0c32ff3161 62-80
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/GetTimesheetMonthHandlerTests.cs
+  s_6772ed77e38b51::t_f9827850dfa3a9 108,151
+  s_6772ed77e38b51::t_167820826e3215 1-107,109-150,152-195
+packages/web/src/api/timesheets.server.ts
+  s_6772ed77e38b51::t_470f0c32ff3161 4,65-74
+  s_6772ed77e38b51::t_d989976f82525f 75
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_6772ed77e38b51::t_8942dfd4c75294 624
+  s_6772ed77e38b51::t_dc97744d51b69f 641
+  s_6772ed77e38b51::t_007038ef298b19 737
+  s_6772ed77e38b51::t_885498449784a0 668,670-671,673,676,678
+  s_6772ed77e38b51::t_470f0c32ff3161 618-623,625-640,642-667,669,672,674-675,677,679-736,738-760
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_6772ed77e38b51::t_470f0c32ff3161 83-101
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetTimesheetMonth.cs
+  s_6772ed77e38b51::t_0247eba129d7ce 79-80,82
+  s_6772ed77e38b51::t_41832f396284ba 1-31,33-39,41-78,81,83-225
+  s_6772ed77e38b51::t_966192d779d0ed 32,40
+packages/web/src/api/schema.ts
+  s_6772ed77e38b51::t_d989976f82525f 1032
+  s_6772ed77e38b51::t_470f0c32ff3161 767-805,976-1031
+CHANGELOG.md
+  s_6772ed77e38b51::t_15071f7f320e7f 5-15
+packages/web/src/api/timesheets.ts
+  s_6772ed77e38b51::t_470f0c32ff3161 12-18
+packages/web/src/routes/_protected/timesheets/month/$year/$month.tsx
+  s_6772ed77e38b51::t_3a2b9775024967 1-32,34-36
+  s_6772ed77e38b51::t_e2e9eb74a2864f 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "8ef23831b01a33312d11f990f4568d1a1d2796c8",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
