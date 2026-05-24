@@ -1,0 +1,49 @@
+packages/web/src/features/timesheets/components/timesheet-week-grid.spec.tsx
+  s_0bd1cf259de613::t_6fb0f421004a1d 6-8
+  s_0bd1cf259de613::t_6fd82347a590c1 122-124,126,141-147,149-151,157
+  s_0bd1cf259de613::t_a2078d21db34ba 1-5,9-121,125,127-140,148,152-156,158-166
+CHANGELOG.md
+  s_0bd1cf259de613::t_4df79a9eab07c0 5-12
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/GetTimesheetMonthHandlerTests.cs
+  s_0bd1cf259de613::t_2122ae8cb18a6b 76
+  s_0bd1cf259de613::t_b761fd3926b05e 123,126
+  s_0bd1cf259de613::t_2eb0e2175bccfa 146
+  s_0bd1cf259de613::t_6a8c81042733f2 166,168
+  s_0bd1cf259de613::t_9ba502e3915b5d 106
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ApplyTimesheetWeekBookings.cs
+  s_0bd1cf259de613::t_a6c8e19ce6d9d6 182
+  s_0bd1cf259de613::t_bb308b2f9dda6e 222-228
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetErrors.cs
+  s_0bd1cf259de613::t_2f9dec403cd703 64-68
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/ApplyTimesheetWeekBookingsValidatorTests.cs
+  s_0bd1cf259de613::t_93938341e40275 251
+  s_0bd1cf259de613::t_583ef06fe34fe3 268
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_0bd1cf259de613::t_585f44803c6443 32-37,719,723
+  s_0bd1cf259de613::t_968039371e7054 724-727,729
+  s_0bd1cf259de613::t_f76761e3ef21d7 136-146,157-158
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Domain/TimesheetWeekTests.cs
+  s_0bd1cf259de613::t_60efe49f0f139a 18-20,38-39,41,45-50,58,61,63,70,73-78,80,87,90,92,98,101,104,108,111,114,118,121-126,131,134,138-143,151,154,156,163,166-171,173,180,183,185,191,194,197-316,425-430
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetWeek.cs
+  s_0bd1cf259de613::t_7a9129f48d985b 8-15,40-47,50-54,56-59,61-63,66-74,81,88,90-91,98
+  s_0bd1cf259de613::t_318a36eda9e0ba 60,65
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_0bd1cf259de613::t_9f860674a68498 531-537,540-615
+  s_0bd1cf259de613::t_c628d1b7368fcd 538-539
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "0e91478e797124e2a21df36c995b7293c893dd75",
+  "prompts": {},
+  "sessions": {
+    "s_0bd1cf259de613": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "728f09f4-a40e-4b2b-b694-08f69465883d",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
