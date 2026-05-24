@@ -1,0 +1,37 @@
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetErrors.cs
+  s_6772ed77e38b51::t_81ce0471f0fe62 34-53
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/TimesheetWeekDtoBuilder.cs
+  s_6772ed77e38b51::t_b725a6a7113cfe 1-35
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ReopenTimesheetWeek.cs
+  s_6772ed77e38b51::t_c8771c486edc07 1-53
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_6772ed77e38b51::t_f8ed3246aa3f4f 3
+  s_6772ed77e38b51::t_7ceb71134451fc 42-82
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Domain/TimesheetWeekTests.cs
+  s_6772ed77e38b51::t_96e2059c037279 121-227
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetWeek.cs
+  s_6772ed77e38b51::t_2e8651585b353c 54-80
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/ApproveTimesheetWeek.cs
+  s_6772ed77e38b51::t_afba685a8ddd0c 1-53
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_6772ed77e38b51::t_eff5c5767bc8c3 278-468
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/SubmitTimesheetWeek.cs
+  s_6772ed77e38b51::t_143da5d0e7d3ef 2,23-24,27,45
+  s_6772ed77e38b51::t_99549193fa48c9 1,3-22,25-26,28-44,46-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "e5a01b2033c6182fd4f3204638762cedabc70675",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
