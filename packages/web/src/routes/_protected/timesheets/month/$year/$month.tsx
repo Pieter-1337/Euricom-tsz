@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { TimesheetMonthGrid } from '#/features/timesheets/components/timesheet-month-grid';
 import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
 import type { CurrentUser } from '#/server/current-user';
@@ -6,7 +6,7 @@ import type { CurrentUser } from '#/server/current-user';
 export const Route = createFileRoute('/_protected/timesheets/month/$year/$month')({
   loader: async ({ params, context }) => {
     const currentUser = (context as { currentUser?: CurrentUser }).currentUser;
-    if (!currentUser) throw new Error('Not authenticated');
+    if (!currentUser) throw redirect({ to: '/' });
     const userId = currentUser.id;
     const year = Number(params.year);
     const month = Number(params.month);
