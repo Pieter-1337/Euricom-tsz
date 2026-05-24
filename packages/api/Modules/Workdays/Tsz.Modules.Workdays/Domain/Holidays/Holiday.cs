@@ -10,7 +10,7 @@ public class Holiday : IEntityBase
     public string Name { get; private set; } = string.Empty;
     public string Country { get; private set; } = string.Empty;
     public HolidayType Type { get; private set; }
-    public DateTimeOffset? DeletedAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
 
     private Holiday() { }
 

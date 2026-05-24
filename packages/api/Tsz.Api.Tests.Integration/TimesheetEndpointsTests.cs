@@ -363,13 +363,13 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Submit_NoDraftRow_Returns400NotFound()
+    public async Task Submit_NoDraftRow_Returns404NotFound()
     {
         var userId = await SeedCallerAsAsync(UserRole.User);
 
         var response = await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/submit", null);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
         Assert.Equal(TimesheetErrors.NotFound.Code, body.GetProperty("code").GetString());
     }

@@ -109,8 +109,8 @@ export function TimesheetWeekGrid({
   const status = initialData?.status ?? 'Draft';
   const isDraft = status === 'Draft';
 
-  const flush = useCallback(async () => {
-    if (!isDirty || isFlushing) return;
+  const flush = useCallback(async (): Promise<boolean> => {
+    if (!isDirty || isFlushing) return true;
     setIsFlushing(true);
     setFlushError(null);
     try {
@@ -130,11 +130,13 @@ export function TimesheetWeekGrid({
         data: { userId, year, week, timeEntries, leaveBookings: leaveBookingInputs },
       });
       setIsDirty(false);
+      return true;
     } catch (e) {
       const apiErr = parseServerError(e);
       if (apiErr?.problem?.code === 'ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED') {
         setFlushError(apiErr.problem.detail ?? 'Leave allowance exceeded.');
       }
+      return false;
     } finally {
       setIsFlushing(false);
     }
@@ -274,9 +276,13 @@ export function TimesheetWeekGrid({
   };
 
   const handleSubmit = async () => {
-    await flush();
     setIsLifecycleLoading(true);
     try {
+      const flushed = await flush();
+      if (!flushed) {
+        setFlushError((prev) => prev ?? 'Could not save changes — please try again');
+        return;
+      }
       await submitWeekLifecycle({ data: { userId, year, week } });
       await router.invalidate();
     } catch {
@@ -390,6 +396,7 @@ export function TimesheetWeekGrid({
         <div className="flex items-center gap-2">
           {isDirty && <span className="text-xs text-amber-500">Unsaved changes</span>}
           {isFlushing && <span className="text-xs text-[#6B7682]">Saving...</span>}
+          {flushError && <span className="text-xs text-red-500">Could not save changes — please try again</span>}
           {isDraft && (
             <Button size="sm" disabled={isLifecycleLoading} onClick={() => void handleSubmit()}>
               Submit
