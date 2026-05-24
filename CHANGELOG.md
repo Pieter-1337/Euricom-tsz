@@ -2,6 +2,12 @@
 
 ## 2026-05-24
 
+### Bug fix — SSR auth crash in timesheets routes
+
+Fix SSR-time crash on the new timesheets week and month routes when the user is not yet authenticated — they now redirect cleanly instead of throwing, matching the admin-route pattern.
+
+
+
 ### Timesheets — month overview
 
 Consultants and admins can now view a month overview of timesheets with daily totals, per-task and per-leave-type summaries, and week-status colour coding. Clicking a day jumps to that week's editing grid.
