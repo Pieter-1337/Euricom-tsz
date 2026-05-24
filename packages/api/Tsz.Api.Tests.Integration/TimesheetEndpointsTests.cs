@@ -275,4 +275,216 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.NotNull(tasks);
         Assert.Empty(tasks);
     }
+
+    // --- Lifecycle helpers (use oid matching TestAuthHandler) ---
+
+    private const string CallerOid = "test-user-id";
+
+    private async Task<Guid> SeedCallerAsAsync(UserRole role)
+    {
+        var id = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Caller", "User", $"caller-{id}@test.com", [role]);
+            user.Id = id;
+            user.LinkEntraOid(CallerOid);
+            uow.RepositoryFor<User>().Add(user);
+            await uow.SaveChangesAsync();
+        });
+        return id;
+    }
+
+    private async Task<TimesheetWeek> SeedDraftWeekAsync(Guid userId)
+    {
+        TimesheetWeek result = null!;
+        await WithUowAsync(async uow =>
+        {
+            var week = TimesheetWeek.Create(userId, 2026, 22);
+            uow.RepositoryFor<TimesheetWeek>().Add(week);
+            await uow.SaveChangesAsync();
+            result = week;
+        });
+        return result;
+    }
+
+    // --- Submit ---
+
+    [Fact]
+    public async Task Submit_AsOwner_Draft_Returns200Submitted()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+        await SeedDraftWeekAsync(userId);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/submit", null);
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(nameof(TimesheetStatus.Submitted), dto.Status);
+    }
+
+    [Fact]
+    public async Task Submit_AsOtherUser_Returns403()
+    {
+        var otherUserId = Guid.NewGuid();
+        await SeedCallerAsAsync(UserRole.User); // seeds caller with CallerOid, but request targets otherUserId
+        await WithUowAsync(async uow =>
+        {
+            var other = User.Create("Other", "User", "other@test.com", [UserRole.User]);
+            other.Id = otherUserId;
+            uow.RepositoryFor<User>().Add(other);
+            await uow.SaveChangesAsync();
+        });
+        await SeedDraftWeekAsync(otherUserId);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{otherUserId}/2026/22/submit", null);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Submit_AlreadySubmitted_Returns400()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+        await SeedDraftWeekAsync(userId);
+        await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/submit", null);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/submit", null);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.NotSubmittable.Code, body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task Submit_NoDraftRow_Returns400NotFound()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/submit", null);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.NotFound.Code, body.GetProperty("code").GetString());
+    }
+
+    // --- Approve ---
+
+    [Fact]
+    public async Task Approve_AsAdmin_Submitted_Returns200Approved()
+    {
+        var adminId = await SeedCallerAsAsync(UserRole.Admin);
+        await SeedDraftWeekAsync(adminId);
+        await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/submit", null);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/approve", null);
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(nameof(TimesheetStatus.Approved), dto.Status);
+    }
+
+    [Fact]
+    public async Task Approve_AsNonAdmin_Returns403()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+        await SeedDraftWeekAsync(userId);
+        await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/submit", null);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/approve", null);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Approve_StillDraft_Returns400()
+    {
+        var adminId = await SeedCallerAsAsync(UserRole.Admin);
+        await SeedDraftWeekAsync(adminId);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/approve", null);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.NotApprovable.Code, body.GetProperty("code").GetString());
+    }
+
+    // --- Reopen ---
+
+    [Fact]
+    public async Task Reopen_AsAdmin_FromApproved_Returns200Draft()
+    {
+        var adminId = await SeedCallerAsAsync(UserRole.Admin);
+        await SeedDraftWeekAsync(adminId);
+        await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/submit", null);
+        await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/approve", null);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/reopen", null);
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(nameof(TimesheetStatus.Draft), dto.Status);
+    }
+
+    [Fact]
+    public async Task Reopen_AsAdmin_FromSubmitted_Returns200Draft()
+    {
+        var adminId = await SeedCallerAsAsync(UserRole.Admin);
+        await SeedDraftWeekAsync(adminId);
+        await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/submit", null);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/reopen", null);
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(nameof(TimesheetStatus.Draft), dto.Status);
+    }
+
+    [Fact]
+    public async Task Reopen_AsNonAdmin_Returns403()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+        await SeedDraftWeekAsync(userId);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{userId}/2026/22/reopen", null);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Reopen_StillDraft_Returns400()
+    {
+        var adminId = await SeedCallerAsAsync(UserRole.Admin);
+        await SeedDraftWeekAsync(adminId);
+
+        var response = await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/reopen", null);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.NotReopenable.Code, body.GetProperty("code").GetString());
+    }
+
+    // --- Lock-while-non-Draft ---
+
+    [Fact]
+    public async Task PutBookings_WhenApproved_Returns400NotDraft()
+    {
+        var adminId = await SeedCallerAsAsync(UserRole.Admin);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(adminId, customerId);
+        await SeedDraftWeekAsync(adminId);
+        await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/submit", null);
+        await Client.PostAsync($"/api/timesheet-weeks/{adminId}/2026/22/approve", null);
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{adminId}/2026/22/bookings",
+            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-25", durationHours = 8.00 } } });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.NotDraft.Code, body.GetProperty("code").GetString());
+    }
 }

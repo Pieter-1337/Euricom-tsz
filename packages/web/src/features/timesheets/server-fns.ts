@@ -1,6 +1,13 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { getTimesheetWeek, applyTimesheetBookings, getSelectableContractTasks } from '#/api/timesheets.server';
+import {
+  getTimesheetWeek,
+  applyTimesheetBookings,
+  getSelectableContractTasks,
+  submitTimesheetWeek,
+  approveTimesheetWeek,
+  reopenTimesheetWeek,
+} from '#/api/timesheets.server';
 import { throwApiError } from '#/lib/server-error';
 import type { ApplyBookingsRequest } from '#/api/timesheets';
 
@@ -34,6 +41,36 @@ export const submitTimesheetBookings = createServerFn({ method: 'POST' })
     try {
       const body: ApplyBookingsRequest = { bookings: data.bookings };
       return await applyTimesheetBookings(data.userId, data.year, data.week, body);
+    } catch (e) {
+      throwApiError(e);
+    }
+  });
+
+export const submitWeekLifecycle = createServerFn({ method: 'POST' })
+  .inputValidator(weekParamsSchema)
+  .handler(async ({ data }) => {
+    try {
+      await submitTimesheetWeek(data.userId, data.year, data.week);
+    } catch (e) {
+      throwApiError(e);
+    }
+  });
+
+export const approveWeekLifecycle = createServerFn({ method: 'POST' })
+  .inputValidator(weekParamsSchema)
+  .handler(async ({ data }) => {
+    try {
+      await approveTimesheetWeek(data.userId, data.year, data.week);
+    } catch (e) {
+      throwApiError(e);
+    }
+  });
+
+export const reopenWeekLifecycle = createServerFn({ method: 'POST' })
+  .inputValidator(weekParamsSchema)
+  .handler(async ({ data }) => {
+    try {
+      await reopenTimesheetWeek(data.userId, data.year, data.week);
     } catch (e) {
       throwApiError(e);
     }

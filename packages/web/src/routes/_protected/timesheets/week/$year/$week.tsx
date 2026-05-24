@@ -2,25 +2,27 @@ import { createFileRoute } from '@tanstack/react-router';
 import { TimesheetWeekGrid } from '#/features/timesheets/components/timesheet-week-grid';
 import { fetchSelectableContractTasks, fetchTimesheetWeek } from '#/features/timesheets/server-fns';
 import type { CurrentUser } from '#/server/current-user';
+import { UserRole } from '#/api/users';
 
 export const Route = createFileRoute('/_protected/timesheets/week/$year/$week')({
   loader: async ({ params, context }) => {
     const currentUser = (context as { currentUser?: CurrentUser }).currentUser;
     if (!currentUser) throw new Error('Not authenticated');
     const userId = currentUser.id;
+    const isAdmin = currentUser.roles.includes(UserRole.Admin);
     const year = Number(params.year);
     const week = Number(params.week);
     const [weekData, selectableTasks] = await Promise.all([
       fetchTimesheetWeek({ data: { userId, year, week } }),
       fetchSelectableContractTasks({ data: { userId, year, week } }),
     ]);
-    return { userId, year, week, weekData, selectableTasks };
+    return { userId, year, week, weekData, selectableTasks, isAdmin };
   },
   component: TimesheetWeekPage,
 });
 
 function TimesheetWeekPage() {
-  const { userId, year, week, weekData, selectableTasks } = Route.useLoaderData();
+  const { userId, year, week, weekData, selectableTasks, isAdmin } = Route.useLoaderData();
 
   return (
     <main>
@@ -31,6 +33,7 @@ function TimesheetWeekPage() {
         week={week}
         initialData={weekData}
         selectableTasks={selectableTasks}
+        isAdmin={isAdmin}
       />
     </main>
   );

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useBlocker, useNavigate } from '@tanstack/react-router';
+import { useBlocker, useNavigate, useRouter } from '@tanstack/react-router';
 import { Calendar, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { Calendar as CalendarPicker } from '#/components/ui/calendar';
@@ -15,7 +15,12 @@ import {
   prevWeek,
   todayWeek,
 } from '#/features/timesheets/iso-week';
-import { submitTimesheetBookings } from '#/features/timesheets/server-fns';
+import {
+  submitTimesheetBookings,
+  submitWeekLifecycle,
+  approveWeekLifecycle,
+  reopenWeekLifecycle,
+} from '#/features/timesheets/server-fns';
 
 type CellKey = `${string}:${string}`; // `${contractTaskId}:${date}`
 
@@ -25,14 +30,23 @@ interface TimesheetWeekGridProps {
   week: number;
   initialData: TimesheetWeek | null;
   selectableTasks: SelectableContractTask[];
+  isAdmin: boolean;
 }
 
 function cellKey(contractTaskId: string, date: string): CellKey {
   return `${contractTaskId}:${date}` as CellKey;
 }
 
-export function TimesheetWeekGrid({ userId, year, week, initialData, selectableTasks }: TimesheetWeekGridProps) {
+export function TimesheetWeekGrid({
+  userId,
+  year,
+  week,
+  initialData,
+  selectableTasks,
+  isAdmin,
+}: TimesheetWeekGridProps) {
   const navigate = useNavigate();
+  const router = useRouter();
   const [bookings, setBookings] = useState<Map<CellKey, number>>(() => {
     const map = new Map<CellKey, number>();
     initialData?.timeEntries?.forEach((e) => {
@@ -51,6 +65,7 @@ export function TimesheetWeekGrid({ userId, year, week, initialData, selectableT
 
   const [isDirty, setIsDirty] = useState(false);
   const [isFlushing, setIsFlushing] = useState(false);
+  const [isLifecycleLoading, setIsLifecycleLoading] = useState(false);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [editingCell, setEditingCell] = useState<CellKey | null>(null);
@@ -168,6 +183,43 @@ export function TimesheetWeekGrid({ userId, year, week, initialData, selectableT
     setShowTaskPicker(false);
   };
 
+  const handleSubmit = async () => {
+    await flush();
+    setIsLifecycleLoading(true);
+    try {
+      await submitWeekLifecycle({ data: { userId, year, week } });
+      await router.invalidate();
+    } catch {
+      // error stays silent; future work: surface toast
+    } finally {
+      setIsLifecycleLoading(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    setIsLifecycleLoading(true);
+    try {
+      await approveWeekLifecycle({ data: { userId, year, week } });
+      await router.invalidate();
+    } catch {
+      // error stays silent; future work: surface toast
+    } finally {
+      setIsLifecycleLoading(false);
+    }
+  };
+
+  const handleReopen = async () => {
+    setIsLifecycleLoading(true);
+    try {
+      await reopenWeekLifecycle({ data: { userId, year, week } });
+      await router.invalidate();
+    } catch {
+      // error stays silent; future work: surface toast
+    } finally {
+      setIsLifecycleLoading(false);
+    }
+  };
+
   const { year: prevYear, week: prevWeekNum } = prevWeek(year, week);
   const { year: nextYear, week: nextWeekNum } = nextWeek(year, week);
   const today = todayWeek();
@@ -240,9 +292,21 @@ export function TimesheetWeekGrid({ userId, year, week, initialData, selectableT
         <div className="flex items-center gap-2">
           {isDirty && <span className="text-xs text-amber-500">Unsaved changes</span>}
           {isFlushing && <span className="text-xs text-[#6B7682]">Saving...</span>}
-          <Button size="sm" disabled className="cursor-not-allowed opacity-60" title="Submission is not available yet">
-            Submit
-          </Button>
+          {isDraft && (
+            <Button size="sm" disabled={isLifecycleLoading} onClick={() => void handleSubmit()}>
+              Submit
+            </Button>
+          )}
+          {isAdmin && status === 'Submitted' && (
+            <Button size="sm" disabled={isLifecycleLoading} onClick={() => void handleApprove()}>
+              Approve
+            </Button>
+          )}
+          {isAdmin && (status === 'Submitted' || status === 'Approved') && (
+            <Button variant="outline" size="sm" disabled={isLifecycleLoading} onClick={() => void handleReopen()}>
+              Reopen
+            </Button>
+          )}
         </div>
       </div>
 
@@ -260,7 +324,13 @@ export function TimesheetWeekGrid({ userId, year, week, initialData, selectableT
       )}
 
       {/* Grid */}
-      <div className="overflow-x-auto rounded-lg border border-black/[0.08] dark:border-white/[0.06]">
+      <div
+        className={cn(
+          'overflow-x-auto rounded-lg border border-black/[0.08] dark:border-white/[0.06]',
+          status === 'Submitted' && 'bg-green-50 dark:bg-green-950/20',
+          status === 'Approved' && 'bg-green-100 dark:bg-green-900/20',
+        )}
+      >
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-black/[0.08] dark:border-white/[0.06] bg-[#F1F5F6] dark:bg-[#1D252D]">

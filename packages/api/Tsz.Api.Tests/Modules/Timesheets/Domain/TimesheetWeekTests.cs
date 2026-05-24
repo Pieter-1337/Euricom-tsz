@@ -118,4 +118,111 @@ public class TimesheetWeekTests
 
         week.Entries.Count.ShouldBe(2);
     }
+
+    // --- Submit ---
+
+    [Fact]
+    public void Submit_FromDraft_SetsStatusSubmitted()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        week.Submit();
+
+        week.Status.ShouldBe(TimesheetStatus.Submitted);
+    }
+
+    [Fact]
+    public void Submit_FromSubmitted_ThrowsValidationException()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() => week.Submit());
+    }
+
+    [Fact]
+    public void Submit_FromApproved_ThrowsValidationException()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+        week.Approve();
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() => week.Submit());
+    }
+
+    // --- Approve ---
+
+    [Fact]
+    public void Approve_FromSubmitted_SetsStatusApproved()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+
+        week.Approve();
+
+        week.Status.ShouldBe(TimesheetStatus.Approved);
+    }
+
+    [Fact]
+    public void Approve_FromDraft_ThrowsValidationException()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() => week.Approve());
+    }
+
+    [Fact]
+    public void Approve_FromApproved_ThrowsValidationException()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+        week.Approve();
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() => week.Approve());
+    }
+
+    // --- Reopen ---
+
+    [Fact]
+    public void Reopen_FromSubmitted_SetsStatusDraft()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+
+        week.Reopen();
+
+        week.Status.ShouldBe(TimesheetStatus.Draft);
+    }
+
+    [Fact]
+    public void Reopen_FromApproved_SetsStatusDraft()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+        week.Approve();
+
+        week.Reopen();
+
+        week.Status.ShouldBe(TimesheetStatus.Draft);
+    }
+
+    [Fact]
+    public void Reopen_FromDraft_ThrowsValidationException()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() => week.Reopen());
+    }
+
+    [Fact]
+    public void Reopen_AfterReopen_CanBeSubmittedAgain()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.Submit();
+        week.Reopen();
+
+        week.Submit();
+
+        week.Status.ShouldBe(TimesheetStatus.Submitted);
+    }
 }
