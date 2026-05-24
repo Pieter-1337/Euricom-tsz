@@ -3,10 +3,10 @@ import { CustomerCreateForm } from '#/features/customers/components/customer-cre
 import { UserRole } from '#/api/users';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/admin/customers/new')({
+export const Route = createFileRoute('/_protected/_authenticated/admin/customers/new')({
   beforeLoad: ({ context }) => {
-    const currentUser = (context as { currentUser?: CurrentUser }).currentUser;
-    if (!currentUser?.roles.includes(UserRole.Admin)) throw redirect({ to: '/admin/customers' });
+    const { currentUser } = context as { currentUser: CurrentUser };
+    if (!currentUser.roles.includes(UserRole.Admin)) throw redirect({ to: '/admin/customers' });
   },
   component: CustomerCreateForm,
 });

@@ -2,6 +2,10 @@
 
 ## 2026-05-24
 
+### Refactor — centralize authenticated-route guard in `_authenticated` layout
+
+Centralize the authenticated-route guard in a single _authenticated layout so admin and timesheets routes no longer each need their own redirect-when-unauthenticated check. URL paths are unchanged; this is a code-quality refactor only.
+
 ### Bug fix — SSR auth crash in timesheets routes
 
 Fix SSR-time crash on the new timesheets week and month routes when the user is not yet authenticated — they now redirect cleanly instead of throwing, matching the admin-route pattern.

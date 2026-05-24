@@ -3,7 +3,7 @@ import { ContractsList } from '#/features/contracts/components/contracts-list';
 import { UserRole } from '#/api/users';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/admin/contracts/')({
+export const Route = createFileRoute('/_protected/_authenticated/admin/contracts/')({
   component: ContractsListPage,
 });
 
