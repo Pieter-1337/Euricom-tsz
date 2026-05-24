@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
 import {
   Building2,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -12,6 +13,7 @@ import { useEffect, useState, type ComponentType, type SVGProps } from 'react';
 
 import { UserRole } from '#/api/users';
 import { ThemeToggle } from '#/components/theme-toggle';
+import { todayWeek } from '#/features/timesheets/iso-week';
 import { Button } from '#/components/ui/button';
 import { Separator } from '#/components/ui/separator';
 import { authClient } from '#/lib/auth-client';
@@ -110,6 +112,8 @@ function Sidebar({
   isAdmin: boolean;
   canManageClients: boolean;
 }) {
+  const { year: isoYear, week: isoWeek } = todayWeek();
+
   return (
     <aside
       aria-label="Primary navigation"
@@ -130,6 +134,12 @@ function Sidebar({
       >
         <NavSection eyebrow="Navigate" collapsed={collapsed}>
           <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
+          <NavLink
+            to={`/timesheets/week/${isoYear}/${isoWeek}`}
+            icon={CalendarDays}
+            label="My Timesheet"
+            collapsed={collapsed}
+          />
         </NavSection>
 
         {canManageClients && (
