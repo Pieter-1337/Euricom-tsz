@@ -8,6 +8,7 @@ import {
   submitTimesheetWeek,
   approveTimesheetWeek,
   reopenTimesheetWeek,
+  getTimesheetMonth,
 } from '#/api/timesheets.server';
 import { throwApiError } from '#/lib/server-error';
 import type { ApplyBookingsRequest } from '#/api/timesheets';
@@ -90,3 +91,13 @@ export const reopenWeekLifecycle = createServerFn({ method: 'POST' })
       throwApiError(e);
     }
   });
+
+const monthParamsSchema = z.object({
+  userId: z.string().uuid(),
+  year: z.number().int(),
+  month: z.number().int().min(1).max(12),
+});
+
+export const fetchTimesheetMonth = createServerFn({ method: 'GET' })
+  .inputValidator(monthParamsSchema)
+  .handler(async ({ data }) => getTimesheetMonth(data.userId, data.year, data.month));

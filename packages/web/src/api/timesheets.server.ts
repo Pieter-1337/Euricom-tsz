@@ -1,6 +1,7 @@
 import { apiClient as client } from '#/server/api-client.server';
 import type {
   TimesheetWeek,
+  TimesheetMonth,
   SelectableContractTask,
   SelectableLeaveType,
   ApplyBookingsRequest,
@@ -60,4 +61,15 @@ export const reopenTimesheetWeek = async (userId: string, year: number, week: nu
   await client.POST('/api/timesheet-weeks/{userId}/{year}/{week}/reopen', {
     params: { path: { userId, year, week } },
   });
+};
+
+export const getTimesheetMonth = async (
+  userId: string,
+  year: number,
+  month: number,
+): Promise<TimesheetMonth | null> => {
+  const resp = await client.GET('/api/timesheets/{userId}/{year}/{month}', {
+    params: { path: { userId, year, month } },
+  });
+  return resp.data ?? null;
 };
