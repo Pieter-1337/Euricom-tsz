@@ -2,6 +2,8 @@ using System.Globalization;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
+using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.LeaveTypes.Contracts.Queries;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Workdays.Contracts;
 
@@ -16,7 +18,8 @@ public sealed record GetTimesheetWeekQuery(
 public sealed class GetTimesheetWeekHandler(
     IUnitOfWork uow,
     IContractsAccessModule contracts,
-    IWorkdaysAccessModule workdays)
+    IWorkdaysAccessModule workdays,
+    ILeaveTypesAccessModule leaveTypes)
     : IQueryHandler<GetTimesheetWeekQuery, TimesheetWeekDto>
 {
     public async Task<TimesheetWeekDto> HandleAsync(GetTimesheetWeekQuery query, CancellationToken ct = default)
@@ -50,9 +53,14 @@ public sealed class GetTimesheetWeekHandler(
                 new GetContractTaskDisplayInfoByIdsQuery(contractTaskIds), ct)
             : [];
 
-        var infoById = displayInfo.ToDictionary(d => d.ContractTaskId);
+        var activeLeaveTypes = week.LeaveEntries.Count > 0
+            ? await leaveTypes.GetActiveLeaveTypesAsync(ct)
+            : [];
 
-        return TimesheetWeekDto.FromEntity(week, dayInfos, infoById);
+        var infoById = displayInfo.ToDictionary(d => d.ContractTaskId);
+        var leaveTypeById = activeLeaveTypes.ToDictionary(lt => lt.Id);
+
+        return TimesheetWeekDto.FromEntity(week, dayInfos, infoById, leaveTypeById);
     }
 }
 
@@ -67,6 +75,13 @@ public sealed record TimeEntryDto(
     DateOnly Date,
     decimal DurationHours);
 
+public sealed record LeaveBookingEntryDto(
+    Guid Id,
+    Guid LeaveTypeId,
+    string LeaveTypeName,
+    DateOnly Date,
+    decimal DurationHours);
+
 public sealed record DayInfoDto(DateOnly Date, bool IsBusinessDay);
 
 public sealed record TimesheetWeekDto(
@@ -76,7 +91,8 @@ public sealed record TimesheetWeekDto(
     int IsoWeek,
     string Status,
     IReadOnlyList<DayInfoDto> Days,
-    IReadOnlyList<TimeEntryDto> TimeEntries)
+    IReadOnlyList<TimeEntryDto> TimeEntries,
+    IReadOnlyList<LeaveBookingEntryDto> LeaveBookings)
 {
     internal static TimesheetWeekDto EmptyDraft(
         Guid userId,
@@ -90,12 +106,14 @@ public sealed record TimesheetWeekDto(
             IsoWeek: isoWeek,
             Status: nameof(TimesheetStatus.Draft),
             Days: days,
-            TimeEntries: []);
+            TimeEntries: [],
+            LeaveBookings: []);
 
     internal static TimesheetWeekDto FromEntity(
         TimesheetWeek week,
         IReadOnlyList<DayInfoDto> days,
-        Dictionary<Guid, ContractTaskDisplayInfoDto> infoById) =>
+        Dictionary<Guid, ContractTaskDisplayInfoDto> infoById,
+        Dictionary<Guid, ActiveLeaveTypeDto> leaveTypeById) =>
         new(
             Id: week.Id,
             UserId: week.UserId,
@@ -117,6 +135,18 @@ public sealed record TimesheetWeekDto(
                         info?.CustomerName ?? string.Empty,
                         e.Date,
                         e.DurationHours);
+                })
+                .ToList(),
+            LeaveBookings: week.LeaveEntries
+                .Select(lb =>
+                {
+                    var lt = leaveTypeById.GetValueOrDefault(lb.LeaveTypeId);
+                    return new LeaveBookingEntryDto(
+                        lb.Id,
+                        lb.LeaveTypeId,
+                        lt?.Name ?? string.Empty,
+                        lb.Date,
+                        lb.DurationHours);
                 })
                 .ToList());
 }

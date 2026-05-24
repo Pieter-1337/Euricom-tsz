@@ -4,6 +4,7 @@ import {
   getTimesheetWeek,
   applyTimesheetBookings,
   getSelectableContractTasks,
+  getSelectableLeaveTypes,
   submitTimesheetWeek,
   approveTimesheetWeek,
   reopenTimesheetWeek,
@@ -17,14 +18,21 @@ const weekParamsSchema = z.object({
   week: z.number().int().min(1).max(53),
 });
 
+const timeEntryInputSchema = z.object({
+  contractTaskId: z.string().uuid(),
+  date: z.string(),
+  durationHours: z.number(),
+});
+
+const leaveBookingInputSchema = z.object({
+  leaveTypeId: z.string().uuid(),
+  date: z.string(),
+  durationHours: z.number(),
+});
+
 const applyBookingsInputSchema = weekParamsSchema.extend({
-  bookings: z.array(
-    z.object({
-      contractTaskId: z.string().uuid(),
-      date: z.string(),
-      durationHours: z.number(),
-    }),
-  ),
+  timeEntries: z.array(timeEntryInputSchema),
+  leaveBookings: z.array(leaveBookingInputSchema),
 });
 
 export const fetchTimesheetWeek = createServerFn({ method: 'GET' })
@@ -35,11 +43,18 @@ export const fetchSelectableContractTasks = createServerFn({ method: 'GET' })
   .inputValidator(weekParamsSchema)
   .handler(async ({ data }) => getSelectableContractTasks(data.userId, data.year, data.week));
 
+export const fetchSelectableLeaveTypes = createServerFn({ method: 'GET' })
+  .inputValidator(z.object({ userId: z.string().uuid() }))
+  .handler(async ({ data }) => getSelectableLeaveTypes(data.userId));
+
 export const submitTimesheetBookings = createServerFn({ method: 'POST' })
   .inputValidator(applyBookingsInputSchema)
   .handler(async ({ data }) => {
     try {
-      const body: ApplyBookingsRequest = { bookings: data.bookings };
+      const body: ApplyBookingsRequest = {
+        timeEntries: data.timeEntries,
+        leaveBookings: data.leaveBookings,
+      };
       return await applyTimesheetBookings(data.userId, data.year, data.week, body);
     } catch (e) {
       throwApiError(e);

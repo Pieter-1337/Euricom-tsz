@@ -1,5 +1,10 @@
 import { apiClient as client } from '#/server/api-client.server';
-import type { TimesheetWeek, SelectableContractTask, ApplyBookingsRequest } from '#/api/timesheets';
+import type {
+  TimesheetWeek,
+  SelectableContractTask,
+  SelectableLeaveType,
+  ApplyBookingsRequest,
+} from '#/api/timesheets';
 
 export const getTimesheetWeek = async (userId: string, year: number, week: number): Promise<TimesheetWeek | null> => {
   const resp = await client.GET('/api/timesheet-weeks/{userId}/{year}/{week}', {
@@ -28,6 +33,13 @@ export const getSelectableContractTasks = async (
 ): Promise<SelectableContractTask[]> => {
   const resp = await client.GET('/api/timesheet-selectable-tasks/{userId}/{year}/{week}', {
     params: { path: { userId, year, week } },
+  });
+  return resp.data ?? [];
+};
+
+export const getSelectableLeaveTypes = async (userId: string): Promise<SelectableLeaveType[]> => {
+  const resp = await client.GET('/api/timesheet-selectable-leave-types/{userId}', {
+    params: { path: { userId } },
   });
   return resp.data ?? [];
 };

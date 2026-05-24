@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Contracts.Contracts;
+using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Workdays.Contracts;
 
@@ -31,7 +32,8 @@ public sealed class SubmitTimesheetWeekValidator : AbstractValidator<SubmitTimes
 public sealed class SubmitTimesheetWeekHandler(
     IUnitOfWork uow,
     IContractsAccessModule contracts,
-    IWorkdaysAccessModule workdays)
+    IWorkdaysAccessModule workdays,
+    ILeaveTypesAccessModule leaveTypes)
     : ICommandHandler<SubmitTimesheetWeekCommand, TimesheetWeekDto>
 {
     public async Task<TimesheetWeekDto> HandleAsync(SubmitTimesheetWeekCommand command, CancellationToken ct = default)
@@ -48,6 +50,6 @@ public sealed class SubmitTimesheetWeekHandler(
         week.Submit();
         await uow.SaveChangesAsync(ct);
 
-        return await TimesheetWeekDtoBuilder.BuildAsync(week, command.IsoYear, command.IsoWeek, workdays, contracts, ct);
+        return await TimesheetWeekDtoBuilder.BuildAsync(week, command.IsoYear, command.IsoWeek, workdays, contracts, leaveTypes, ct);
     }
 }

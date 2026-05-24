@@ -1,6 +1,7 @@
 using System.Globalization;
 using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
+using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Workdays.Contracts;
 
@@ -14,6 +15,7 @@ internal static class TimesheetWeekDtoBuilder
         int isoWeek,
         IWorkdaysAccessModule workdays,
         IContractsAccessModule contracts,
+        ILeaveTypesAccessModule leaveTypes,
         CancellationToken ct)
     {
         var weekStart = ISOWeek.ToDateTime(isoYear, isoWeek, DayOfWeek.Monday);
@@ -29,7 +31,12 @@ internal static class TimesheetWeekDtoBuilder
             ? await contracts.ExecuteQueryAsync(new GetContractTaskDisplayInfoByIdsQuery(contractTaskIds), ct)
             : [];
 
+        var activeLeaveTypes = week.LeaveEntries.Count > 0
+            ? await leaveTypes.GetActiveLeaveTypesAsync(ct)
+            : [];
+
         var infoById = displayInfo.ToDictionary(d => d.ContractTaskId);
-        return TimesheetWeekDto.FromEntity(week, dayInfos, infoById);
+        var leaveTypeById = activeLeaveTypes.ToDictionary(lt => lt.Id);
+        return TimesheetWeekDto.FromEntity(week, dayInfos, infoById, leaveTypeById);
     }
 }

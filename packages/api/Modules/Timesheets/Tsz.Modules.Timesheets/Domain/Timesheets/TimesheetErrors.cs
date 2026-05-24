@@ -51,4 +51,14 @@ public sealed class TimesheetErrors : ErrorCodeBase<TimesheetErrors>
         new("ERR_TIMESHEET_NOT_REOPENABLE",
             "The timesheet week cannot be reopened because it is not in Submitted or Approved status.",
             ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors LeaveTypeNotFound =
+        new("ERR_TIMESHEET_LEAVE_TYPE_NOT_FOUND",
+            "One or more leave types do not exist.",
+            ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors LeaveAllowanceExceeded =
+        new("ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED",
+            "The requested leave bookings exceed the yearly allowance for one or more leave types.",
+            ErrorCategory.Validation);
 }

@@ -34,7 +34,7 @@ public static class TimesheetEndpoints
             CancellationToken ct) =>
         {
             var command = new ApplyTimesheetWeekBookingsCommand(
-                userId, year, week, body.Bookings);
+                userId, year, week, body.TimeEntries, body.LeaveBookings);
             var dto = await dispatcher.SendAsync(command, ct);
             return TypedResults.Ok(dto);
         });
@@ -94,7 +94,22 @@ public static class TimesheetEndpoints
                 new GetSelectableContractTasksQuery(userId, year, week), ct);
             return TypedResults.Ok(tasks);
         });
+
+        var leaveTypesGroup = app.MapApiGroup("timesheet-selectable-leave-types")
+            .RequireAuthorization();
+
+        leaveTypesGroup.MapGet("/{userId:guid}", async (
+            Guid userId,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            var leaveTypes = await dispatcher.SendAsync(
+                new GetSelectableLeaveTypesQuery(userId), ct);
+            return TypedResults.Ok(leaveTypes);
+        });
     }
 }
 
-public sealed record ApplyBookingsRequest(IReadOnlyList<BookingInputDto> Bookings);
+public sealed record ApplyBookingsRequest(
+    IReadOnlyList<TimeEntryInputDto> TimeEntries,
+    IReadOnlyList<LeaveBookingInputDto> LeaveBookings);
