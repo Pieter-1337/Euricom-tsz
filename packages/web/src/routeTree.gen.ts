@@ -15,17 +15,20 @@ import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAuthenticatedRouteImport } from './routes/_protected/_authenticated'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedAuthenticatedTimesheetsRouteImport } from './routes/_protected/_authenticated/timesheets'
+import { Route as ProtectedAuthenticatedCustomersRouteImport } from './routes/_protected/_authenticated/customers'
+import { Route as ProtectedAuthenticatedContractsRouteImport } from './routes/_protected/_authenticated/contracts'
 import { Route as ProtectedAuthenticatedAdminRouteImport } from './routes/_protected/_authenticated/admin'
+import { Route as ProtectedAuthenticatedTimesheetsIndexRouteImport } from './routes/_protected/_authenticated/timesheets/index'
+import { Route as ProtectedAuthenticatedCustomersIndexRouteImport } from './routes/_protected/_authenticated/customers/index'
+import { Route as ProtectedAuthenticatedContractsIndexRouteImport } from './routes/_protected/_authenticated/contracts/index'
+import { Route as ProtectedAuthenticatedCustomersNewRouteImport } from './routes/_protected/_authenticated/customers/new'
+import { Route as ProtectedAuthenticatedCustomersIdRouteImport } from './routes/_protected/_authenticated/customers/$id'
+import { Route as ProtectedAuthenticatedContractsNewRouteImport } from './routes/_protected/_authenticated/contracts/new'
+import { Route as ProtectedAuthenticatedContractsContractIdRouteImport } from './routes/_protected/_authenticated/contracts/$contractId'
 import { Route as ProtectedAuthenticatedAdminUsersRouteImport } from './routes/_protected/_authenticated/admin/users'
 import { Route as ProtectedAuthenticatedAdminUsersIndexRouteImport } from './routes/_protected/_authenticated/admin/users/index'
-import { Route as ProtectedAuthenticatedAdminCustomersIndexRouteImport } from './routes/_protected/_authenticated/admin/customers/index'
-import { Route as ProtectedAuthenticatedAdminContractsIndexRouteImport } from './routes/_protected/_authenticated/admin/contracts/index'
 import { Route as ProtectedAuthenticatedAdminUsersNewRouteImport } from './routes/_protected/_authenticated/admin/users/new'
 import { Route as ProtectedAuthenticatedAdminUsersIdRouteImport } from './routes/_protected/_authenticated/admin/users/$id'
-import { Route as ProtectedAuthenticatedAdminCustomersNewRouteImport } from './routes/_protected/_authenticated/admin/customers/new'
-import { Route as ProtectedAuthenticatedAdminCustomersIdRouteImport } from './routes/_protected/_authenticated/admin/customers/$id'
-import { Route as ProtectedAuthenticatedAdminContractsNewRouteImport } from './routes/_protected/_authenticated/admin/contracts/new'
-import { Route as ProtectedAuthenticatedAdminContractsContractIdRouteImport } from './routes/_protected/_authenticated/admin/contracts/$contractId'
 import { Route as ProtectedAuthenticatedTimesheetsWeekYearWeekRouteImport } from './routes/_protected/_authenticated/timesheets/week/$year/$week'
 import { Route as ProtectedAuthenticatedTimesheetsMonthYearMonthRouteImport } from './routes/_protected/_authenticated/timesheets/month/$year/$month'
 
@@ -58,11 +61,65 @@ const ProtectedAuthenticatedTimesheetsRoute =
     path: '/timesheets',
     getParentRoute: () => ProtectedAuthenticatedRoute,
   } as any)
+const ProtectedAuthenticatedCustomersRoute =
+  ProtectedAuthenticatedCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => ProtectedAuthenticatedRoute,
+  } as any)
+const ProtectedAuthenticatedContractsRoute =
+  ProtectedAuthenticatedContractsRouteImport.update({
+    id: '/contracts',
+    path: '/contracts',
+    getParentRoute: () => ProtectedAuthenticatedRoute,
+  } as any)
 const ProtectedAuthenticatedAdminRoute =
   ProtectedAuthenticatedAdminRouteImport.update({
     id: '/admin',
     path: '/admin',
     getParentRoute: () => ProtectedAuthenticatedRoute,
+  } as any)
+const ProtectedAuthenticatedTimesheetsIndexRoute =
+  ProtectedAuthenticatedTimesheetsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProtectedAuthenticatedTimesheetsRoute,
+  } as any)
+const ProtectedAuthenticatedCustomersIndexRoute =
+  ProtectedAuthenticatedCustomersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProtectedAuthenticatedCustomersRoute,
+  } as any)
+const ProtectedAuthenticatedContractsIndexRoute =
+  ProtectedAuthenticatedContractsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProtectedAuthenticatedContractsRoute,
+  } as any)
+const ProtectedAuthenticatedCustomersNewRoute =
+  ProtectedAuthenticatedCustomersNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => ProtectedAuthenticatedCustomersRoute,
+  } as any)
+const ProtectedAuthenticatedCustomersIdRoute =
+  ProtectedAuthenticatedCustomersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ProtectedAuthenticatedCustomersRoute,
+  } as any)
+const ProtectedAuthenticatedContractsNewRoute =
+  ProtectedAuthenticatedContractsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => ProtectedAuthenticatedContractsRoute,
+  } as any)
+const ProtectedAuthenticatedContractsContractIdRoute =
+  ProtectedAuthenticatedContractsContractIdRouteImport.update({
+    id: '/$contractId',
+    path: '/$contractId',
+    getParentRoute: () => ProtectedAuthenticatedContractsRoute,
   } as any)
 const ProtectedAuthenticatedAdminUsersRoute =
   ProtectedAuthenticatedAdminUsersRouteImport.update({
@@ -76,18 +133,6 @@ const ProtectedAuthenticatedAdminUsersIndexRoute =
     path: '/',
     getParentRoute: () => ProtectedAuthenticatedAdminUsersRoute,
   } as any)
-const ProtectedAuthenticatedAdminCustomersIndexRoute =
-  ProtectedAuthenticatedAdminCustomersIndexRouteImport.update({
-    id: '/customers/',
-    path: '/customers/',
-    getParentRoute: () => ProtectedAuthenticatedAdminRoute,
-  } as any)
-const ProtectedAuthenticatedAdminContractsIndexRoute =
-  ProtectedAuthenticatedAdminContractsIndexRouteImport.update({
-    id: '/contracts/',
-    path: '/contracts/',
-    getParentRoute: () => ProtectedAuthenticatedAdminRoute,
-  } as any)
 const ProtectedAuthenticatedAdminUsersNewRoute =
   ProtectedAuthenticatedAdminUsersNewRouteImport.update({
     id: '/new',
@@ -99,30 +144,6 @@ const ProtectedAuthenticatedAdminUsersIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => ProtectedAuthenticatedAdminUsersRoute,
-  } as any)
-const ProtectedAuthenticatedAdminCustomersNewRoute =
-  ProtectedAuthenticatedAdminCustomersNewRouteImport.update({
-    id: '/customers/new',
-    path: '/customers/new',
-    getParentRoute: () => ProtectedAuthenticatedAdminRoute,
-  } as any)
-const ProtectedAuthenticatedAdminCustomersIdRoute =
-  ProtectedAuthenticatedAdminCustomersIdRouteImport.update({
-    id: '/customers/$id',
-    path: '/customers/$id',
-    getParentRoute: () => ProtectedAuthenticatedAdminRoute,
-  } as any)
-const ProtectedAuthenticatedAdminContractsNewRoute =
-  ProtectedAuthenticatedAdminContractsNewRouteImport.update({
-    id: '/contracts/new',
-    path: '/contracts/new',
-    getParentRoute: () => ProtectedAuthenticatedAdminRoute,
-  } as any)
-const ProtectedAuthenticatedAdminContractsContractIdRoute =
-  ProtectedAuthenticatedAdminContractsContractIdRouteImport.update({
-    id: '/contracts/$contractId',
-    path: '/contracts/$contractId',
-    getParentRoute: () => ProtectedAuthenticatedAdminRoute,
   } as any)
 const ProtectedAuthenticatedTimesheetsWeekYearWeekRoute =
   ProtectedAuthenticatedTimesheetsWeekYearWeekRouteImport.update({
@@ -141,17 +162,20 @@ export interface FileRoutesByFullPath {
   '/': typeof ProtectedIndexRoute
   '/no-access': typeof NoAccessRoute
   '/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
+  '/contracts': typeof ProtectedAuthenticatedContractsRouteWithChildren
+  '/customers': typeof ProtectedAuthenticatedCustomersRouteWithChildren
   '/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/users': typeof ProtectedAuthenticatedAdminUsersRouteWithChildren
-  '/admin/contracts/$contractId': typeof ProtectedAuthenticatedAdminContractsContractIdRoute
-  '/admin/contracts/new': typeof ProtectedAuthenticatedAdminContractsNewRoute
-  '/admin/customers/$id': typeof ProtectedAuthenticatedAdminCustomersIdRoute
-  '/admin/customers/new': typeof ProtectedAuthenticatedAdminCustomersNewRoute
+  '/contracts/$contractId': typeof ProtectedAuthenticatedContractsContractIdRoute
+  '/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
+  '/customers/$id': typeof ProtectedAuthenticatedCustomersIdRoute
+  '/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
+  '/contracts/': typeof ProtectedAuthenticatedContractsIndexRoute
+  '/customers/': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/timesheets/': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAuthenticatedAdminUsersNewRoute
-  '/admin/contracts/': typeof ProtectedAuthenticatedAdminContractsIndexRoute
-  '/admin/customers/': typeof ProtectedAuthenticatedAdminCustomersIndexRoute
   '/admin/users/': typeof ProtectedAuthenticatedAdminUsersIndexRoute
   '/timesheets/month/$year/$month': typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
   '/timesheets/week/$year/$week': typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
@@ -160,16 +184,16 @@ export interface FileRoutesByTo {
   '/no-access': typeof NoAccessRoute
   '/': typeof ProtectedIndexRoute
   '/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
-  '/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/admin/contracts/$contractId': typeof ProtectedAuthenticatedAdminContractsContractIdRoute
-  '/admin/contracts/new': typeof ProtectedAuthenticatedAdminContractsNewRoute
-  '/admin/customers/$id': typeof ProtectedAuthenticatedAdminCustomersIdRoute
-  '/admin/customers/new': typeof ProtectedAuthenticatedAdminCustomersNewRoute
+  '/contracts/$contractId': typeof ProtectedAuthenticatedContractsContractIdRoute
+  '/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
+  '/customers/$id': typeof ProtectedAuthenticatedCustomersIdRoute
+  '/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
+  '/contracts': typeof ProtectedAuthenticatedContractsIndexRoute
+  '/customers': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/timesheets': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAuthenticatedAdminUsersNewRoute
-  '/admin/contracts': typeof ProtectedAuthenticatedAdminContractsIndexRoute
-  '/admin/customers': typeof ProtectedAuthenticatedAdminCustomersIndexRoute
   '/admin/users': typeof ProtectedAuthenticatedAdminUsersIndexRoute
   '/timesheets/month/$year/$month': typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
   '/timesheets/week/$year/$week': typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
@@ -181,17 +205,20 @@ export interface FileRoutesById {
   '/_protected/_authenticated': typeof ProtectedAuthenticatedRouteWithChildren
   '/_protected/': typeof ProtectedIndexRoute
   '/_protected/_authenticated/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
+  '/_protected/_authenticated/contracts': typeof ProtectedAuthenticatedContractsRouteWithChildren
+  '/_protected/_authenticated/customers': typeof ProtectedAuthenticatedCustomersRouteWithChildren
   '/_protected/_authenticated/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_protected/_authenticated/admin/users': typeof ProtectedAuthenticatedAdminUsersRouteWithChildren
-  '/_protected/_authenticated/admin/contracts/$contractId': typeof ProtectedAuthenticatedAdminContractsContractIdRoute
-  '/_protected/_authenticated/admin/contracts/new': typeof ProtectedAuthenticatedAdminContractsNewRoute
-  '/_protected/_authenticated/admin/customers/$id': typeof ProtectedAuthenticatedAdminCustomersIdRoute
-  '/_protected/_authenticated/admin/customers/new': typeof ProtectedAuthenticatedAdminCustomersNewRoute
+  '/_protected/_authenticated/contracts/$contractId': typeof ProtectedAuthenticatedContractsContractIdRoute
+  '/_protected/_authenticated/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
+  '/_protected/_authenticated/customers/$id': typeof ProtectedAuthenticatedCustomersIdRoute
+  '/_protected/_authenticated/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
+  '/_protected/_authenticated/contracts/': typeof ProtectedAuthenticatedContractsIndexRoute
+  '/_protected/_authenticated/customers/': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/_protected/_authenticated/timesheets/': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/_protected/_authenticated/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
   '/_protected/_authenticated/admin/users/new': typeof ProtectedAuthenticatedAdminUsersNewRoute
-  '/_protected/_authenticated/admin/contracts/': typeof ProtectedAuthenticatedAdminContractsIndexRoute
-  '/_protected/_authenticated/admin/customers/': typeof ProtectedAuthenticatedAdminCustomersIndexRoute
   '/_protected/_authenticated/admin/users/': typeof ProtectedAuthenticatedAdminUsersIndexRoute
   '/_protected/_authenticated/timesheets/month/$year/$month': typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
   '/_protected/_authenticated/timesheets/week/$year/$week': typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
@@ -202,17 +229,20 @@ export interface FileRouteTypes {
     | '/'
     | '/no-access'
     | '/admin'
+    | '/contracts'
+    | '/customers'
     | '/timesheets'
     | '/api/auth/$'
     | '/admin/users'
-    | '/admin/contracts/$contractId'
-    | '/admin/contracts/new'
-    | '/admin/customers/$id'
-    | '/admin/customers/new'
+    | '/contracts/$contractId'
+    | '/contracts/new'
+    | '/customers/$id'
+    | '/customers/new'
+    | '/contracts/'
+    | '/customers/'
+    | '/timesheets/'
     | '/admin/users/$id'
     | '/admin/users/new'
-    | '/admin/contracts/'
-    | '/admin/customers/'
     | '/admin/users/'
     | '/timesheets/month/$year/$month'
     | '/timesheets/week/$year/$week'
@@ -221,16 +251,16 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/'
     | '/admin'
-    | '/timesheets'
     | '/api/auth/$'
-    | '/admin/contracts/$contractId'
-    | '/admin/contracts/new'
-    | '/admin/customers/$id'
-    | '/admin/customers/new'
+    | '/contracts/$contractId'
+    | '/contracts/new'
+    | '/customers/$id'
+    | '/customers/new'
+    | '/contracts'
+    | '/customers'
+    | '/timesheets'
     | '/admin/users/$id'
     | '/admin/users/new'
-    | '/admin/contracts'
-    | '/admin/customers'
     | '/admin/users'
     | '/timesheets/month/$year/$month'
     | '/timesheets/week/$year/$week'
@@ -241,17 +271,20 @@ export interface FileRouteTypes {
     | '/_protected/_authenticated'
     | '/_protected/'
     | '/_protected/_authenticated/admin'
+    | '/_protected/_authenticated/contracts'
+    | '/_protected/_authenticated/customers'
     | '/_protected/_authenticated/timesheets'
     | '/api/auth/$'
     | '/_protected/_authenticated/admin/users'
-    | '/_protected/_authenticated/admin/contracts/$contractId'
-    | '/_protected/_authenticated/admin/contracts/new'
-    | '/_protected/_authenticated/admin/customers/$id'
-    | '/_protected/_authenticated/admin/customers/new'
+    | '/_protected/_authenticated/contracts/$contractId'
+    | '/_protected/_authenticated/contracts/new'
+    | '/_protected/_authenticated/customers/$id'
+    | '/_protected/_authenticated/customers/new'
+    | '/_protected/_authenticated/contracts/'
+    | '/_protected/_authenticated/customers/'
+    | '/_protected/_authenticated/timesheets/'
     | '/_protected/_authenticated/admin/users/$id'
     | '/_protected/_authenticated/admin/users/new'
-    | '/_protected/_authenticated/admin/contracts/'
-    | '/_protected/_authenticated/admin/customers/'
     | '/_protected/_authenticated/admin/users/'
     | '/_protected/_authenticated/timesheets/month/$year/$month'
     | '/_protected/_authenticated/timesheets/week/$year/$week'
@@ -307,12 +340,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsRouteImport
       parentRoute: typeof ProtectedAuthenticatedRoute
     }
+    '/_protected/_authenticated/customers': {
+      id: '/_protected/_authenticated/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof ProtectedAuthenticatedCustomersRouteImport
+      parentRoute: typeof ProtectedAuthenticatedRoute
+    }
+    '/_protected/_authenticated/contracts': {
+      id: '/_protected/_authenticated/contracts'
+      path: '/contracts'
+      fullPath: '/contracts'
+      preLoaderRoute: typeof ProtectedAuthenticatedContractsRouteImport
+      parentRoute: typeof ProtectedAuthenticatedRoute
+    }
     '/_protected/_authenticated/admin': {
       id: '/_protected/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof ProtectedAuthenticatedAdminRouteImport
       parentRoute: typeof ProtectedAuthenticatedRoute
+    }
+    '/_protected/_authenticated/timesheets/': {
+      id: '/_protected/_authenticated/timesheets/'
+      path: '/'
+      fullPath: '/timesheets/'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimesheetsRoute
+    }
+    '/_protected/_authenticated/customers/': {
+      id: '/_protected/_authenticated/customers/'
+      path: '/'
+      fullPath: '/customers/'
+      preLoaderRoute: typeof ProtectedAuthenticatedCustomersIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedCustomersRoute
+    }
+    '/_protected/_authenticated/contracts/': {
+      id: '/_protected/_authenticated/contracts/'
+      path: '/'
+      fullPath: '/contracts/'
+      preLoaderRoute: typeof ProtectedAuthenticatedContractsIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedContractsRoute
+    }
+    '/_protected/_authenticated/customers/new': {
+      id: '/_protected/_authenticated/customers/new'
+      path: '/new'
+      fullPath: '/customers/new'
+      preLoaderRoute: typeof ProtectedAuthenticatedCustomersNewRouteImport
+      parentRoute: typeof ProtectedAuthenticatedCustomersRoute
+    }
+    '/_protected/_authenticated/customers/$id': {
+      id: '/_protected/_authenticated/customers/$id'
+      path: '/$id'
+      fullPath: '/customers/$id'
+      preLoaderRoute: typeof ProtectedAuthenticatedCustomersIdRouteImport
+      parentRoute: typeof ProtectedAuthenticatedCustomersRoute
+    }
+    '/_protected/_authenticated/contracts/new': {
+      id: '/_protected/_authenticated/contracts/new'
+      path: '/new'
+      fullPath: '/contracts/new'
+      preLoaderRoute: typeof ProtectedAuthenticatedContractsNewRouteImport
+      parentRoute: typeof ProtectedAuthenticatedContractsRoute
+    }
+    '/_protected/_authenticated/contracts/$contractId': {
+      id: '/_protected/_authenticated/contracts/$contractId'
+      path: '/$contractId'
+      fullPath: '/contracts/$contractId'
+      preLoaderRoute: typeof ProtectedAuthenticatedContractsContractIdRouteImport
+      parentRoute: typeof ProtectedAuthenticatedContractsRoute
     }
     '/_protected/_authenticated/admin/users': {
       id: '/_protected/_authenticated/admin/users'
@@ -328,20 +424,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedAdminUsersIndexRouteImport
       parentRoute: typeof ProtectedAuthenticatedAdminUsersRoute
     }
-    '/_protected/_authenticated/admin/customers/': {
-      id: '/_protected/_authenticated/admin/customers/'
-      path: '/customers'
-      fullPath: '/admin/customers/'
-      preLoaderRoute: typeof ProtectedAuthenticatedAdminCustomersIndexRouteImport
-      parentRoute: typeof ProtectedAuthenticatedAdminRoute
-    }
-    '/_protected/_authenticated/admin/contracts/': {
-      id: '/_protected/_authenticated/admin/contracts/'
-      path: '/contracts'
-      fullPath: '/admin/contracts/'
-      preLoaderRoute: typeof ProtectedAuthenticatedAdminContractsIndexRouteImport
-      parentRoute: typeof ProtectedAuthenticatedAdminRoute
-    }
     '/_protected/_authenticated/admin/users/new': {
       id: '/_protected/_authenticated/admin/users/new'
       path: '/new'
@@ -355,34 +437,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/users/$id'
       preLoaderRoute: typeof ProtectedAuthenticatedAdminUsersIdRouteImport
       parentRoute: typeof ProtectedAuthenticatedAdminUsersRoute
-    }
-    '/_protected/_authenticated/admin/customers/new': {
-      id: '/_protected/_authenticated/admin/customers/new'
-      path: '/customers/new'
-      fullPath: '/admin/customers/new'
-      preLoaderRoute: typeof ProtectedAuthenticatedAdminCustomersNewRouteImport
-      parentRoute: typeof ProtectedAuthenticatedAdminRoute
-    }
-    '/_protected/_authenticated/admin/customers/$id': {
-      id: '/_protected/_authenticated/admin/customers/$id'
-      path: '/customers/$id'
-      fullPath: '/admin/customers/$id'
-      preLoaderRoute: typeof ProtectedAuthenticatedAdminCustomersIdRouteImport
-      parentRoute: typeof ProtectedAuthenticatedAdminRoute
-    }
-    '/_protected/_authenticated/admin/contracts/new': {
-      id: '/_protected/_authenticated/admin/contracts/new'
-      path: '/contracts/new'
-      fullPath: '/admin/contracts/new'
-      preLoaderRoute: typeof ProtectedAuthenticatedAdminContractsNewRouteImport
-      parentRoute: typeof ProtectedAuthenticatedAdminRoute
-    }
-    '/_protected/_authenticated/admin/contracts/$contractId': {
-      id: '/_protected/_authenticated/admin/contracts/$contractId'
-      path: '/contracts/$contractId'
-      fullPath: '/admin/contracts/$contractId'
-      preLoaderRoute: typeof ProtectedAuthenticatedAdminContractsContractIdRouteImport
-      parentRoute: typeof ProtectedAuthenticatedAdminRoute
     }
     '/_protected/_authenticated/timesheets/week/$year/$week': {
       id: '/_protected/_authenticated/timesheets/week/$year/$week'
@@ -424,30 +478,12 @@ const ProtectedAuthenticatedAdminUsersRouteWithChildren =
 
 interface ProtectedAuthenticatedAdminRouteChildren {
   ProtectedAuthenticatedAdminUsersRoute: typeof ProtectedAuthenticatedAdminUsersRouteWithChildren
-  ProtectedAuthenticatedAdminContractsContractIdRoute: typeof ProtectedAuthenticatedAdminContractsContractIdRoute
-  ProtectedAuthenticatedAdminContractsNewRoute: typeof ProtectedAuthenticatedAdminContractsNewRoute
-  ProtectedAuthenticatedAdminCustomersIdRoute: typeof ProtectedAuthenticatedAdminCustomersIdRoute
-  ProtectedAuthenticatedAdminCustomersNewRoute: typeof ProtectedAuthenticatedAdminCustomersNewRoute
-  ProtectedAuthenticatedAdminContractsIndexRoute: typeof ProtectedAuthenticatedAdminContractsIndexRoute
-  ProtectedAuthenticatedAdminCustomersIndexRoute: typeof ProtectedAuthenticatedAdminCustomersIndexRoute
 }
 
 const ProtectedAuthenticatedAdminRouteChildren: ProtectedAuthenticatedAdminRouteChildren =
   {
     ProtectedAuthenticatedAdminUsersRoute:
       ProtectedAuthenticatedAdminUsersRouteWithChildren,
-    ProtectedAuthenticatedAdminContractsContractIdRoute:
-      ProtectedAuthenticatedAdminContractsContractIdRoute,
-    ProtectedAuthenticatedAdminContractsNewRoute:
-      ProtectedAuthenticatedAdminContractsNewRoute,
-    ProtectedAuthenticatedAdminCustomersIdRoute:
-      ProtectedAuthenticatedAdminCustomersIdRoute,
-    ProtectedAuthenticatedAdminCustomersNewRoute:
-      ProtectedAuthenticatedAdminCustomersNewRoute,
-    ProtectedAuthenticatedAdminContractsIndexRoute:
-      ProtectedAuthenticatedAdminContractsIndexRoute,
-    ProtectedAuthenticatedAdminCustomersIndexRoute:
-      ProtectedAuthenticatedAdminCustomersIndexRoute,
   }
 
 const ProtectedAuthenticatedAdminRouteWithChildren =
@@ -455,13 +491,58 @@ const ProtectedAuthenticatedAdminRouteWithChildren =
     ProtectedAuthenticatedAdminRouteChildren,
   )
 
+interface ProtectedAuthenticatedContractsRouteChildren {
+  ProtectedAuthenticatedContractsContractIdRoute: typeof ProtectedAuthenticatedContractsContractIdRoute
+  ProtectedAuthenticatedContractsNewRoute: typeof ProtectedAuthenticatedContractsNewRoute
+  ProtectedAuthenticatedContractsIndexRoute: typeof ProtectedAuthenticatedContractsIndexRoute
+}
+
+const ProtectedAuthenticatedContractsRouteChildren: ProtectedAuthenticatedContractsRouteChildren =
+  {
+    ProtectedAuthenticatedContractsContractIdRoute:
+      ProtectedAuthenticatedContractsContractIdRoute,
+    ProtectedAuthenticatedContractsNewRoute:
+      ProtectedAuthenticatedContractsNewRoute,
+    ProtectedAuthenticatedContractsIndexRoute:
+      ProtectedAuthenticatedContractsIndexRoute,
+  }
+
+const ProtectedAuthenticatedContractsRouteWithChildren =
+  ProtectedAuthenticatedContractsRoute._addFileChildren(
+    ProtectedAuthenticatedContractsRouteChildren,
+  )
+
+interface ProtectedAuthenticatedCustomersRouteChildren {
+  ProtectedAuthenticatedCustomersIdRoute: typeof ProtectedAuthenticatedCustomersIdRoute
+  ProtectedAuthenticatedCustomersNewRoute: typeof ProtectedAuthenticatedCustomersNewRoute
+  ProtectedAuthenticatedCustomersIndexRoute: typeof ProtectedAuthenticatedCustomersIndexRoute
+}
+
+const ProtectedAuthenticatedCustomersRouteChildren: ProtectedAuthenticatedCustomersRouteChildren =
+  {
+    ProtectedAuthenticatedCustomersIdRoute:
+      ProtectedAuthenticatedCustomersIdRoute,
+    ProtectedAuthenticatedCustomersNewRoute:
+      ProtectedAuthenticatedCustomersNewRoute,
+    ProtectedAuthenticatedCustomersIndexRoute:
+      ProtectedAuthenticatedCustomersIndexRoute,
+  }
+
+const ProtectedAuthenticatedCustomersRouteWithChildren =
+  ProtectedAuthenticatedCustomersRoute._addFileChildren(
+    ProtectedAuthenticatedCustomersRouteChildren,
+  )
+
 interface ProtectedAuthenticatedTimesheetsRouteChildren {
+  ProtectedAuthenticatedTimesheetsIndexRoute: typeof ProtectedAuthenticatedTimesheetsIndexRoute
   ProtectedAuthenticatedTimesheetsMonthYearMonthRoute: typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
   ProtectedAuthenticatedTimesheetsWeekYearWeekRoute: typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
 }
 
 const ProtectedAuthenticatedTimesheetsRouteChildren: ProtectedAuthenticatedTimesheetsRouteChildren =
   {
+    ProtectedAuthenticatedTimesheetsIndexRoute:
+      ProtectedAuthenticatedTimesheetsIndexRoute,
     ProtectedAuthenticatedTimesheetsMonthYearMonthRoute:
       ProtectedAuthenticatedTimesheetsMonthYearMonthRoute,
     ProtectedAuthenticatedTimesheetsWeekYearWeekRoute:
@@ -475,6 +556,8 @@ const ProtectedAuthenticatedTimesheetsRouteWithChildren =
 
 interface ProtectedAuthenticatedRouteChildren {
   ProtectedAuthenticatedAdminRoute: typeof ProtectedAuthenticatedAdminRouteWithChildren
+  ProtectedAuthenticatedContractsRoute: typeof ProtectedAuthenticatedContractsRouteWithChildren
+  ProtectedAuthenticatedCustomersRoute: typeof ProtectedAuthenticatedCustomersRouteWithChildren
   ProtectedAuthenticatedTimesheetsRoute: typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
 }
 
@@ -482,6 +565,10 @@ const ProtectedAuthenticatedRouteChildren: ProtectedAuthenticatedRouteChildren =
   {
     ProtectedAuthenticatedAdminRoute:
       ProtectedAuthenticatedAdminRouteWithChildren,
+    ProtectedAuthenticatedContractsRoute:
+      ProtectedAuthenticatedContractsRouteWithChildren,
+    ProtectedAuthenticatedCustomersRoute:
+      ProtectedAuthenticatedCustomersRouteWithChildren,
     ProtectedAuthenticatedTimesheetsRoute:
       ProtectedAuthenticatedTimesheetsRouteWithChildren,
   }

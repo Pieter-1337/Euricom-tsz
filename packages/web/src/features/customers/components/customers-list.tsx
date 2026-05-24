@@ -109,7 +109,7 @@ export function CustomersList({ canCreate }: { canCreate: boolean }) {
       action={
         canCreate ? (
           <Button asChild size="sm">
-            <Link to="/admin/customers/new">New customer</Link>
+            <Link to="/customers/new">New customer</Link>
           </Button>
         ) : undefined
       }
@@ -122,7 +122,7 @@ export function CustomersList({ canCreate }: { canCreate: boolean }) {
         <h1 className="text-2xl font-bold">Customers</h1>
         {canCreate && (
           <Button asChild>
-            <Link to="/admin/customers/new">New customer</Link>
+            <Link to="/customers/new">New customer</Link>
           </Button>
         )}
       </div>
@@ -144,7 +144,7 @@ export function CustomersList({ canCreate }: { canCreate: boolean }) {
           error,
           emptyState,
           sentinelRef,
-          onRowClick: (c) => void router.navigate({ to: '/admin/customers/$id', params: { id: c.id } }),
+          onRowClick: (c) => void router.navigate({ to: '/customers/$id', params: { id: c.id } }),
         }}
       />
     </div>

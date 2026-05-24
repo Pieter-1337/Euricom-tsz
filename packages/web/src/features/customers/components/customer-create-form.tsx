@@ -48,7 +48,7 @@ export function CustomerCreateForm() {
       try {
         const created = await submitCreateCustomer({ data: value });
         await router.invalidate();
-        if (created) router.navigate({ to: '/admin/customers/$id', params: { id: created.id } });
+        if (created) router.navigate({ to: '/customers/$id', params: { id: created.id } });
       } catch (e) {
         handleApiError(e);
       }

@@ -101,7 +101,7 @@ export function ContractEditForm({ contract, currentUser }: { contract: Contract
               if (!confirm(`Delete contract #${contract.number} — ${contract.subject}?`)) return;
               try {
                 await deleteContract({ data: contract.id });
-                router.navigate({ to: '/admin/contracts' });
+                router.navigate({ to: '/contracts' });
               } catch (e) {
                 handleApiError(e);
               }

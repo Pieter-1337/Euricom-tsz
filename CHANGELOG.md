@@ -2,6 +2,18 @@
 
 ## 2026-05-24
 
+### Sidebar restructure, timesheet grid UX, and day-capacity design docs
+
+Customers and contracts are now top-level navigation items; admin retains users only. The timesheet week grid gets a UX pass, and the day-capacity rule is captured in CONTEXT.md, the time-entry PRD, and a new ADR (implementation pending).
+
+- Move `/admin/customers` and `/admin/contracts` to top-level `/customers` and `/contracts`. Route files moved under `_protected/_authenticated/` so they inherit the centralized auth guard; sidebar restructured to surface them outside the admin zone.
+- New `/timesheets` index route redirects to the consultant's current ISO week.
+- Tighten the admin layout role check to Admin-only (was Admin or ClientManager); customers/contracts have their own canManageClients guards.
+- Timesheet week grid: replace hand-rolled Add-task / Add-leave dropdowns with shadcn `Popover`; add row delete; reset per-week state on week change via React `key`; fix calendar chevron stacking-context bug.
+- Add `WorkdayCapacity` term to `CONTEXT.md`: one daily working-hours constant driving both the per-day booking cap and leave-day-equivalence arithmetic.
+- Add a per-day cap bullet to `docs/product/requirements/time-entry/time-entry.md`: total booked time per day (tasks + leave combined) cannot exceed 8 hours.
+- Add `docs/adr/0003-aggregate-vs-validator-rule-placement.md`: domain invariants that depend only on aggregate state live in the aggregate; cross-module and cross-aggregate concerns live in the validator. Day-capacity is the rule's first application.
+
 ### Nav — Add "My Timesheet" sidebar link
 
 Add a 'My Timesheet' sidebar link that opens the consultant's current-week timesheet, so the new timesheets feature is discoverable from the navigation.

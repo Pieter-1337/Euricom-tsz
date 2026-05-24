@@ -11,6 +11,7 @@
 - The week-end and holidays are not editable
 - A total time per task/leave is calculated
 - A total time per day and week is calculated
+- The total booked time per day (tasks + leave combined) cannot exceed 8 hours.
 - You can navigate to the previous and next week and choose a date in the calendar or 'today'
 - When navigating away from the time entry page or week is changed, the time entries are saved automatically
 - You can submit the week for approval (week will be marked as 'approved)
