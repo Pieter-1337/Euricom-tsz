@@ -13,6 +13,13 @@ Consultants can now record leave hours alongside work hours in the weekly grid; 
 - A null allowance means unlimited leave — no enforcement is applied for those types.
 - The bulk PUT body now carries `timeEntries` and `leaveBookings` as separate arrays.
 
+### Cleanup — cubic-dev-ai review findings (#20, #23)
+
+- `Holiday.DeletedAt` now has a `private set`, matching the entity encapsulation convention.
+- `TimesheetErrors.NotFound` now maps to `ErrorCategory.NotFound` (HTTP 404) instead of `ErrorCategory.Validation` (HTTP 400).
+- `handleSubmit` in the timesheet grid now sets the loading state before `flush()`, preventing a race where the Submit button was briefly re-enabled during the async save.
+- `flush()` now returns `Promise<boolean>`; `handleSubmit` aborts and surfaces an inline error if the save failed, preventing a submit call on un-persisted edits.
+
 ### Timesheets — submit / approve / reopen lifecycle
 
 - Consultants can now submit a Draft timesheet week. The Submit button in the grid header posts `POST /api/timesheet-weeks/{userId}/{year}/{week}/submit` and refreshes the page with the new Submitted status.

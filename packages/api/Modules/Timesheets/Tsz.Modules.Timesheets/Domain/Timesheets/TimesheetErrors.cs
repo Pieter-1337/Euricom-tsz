@@ -35,7 +35,7 @@ public sealed class TimesheetErrors : ErrorCodeBase<TimesheetErrors>
     public static readonly TimesheetErrors NotFound =
         new("ERR_TIMESHEET_NOT_FOUND",
             "The timesheet week was not found.",
-            ErrorCategory.Validation);
+            ErrorCategory.NotFound);
 
     public static readonly TimesheetErrors NotSubmittable =
         new("ERR_TIMESHEET_NOT_SUBMITTABLE",
