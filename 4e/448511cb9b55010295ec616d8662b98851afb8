@@ -1,0 +1,88 @@
+packages/web/src/features/contracts/components/contract-edit-form.tsx
+  s_cda2ad85dee6a3::t_eff56b237895d3 104
+packages/web/src/features/customers/components/customer-create-form.tsx
+  s_cda2ad85dee6a3::t_39727b079c3b87 51
+packages/web/src/features/contracts/components/contract-create-form.tsx
+  s_cda2ad85dee6a3::t_2d979befee930e 37
+packages/web/src/routes/_protected/contracts/index.tsx
+  s_cda2ad85dee6a3::t_ba2a6de332c233 1-14
+packages/web/src/routes/_protected/contracts/new.tsx
+  s_cda2ad85dee6a3::t_e4d50057163b12 1-12
+packages/web/src/features/contracts/components/contracts-list.tsx
+  s_cda2ad85dee6a3::t_07f8aff7880a56 81,139,195
+packages/web/src/routes/_protected/contracts.tsx
+  s_cda2ad85dee6a3::t_c5039566f8a5f0 1-12
+docs/adr/0003-aggregate-vs-validator-rule-placement.md
+  s_0bd1cf259de613::t_8938b577610394 1-71
+packages/web/src/routes/_protected/customers.tsx
+  s_cda2ad85dee6a3::t_5ed195048628ca 1-12
+packages/web/src/routes/_protected/admin.tsx
+  s_cda2ad85dee6a3::t_5eb8e8bba50198 7
+packages/web/src/routes/_protected/customers/new.tsx
+  s_cda2ad85dee6a3::t_0abfc5de31e3bb 1-12
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_cda2ad85dee6a3::t_5d561d8fffc7c3 671-683
+  s_cda2ad85dee6a3::t_736b42c6933940 707
+  s_cda2ad85dee6a3::t_dcb171a42e1751 506,512
+  s_cda2ad85dee6a3::t_893957cbaf6c05 3
+  s_cda2ad85dee6a3::t_fa873d234276d0 427,716-744,746-777
+  s_cda2ad85dee6a3::t_0a60c552c80584 586-598
+  s_cda2ad85dee6a3::t_ccee2d54b00533 280-303
+  s_cda2ad85dee6a3::t_5f9081d959f827 138-139
+  s_cda2ad85dee6a3::t_15f842677ae6c9 350-351
+  s_cda2ad85dee6a3::t_a7df142251501c 428-436
+packages/web/src/routeTree.gen.ts
+  s_cda2ad85dee6a3::t_3d855fbeab2f00 19,68-73,159,177,201,225,243,266,331-336,490,496
+  s_cda2ad85dee6a3::t_5a68ced06ae8e5 16-17,20-21,23-26,32,53-62,74-83,89-109,137-142,148-149,152-155,157-158,163,170-173,175-176,181,189-190,194-197,199-200,205,214-215,218-221,223-224,229,236-239,241-242,247,254-255,259-262,264-265,270,310-321,337-351,359-386,422-428,459-487,491,497-498,507-508,515-516
+packages/web/src/routes/_protected.tsx
+  s_cda2ad85dee6a3::t_093179ba59ea32 6
+  s_cda2ad85dee6a3::t_fe9854bfa76a29 132,134-136,138-139,141-142
+  s_cda2ad85dee6a3::t_201f62bd9e9d95 137,140
+packages/web/src/routes/_protected/timesheets/week/$year/$week.tsx
+  s_cda2ad85dee6a3::t_66b2fdaf946af5 36
+CHANGELOG.md
+  s_0bd1cf259de613::t_fac2a4bf52e5ef 5-14
+packages/web/src/features/customers/components/customers-list.tsx
+  s_cda2ad85dee6a3::t_f02e0923c5c5f6 112,125,147
+packages/web/src/features/customers/components/customer-edit-card.tsx
+  s_cda2ad85dee6a3::t_c018932f9fcad7 81
+packages/web/src/routes/_protected/customers/$id.tsx
+  s_cda2ad85dee6a3::t_79e7725b9b82cd 1-28
+packages/web/src/routes/_protected/contracts/$contractId.tsx
+  s_cda2ad85dee6a3::t_7bb8b0842b2d6f 1-24
+packages/web/src/components/ui/calendar.tsx
+  s_cda2ad85dee6a3::t_d480498fda063c 55
+  s_cda2ad85dee6a3::t_b8cdfe9f4297ee 18,20,22,25,29
+packages/web/src/routes/_protected/timesheets/index.tsx
+  s_cda2ad85dee6a3::t_a3652f9e56ca30 1-9
+CONTEXT.md
+  s_0bd1cf259de613::t_57db5e66c81f8f 55-58
+packages/web/src/routes/_protected/customers/index.tsx
+  s_cda2ad85dee6a3::t_26d4ff693da5ab 1-14
+docs/product/requirements/time-entry/time-entry.md
+  s_0bd1cf259de613::t_e8f02fce05d324 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "4e448511cb9b55010295ec616d8662b98851afb8",
+  "prompts": {},
+  "sessions": {
+    "s_0bd1cf259de613": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "728f09f4-a40e-4b2b-b694-08f69465883d",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_cda2ad85dee6a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eb58e6db-bcb3-496b-b4f4-0a162d96bfdf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
