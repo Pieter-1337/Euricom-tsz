@@ -13,8 +13,10 @@ public class TimesheetWeek : IEntityBase
     public DateTimeOffset? DeletedAt { get; private set; }
 
     internal List<TimeEntry> TimeEntries { get; private set; } = [];
+    internal List<LeaveBooking> LeaveBookings { get; private set; } = [];
 
     public IReadOnlyCollection<TimeEntry> Entries => TimeEntries.AsReadOnly();
+    public IReadOnlyCollection<LeaveBooking> LeaveEntries => LeaveBookings.AsReadOnly();
 
     private TimesheetWeek() { }
 
@@ -48,6 +50,30 @@ public class TimesheetWeek : IEntityBase
                 existing.Update(dto.DurationHours);
             else
                 TimeEntries.Add(TimeEntry.Create(dto.ContractTaskId, dto.Date, dto.DurationHours));
+        }
+    }
+
+    public void ApplyLeaveBookings(IReadOnlyList<LeaveBookingDto> desired)
+    {
+        EnsureDraft();
+
+        var existingByKey = LeaveBookings
+            .ToDictionary(e => (e.LeaveTypeId, e.Date));
+
+        var desiredKeys = desired
+            .Select(d => (d.LeaveTypeId, d.Date))
+            .ToHashSet();
+
+        foreach (var entry in LeaveBookings.Where(e => !desiredKeys.Contains((e.LeaveTypeId, e.Date))).ToList())
+            LeaveBookings.Remove(entry);
+
+        foreach (var dto in desired)
+        {
+            var key = (dto.LeaveTypeId, dto.Date);
+            if (existingByKey.TryGetValue(key, out var existing))
+                existing.Update(dto.DurationHours);
+            else
+                LeaveBookings.Add(LeaveBooking.Create(dto.LeaveTypeId, dto.Date, dto.DurationHours));
         }
     }
 
@@ -89,5 +115,10 @@ public class TimesheetWeek : IEntityBase
 
 public sealed record TimeEntryBookingDto(
     Guid ContractTaskId,
+    DateOnly Date,
+    decimal DurationHours);
+
+public sealed record LeaveBookingDto(
+    Guid LeaveTypeId,
     DateOnly Date,
     decimal DurationHours);

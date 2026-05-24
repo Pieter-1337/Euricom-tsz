@@ -4,6 +4,8 @@ using Tsz.Api.Tests.Integration.TestAuth;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.Contracts.Domain.Contracts;
 using Tsz.Modules.Customers.Domain.Customers;
+using Tsz.Modules.LeaveTypes.Domain.LeaveTypes;
+using Tsz.Modules.LeaveTypes.Domain.Leaves;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Timesheets.Features;
 using Tsz.Modules.Users.Contracts;
@@ -17,9 +19,13 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     public TimesheetEndpointsTests(TestWebApplicationFactory factory) : base(factory) { }
 
+    // Seeded leave type IDs (from LeaveTypeConfiguration.HasData)
+    private static readonly Guid VerlofId = new("11111111-1111-1111-1111-000000000001");
+
     public async Task InitializeAsync()
     {
         await WithUowAsync(uow => uow.RepositoryFor<TimesheetWeek>().BatchHardDeleteAsync(_ => true));
+        await WithUowAsync(uow => uow.RepositoryFor<UserLeave>().BatchHardDeleteAsync(_ => true));
         await WithUowAsync(uow => uow.RepositoryFor<Contract>().BatchHardDeleteAsync(_ => true));
         await WithUowAsync(uow => uow.RepositoryFor<Customer>().BatchHardDeleteAsync(_ => true));
         await WithUowAsync(uow => uow.RepositoryFor<User>().BatchHardDeleteAsync(_ => true));
@@ -141,7 +147,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var response = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
 
         response.EnsureSuccessStatusCode();
         var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
@@ -162,13 +168,13 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
         // Add
         var r1 = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
         r1.EnsureSuccessStatusCode();
 
         // Update
         var r2 = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 4.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 4.00 } }, leaveBookings = Array.Empty<object>() });
         r2.EnsureSuccessStatusCode();
         var dto2 = await r2.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
         Assert.Equal(4.00m, dto2!.TimeEntries[0].DurationHours);
@@ -176,7 +182,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
         // Remove
         var r3 = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = Array.Empty<object>() });
+            new { timeEntries = Array.Empty<object>(), leaveBookings = Array.Empty<object>() });
         r3.EnsureSuccessStatusCode();
         var dto3 = await r3.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
         Assert.Empty(dto3!.TimeEntries);
@@ -191,7 +197,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var response = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-25", durationHours = 8.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-25", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
@@ -207,7 +213,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var response = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 0.1 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 0.1 } }, leaveBookings = Array.Empty<object>() });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
@@ -221,7 +227,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var response = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = Guid.NewGuid(), date = "2026-05-18", durationHours = 8.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = Guid.NewGuid(), date = "2026-05-18", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
@@ -237,7 +243,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
 
         var response = await Client.GetAsync($"/api/timesheet-weeks/{userId}/2026/21");
         response.EnsureSuccessStatusCode();
@@ -481,10 +487,132 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
         var response = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{adminId}/2026/22/bookings",
-            new { bookings = new[] { new { contractTaskId = taskId, date = "2026-05-25", durationHours = 8.00 } } });
+            new { timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-25", durationHours = 8.00 } }, leaveBookings = Array.Empty<object>() });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
         Assert.Equal(TimesheetErrors.NotDraft.Code, body.GetProperty("code").GetString());
+    }
+
+    // --- Leave booking integration tests ---
+
+    private async Task SeedUserLeaveAsync(Guid userId, Guid leaveTypeId, decimal? totalDays)
+    {
+        await WithUowAsync(async uow =>
+        {
+            var userLeave = UserLeave.Create(userId, leaveTypeId, 2026, totalDays);
+            uow.RepositoryFor<UserLeave>().Add(userLeave);
+            await uow.SaveChangesAsync();
+        });
+    }
+
+    [Fact]
+    public async Task PutLeaveBookings_UnderAllowance_Returns200()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        await SeedUserLeaveAsync(userId, VerlofId, 5m); // 5 days = 40h
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = Array.Empty<object>(),
+                leaveBookings = new[] { new { leaveTypeId = VerlofId, date = "2026-05-18", durationHours = 8.00 } }
+            });
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Single(dto.LeaveBookings);
+        Assert.Equal(VerlofId, dto.LeaveBookings[0].LeaveTypeId);
+        Assert.Equal(8.00m, dto.LeaveBookings[0].DurationHours);
+    }
+
+    [Fact]
+    public async Task PutLeaveBookings_OverAllowance_Returns400LeaveAllowanceExceeded()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        await SeedUserLeaveAsync(userId, VerlofId, 1m); // 1 day = 8h
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = Array.Empty<object>(),
+                leaveBookings = new[]
+                {
+                    new { leaveTypeId = VerlofId, date = "2026-05-18", durationHours = 8.00 },
+                    new { leaveTypeId = VerlofId, date = "2026-05-19", durationHours = 4.00 }
+                }
+            });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.LeaveAllowanceExceeded.Code, body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task PutLeaveBookings_NullAllowance_Unlimited_Returns200()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        await SeedUserLeaveAsync(userId, VerlofId, null); // unlimited
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = Array.Empty<object>(),
+                leaveBookings = new[]
+                {
+                    new { leaveTypeId = VerlofId, date = "2026-05-18", durationHours = 8.00 },
+                    new { leaveTypeId = VerlofId, date = "2026-05-19", durationHours = 8.00 },
+                    new { leaveTypeId = VerlofId, date = "2026-05-20", durationHours = 8.00 },
+                    new { leaveTypeId = VerlofId, date = "2026-05-21", durationHours = 8.00 },
+                    new { leaveTypeId = VerlofId, date = "2026-05-22", durationHours = 8.00 }
+                }
+            });
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(5, dto.LeaveBookings.Count);
+    }
+
+    [Fact]
+    public async Task PutLeaveBookings_MixedWithTimeEntries_RoundTrips()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
+        await SeedUserLeaveAsync(userId, VerlofId, 5m);
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 8.00 } },
+                leaveBookings = new[] { new { leaveTypeId = VerlofId, date = "2026-05-19", durationHours = 4.00 } }
+            });
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Single(dto.TimeEntries);
+        Assert.Single(dto.LeaveBookings);
+        Assert.Equal(8.00m, dto.TimeEntries[0].DurationHours);
+        Assert.Equal(4.00m, dto.LeaveBookings[0].DurationHours);
+    }
+
+    [Fact]
+    public async Task GetSelectableLeaveTypes_ReturnsActiveLeaveTypes()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+
+        var response = await Client.GetAsync($"/api/timesheet-selectable-leave-types/{userId}");
+
+        response.EnsureSuccessStatusCode();
+        var leaveTypes = await response.Content.ReadFromJsonAsync<SelectableLeaveTypeDto[]>(Json);
+        Assert.NotNull(leaveTypes);
+        Assert.NotEmpty(leaveTypes);
     }
 }

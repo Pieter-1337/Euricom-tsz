@@ -12,6 +12,8 @@ public class TimesheetWeekTests
 
     private static readonly Guid TaskA = Guid.NewGuid();
     private static readonly Guid TaskB = Guid.NewGuid();
+    private static readonly Guid LeaveTypeA = Guid.NewGuid();
+    private static readonly Guid LeaveTypeB = Guid.NewGuid();
 
     [Fact]
     public void Create_SetsStatusDraft()
@@ -117,6 +119,73 @@ public class TimesheetWeekTests
         ]);
 
         week.Entries.Count.ShouldBe(2);
+    }
+
+    // --- ApplyLeaveBookings ---
+
+    [Fact]
+    public void ApplyLeaveBookings_Draft_AddsEntries()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        week.ApplyLeaveBookings([
+            new LeaveBookingDto(LeaveTypeA, Mon, 8.00m),
+            new LeaveBookingDto(LeaveTypeB, Tue, 4.00m),
+        ]);
+
+        week.LeaveEntries.Count.ShouldBe(2);
+        week.LeaveEntries.ShouldContain(e => e.LeaveTypeId == LeaveTypeA && e.Date == Mon && e.DurationHours == 8.00m);
+        week.LeaveEntries.ShouldContain(e => e.LeaveTypeId == LeaveTypeB && e.Date == Tue && e.DurationHours == 4.00m);
+    }
+
+    [Fact]
+    public void ApplyLeaveBookings_UpdatesExistingEntry()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
+
+        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 4.00m)]);
+
+        week.LeaveEntries.Count.ShouldBe(1);
+        week.LeaveEntries.Single().DurationHours.ShouldBe(4.00m);
+    }
+
+    [Fact]
+    public void ApplyLeaveBookings_RemovesEntryNotInDesired()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.ApplyLeaveBookings([
+            new LeaveBookingDto(LeaveTypeA, Mon, 8.00m),
+            new LeaveBookingDto(LeaveTypeB, Tue, 4.00m),
+        ]);
+
+        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
+
+        week.LeaveEntries.Count.ShouldBe(1);
+        week.LeaveEntries.Single().LeaveTypeId.ShouldBe(LeaveTypeA);
+    }
+
+    [Fact]
+    public void ApplyLeaveBookings_EmptyDesired_ClearsAllEntries()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
+
+        week.ApplyLeaveBookings([]);
+
+        week.LeaveEntries.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void ApplyLeaveBookings_NonDraft_ThrowsValidationException()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        typeof(TimesheetWeek).GetProperty("Status",
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!
+            .SetValue(week, TimesheetStatus.Submitted);
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
+            week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]));
     }
 
     // --- Submit ---

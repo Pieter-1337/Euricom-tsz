@@ -25,6 +25,7 @@ public class TimesheetWeekConfiguration : IEntityTypeConfiguration<TimesheetWeek
 
         builder.Ignore(w => w.DeletedAt);
         builder.Ignore(w => w.Entries);
+        builder.Ignore(w => w.LeaveEntries);
 
         builder.OwnsMany(w => w.TimeEntries, te =>
         {
@@ -35,6 +36,19 @@ public class TimesheetWeekConfiguration : IEntityTypeConfiguration<TimesheetWeek
             te.Property(e => e.ContractTaskId).IsRequired();
             te.Property(e => e.Date).IsRequired();
             te.Property(e => e.DurationHours)
+                .IsRequired()
+                .HasColumnType("decimal(3,2)");
+        });
+
+        builder.OwnsMany(w => w.LeaveBookings, lb =>
+        {
+            lb.ToTable("LeaveBookings");
+            lb.WithOwner().HasForeignKey("TimesheetWeekId");
+            lb.HasKey(e => e.Id);
+            lb.Property(e => e.Id).ValueGeneratedNever();
+            lb.Property(e => e.LeaveTypeId).IsRequired();
+            lb.Property(e => e.Date).IsRequired();
+            lb.Property(e => e.DurationHours)
                 .IsRequired()
                 .HasColumnType("decimal(3,2)");
         });

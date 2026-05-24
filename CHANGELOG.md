@@ -2,6 +2,17 @@
 
 ## 2026-05-24
 
+### Timesheets — leave rows + allowance enforcement
+
+Consultants can now record leave hours alongside work hours in the weekly grid; year-based allowance limits are enforced server-side and excess bookings are rejected with a clear error.
+
+- A new "Add leave row" button opens a picker of active leave types. Leave rows are visually distinguished (amber tint) from task rows.
+- Leave cells support the same hotkeys (`d` = 8 h, `h` = 4 h, `Del` = clear) and 15-minute increments as task rows. Weekend and holiday cells are read-only.
+- Day totals and the weekly total now include leave hours.
+- The server enforces per-year leave allowances: if the total booked hours for a leave type in the calendar year would exceed the user's allowance, the PUT is rejected with `ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED`. An inline banner displays the rejection message.
+- A null allowance means unlimited leave — no enforcement is applied for those types.
+- The bulk PUT body now carries `timeEntries` and `leaveBookings` as separate arrays.
+
 ### Timesheets — submit / approve / reopen lifecycle
 
 - Consultants can now submit a Draft timesheet week. The Submit button in the grid header posts `POST /api/timesheet-weeks/{userId}/{year}/{week}/submit` and refreshes the page with the new Submitted status.

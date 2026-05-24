@@ -801,6 +801,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/timesheet-selectable-leave-types/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SelectableLeaveTypeDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -816,15 +853,40 @@ export interface components {
       version: null | string;
     };
     ApplyBookingsRequest: {
-      bookings: components['schemas']['BookingInputDto'][];
+      timeEntries: components['schemas']['TimeEntryInputDto'][];
+      leaveBookings: components['schemas']['LeaveBookingInputDto'][];
     };
-    BookingInputDto: {
+    TimeEntryInputDto: {
       /** Format: uuid */
       contractTaskId: string;
       /** Format: date */
       date: string;
       /** Format: double */
       durationHours: number;
+    };
+    LeaveBookingInputDto: {
+      /** Format: uuid */
+      leaveTypeId: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    LeaveBookingEntryDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      leaveTypeId: string;
+      leaveTypeName: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    SelectableLeaveTypeDto: {
+      /** Format: uuid */
+      id: string;
+      name: string;
     };
     DayInfoDto: {
       /** Format: date */
@@ -870,6 +932,7 @@ export interface components {
       status: string;
       days: components['schemas']['DayInfoDto'][];
       timeEntries: components['schemas']['TimeEntryDto'][];
+      leaveBookings: components['schemas']['LeaveBookingEntryDto'][];
     };
     ContactPersonDto: {
       name: null | string;
