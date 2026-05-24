@@ -3,7 +3,7 @@ import { CustomersList } from '#/features/customers/components/customers-list';
 import { UserRole } from '#/api/users';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/admin/customers/')({
+export const Route = createFileRoute('/_protected/_authenticated/admin/customers/')({
   component: CustomersListPage,
 });
 

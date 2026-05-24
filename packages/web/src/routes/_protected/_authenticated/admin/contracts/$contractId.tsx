@@ -3,7 +3,7 @@ import { fetchContract } from '#/features/contracts/server-fns';
 import { ContractEditForm } from '#/features/contracts/components/contract-edit-form';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/admin/contracts/$contractId')({
+export const Route = createFileRoute('/_protected/_authenticated/admin/contracts/$contractId')({
   loader: ({ params }) => fetchContract({ data: params.contractId }),
   component: EditContractPage,
 });

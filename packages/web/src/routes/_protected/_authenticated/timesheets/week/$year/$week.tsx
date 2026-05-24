@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { TimesheetWeekGrid } from '#/features/timesheets/components/timesheet-week-grid';
 import {
   fetchSelectableContractTasks,
@@ -8,10 +8,9 @@ import {
 import type { CurrentUser } from '#/server/current-user';
 import { UserRole } from '#/api/users';
 
-export const Route = createFileRoute('/_protected/timesheets/week/$year/$week')({
+export const Route = createFileRoute('/_protected/_authenticated/timesheets/week/$year/$week')({
   loader: async ({ params, context }) => {
-    const currentUser = (context as { currentUser?: CurrentUser }).currentUser;
-    if (!currentUser) throw redirect({ to: '/' });
+    const { currentUser } = context as { currentUser: CurrentUser };
     const userId = currentUser.id;
     const isAdmin = currentUser.roles.includes(UserRole.Admin);
     const year = Number(params.year);

@@ -3,7 +3,7 @@ import { fetchUserAndLeaves } from '#/features/users/server-fns';
 import { UserEditCard } from '#/features/users/components/user-edit-card';
 import { LeaveOverviewSection } from '#/features/users/components/leave-overview-section';
 
-export const Route = createFileRoute('/_protected/admin/users/$id')({
+export const Route = createFileRoute('/_protected/_authenticated/admin/users/$id')({
   loader: ({ params }) => fetchUserAndLeaves({ data: params.id }),
   component: EditUserPage,
 });
