@@ -61,4 +61,9 @@ public sealed class TimesheetErrors : ErrorCodeBase<TimesheetErrors>
         new("ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED",
             "The requested leave bookings exceed the yearly allowance for one or more leave types.",
             ErrorCategory.Validation);
+
+    public static readonly TimesheetErrors DayCapacityExceeded =
+        new("ERR_TIMESHEET_DAY_CAPACITY_EXCEEDED",
+            "One or more days exceed the daily capacity.",
+            ErrorCategory.Validation);
 }

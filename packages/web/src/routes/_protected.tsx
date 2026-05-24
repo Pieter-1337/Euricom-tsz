@@ -133,12 +133,8 @@ function Sidebar({
           <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
           <NavLink to="/timesheets" icon={Clock} label="Timesheets" collapsed={collapsed} />
           {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
-          {canManageClients && (
-            <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />
-          )}
-          {canManageClients && (
-            <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />
-          )}
+          {canManageClients && <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />}
+          {canManageClients && <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />}
         </div>
       </nav>
 

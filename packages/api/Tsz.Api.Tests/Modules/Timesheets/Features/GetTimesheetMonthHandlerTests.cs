@@ -73,7 +73,7 @@ public class GetTimesheetMonthHandlerTests
     {
         // Week 21 of 2026: Mon 18 May - Sun 24 May — Monday is inside May.
         var week = TimesheetWeek.Create(UserId, 2026, 21);
-        week.ApplyTimeEntries([new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 18), 8m)]);
+        week.ApplyBookings([new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 18), 8m)], []);
 
         var displayInfo = new List<ContractTaskDisplayInfoDto>
         {
@@ -103,7 +103,7 @@ public class GetTimesheetMonthHandlerTests
     public async Task WeekWithLeaveBooking_ComputesLeaveTotal()
     {
         var week = TimesheetWeek.Create(UserId, 2026, 21);
-        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 18), 4m)]);
+        week.ApplyBookings([], [new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 18), 4m)]);
 
         var activeLeaveTypes = new List<ActiveLeaveTypeDto> { new(LeaveTypeId, "Verlof", LeaveAllowed.Limited, 20m) };
         var handler = BuildHandler(weeks: [week], activeLeaveTypes: activeLeaveTypes);
@@ -120,10 +120,10 @@ public class GetTimesheetMonthHandlerTests
     public async Task PerTaskSummary_GroupsByTaskAcrossWeek()
     {
         var week = TimesheetWeek.Create(UserId, 2026, 21);
-        week.ApplyTimeEntries([
+        week.ApplyBookings([
             new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 18), 8m),
             new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 19), 4m),
-        ]);
+        ], []);
 
         var displayInfo = new List<ContractTaskDisplayInfoDto>
         {
@@ -143,7 +143,7 @@ public class GetTimesheetMonthHandlerTests
     public async Task PerLeaveTypeSummary_GroupsByLeaveType()
     {
         var week = TimesheetWeek.Create(UserId, 2026, 21);
-        week.ApplyLeaveBookings([
+        week.ApplyBookings([], [
             new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 18), 8m),
             new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 19), 8m),
         ]);
@@ -163,9 +163,9 @@ public class GetTimesheetMonthHandlerTests
     {
         var week1 = TimesheetWeek.Create(UserId, 2026, 18); // Mon Apr 27 — inside April? Actually week 18 of 2026: Mon Apr 27 — not in May
         var week21 = TimesheetWeek.Create(UserId, 2026, 21);
-        week21.ApplyTimeEntries([new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 18), 8m)]);
+        week21.ApplyBookings([new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 18), 8m)], []);
         var week22 = TimesheetWeek.Create(UserId, 2026, 22);
-        week22.ApplyTimeEntries([new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 25), 6m)]);
+        week22.ApplyBookings([new TimeEntryBookingDto(TaskId, new DateOnly(2026, 5, 25), 6m)], []);
 
         var displayInfo = new List<ContractTaskDisplayInfoDto>
         {

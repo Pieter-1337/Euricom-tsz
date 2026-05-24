@@ -15,6 +15,9 @@ public class TimesheetWeekTests
     private static readonly Guid LeaveTypeA = Guid.NewGuid();
     private static readonly Guid LeaveTypeB = Guid.NewGuid();
 
+    private static readonly IReadOnlyList<TimeEntryBookingDto> NoTimeEntries = [];
+    private static readonly IReadOnlyList<LeaveBookingDto> NoLeaveBookings = [];
+
     [Fact]
     public void Create_SetsStatusDraft()
     {
@@ -32,15 +35,19 @@ public class TimesheetWeekTests
         week.IsoWeek.ShouldBe(21);
     }
 
+    // --- ApplyBookings: time entries ---
+
     [Fact]
-    public void ApplyTimeEntries_Draft_AddsEntries()
+    public void ApplyBookings_Draft_AddsTimeEntries()
     {
         var week = TimesheetWeekBuilder.Build();
 
-        week.ApplyTimeEntries([
-            new TimeEntryBookingDto(TaskA, Mon, 8.00m),
-            new TimeEntryBookingDto(TaskB, Tue, 4.00m),
-        ]);
+        week.ApplyBookings(
+            [
+                new TimeEntryBookingDto(TaskA, Mon, 8.00m),
+                new TimeEntryBookingDto(TaskB, Tue, 4.00m),
+            ],
+            NoLeaveBookings);
 
         week.Entries.Count.ShouldBe(2);
         week.Entries.ShouldContain(e => e.ContractTaskId == TaskA && e.Date == Mon && e.DurationHours == 8.00m);
@@ -48,90 +55,92 @@ public class TimesheetWeekTests
     }
 
     [Fact]
-    public void ApplyTimeEntries_UpdatesExistingEntry()
+    public void ApplyBookings_UpdatesExistingTimeEntry()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyTimeEntries([new TimeEntryBookingDto(TaskA, Mon, 8.00m)]);
+        week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 8.00m)], NoLeaveBookings);
 
-        week.ApplyTimeEntries([new TimeEntryBookingDto(TaskA, Mon, 4.00m)]);
+        week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 4.00m)], NoLeaveBookings);
 
         week.Entries.Count.ShouldBe(1);
         week.Entries.Single().DurationHours.ShouldBe(4.00m);
     }
 
     [Fact]
-    public void ApplyTimeEntries_RemovesEntryNotInDesired()
+    public void ApplyBookings_RemovesTimeEntryNotInDesired()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyTimeEntries([
-            new TimeEntryBookingDto(TaskA, Mon, 8.00m),
-            new TimeEntryBookingDto(TaskB, Tue, 4.00m),
-        ]);
+        week.ApplyBookings(
+            [
+                new TimeEntryBookingDto(TaskA, Mon, 8.00m),
+                new TimeEntryBookingDto(TaskB, Tue, 4.00m),
+            ],
+            NoLeaveBookings);
 
-        week.ApplyTimeEntries([new TimeEntryBookingDto(TaskA, Mon, 8.00m)]);
+        week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 8.00m)], NoLeaveBookings);
 
         week.Entries.Count.ShouldBe(1);
         week.Entries.Single().ContractTaskId.ShouldBe(TaskA);
     }
 
     [Fact]
-    public void ApplyTimeEntries_EmptyDesired_ClearsAllEntries()
+    public void ApplyBookings_EmptyDesired_ClearsAllTimeEntries()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyTimeEntries([new TimeEntryBookingDto(TaskA, Mon, 8.00m)]);
+        week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 8.00m)], NoLeaveBookings);
 
-        week.ApplyTimeEntries([]);
+        week.ApplyBookings(NoTimeEntries, NoLeaveBookings);
 
         week.Entries.ShouldBeEmpty();
     }
 
     [Fact]
-    public void ApplyTimeEntries_NonDraft_ThrowsValidationException()
+    public void ApplyBookings_NonDraft_ThrowsValidationException()
     {
         var week = TimesheetWeekBuilder.Build();
-        var statusField = typeof(TimesheetWeek).GetProperty("Status",
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-        statusField!.SetValue(week, TimesheetStatus.Submitted);
+        SetStatus(week, TimesheetStatus.Submitted);
 
         Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
-            week.ApplyTimeEntries([new TimeEntryBookingDto(TaskA, Mon, 8.00m)]));
+            week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 8.00m)], NoLeaveBookings));
     }
 
     [Fact]
-    public void ApplyTimeEntries_Approved_ThrowsValidationException()
+    public void ApplyBookings_Approved_ThrowsValidationException()
     {
         var week = TimesheetWeekBuilder.Build();
-        var statusField = typeof(TimesheetWeek).GetProperty("Status",
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-        statusField!.SetValue(week, TimesheetStatus.Approved);
+        SetStatus(week, TimesheetStatus.Approved);
 
         Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
-            week.ApplyTimeEntries([new TimeEntryBookingDto(TaskA, Mon, 8.00m)]));
+            week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 8.00m)], NoLeaveBookings));
     }
 
     [Fact]
-    public void ApplyTimeEntries_SameKeyDifferentTask_TreatedAsDifferentEntry()
+    public void ApplyBookings_SameDateDifferentTask_TreatedAsDifferentEntry()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyTimeEntries([
-            new TimeEntryBookingDto(TaskA, Mon, 8.00m),
-            new TimeEntryBookingDto(TaskB, Mon, 4.00m),
-        ]);
+        week.ApplyBookings(
+            [
+                new TimeEntryBookingDto(TaskA, Mon, 4.00m),
+                new TimeEntryBookingDto(TaskB, Mon, 4.00m),
+            ],
+            NoLeaveBookings);
 
         week.Entries.Count.ShouldBe(2);
     }
 
-    // --- ApplyLeaveBookings ---
+    // --- ApplyBookings: leave bookings ---
 
     [Fact]
-    public void ApplyLeaveBookings_Draft_AddsEntries()
+    public void ApplyBookings_Draft_AddsLeaveBookings()
     {
         var week = TimesheetWeekBuilder.Build();
 
-        week.ApplyLeaveBookings([
-            new LeaveBookingDto(LeaveTypeA, Mon, 8.00m),
-            new LeaveBookingDto(LeaveTypeB, Tue, 4.00m),
-        ]);
+        week.ApplyBookings(
+            NoTimeEntries,
+            [
+                new LeaveBookingDto(LeaveTypeA, Mon, 8.00m),
+                new LeaveBookingDto(LeaveTypeB, Tue, 4.00m),
+            ]);
 
         week.LeaveEntries.Count.ShouldBe(2);
         week.LeaveEntries.ShouldContain(e => e.LeaveTypeId == LeaveTypeA && e.Date == Mon && e.DurationHours == 8.00m);
@@ -139,53 +148,172 @@ public class TimesheetWeekTests
     }
 
     [Fact]
-    public void ApplyLeaveBookings_UpdatesExistingEntry()
+    public void ApplyBookings_UpdatesExistingLeaveBooking()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
+        week.ApplyBookings(NoTimeEntries, [new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
 
-        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 4.00m)]);
+        week.ApplyBookings(NoTimeEntries, [new LeaveBookingDto(LeaveTypeA, Mon, 4.00m)]);
 
         week.LeaveEntries.Count.ShouldBe(1);
         week.LeaveEntries.Single().DurationHours.ShouldBe(4.00m);
     }
 
     [Fact]
-    public void ApplyLeaveBookings_RemovesEntryNotInDesired()
+    public void ApplyBookings_RemovesLeaveBookingNotInDesired()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyLeaveBookings([
-            new LeaveBookingDto(LeaveTypeA, Mon, 8.00m),
-            new LeaveBookingDto(LeaveTypeB, Tue, 4.00m),
-        ]);
+        week.ApplyBookings(
+            NoTimeEntries,
+            [
+                new LeaveBookingDto(LeaveTypeA, Mon, 8.00m),
+                new LeaveBookingDto(LeaveTypeB, Tue, 4.00m),
+            ]);
 
-        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
+        week.ApplyBookings(NoTimeEntries, [new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
 
         week.LeaveEntries.Count.ShouldBe(1);
         week.LeaveEntries.Single().LeaveTypeId.ShouldBe(LeaveTypeA);
     }
 
     [Fact]
-    public void ApplyLeaveBookings_EmptyDesired_ClearsAllEntries()
+    public void ApplyBookings_EmptyDesired_ClearsAllLeaveBookings()
     {
         var week = TimesheetWeekBuilder.Build();
-        week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
+        week.ApplyBookings(NoTimeEntries, [new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]);
 
-        week.ApplyLeaveBookings([]);
+        week.ApplyBookings(NoTimeEntries, NoLeaveBookings);
 
         week.LeaveEntries.ShouldBeEmpty();
     }
 
     [Fact]
-    public void ApplyLeaveBookings_NonDraft_ThrowsValidationException()
+    public void ApplyBookings_NonDraft_LeaveOnly_ThrowsValidationException()
     {
         var week = TimesheetWeekBuilder.Build();
-        typeof(TimesheetWeek).GetProperty("Status",
-            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!
-            .SetValue(week, TimesheetStatus.Submitted);
+        SetStatus(week, TimesheetStatus.Submitted);
 
         Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
-            week.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]));
+            week.ApplyBookings(NoTimeEntries, [new LeaveBookingDto(LeaveTypeA, Mon, 8.00m)]));
+    }
+
+    // --- ApplyBookings: day-capacity invariant ---
+
+    [Fact]
+    public void ApplyBookings_TimeOnly_OverCap_Throws()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        var ex = Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
+            week.ApplyBookings(
+                [
+                    new TimeEntryBookingDto(TaskA, Mon, 5.00m),
+                    new TimeEntryBookingDto(TaskB, Mon, 4.00m),
+                ],
+                NoLeaveBookings));
+
+        ex.Errors.ShouldContain(e =>
+            ((TimesheetErrors)e.CustomState).Code == TimesheetErrors.DayCapacityExceeded.Code);
+    }
+
+    [Fact]
+    public void ApplyBookings_LeaveOnly_OverCap_Throws()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        var ex = Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
+            week.ApplyBookings(
+                NoTimeEntries,
+                [
+                    new LeaveBookingDto(LeaveTypeA, Mon, 6.00m),
+                    new LeaveBookingDto(LeaveTypeB, Mon, 4.00m),
+                ]));
+
+        ex.Errors.ShouldContain(e =>
+            ((TimesheetErrors)e.CustomState).Code == TimesheetErrors.DayCapacityExceeded.Code);
+    }
+
+    [Fact]
+    public void ApplyBookings_TimePlusLeave_OverCap_Throws()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        var ex = Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
+            week.ApplyBookings(
+                [new TimeEntryBookingDto(TaskA, Mon, 6.00m)],
+                [new LeaveBookingDto(LeaveTypeA, Mon, 4.00m)]));
+
+        ex.Errors.ShouldContain(e =>
+            ((TimesheetErrors)e.CustomState).Code == TimesheetErrors.DayCapacityExceeded.Code);
+    }
+
+    [Fact]
+    public void ApplyBookings_ExactlyAtCap_Allowed()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        week.ApplyBookings(
+            [new TimeEntryBookingDto(TaskA, Mon, 4.00m)],
+            [new LeaveBookingDto(LeaveTypeA, Mon, 4.00m)]);
+
+        week.Entries.Count.ShouldBe(1);
+        week.LeaveEntries.Count.ShouldBe(1);
+    }
+
+    [Fact]
+    public void ApplyBookings_UnderCapIncludingUnderfilledDay_Allowed()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        week.ApplyBookings(
+            [
+                new TimeEntryBookingDto(TaskA, Mon, 2.00m), // underfilled
+                new TimeEntryBookingDto(TaskB, Tue, 8.00m),
+            ],
+            NoLeaveBookings);
+
+        week.Entries.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void ApplyBookings_MultiDay_OnlyOneDayOverCap_BlocksWholeWeek()
+    {
+        var week = TimesheetWeekBuilder.Build();
+
+        var ex = Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
+            week.ApplyBookings(
+                [
+                    new TimeEntryBookingDto(TaskA, Mon, 8.00m), // OK
+                    new TimeEntryBookingDto(TaskA, Tue, 5.00m), // Tue total = 9 → over
+                    new TimeEntryBookingDto(TaskB, Tue, 4.00m),
+                    new TimeEntryBookingDto(TaskA, Wed, 4.00m), // OK
+                ],
+                NoLeaveBookings));
+
+        ex.Errors.ShouldContain(e =>
+            ((TimesheetErrors)e.CustomState).Code == TimesheetErrors.DayCapacityExceeded.Code);
+
+        // None of the entries should have been applied (all-or-nothing)
+        week.Entries.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void ApplyBookings_OverCap_DoesNotPartiallyMutate()
+    {
+        var week = TimesheetWeekBuilder.Build();
+        week.ApplyBookings([new TimeEntryBookingDto(TaskA, Mon, 8.00m)], NoLeaveBookings);
+
+        Should.Throw<Tsz.Infrastructure.Errors.ValidationException>(() =>
+            week.ApplyBookings(
+                [
+                    new TimeEntryBookingDto(TaskA, Mon, 5.00m),
+                    new TimeEntryBookingDto(TaskB, Mon, 4.00m),
+                ],
+                NoLeaveBookings));
+
+        // Original state preserved
+        week.Entries.Count.ShouldBe(1);
+        week.Entries.Single().DurationHours.ShouldBe(8.00m);
     }
 
     // --- Submit ---
@@ -293,5 +421,12 @@ public class TimesheetWeekTests
         week.Submit();
 
         week.Status.ShouldBe(TimesheetStatus.Submitted);
+    }
+
+    private static void SetStatus(TimesheetWeek week, TimesheetStatus status)
+    {
+        typeof(TimesheetWeek)
+            .GetProperty("Status", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)!
+            .SetValue(week, status);
     }
 }
