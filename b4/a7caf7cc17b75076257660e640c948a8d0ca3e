@@ -1,0 +1,29 @@
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Domain/Timesheets/TimesheetErrors.cs
+  s_6772ed77e38b51::t_fb90f0a578b34c 38
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_6772ed77e38b51::t_fe7fc702eaf462 112-113,133,139
+  s_6772ed77e38b51::t_7826aca1bce320 281-282,284-285
+  s_6772ed77e38b51::t_62584f8fc71e89 399
+CHANGELOG.md
+  s_6772ed77e38b51::t_8373ce3ce438e6 16-22
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/Domain/Holidays/Holiday.cs
+  s_6772ed77e38b51::t_0bb51398d0ae9e 13
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_6772ed77e38b51::t_9f54b0026a1c76 366,372
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "b4a7caf7cc17b75076257660e640c948a8d0ca3e",
+  "prompts": {},
+  "sessions": {
+    "s_6772ed77e38b51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a475595-6638-45f6-9d4b-39e0cc594548",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
