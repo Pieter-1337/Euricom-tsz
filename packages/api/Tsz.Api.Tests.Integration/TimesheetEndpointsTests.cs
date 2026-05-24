@@ -529,6 +529,91 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     }
 
     [Fact]
+    public async Task PutBookings_DayCapacityExceeded_TimeOnly_Returns400()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
+
+        // Per-entry duration is capped at 8h by the validator, so reaching the day cap
+        // with time entries only requires bookings on two different tasks.
+        var contractId2 = Guid.NewGuid();
+        var taskId2 = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var contract = Contract.Create(2, "Engagement 2", customerId, null,
+                new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31));
+            contract.Id = contractId2;
+            contract.ReplaceConsultants([userId]);
+            contract.ApplyTasks([new UpdateContractTaskDto(null, "Support", 100m)], DateTimeOffset.UtcNow);
+            uow.RepositoryFor<Contract>().Add(contract);
+            await uow.SaveChangesAsync();
+            var saved = await uow.RepositoryFor<Contract>().GetByIdAsync(contractId2);
+            taskId2 = saved!.Tasks.First().Id;
+        });
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = new[]
+                {
+                    new { contractTaskId = taskId, date = "2026-05-18", durationHours = 5.00 },
+                    new { contractTaskId = taskId2, date = "2026-05-18", durationHours = 4.00 }
+                },
+                leaveBookings = Array.Empty<object>()
+            });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.DayCapacityExceeded.Code, body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task PutBookings_DayCapacityExceeded_TimePlusLeave_Returns400()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
+        await SeedUserLeaveAsync(userId, VerlofId, 5m);
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 6.00 } },
+                leaveBookings = new[] { new { leaveTypeId = VerlofId, date = "2026-05-18", durationHours = 4.00 } }
+            });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(Json);
+        Assert.Equal(TimesheetErrors.DayCapacityExceeded.Code, body.GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task PutBookings_ExactlyAtCap_Returns200()
+    {
+        var userId = await SeedUserAsync(UserRole.User);
+        var customerId = await SeedCustomerAsync();
+        var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
+        await SeedUserLeaveAsync(userId, VerlofId, 5m);
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new
+            {
+                timeEntries = new[] { new { contractTaskId = taskId, date = "2026-05-18", durationHours = 4.00 } },
+                leaveBookings = new[] { new { leaveTypeId = VerlofId, date = "2026-05-18", durationHours = 4.00 } }
+            });
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Single(dto.TimeEntries);
+        Assert.Single(dto.LeaveBookings);
+    }
+
+    [Fact]
     public async Task PutLeaveBookings_OverAllowance_Returns400LeaveAllowanceExceeded()
     {
         var userId = await SeedUserAsync(UserRole.User);

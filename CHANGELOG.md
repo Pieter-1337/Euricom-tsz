@@ -2,6 +2,14 @@
 
 ## 2026-05-24
 
+### Timesheets — day-capacity rule
+
+Saving a timesheet week now blocks when any single day's combined time and leave bookings exceed eight hours. The over-cap day is flagged in red directly in the grid so consultants see the problem before they hit Save.
+
+- Each day-total cell shows `{total}h / 8h max` in red whenever its combined time + leave booking total exceeds eight hours.
+- Clicking Save (or navigating away) with an over-cap day no longer sends a request; the grid surfaces the same "One or more days exceed the daily capacity" message inline.
+- The same rule is enforced on the backend so out-of-band callers cannot bypass it: the bulk save endpoint returns `400` with code `ERR_TIMESHEET_DAY_CAPACITY_EXCEEDED`.
+
 ### Sidebar restructure, timesheet grid UX, and day-capacity design docs
 
 Customers and contracts are now top-level navigation items; admin retains users only. The timesheet week grid gets a UX pass, and the day-capacity rule is captured in CONTEXT.md, the time-entry PRD, and a new ADR (implementation pending).

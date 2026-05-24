@@ -31,8 +31,6 @@ public sealed record ApplyTimesheetWeekBookingsCommand(
 public sealed class ApplyTimesheetWeekBookingsValidator
     : AbstractValidator<ApplyTimesheetWeekBookingsCommand>
 {
-    private const decimal DefaultDayHours = 8m;
-
     public ApplyTimesheetWeekBookingsValidator(
         IUnitOfWork uow,
         IWorkdaysAccessModule workdays,
@@ -181,7 +179,7 @@ public sealed class ApplyTimesheetWeekBookingsValidator
                         .Where(b => b.LeaveTypeId == leaveTypeId)
                         .Sum(b => b.DurationHours);
 
-                    var totalDays = (existingHours + proposedHours) / DefaultDayHours;
+                    var totalDays = (existingHours + proposedHours) / TimesheetWeek.WorkdayCapacity;
 
                     if (totalDays > allowanceDays.Value)
                     {
@@ -221,13 +219,13 @@ public sealed class ApplyTimesheetWeekBookingsHandler(
             repo.Add(week);
         }
 
-        week.ApplyTimeEntries(command.TimeEntries
-            .Select(b => new TimeEntryBookingDto(b.ContractTaskId, b.Date, b.DurationHours))
-            .ToList());
-
-        week.ApplyLeaveBookings(command.LeaveBookings
-            .Select(b => new LeaveBookingDto(b.LeaveTypeId, b.Date, b.DurationHours))
-            .ToList());
+        week.ApplyBookings(
+            command.TimeEntries
+                .Select(b => new TimeEntryBookingDto(b.ContractTaskId, b.Date, b.DurationHours))
+                .ToList(),
+            command.LeaveBookings
+                .Select(b => new LeaveBookingDto(b.LeaveTypeId, b.Date, b.DurationHours))
+                .ToList());
 
         await uow.SaveChangesAsync(ct);
 

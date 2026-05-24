@@ -248,7 +248,7 @@ public class ApplyTimesheetWeekBookingsValidatorTests
     {
         // Other week already has 8h. Allowance = 1 day = 8h. Proposing 0.25h more → over.
         var otherWeek = TimesheetWeek.Create(UserId, Year, Week + 1);
-        otherWeek.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 25), 8.00m)]);
+        otherWeek.ApplyBookings([], [new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 25), 8.00m)]);
 
         var result = await BuildValidator(
                 leaveTypeExists: true,
@@ -265,7 +265,7 @@ public class ApplyTimesheetWeekBookingsValidatorTests
     {
         // Other week has 4h. Allowance = 2 days = 16h. Proposing 8h → total 12h < 16h.
         var otherWeek = TimesheetWeek.Create(UserId, Year, Week + 1);
-        otherWeek.ApplyLeaveBookings([new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 25), 4.00m)]);
+        otherWeek.ApplyBookings([], [new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 25), 4.00m)]);
 
         var result = await BuildValidator(
                 leaveTypeExists: true,

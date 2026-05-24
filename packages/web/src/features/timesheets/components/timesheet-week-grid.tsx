@@ -29,6 +29,13 @@ import {
 } from '#/features/timesheets/server-fns';
 import { parseServerError } from '#/lib/server-error';
 
+/**
+ * Daily working-hours cap. Mirrors backend `TimesheetWeek.WorkdayCapacity`.
+ * Drives the red per-day indicator and the local pre-check in `flush()`.
+ */
+const WORKDAY_CAPACITY = 8;
+const DAY_CAPACITY_ERROR_MESSAGE = 'One or more days exceed the daily capacity.';
+
 type TaskCellKey = `task:${string}:${string}`; // `task:${contractTaskId}:${date}`
 type LeaveCellKey = `leave:${string}:${string}`; // `leave:${leaveTypeId}:${date}`
 type CellKey = TaskCellKey | LeaveCellKey;
@@ -126,6 +133,18 @@ export function TimesheetWeekGrid({
         leaveBookingInputs.push({ leaveTypeId, date, durationHours });
       });
 
+      // Local pre-check: mirror the backend day-capacity invariant. Short-circuit
+      // without a network call so the whole week's save is blocked, not partially applied.
+      const perDay = new Map<string, number>();
+      for (const e of timeEntries) perDay.set(e.date, (perDay.get(e.date) ?? 0) + e.durationHours);
+      for (const b of leaveBookingInputs) perDay.set(b.date, (perDay.get(b.date) ?? 0) + b.durationHours);
+      for (const total of perDay.values()) {
+        if (total > WORKDAY_CAPACITY) {
+          setFlushError(DAY_CAPACITY_ERROR_MESSAGE);
+          return false;
+        }
+      }
+
       await submitTimesheetBookings({
         data: { userId, year, week, timeEntries, leaveBookings: leaveBookingInputs },
       });
@@ -135,6 +154,8 @@ export function TimesheetWeekGrid({
       const apiErr = parseServerError(e);
       if (apiErr?.problem?.code === 'ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED') {
         setFlushError(apiErr.problem.detail ?? 'Leave allowance exceeded.');
+      } else if (apiErr?.problem?.code === 'ERR_TIMESHEET_DAY_CAPACITY_EXCEEDED') {
+        setFlushError(apiErr.problem.detail ?? DAY_CAPACITY_ERROR_MESSAGE);
       } else {
         setFlushError(apiErr?.problem?.detail ?? 'Could not save changes — please try again');
       }
@@ -509,7 +530,10 @@ export function TimesheetWeekGrid({
           <tbody>
             {!hasRows && (
               <tr>
-                <td colSpan={isDraft ? 10 : 9} className="px-4 py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
+                <td
+                  colSpan={isDraft ? 10 : 9}
+                  className="px-4 py-8 text-center text-sm text-[#6B7682] dark:text-white/40"
+                >
                   No tasks added. Use the buttons below to add a task or leave row.
                 </td>
               </tr>
@@ -692,12 +716,17 @@ export function TimesheetWeekGrid({
               </td>
               {days.map((d) => {
                 const total = dayTotals.get(d.date) ?? 0;
+                const overCap = total > WORKDAY_CAPACITY;
                 return (
                   <td
                     key={d.date}
-                    className="px-2 py-2 text-center font-semibold text-sm text-[#3A4651] dark:text-white/80"
+                    className={cn(
+                      'px-2 py-2 text-center font-semibold text-sm',
+                      overCap ? 'text-red-600 dark:text-red-400' : 'text-[#3A4651] dark:text-white/80',
+                    )}
+                    data-testid={`day-total-${d.date}`}
                   >
-                    {total > 0 ? total : ''}
+                    {overCap ? `${total}h / ${WORKDAY_CAPACITY}h max` : total > 0 ? total : ''}
                   </td>
                 );
               })}
