@@ -1,0 +1,25 @@
+.claude/skills/app-do-work/SKILL.md
+  s_057d5dcbf695aa::t_a5d39f624cd3df 81-85,90-91
+.gitattributes
+  s_057d5dcbf695aa::t_a22df9547c2907 1-8
+.claude/skills/app-do-prd/SKILL.md
+  s_057d5dcbf695aa::t_22a1a243aee11d 73-76,80-84
+CHANGELOG.md
+  s_057d5dcbf695aa::t_01178b5ee2e2be 5-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "02a76773ee14a815b499ad253b38b079fcd44673",
+  "prompts": {},
+  "sessions": {
+    "s_057d5dcbf695aa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f97c48e2-398c-484d-b0d1-76b40c505a89",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
