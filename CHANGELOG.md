@@ -18,6 +18,14 @@ from the Timesheets (submission tracking) view. Key changes:
 
 Internal: update all navigation references, remove unused params in grids.
 
+### feat: consultants can read their own leave allowance
+
+Consultants no longer need admin access to read their own `UserLeave` rows. `GET /users/{userId}/leaves?year=YYYY` now accepts any caller whose authenticated user id matches the route, in addition to admins reading any user. `PUT /users/{userId}/leaves` stays admin-only — consultants cannot grant themselves leave.
+
+Powered by a new reusable `RequireAdminOrSelf` authorization policy that resolves the route's `userId` and compares it to the current user, or short-circuits when the user is in the `Admin` role.
+
+Wire-shape cleanup: `UserLeaveDto` drops the dead `TakenDays` and `BalanceDays` slots that were never populated. The admin user-edit form already hardcodes `—` placeholders in those columns and is unaffected. Consumers computing Taken/Balance now derive them from `LeaveBooking` reads on the frontend.
+
 ### chore: fix worktree line-ending churn and strengthen orchestration contracts
 
 Add `* text=auto eol=lf` to `.gitattributes` to normalize all text files to LF on checkout, preventing fresh worktree creations (with `core.autocrlf=true`) from expanding files to CRLF and leaving ~hundreds of phantom line-ending modifications versus the LF-stored index.

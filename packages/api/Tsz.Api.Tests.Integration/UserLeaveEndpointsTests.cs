@@ -41,6 +41,20 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         await uow.SaveChangesAsync();
     });
 
+    private async Task<Guid> SeedNonAdminWithTestOidAsync()
+    {
+        var userId = Guid.Empty;
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Consultant", "User", $"consultant_{Guid.NewGuid().ToString()[..6]}@example.com", [UserRole.User]);
+            user.LinkEntraOid(AdminOid);
+            uow.RepositoryFor<User>().Add(user);
+            userId = user.Id;
+            await uow.SaveChangesAsync();
+        });
+        return userId;
+    }
+
     /// <summary>
     /// Creates a user + 4 UserLeave rows (one per seeded LeaveType) for the current year.
     /// </summary>
@@ -93,6 +107,38 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var leaves = await response.Content.ReadFromJsonAsync<List<UserLeaveDto>>(Json);
         Assert.NotNull(leaves);
         Assert.Empty(leaves);
+    }
+
+    [Fact]
+    public async Task Get_AsAdmin_AnyUserId_Returns200()
+    {
+        await SeedAdminAsync();
+        var userId = await SeedUserWithCurrentYearLeavesAsync();
+
+        var response = await Client.GetAsync($"/api/users/{userId}/leaves");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_AsSelf_Returns200()
+    {
+        var selfId = await SeedNonAdminWithTestOidAsync();
+
+        var response = await Client.GetAsync($"/api/users/{selfId}/leaves");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_AsOtherNonAdmin_Returns403()
+    {
+        await SeedNonAdminWithTestOidAsync();
+        var otherUserId = Guid.NewGuid();
+
+        var response = await Client.GetAsync($"/api/users/{otherUserId}/leaves");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     // ── PUT (bulk) ───────────────────────────────────────────────────────────
