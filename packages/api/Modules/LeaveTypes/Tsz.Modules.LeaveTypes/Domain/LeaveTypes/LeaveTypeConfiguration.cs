@@ -35,10 +35,10 @@ public class LeaveTypeConfiguration : IEntityTypeConfiguration<LeaveType>
         builder.Ignore(lt => lt.DeletedAt);
 
         builder.HasData(
-            new { Id = VerlofId,       Name = "Verlof",        DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)20m  },
-            new { Id = AdvId,          Name = "ADV dagen",     DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)5m   },
-            new { Id = AncienniteitId, Name = "Anciënniteit",  DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)0m   },
-            new { Id = ZiekteId,       Name = "Ziekte",        DefaultAllowed = LeaveAllowed.Unlimited, DefaultDays = (decimal?)null }
+            new { Id = VerlofId,       Name = "Annual leave",   DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)20m  },
+            new { Id = AdvId,          Name = "ADV days",       DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)5m   },
+            new { Id = AncienniteitId, Name = "Seniority leave", DefaultAllowed = LeaveAllowed.Limited,   DefaultDays = (decimal?)0m   },
+            new { Id = ZiekteId,       Name = "Sick leave",     DefaultAllowed = LeaveAllowed.Unlimited, DefaultDays = (decimal?)null }
         );
     }
 }

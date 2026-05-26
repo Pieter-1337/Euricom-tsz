@@ -23,8 +23,8 @@ internal static class TimesheetWeekDtoBuilder
             .Select(i => DateOnly.FromDateTime(weekStart.AddDays(i)))
             .ToArray();
 
-        var businessDayChecks = await Task.WhenAll(days.Select(d => workdays.IsBusinessDay(d, ct)));
-        var dayInfos = days.Select((d, i) => new DayInfoDto(d, businessDayChecks[i])).ToList();
+        var dayKinds = await workdays.GetDayKindsAsync(days, ct);
+        var dayInfos = dayKinds.Select(dk => new DayInfoDto(dk.Date, dk.IsBusinessDay, dk.HolidayName)).ToList();
 
         var contractTaskIds = week.Entries.Select(e => e.ContractTaskId).Distinct().ToList();
         var displayInfo = contractTaskIds.Count > 0

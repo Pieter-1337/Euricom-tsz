@@ -31,6 +31,18 @@ public class HolidayConfiguration : IEntityTypeConfiguration<Holiday>
 
         return
         [
+            // 2025
+            Seed("a0000001-0000-0000-0000-000000000000", new DateOnly(2025, 1, 1),  "New Year's Day",        be, h),
+            Seed("a0000002-0000-0000-0000-000000000000", new DateOnly(2025, 4, 21), "Easter Monday",         be, h),
+            Seed("a0000003-0000-0000-0000-000000000000", new DateOnly(2025, 5, 1),  "Labour Day",            be, h),
+            Seed("a0000004-0000-0000-0000-000000000000", new DateOnly(2025, 5, 29), "Ascension Day",         be, h),
+            Seed("a0000005-0000-0000-0000-000000000000", new DateOnly(2025, 6, 9),  "Whit Monday",           be, h),
+            Seed("a0000006-0000-0000-0000-000000000000", new DateOnly(2025, 7, 21), "Belgian National Day",  be, h),
+            Seed("a0000007-0000-0000-0000-000000000000", new DateOnly(2025, 8, 15), "Assumption of Mary",    be, h),
+            Seed("a0000008-0000-0000-0000-000000000000", new DateOnly(2025, 11, 1), "All Saints' Day",       be, h),
+            Seed("a0000009-0000-0000-0000-000000000000", new DateOnly(2025, 11, 11),"Armistice Day",         be, h),
+            Seed("a0000010-0000-0000-0000-000000000000", new DateOnly(2025, 12, 25),"Christmas Day",         be, h),
+
             // 2026
             Seed("a1000001-0000-0000-0000-000000000000", new DateOnly(2026, 1, 1),  "New Year's Day",        be, h),
             Seed("a1000002-0000-0000-0000-000000000000", new DateOnly(2026, 4, 6),  "Easter Monday",         be, h),

@@ -36,9 +36,8 @@ public sealed class GetTimesheetWeekHandler(
             .Select(i => DateOnly.FromDateTime(weekStart.AddDays(i)))
             .ToArray();
 
-        var businessDayChecks = await Task.WhenAll(
-            days.Select(d => workdays.IsBusinessDay(d, ct)));
-        var dayInfos = days.Select((d, i) => new DayInfoDto(d, businessDayChecks[i])).ToList();
+        var dayKinds = await workdays.GetDayKindsAsync(days, ct);
+        var dayInfos = dayKinds.Select(dk => new DayInfoDto(dk.Date, dk.IsBusinessDay, dk.HolidayName)).ToList();
 
         if (week is null)
             return TimesheetWeekDto.EmptyDraft(query.UserId, query.IsoYear, query.IsoWeek, dayInfos);
@@ -82,7 +81,7 @@ public sealed record LeaveBookingEntryDto(
     DateOnly Date,
     decimal DurationHours);
 
-public sealed record DayInfoDto(DateOnly Date, bool IsBusinessDay);
+public sealed record DayInfoDto(DateOnly Date, bool IsBusinessDay, string? HolidayName = null);
 
 public sealed record TimesheetWeekDto(
     Guid? Id,

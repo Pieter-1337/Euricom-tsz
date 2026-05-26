@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { TimesheetWeekGrid } from '#/features/timesheets/components/timesheet-week-grid';
+import { TimesheetWeekGrid } from '#/features/timesheets/components/week-grid/timesheet-week-grid';
 import {
   fetchSelectableContractTasks,
   fetchSelectableLeaveTypes,

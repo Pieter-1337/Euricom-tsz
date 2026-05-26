@@ -42,6 +42,10 @@ _Avoid_: WorkWeek, WeekSheet, WeeklyTimesheet
 The month-level read view shown in the FE. NOT a persisted entity — produced by a query handler aggregating bookings across the relevant TimesheetWeeks for a User × month.
 _Avoid_: MonthSheet, MonthlyReport
 
+**Leave Overview**:
+The year-level read view shown in the FE for one User — calendar grid of LeaveBookings + public Holidays, plus a balance panel of UserLeave allowances. NOT a persisted entity AND NOT a backend module — composed FE-side from three independent endpoints owned by `LeaveTypes` (allowance), `Timesheets` (bookings), and `Workdays` (holidays). Sibling to Timesheet in being a view-only domain term.
+_Avoid_: LeaveCalendar, LeaveDashboard, YearSheet
+
 ### Leave catalog
 
 **LeaveType**:
@@ -71,3 +75,4 @@ _Avoid_: DefaultDayHours (implementation name), DailyBudget, DayTotalCap, MaxWor
 - *"time entry" vs "timesheet"* — colloquially overlap. Resolution: **TimeEntry** is one row of booked work; **TimesheetWeek** is the persisted week-level container with a Status; **Timesheet** is the month-level *view* (not persisted). Never persist a "Timesheet" row.
 - *"WeekApproval"* — there is no separate WeekApproval entity. Approval state is a `Status` field on **TimesheetWeek**.
 - *"leave"* alone is ambiguous (catalog vs allowance vs consumption). Use **LeaveType** (catalog), **UserLeave** (allowance), **LeaveBooking** (consumption).
+- *"Feestdag"* — refers to a public **Workdays.Holiday**, NOT a LeaveType. The seed has no `Feestdag` LeaveType (Verlof, ADV dagen, Anciënniteit, Ziekte only). The "Feestdagen" row in the Leave Overview balance panel is FE-synthesized from Holiday counts.

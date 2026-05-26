@@ -34,13 +34,16 @@ public class GetTimesheetMonthHandlerTests
         uow.Setup(u => u.RepositoryFor<TimesheetWeek>()).Returns(repo.Object);
 
         var workdays = new Mock<IWorkdaysAccessModule>();
-        workdays.Setup(w => w.IsBusinessDay(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(isBusinessDay);
-        // Weekends return false regardless of the general flag
-        workdays.Setup(w => w.IsBusinessDay(
-                It.Is<DateOnly>(d => d.DayOfWeek == DayOfWeek.Saturday || d.DayOfWeek == DayOfWeek.Sunday),
+        workdays.Setup(w => w.GetDayKindsAsync(
+                It.IsAny<IReadOnlyCollection<DateOnly>>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+            .ReturnsAsync((IReadOnlyCollection<DateOnly> dates, CancellationToken _) =>
+                (IReadOnlyList<DayKindInfo>)dates.Select(d =>
+                {
+                    var isWeekend = d.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+                    var biz = !isWeekend && isBusinessDay;
+                    return new DayKindInfo(d, biz, null);
+                }).ToList());
 
         var contracts = new Mock<IContractsAccessModule>();
         contracts.Setup(c => c.ExecuteQueryAsync(

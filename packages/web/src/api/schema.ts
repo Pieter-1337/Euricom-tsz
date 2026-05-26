@@ -931,6 +931,7 @@ export interface components {
       /** Format: date */
       date: string;
       isBusinessDay: boolean;
+      holidayName?: string | null;
     };
     SelectableContractTaskDto: {
       /** Format: uuid */
@@ -998,6 +999,7 @@ export interface components {
       /** Format: date */
       date: string;
       isBusinessDay: boolean;
+      holidayName?: string | null;
       timeEntries: components['schemas']['TimesheetMonthTimeEntryDto'][];
       leaveBookings: components['schemas']['TimesheetMonthLeaveBookingDto'][];
       /** Format: double */

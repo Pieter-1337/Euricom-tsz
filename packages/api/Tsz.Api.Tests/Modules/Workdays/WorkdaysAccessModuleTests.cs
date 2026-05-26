@@ -4,6 +4,7 @@ using Shouldly;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
 using Tsz.Modules.Workdays;
+using Tsz.Modules.Workdays.Contracts;
 using Tsz.Modules.Workdays.Domain.Holidays;
 
 namespace Tsz.Api.Tests.Modules.Workdays;
@@ -18,6 +19,21 @@ public class WorkdaysAccessModuleTests
                 It.IsAny<CancellationToken>(),
                 It.IsAny<bool>()))
             .ReturnsAsync(holidayExists);
+
+        var uow = new Mock<IUnitOfWork>();
+        uow.Setup(u => u.RepositoryFor<Holiday>()).Returns(repo.Object);
+        return (uow, repo);
+    }
+
+    private static (Mock<IUnitOfWork> uow, Mock<IRepository<Holiday>> repo) BuildMocksWithHolidays(
+        IEnumerable<Holiday> holidays)
+    {
+        var repo = new Mock<IRepository<Holiday>>();
+        repo.Setup(r => r.GetAllAsListAsync(
+                It.IsAny<Expression<Func<Holiday, bool>>>(),
+                It.IsAny<CancellationToken>(),
+                It.IsAny<bool>()))
+            .ReturnsAsync(holidays.ToList());
 
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<Holiday>()).Returns(repo.Object);
@@ -77,5 +93,49 @@ public class WorkdaysAccessModuleTests
         var result = await module.IsBusinessDay(new DateOnly(2030, 6, 17)); // Far future weekday (Monday)
 
         result.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task GetDayKindsAsync_WeekendDay_IsBusinessDayFalseHolidayNameNull()
+    {
+        var saturday = new DateOnly(2026, 5, 23);
+        var (uow, _) = BuildMocksWithHolidays([]);
+        var module = new WorkdaysAccessModule(uow.Object);
+
+        var result = await module.GetDayKindsAsync([saturday]);
+
+        result.Count.ShouldBe(1);
+        result[0].Date.ShouldBe(saturday);
+        result[0].IsBusinessDay.ShouldBeFalse();
+        result[0].HolidayName.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GetDayKindsAsync_HolidayOnWeekday_IsBusinessDayFalseHolidayNameSet()
+    {
+        var ascensionDay = new DateOnly(2026, 5, 14); // Thursday — Ascension Day 2026
+        var holiday = Holiday.Create(ascensionDay, "Ascension Day", "BE", HolidayType.Public);
+        var (uow, _) = BuildMocksWithHolidays([holiday]);
+        var module = new WorkdaysAccessModule(uow.Object);
+
+        var result = await module.GetDayKindsAsync([ascensionDay]);
+
+        result.Count.ShouldBe(1);
+        result[0].IsBusinessDay.ShouldBeFalse();
+        result[0].HolidayName.ShouldBe("Ascension Day");
+    }
+
+    [Fact]
+    public async Task GetDayKindsAsync_PlainWeekday_IsBusinessDayTrueHolidayNameNull()
+    {
+        var monday = new DateOnly(2026, 5, 18);
+        var (uow, _) = BuildMocksWithHolidays([]);
+        var module = new WorkdaysAccessModule(uow.Object);
+
+        var result = await module.GetDayKindsAsync([monday]);
+
+        result.Count.ShouldBe(1);
+        result[0].IsBusinessDay.ShouldBeTrue();
+        result[0].HolidayName.ShouldBeNull();
     }
 }

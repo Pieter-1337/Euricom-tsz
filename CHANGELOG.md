@@ -12,6 +12,34 @@ generic "Could not save changes" inline text, and shorten the row picker
 labels to "Add task" / "Add leave". Rename the sidebar entry "Timesheets"
 to "Time Entry". Extract `areMapsEqual` to `lib/utils.ts`.
 
+### refactor: scaffold leave overview foundations and split week grid
+
+Two bundled efforts to prepare for the Leave Overview view:
+
+Backend — Leave Overview groundwork:
+- Rename seeded LeaveType names from Dutch to English (Annual leave,
+  ADV days, Seniority leave, Sick leave) via migration.
+- Seed Belgian 2025 public holidays into the Workdays.Holiday table.
+- Expose `GetDayKindsAsync` on `IWorkdaysAccessModule` returning
+  per-date business-day / holiday metadata in one round-trip, so the
+  FE Leave Overview can render the year calendar without N queries.
+- Update Timesheets handlers and tests to consume the new API.
+
+Frontend — week grid split (no behaviour change):
+- Move `timesheet-week-grid.tsx` into a `week-grid/` subfolder and
+  break the 823-line file into an orchestrator plus focused parts:
+  `week-actions-bar`, `week-table`, `booking-row`, `add-row-popover`,
+  and hooks `use-week-bookings` / `use-week-flush`.
+- Collapse duplicated task / leave row + popover structure into one
+  generic component parametrised by `variant`.
+- Existing spec passes unchanged.
+
+Docs:
+- Add Leave Overview term to CONTEXT.md (FE-composed view, not a
+  persisted entity; sibling to Timesheet).
+- Capture rationale that "Feestdag" is a Workdays.Holiday, not a
+  LeaveType — the balance panel row is FE-synthesized.
+
 ## 2026-05-24
 
 ### Timesheets — day-capacity rule

@@ -72,17 +72,15 @@ public sealed class GetTimesheetMonthHandler(
             .Select(i => firstDay.AddDays(i))
             .ToArray();
 
-        var businessDayChecksTask = Task.WhenAll(allDays.Select(d => workdays.IsBusinessDay(d, ct)));
+        var dayKindsTask = workdays.GetDayKindsAsync(allDays, ct);
 
-        await Task.WhenAll(displayInfoTask, leaveTypesTask, businessDayChecksTask);
+        await Task.WhenAll(displayInfoTask, leaveTypesTask, dayKindsTask);
 
         var infoById = displayInfoTask.Result.ToDictionary(d => d.ContractTaskId);
         var leaveTypeById = leaveTypesTask.Result.ToDictionary(lt => lt.Id);
-        var businessDayByDate = allDays
-            .Zip(businessDayChecksTask.Result, (d, isBiz) => (d, isBiz))
-            .ToDictionary(x => x.d, x => x.isBiz);
+        var dayKindByDate = dayKindsTask.Result.ToDictionary(dk => dk.Date);
 
-        var weekDtos = BuildWeekDtos(weeks, firstDay, lastDay, infoById, leaveTypeById, businessDayByDate);
+        var weekDtos = BuildWeekDtos(weeks, firstDay, lastDay, infoById, leaveTypeById, dayKindByDate);
 
         var monthTotalHours = weekDtos.Sum(w => w.Days.Sum(d => d.TotalHours));
 
@@ -100,7 +98,7 @@ public sealed class GetTimesheetMonthHandler(
         DateOnly lastDay,
         Dictionary<Guid, ContractTaskDisplayInfoDto> infoById,
         Dictionary<Guid, ActiveLeaveTypeDto> leaveTypeById,
-        Dictionary<DateOnly, bool> businessDayByDate)
+        Dictionary<DateOnly, DayKindInfo> dayKindByDate)
     {
         return weeks.Select(week =>
         {
@@ -109,7 +107,9 @@ public sealed class GetTimesheetMonthHandler(
 
             var dayDtos = weekDays.Select(day =>
             {
-                var isBusinessDay = businessDayByDate.TryGetValue(day, out var biz) ? biz : (day.DayOfWeek != DayOfWeek.Saturday && day.DayOfWeek != DayOfWeek.Sunday);
+                var dayKind = dayKindByDate.GetValueOrDefault(day);
+                var isBusinessDay = dayKind?.IsBusinessDay ?? (day.DayOfWeek != DayOfWeek.Saturday && day.DayOfWeek != DayOfWeek.Sunday);
+                var holidayName = dayKind?.HolidayName;
 
                 var timeEntries = week.Entries
                     .Where(e => e.Date == day)
@@ -142,6 +142,7 @@ public sealed class GetTimesheetMonthHandler(
                 return new TimesheetMonthDayDto(
                     Date: day,
                     IsBusinessDay: isBusinessDay,
+                    HolidayName: holidayName,
                     TimeEntries: timeEntries,
                     LeaveBookings: leaveBookings,
                     TotalHours: totalHours);
@@ -199,6 +200,7 @@ public sealed record TimesheetMonthWeekDto(
 public sealed record TimesheetMonthDayDto(
     DateOnly Date,
     bool IsBusinessDay,
+    string? HolidayName,
     IReadOnlyList<TimesheetMonthTimeEntryDto> TimeEntries,
     IReadOnlyList<TimesheetMonthLeaveBookingDto> LeaveBookings,
     decimal TotalHours);

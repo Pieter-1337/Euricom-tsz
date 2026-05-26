@@ -13,5 +13,9 @@
     <Project Path="packages/api/Modules/Customers/Tsz.Modules.Customers.Contracts/Tsz.Modules.Customers.Contracts.csproj" />
     <Project Path="packages/api/Modules/Contracts/Tsz.Modules.Contracts/Tsz.Modules.Contracts.csproj" />
     <Project Path="packages/api/Modules/Contracts/Tsz.Modules.Contracts.Contracts/Tsz.Modules.Contracts.Contracts.csproj" />
+    <Project Path="packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Tsz.Modules.LeaveTypes.csproj" />
+    <Project Path="packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes.Contracts/Tsz.Modules.LeaveTypes.Contracts.csproj" />
+    <Project Path="packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Tsz.Modules.Timesheets.csproj" />
+    <Project Path="packages/api/Modules/Timesheets/Tsz.Modules.Timesheets.Contracts/Tsz.Modules.Timesheets.Contracts.csproj" />
   </Folder>
 </Solution>

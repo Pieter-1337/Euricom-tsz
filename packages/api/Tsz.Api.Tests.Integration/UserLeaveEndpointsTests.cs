@@ -111,7 +111,7 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
             l.Id,
             l.DefaultAllowed == LeaveAllowed.Unlimited ? null : l.TotalDays)).ToList();
         // bump Verlof to 22
-        var verlofItem = updatedItems.First(i => leaves.First(l => l.Id == i.Id).LeaveTypeName == "Verlof");
+        var verlofItem = updatedItems.First(i => leaves.First(l => l.Id == i.Id).LeaveTypeName == "Annual leave");
         updatedItems[updatedItems.IndexOf(verlofItem)] = verlofItem with { TotalDays = 22m };
 
         var body = new UpdateUserLeavesBody(CurrentYear, updatedItems);
@@ -121,13 +121,13 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var result = await putResp.Content.ReadFromJsonAsync<List<UserLeaveDto>>(Json);
         Assert.NotNull(result);
         Assert.Equal(4, result.Count);
-        Assert.Contains(result, r => r.LeaveTypeName == "Verlof" && r.TotalDays == 22m);
+        Assert.Contains(result, r => r.LeaveTypeName == "Annual leave" && r.TotalDays == 22m);
 
         // Subsequent GET reflects change
         var getResp = await Client.GetFromJsonAsync<List<UserLeaveDto>>(
             $"/api/users/{userId}/leaves", Json);
         Assert.NotNull(getResp);
-        Assert.Contains(getResp, r => r.LeaveTypeName == "Verlof" && r.TotalDays == 22m);
+        Assert.Contains(getResp, r => r.LeaveTypeName == "Annual leave" && r.TotalDays == 22m);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var leaves = await Client.GetFromJsonAsync<List<UserLeaveDto>>(
             $"/api/users/{userId}/leaves", Json);
         Assert.NotNull(leaves);
-        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Verlof");
+        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Annual leave");
 
         var body = new UpdateUserLeavesBody(CurrentYear,
             [new UpdateUserLeavesItem(verlofLeave.Id, -1m)]);
@@ -182,7 +182,7 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var leaves = await Client.GetFromJsonAsync<List<UserLeaveDto>>(
             $"/api/users/{userId}/leaves", Json);
         Assert.NotNull(leaves);
-        var ziekteLeave = leaves.First(l => l.LeaveTypeName == "Ziekte");
+        var ziekteLeave = leaves.First(l => l.LeaveTypeName == "Sick leave");
 
         var body = new UpdateUserLeavesBody(CurrentYear,
             [new UpdateUserLeavesItem(ziekteLeave.Id, 5m)]);
@@ -205,7 +205,7 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var leaves = await Client.GetFromJsonAsync<List<UserLeaveDto>>(
             $"/api/users/{userId}/leaves", Json);
         Assert.NotNull(leaves);
-        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Verlof");
+        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Annual leave");
 
         var body = new UpdateUserLeavesBody(CurrentYear,
             [new UpdateUserLeavesItem(verlofLeave.Id, null)]);
@@ -228,7 +228,7 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var leaves = await Client.GetFromJsonAsync<List<UserLeaveDto>>(
             $"/api/users/{userId}/leaves", Json);
         Assert.NotNull(leaves);
-        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Verlof");
+        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Annual leave");
 
         // Use wrong year in body — row won't be found for (Id, UserId, Year=2020)
         var body = new UpdateUserLeavesBody(2020,
@@ -263,7 +263,7 @@ public class UserLeaveEndpointsTests : IntegrationTestBase, IAsyncLifetime
         var leaves = await Client.GetFromJsonAsync<List<UserLeaveDto>>(
             $"/api/users/{userId}/leaves", Json);
         Assert.NotNull(leaves);
-        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Verlof");
+        var verlofLeave = leaves.First(l => l.LeaveTypeName == "Annual leave");
 
         var body = new UpdateUserLeavesBody(CurrentYear,
         [

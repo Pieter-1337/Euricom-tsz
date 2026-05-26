@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tsz.Api.Persistence;
 
@@ -10,9 +11,11 @@ using Tsz.Api.Persistence;
 namespace Tsz.Api.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260526101426_RenameLeaveTypesToEnglish")]
+    partial class RenameLeaveTypesToEnglish
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
@@ -268,86 +271,6 @@ namespace Tsz.Api.Persistence.Migrations
                     b.ToTable("Holidays", (string)null);
 
                     b.HasData(
-                        new
-                        {
-                            Id = new Guid("a0000001-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 1, 1),
-                            Name = "New Year's Day",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000002-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 4, 21),
-                            Name = "Easter Monday",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000003-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 5, 1),
-                            Name = "Labour Day",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000004-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 5, 29),
-                            Name = "Ascension Day",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000005-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 6, 9),
-                            Name = "Whit Monday",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000006-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 7, 21),
-                            Name = "Belgian National Day",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000007-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 8, 15),
-                            Name = "Assumption of Mary",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000008-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 11, 1),
-                            Name = "All Saints' Day",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000009-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 11, 11),
-                            Name = "Armistice Day",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000010-0000-0000-0000-000000000000"),
-                            Country = "BE",
-                            Date = new DateOnly(2025, 12, 25),
-                            Name = "Christmas Day",
-                            Type = 0
-                        },
                         new
                         {
                             Id = new Guid("a1000001-0000-0000-0000-000000000000"),
