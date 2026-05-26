@@ -2,6 +2,38 @@
 
 ## 2026-05-26
 
+### feat: Leave Overview Slice 3 — computeLeaveSummary + useLeaveSummary + retrofit admin form
+
+New folder packages/web/src/features/leaves/ with:
+- computeLeaveSummary pure function: builds Limited/Unlimited rows, synthesized
+  Feestdagen row, and totals (Limited only). Taken = Σ durationHours / 8.
+- useLeaveSummary(userId, year) hook: composes 3 TanStack Query calls
+  (['user-leaves', userId, year], ['leave-bookings', userId, year], ['holidays', year])
+  and returns raw bookings + holidays (for Slice 4 calendar) and computed rows/totals.
+- server-fns.ts wrapping fetchUserLeavesForYear, fetchLeaveBookingsForYear,
+  fetchHolidaysForYear using existing apiClient pattern.
+
+API layer:
+- packages/web/src/api/leaves.ts — re-exports LeaveBookingForYear, HolidayDto types.
+- packages/web/src/api/leaves.server.ts — getLeaveBookingsForYear, getHolidaysForYear
+  calling the Slice 2 endpoints.
+- packages/web/src/api/schema.ts — adds /api/timesheet-weeks/{userId}/leave-bookings
+  and /api/workdays/holidays paths + LeaveBookingForYearDto, HolidayDto, HolidayType
+  schemas. Also adds TimesheetMonth* DTOs that were missing (pre-existing typecheck
+  failures on master from the Slice 2 PR).
+
+Retrofit admin form:
+- LeaveOverviewSection now consumes useLeaveSummary and renders real Taken/Balance
+  values. Synthesized Feestdagen row appears in TableBody. TableFooter shows totals
+  row (Limited only). Form indices unchanged — Feestdagen row is appended after the
+  form-bound leave rows, not spliced in.
+
+Tests (all passing):
+- compute-leave-summary.spec.ts: 8 unit tests covering each AC scenario.
+- use-leave-summary.spec.tsx: 2 hook tests with mocked server fns and QueryClientProvider.
+
+Slice 3 of the Leave Overview PRD (#33). Fixes #36.
+
 ### feat: split Time Entry and Timesheets into separate pages
 
 Reorganize routing and UI to separate the Time Entry (data entry) workflow
