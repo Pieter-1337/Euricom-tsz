@@ -28,7 +28,7 @@ function TimesheetMonthPage() {
 
   return (
     <main>
-      <h1 className="mb-6 text-2xl font-bold">My Timesheet</h1>
+      <h1 className="mb-6 text-2xl font-bold">Time Entry</h1>
       <TimesheetMonthGrid month={monthData ?? emptyMonth} year={year} monthNum={month} userId={userId} />
     </main>
   );

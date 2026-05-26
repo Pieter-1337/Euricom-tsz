@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useRouter } from '@tanstack/react-router';
 import { Calendar, ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { Calendar as CalendarPicker } from '#/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '#/components/ui/popover';
-import { cn } from '#/lib/utils';
+import { areMapsEqual, cn } from '#/lib/utils';
 import type {
   TimesheetWeek,
   SelectableContractTask,
@@ -70,21 +70,30 @@ export function TimesheetWeekGrid({
   const navigate = useNavigate();
   const router = useRouter();
 
-  const [taskBookings, setTaskBookings] = useState<Map<TaskCellKey, number>>(() => {
+  const initialTaskBookings = useMemo(() => {
     const map = new Map<TaskCellKey, number>();
     initialData?.timeEntries?.forEach((e) => {
       map.set(taskCellKey(e.contractTaskId, e.date), e.durationHours);
     });
     return map;
-  });
+  }, [initialData]);
 
-  const [leaveBookings, setLeaveBookings] = useState<Map<LeaveCellKey, number>>(() => {
+  const initialLeaveBookings = useMemo(() => {
     const map = new Map<LeaveCellKey, number>();
     initialData?.leaveBookings?.forEach((e) => {
       map.set(leaveCellKey(e.leaveTypeId, e.date), e.durationHours);
     });
     return map;
-  });
+  }, [initialData]);
+
+  const [taskBookings, setTaskBookings] = useState<Map<TaskCellKey, number>>(() => new Map(initialTaskBookings));
+  const [leaveBookings, setLeaveBookings] = useState<Map<LeaveCellKey, number>>(() => new Map(initialLeaveBookings));
+  const [savedTaskBookings, setSavedTaskBookings] = useState<Map<TaskCellKey, number>>(
+    () => new Map(initialTaskBookings),
+  );
+  const [savedLeaveBookings, setSavedLeaveBookings] = useState<Map<LeaveCellKey, number>>(
+    () => new Map(initialLeaveBookings),
+  );
 
   const [taskRows, setTaskRows] = useState<Array<{ id: string; name: string }>>(() => {
     const seen = new Map<string, string>();
@@ -102,7 +111,6 @@ export function TimesheetWeekGrid({
     return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
   });
 
-  const [isDirty, setIsDirty] = useState(false);
   const [isFlushing, setIsFlushing] = useState(false);
   const [isLifecycleLoading, setIsLifecycleLoading] = useState(false);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
@@ -115,6 +123,9 @@ export function TimesheetWeekGrid({
   const days = initialData?.days ?? [];
   const status = initialData?.status ?? 'Draft';
   const isDraft = status === 'Draft';
+
+  const isDirty =
+    !areMapsEqual(taskBookings, savedTaskBookings) || !areMapsEqual(leaveBookings, savedLeaveBookings);
 
   const flush = useCallback(async (): Promise<boolean> => {
     if (!isDirty || isFlushing) return true;
@@ -148,7 +159,8 @@ export function TimesheetWeekGrid({
       await submitTimesheetBookings({
         data: { userId, year, week, timeEntries, leaveBookings: leaveBookingInputs },
       });
-      setIsDirty(false);
+      setSavedTaskBookings(new Map(taskBookings));
+      setSavedLeaveBookings(new Map(leaveBookings));
       return true;
     } catch (e) {
       const apiErr = parseServerError(e);
@@ -192,7 +204,6 @@ export function TimesheetWeekGrid({
         else next.set(key, value);
         return next;
       });
-      setIsDirty(true);
     },
     [isDraft],
   );
@@ -207,7 +218,6 @@ export function TimesheetWeekGrid({
         else next.set(key, value);
         return next;
       });
-      setIsDirty(true);
     },
     [isDraft],
   );
@@ -307,7 +317,6 @@ export function TimesheetWeekGrid({
       }
       return next;
     });
-    setIsDirty(true);
   };
 
   const removeLeaveRow = (leaveTypeId: string) => {
@@ -319,17 +328,13 @@ export function TimesheetWeekGrid({
       }
       return next;
     });
-    setIsDirty(true);
   };
 
   const handleSubmit = async () => {
     setIsLifecycleLoading(true);
     try {
       const flushed = await flush();
-      if (!flushed) {
-        setFlushError((prev) => prev ?? 'Could not save changes — please try again');
-        return;
-      }
+      if (!flushed) return;
       await submitWeekLifecycle({ data: { userId, year, week } });
       await router.invalidate();
     } catch {
@@ -395,6 +400,8 @@ export function TimesheetWeekGrid({
   const availableLeaveToAdd = selectableLeaveTypes.filter((lt) => !addableLeaveIds.has(lt.id));
 
   const hasRows = taskRows.length > 0 || leaveRows.length > 0;
+  const hasDayCapacityError = Array.from(dayTotals.values()).some((t) => t > WORKDAY_CAPACITY);
+  const errorMessage = hasDayCapacityError ? DAY_CAPACITY_ERROR_MESSAGE : flushError;
 
   return (
     <div className="flex flex-col gap-4">
@@ -444,19 +451,22 @@ export function TimesheetWeekGrid({
         <div className="flex items-center gap-2">
           {isDirty && <span className="text-xs text-amber-500">Unsaved changes</span>}
           {isFlushing && <span className="text-xs text-[#6B7682]">Saving...</span>}
-          {flushError && <span className="text-xs text-red-500">Could not save changes — please try again</span>}
           {isDraft && (
             <Button
               variant="outline"
               size="sm"
-              disabled={!isDirty || isFlushing || isLifecycleLoading}
+              disabled={!isDirty || isFlushing || isLifecycleLoading || hasDayCapacityError}
               onClick={() => void flush()}
             >
               Save
             </Button>
           )}
           {isDraft && (
-            <Button size="sm" disabled={isLifecycleLoading} onClick={() => void handleSubmit()}>
+            <Button
+              size="sm"
+              disabled={isLifecycleLoading || hasDayCapacityError}
+              onClick={() => void handleSubmit()}
+            >
               Submit
             </Button>
           )}
@@ -487,9 +497,9 @@ export function TimesheetWeekGrid({
       )}
 
       {/* Allowance error banner */}
-      {flushError && (
+      {errorMessage && (
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
-          {flushError}
+          {errorMessage}
         </div>
       )}
 
@@ -746,7 +756,7 @@ export function TimesheetWeekGrid({
             <PopoverTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2 text-[13px]">
                 <Plus className="h-4 w-4" />
-                Add task row
+                Add task
               </Button>
             </PopoverTrigger>
             <PopoverContent align="start" className="w-72 p-0">
@@ -780,7 +790,7 @@ export function TimesheetWeekGrid({
                 className="gap-2 text-[13px] text-amber-700 hover:text-amber-800 dark:text-amber-400"
               >
                 <Plus className="h-4 w-4" />
-                Add leave row
+                Add leave
               </Button>
             </PopoverTrigger>
             <PopoverContent align="start" className="w-64 p-0">

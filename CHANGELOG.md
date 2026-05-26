@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-05-26
+
+### refactor: tighten timesheet week grid dirty state and error display
+
+Derive `isDirty` from a saved-bookings snapshot instead of a manual flag,
+so adding a task row then removing it no longer leaves the form dirty.
+Surface the day-capacity error banner immediately (not just after a save
+attempt), disable Save and Submit while a day exceeds the cap, drop the
+generic "Could not save changes" inline text, and shorten the row picker
+labels to "Add task" / "Add leave". Rename the sidebar entry "Timesheets"
+to "Time Entry". Extract `areMapsEqual` to `lib/utils.ts`.
+
 ## 2026-05-24
 
 ### Timesheets — day-capacity rule

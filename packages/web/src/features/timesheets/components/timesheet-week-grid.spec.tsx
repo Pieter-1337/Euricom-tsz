@@ -138,8 +138,8 @@ describe('TimesheetWeekGrid — day capacity', () => {
       />,
     );
 
-    // Add a second task row (Task B) via the "Add task row" popover.
-    fireEvent.click(screen.getByRole('button', { name: /Add task row/i }));
+    // Add a second task row (Task B) via the "Add task" popover.
+    fireEvent.click(screen.getByRole('button', { name: /^Add task$/i }));
     fireEvent.click(screen.getByRole('button', { name: /Task B/i }));
 
     // Now edit TaskB's Monday cell to 4h. The TaskA row exists first; its 5 inputs
