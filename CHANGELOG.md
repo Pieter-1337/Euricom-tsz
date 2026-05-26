@@ -2,6 +2,21 @@
 
 ## 2026-05-26
 
+### feat: refine leave overview, timesheet totals and form field layout
+
+- Count leave bookings in the timesheet month totals so approved leave days
+  are included alongside worked entries (e.g. 9/9 workdays).
+- Render the leave balance totals as a real table footer row so it aligns
+  with the columns, and move the balance panel beside the year calendar.
+- Split leave calendar day cells into equal bands per entry, add hover
+  tooltips listing every entry with its hours, and a pointer cursor.
+- Lay out the admin leave table in even quarter-width columns with uniform
+  row heights (number input cells collapsed to match text rows).
+- Add a shared StaticField so read-only fields keep consistent spacing in
+  the user and customer edit forms.
+- Add a `side` prop to Tooltip and use it for the sidebar collapse button
+  and collapsed nav links.
+
 ### feat: self-service Leave overview page with year grid
 
 Consultants get a new **Leave overview** page (linked in the primary sidebar, visible to everyone) showing their leave year at a glance:

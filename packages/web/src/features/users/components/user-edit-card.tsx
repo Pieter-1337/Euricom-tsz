@@ -3,8 +3,7 @@ import { USER_ROLES, UserRole, type User } from '#/api/users';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
 import { Button } from '#/components/ui/button';
-import { Input } from '#/components/ui/input';
-import { Label } from '#/components/ui/label';
+import { StaticField } from '#/components/form/static-field';
 import { updateUserSchema } from '#/features/users/schemas';
 import { deleteUser, saveUser } from '#/features/users/server-fns';
 
@@ -72,10 +71,7 @@ export function UserEditCard({ user }: { user: User }) {
             }}
             className="grid max-w-md gap-4"
           >
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" value={user.email} disabled />
-            </div>
+            <StaticField id="email" label="Email" value={user.email} />
 
             <form.AppField name="firstName">{(field) => <field.TextField label="First name" />}</form.AppField>
 

@@ -5,8 +5,7 @@ import type { CurrentUser } from '#/server/current-user';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
 import { Button } from '#/components/ui/button';
-import { Input } from '#/components/ui/input';
-import { Label } from '#/components/ui/label';
+import { StaticField } from '#/components/form/static-field';
 import { COUNTRY_OPTIONS } from '#/lib/countries';
 import { UserRole } from '#/api/users';
 import { customerFormSchema, type CustomerFormValues } from '#/features/customers/schemas';
@@ -101,10 +100,7 @@ export function CustomerEditCard({ customer, currentUser }: { customer: Customer
         >
           <section className="grid gap-4">
             <h2 className="text-lg font-semibold">General</h2>
-            <div className="grid gap-2">
-              <Label htmlFor="number">Customer number</Label>
-              <Input id="number" value={customer.number} disabled />
-            </div>
+            <StaticField id="number" label="Customer number" value={customer.number} />
             <form.AppField name="name">{(field) => <field.TextField label="Name" disabled={readOnly} />}</form.AppField>
           </section>
 

@@ -17,6 +17,7 @@ import { UserRole } from '#/api/users';
 import { ThemeToggle } from '#/components/theme-toggle';
 import { Button } from '#/components/ui/button';
 import { Separator } from '#/components/ui/separator';
+import { Tooltip, TooltipProvider } from '#/components/ui/tooltip';
 import { authClient } from '#/lib/auth-client';
 import { cn } from '#/lib/utils';
 import type { SessionUser } from '#/server/auth-functions';
@@ -56,6 +57,7 @@ function ProtectedLayout() {
   }, [collapsed]);
 
   return (
+    <TooltipProvider delayDuration={100} skipDelayDuration={200}>
     <div className="flex min-h-screen flex-col">
       <header className="bg-euri-charcoal flex h-14 flex-shrink-0 items-center justify-between border-b border-white/[0.06] px-5 text-white">
         <div className="flex items-center gap-3">
@@ -97,6 +99,7 @@ function ProtectedLayout() {
         <Main />
       </div>
     </div>
+    </TooltipProvider>
   );
 }
 
@@ -148,30 +151,31 @@ function Sidebar({
           collapsed ? 'flex justify-center px-0 py-2.5' : 'flex justify-end px-3 py-2.5',
         )}
       >
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggle}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-expanded={!collapsed}
-          className={cn(
-            'h-8 gap-2 rounded-lg text-[12px] font-medium shadow-none',
-            'hover:text-euri-charcoal border-black/10 bg-transparent text-[#3A4651] hover:bg-black/[0.04]',
-            'dark:border-white/10 dark:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.04] dark:hover:text-white',
-            'focus-visible:outline-euri-green focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2',
-            collapsed ? 'w-10 px-0' : 'px-2.5',
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="size-3.5" strokeWidth={1.75} />
-          ) : (
-            <>
-              <ChevronLeft className="size-3.5" strokeWidth={1.75} />
-              <span>Collapse</span>
-            </>
-          )}
-        </Button>
+        <Tooltip content={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} side="right">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onToggle}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!collapsed}
+            className={cn(
+              'h-8 gap-2 rounded-lg text-[12px] font-medium shadow-none',
+              'hover:text-euri-charcoal border-black/10 bg-transparent text-[#3A4651] hover:bg-black/[0.04]',
+              'dark:border-white/10 dark:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.04] dark:hover:text-white',
+              'focus-visible:outline-euri-green focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2',
+              collapsed ? 'w-10 px-0' : 'px-2.5',
+            )}
+          >
+            {collapsed ? (
+              <ChevronRight className="size-3.5" strokeWidth={1.75} />
+            ) : (
+              <>
+                <ChevronLeft className="size-3.5" strokeWidth={1.75} />
+                <span>Collapse</span>
+              </>
+            )}
+          </Button>
+        </Tooltip>
       </div>
     </aside>
   );
@@ -192,26 +196,27 @@ function NavLink({
 }) {
   if (collapsed) {
     return (
-      <Link
-        to={to}
-        title={label}
-        activeOptions={exact ? { exact: true } : undefined}
-        className={cn(
-          'group relative grid h-10 w-10 place-items-center rounded-[10px]',
-          'hover:text-euri-charcoal text-[#3A4651] hover:bg-black/[0.04]',
-          'dark:text-white/70 dark:hover:bg-white/[0.04] dark:hover:text-white',
-          'transition-colors duration-[120ms]',
-          'focus-visible:outline-euri-green focus-visible:outline-2 focus-visible:outline-offset-2',
-          '[&.active]:bg-euri-green/10 [&.active]:text-euri-charcoal',
-          'dark:[&.active]:bg-euri-green/[0.08] dark:[&.active]:text-white',
-        )}
-      >
-        <span
-          aria-hidden="true"
-          className="bg-euri-green group-[.active]:block pointer-events-none absolute top-2 -left-3 bottom-2 hidden w-0.5 rounded-sm"
-        />
-        <Icon className="group-[.active]:stroke-euri-green h-[18px] w-[18px] stroke-current" strokeWidth={1.75} />
-      </Link>
+      <Tooltip content={label} side="right">
+        <Link
+          to={to}
+          activeOptions={exact ? { exact: true } : undefined}
+          className={cn(
+            'group relative grid h-10 w-10 place-items-center rounded-[10px]',
+            'hover:text-euri-charcoal text-[#3A4651] hover:bg-black/[0.04]',
+            'dark:text-white/70 dark:hover:bg-white/[0.04] dark:hover:text-white',
+            'transition-colors duration-[120ms]',
+            'focus-visible:outline-euri-green focus-visible:outline-2 focus-visible:outline-offset-2',
+            '[&.active]:bg-euri-green/10 [&.active]:text-euri-charcoal',
+            'dark:[&.active]:bg-euri-green/[0.08] dark:[&.active]:text-white',
+          )}
+        >
+          <span
+            aria-hidden="true"
+            className="bg-euri-green group-[.active]:block pointer-events-none absolute top-2 -left-3 bottom-2 hidden w-0.5 rounded-sm"
+          />
+          <Icon className="group-[.active]:stroke-euri-green h-[18px] w-[18px] stroke-current" strokeWidth={1.75} />
+        </Link>
+      </Tooltip>
     );
   }
   return (

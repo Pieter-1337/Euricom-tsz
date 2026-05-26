@@ -59,25 +59,27 @@ export function LeaveOverviewSection({ userId, leaves }: { userId: string; leave
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Taken</TableHead>
-                <TableHead>Balance</TableHead>
+                <TableHead className="w-1/4">Name</TableHead>
+                <TableHead className="w-1/4">Total</TableHead>
+                <TableHead className="w-1/4">Taken</TableHead>
+                <TableHead className="w-1/4">Balance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {leaves.map((l, i) => {
                 const row = summaryByLeaveTypeId.get(l.leaveTypeId);
                 return (
-                  <TableRow key={l.id}>
+                  <TableRow key={l.id} className="h-14">
                     <TableCell>{l.leaveTypeName}</TableCell>
                     <TableCell>
                       {l.defaultAllowed === LeaveAllowed.Unlimited ? (
                         <span className="text-muted-foreground">Unlimited</span>
                       ) : (
-                        <form.AppField name={`items[${i}].totalDays`}>
-                          {(field) => <field.NumberField label="" min={0} />}
-                        </form.AppField>
+                        <div className="w-28 [&_label]:sr-only [&_p]:hidden">
+                          <form.AppField name={`items[${i}].totalDays`}>
+                            {(field) => <field.NumberField label="" min={0} />}
+                          </form.AppField>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>
@@ -90,7 +92,7 @@ export function LeaveOverviewSection({ userId, leaves }: { userId: string; leave
                 );
               })}
               {feestdagenRow && (
-                <TableRow>
+                <TableRow className="h-14">
                   <TableCell>{feestdagenRow.name}</TableCell>
                   <TableCell>
                     <DisplayCell value={feestdagenRow.total} />

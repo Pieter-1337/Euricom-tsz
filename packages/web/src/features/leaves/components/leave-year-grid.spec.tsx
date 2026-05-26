@@ -107,42 +107,47 @@ describe('LeaveYearGrid', () => {
     expect(coloured).not.toBeNull();
   });
 
-  it('renders top/bottom split for 2-type day', () => {
+  const COLOR_SELECTOR =
+    '[class*="bg-amber-"], [class*="bg-blue-"], [class*="bg-violet-"], [class*="bg-rose-"], [class*="bg-cyan-"], [class*="bg-orange-"], [class*="bg-indigo-"], [class*="bg-teal-"]';
+
+  it('splits the cell into equal halves on a 2-entry day', () => {
     const bookings = [
-      makeBooking('2026-04-20', LT_A, 'Verlof', 8),
-      makeBooking('2026-04-20', LT_B, 'ADV', 8),
+      makeBooking('2026-04-20', LT_A, 'Verlof', 4),
+      makeBooking('2026-04-20', LT_B, 'ADV', 4),
     ];
 
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={bookings} holidays={[]} />);
 
-    // The split day cell has 2 half-height divs
-    const halfDivs = container.querySelectorAll('.h-1\\/2');
-    expect(halfDivs.length).toBeGreaterThanOrEqual(2);
+    // Two entries → two 50%-height coloured bands.
+    const segments = Array.from(container.querySelectorAll<HTMLElement>(COLOR_SELECTOR));
+    const halves = segments.filter((el) => el.style.height === '50%');
+    expect(halves.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('renders hatched pattern for 3+ type day', () => {
+  it('renders a segment per type on a 3-type day', () => {
     const LT_C = '00000000-0000-0000-0000-000000000003';
     const bookings = [
-      makeBooking('2026-05-05', LT_A, 'Verlof', 8),
-      makeBooking('2026-05-05', LT_B, 'ADV', 8),
-      makeBooking('2026-05-05', LT_C, 'Sick', 8),
+      makeBooking('2026-05-05', LT_A, 'Verlof', 2),
+      makeBooking('2026-05-05', LT_B, 'ADV', 2),
+      makeBooking('2026-05-05', LT_C, 'Sick', 4),
     ];
 
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={bookings} holidays={[]} />);
 
-    // Hatched cell uses inline backgroundImage with repeating-linear-gradient
-    const hatchedEl = container.querySelector('[style*="repeating-linear-gradient"]');
-    expect(hatchedEl).not.toBeNull();
+    const segments = container.querySelectorAll(COLOR_SELECTOR);
+    expect(segments.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('renders half-day visual modifier for bookings < 8 hours', () => {
+  it('fills the whole cell for a single booking regardless of hours', () => {
     const bookings = [makeBooking('2026-07-06', LT_A, 'Verlof', 4)];
 
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={bookings} holidays={[]} />);
 
-    // Half-day rendering adds bg-white/30 overlay div
-    const halfOverlay = container.querySelector('.bg-white\\/30');
-    expect(halfOverlay).not.toBeNull();
+    // One entry → one full-height band (no hours-based back-fill / overlay).
+    const segment = container.querySelector<HTMLElement>(COLOR_SELECTOR);
+    expect(segment).not.toBeNull();
+    expect(segment?.style.height).toBe('100%');
+    expect(container.querySelector('.bg-white\\/30')).toBeNull();
   });
 
   it('click target link navigates to correct ISO week URL for 2026-01-05 (W02)', () => {
@@ -160,12 +165,13 @@ describe('LeaveYearGrid', () => {
     expect(weekLinks.length).toBeGreaterThan(0);
   });
 
-  it('holiday cells have a title attribute with the holiday name', () => {
+  it('shades holiday cells that have no booking', () => {
     const holidays = [makeHoliday('2026-01-01', 'Nieuwjaar')];
 
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={[]} holidays={holidays} />);
 
-    const holidayLink = container.querySelector('[title="Nieuwjaar"]');
-    expect(holidayLink).not.toBeNull();
+    // Holiday name is surfaced via the hover tooltip; the cell itself is shaded.
+    const shaded = container.querySelector('[class*="3A4651"]');
+    expect(shaded).not.toBeNull();
   });
 });

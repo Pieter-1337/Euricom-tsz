@@ -242,21 +242,25 @@ function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
     .length;
 
   const approvedWeeks = monthData.weeks.filter((w) => w.status === 'Approved');
-  const customerHours = new Map<string, number>();
+  const breakdownHours = new Map<string, number>();
   let approvedTotalHours = 0;
 
   for (const week of approvedWeeks) {
     for (const day of week.days) {
       for (const entry of day.timeEntries) {
         const cust = entry.customerName || 'Unknown';
-        customerHours.set(cust, (customerHours.get(cust) ?? 0) + entry.durationHours);
+        breakdownHours.set(cust, (breakdownHours.get(cust) ?? 0) + entry.durationHours);
         approvedTotalHours += entry.durationHours;
+      }
+      for (const leave of day.leaveBookings) {
+        breakdownHours.set(leave.leaveTypeName, (breakdownHours.get(leave.leaveTypeName) ?? 0) + leave.durationHours);
+        approvedTotalHours += leave.durationHours;
       }
     }
   }
 
   const approvedDays = Math.round((approvedTotalHours / 8) * 10) / 10;
-  const customerRows = Array.from(customerHours.entries()).sort((a, b) => b[1] - a[1]);
+  const customerRows = Array.from(breakdownHours.entries()).sort((a, b) => b[1] - a[1]);
 
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">

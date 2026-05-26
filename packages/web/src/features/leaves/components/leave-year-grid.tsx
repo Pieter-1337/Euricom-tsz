@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { cn } from '#/lib/utils';
+import { Tooltip, TooltipProvider } from '#/components/ui/tooltip';
 import { dateToIsoWeek, formatIsoDate } from '#/features/timesheets/iso-week';
 import { useLeaveColors } from '#/features/leaves/use-leave-colors';
 import type { LeaveBookingForYear, HolidayDto } from '#/api/leaves';
@@ -65,38 +66,24 @@ function buildMonthCells(
   return cells;
 }
 
-interface BookingDisplay {
-  leaveTypeId: string;
-  leaveTypeName: string;
-  isHalfDay: boolean;
+interface DaySegment {
+  key: string;
+  bg: string;
+  heightPct: number;
 }
 
-function classifyDay(bookings: LeaveBookingForYear[]): {
-  type: 'none' | 'single' | 'split' | 'multi';
-  displays: BookingDisplay[];
-} {
-  if (bookings.length === 0) return { type: 'none', displays: [] };
-
-  // Sort by (leaveTypeId) for deterministic ordering
+function buildSegments(
+  bookings: LeaveBookingForYear[],
+  colorMap: Map<string, { bg: string; text: string }>,
+): DaySegment[] {
+  // Deterministic order; the cell is split into equal bands, one per entry
+  // (1 entry fills the block, 2 → halves, 3 → thirds, …).
   const sorted = [...bookings].sort((a, b) => a.leaveTypeId.localeCompare(b.leaveTypeId));
-
-  // De-duplicate by leaveTypeId, keeping first booking per type
-  const seen = new Set<string>();
-  const unique: BookingDisplay[] = [];
-  for (const b of sorted) {
-    if (!seen.has(b.leaveTypeId)) {
-      seen.add(b.leaveTypeId);
-      unique.push({
-        leaveTypeId: b.leaveTypeId,
-        leaveTypeName: b.leaveTypeName,
-        isHalfDay: b.durationHours < 8,
-      });
-    }
-  }
-
-  if (unique.length === 1) return { type: 'single', displays: unique };
-  if (unique.length === 2) return { type: 'split', displays: unique };
-  return { type: 'multi', displays: unique };
+  return sorted.map((b, i) => ({
+    key: `${b.leaveTypeId}-${i}`,
+    bg: colorMap.get(b.leaveTypeId)?.bg ?? 'bg-amber-500/80',
+    heightPct: 100 / sorted.length,
+  }));
 }
 
 function DayCellContent({
@@ -106,7 +93,8 @@ function DayCellContent({
   cell: DayCellInfo;
   colorMap: Map<string, { bg: string; text: string }>;
 }) {
-  const { type, displays } = classifyDay(cell.bookings);
+  const segments = buildSegments(cell.bookings, colorMap);
+  const hasBookings = segments.length > 0;
   const { year: weekYear, week } = dateToIsoWeek(new Date(cell.isoDate + 'T00:00:00'));
 
   const cellContent = (
@@ -115,8 +103,8 @@ function DayCellContent({
         'relative flex h-full min-h-[32px] flex-col overflow-hidden rounded-sm',
         cell.isToday && 'ring-2 ring-inset ring-[#00FF00]',
         cell.outside && 'opacity-30',
-        cell.isWeekend && type === 'none' && 'bg-black/[0.04] dark:bg-white/[0.04]',
-        cell.isHoliday && type === 'none' && 'bg-[#3A4651]/20 dark:bg-white/[0.08]',
+        cell.isWeekend && !hasBookings && 'bg-black/[0.04] dark:bg-white/[0.04]',
+        cell.isHoliday && !hasBookings && 'bg-[#3A4651]/20 dark:bg-white/[0.08]',
       )}
     >
       <span
@@ -128,61 +116,46 @@ function DayCellContent({
         {cell.dayNumber}
       </span>
 
-      {type === 'single' && displays[0] && (
-        <div
-          className={cn(
-            'h-full w-full',
-            colorMap.get(displays[0].leaveTypeId)?.bg ?? 'bg-amber-500/80',
-          )}
-        >
-          {displays[0].isHalfDay && (
-            <div className="h-1/2 w-full bg-white/30" />
-          )}
-        </div>
-      )}
-
-      {type === 'split' && displays[0] && displays[1] && (
-        <>
-          <div
-            className={cn(
-              'h-1/2 w-full',
-              colorMap.get(displays[0].leaveTypeId)?.bg ?? 'bg-amber-500/80',
-            )}
-          />
-          <div
-            className={cn(
-              'h-1/2 w-full',
-              colorMap.get(displays[1].leaveTypeId)?.bg ?? 'bg-blue-500/80',
-            )}
-          />
-        </>
-      )}
-
-      {type === 'multi' && (
-        <div
-          className="h-full w-full"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, rgba(100,100,100,0.3) 0px, rgba(100,100,100,0.3) 3px, transparent 3px, transparent 9px)',
-          }}
-        />
-      )}
+      {segments.map((s) => (
+        <div key={s.key} className={cn('w-full', s.bg)} style={{ height: `${s.heightPct}%` }} />
+      ))}
     </div>
   );
 
+  const tooltipLines: string[] = cell.bookings.map(
+    (b) => `${b.leaveTypeName} (${b.durationHours}h)`,
+  );
+  if (cell.isHoliday) tooltipLines.push(cell.holidayName ?? 'Holiday');
+
   // Cells are clickable — navigate to the week containing this date
-  return (
+  const link = (
     <Link
       to="/time-entry/week/$year/$week"
       params={{ year: String(weekYear), week: String(week) }}
-      title={cell.isHoliday ? (cell.holidayName ?? 'Holiday') : undefined}
       className={cn(
-        'block h-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#00FF00]',
-        'rounded-sm',
+        'block h-full cursor-pointer rounded-sm',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#00FF00]',
       )}
       aria-label={`Week ${week} of ${weekYear}`}
     >
       {cellContent}
     </Link>
+  );
+
+  if (tooltipLines.length === 0) return link;
+
+  return (
+    <Tooltip
+      content={
+        <div className="flex flex-col gap-0.5">
+          {tooltipLines.map((line, i) => (
+            <span key={i}>{line}</span>
+          ))}
+        </div>
+      }
+    >
+      {link}
+    </Tooltip>
   );
 }
 
@@ -258,19 +231,21 @@ export function LeaveYearGrid({ year, bookings, holidays }: LeaveYearGridProps) 
   const colorMap = useLeaveColors(leaveTypeIds);
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-        <MonthGrid
-          key={month}
-          year={year}
-          month={month}
-          bookingsByDate={bookingsByDate}
-          holidayDates={holidayDates}
-          holidayNames={holidayNames}
-          today={today}
-          colorMap={colorMap}
-        />
-      ))}
-    </div>
+    <TooltipProvider delayDuration={100} skipDelayDuration={200}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+          <MonthGrid
+            key={month}
+            year={year}
+            month={month}
+            bookingsByDate={bookingsByDate}
+            holidayDates={holidayDates}
+            holidayNames={holidayNames}
+            today={today}
+            colorMap={colorMap}
+          />
+        ))}
+      </div>
+    </TooltipProvider>
   );
 }

@@ -1,5 +1,5 @@
 import { cn } from '#/lib/utils';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import type { LeaveSummaryResult, DisplayValue } from '#/features/leaves/compute-leave-summary';
 
@@ -66,15 +66,15 @@ export function LeaveBalancePanel({ summary }: LeaveBalancePanelProps) {
             </TableRow>
           ))}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell className="font-semibold">Total (limited)</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">{displayVal(summary.totals.total)}</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">{displayVal(summary.totals.taken)}</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">{displayVal(summary.totals.balance)}</TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
-
-      {/* Totals footer */}
-      <div className="flex items-center border-t border-black/[0.08] px-4 py-3 text-[13px] font-semibold dark:border-white/[0.06]">
-        <span className="flex-1">Total (limited)</span>
-        <span className="w-16 text-right tabular-nums">{displayVal(summary.totals.total)}</span>
-        <span className="w-16 text-right tabular-nums">{displayVal(summary.totals.taken)}</span>
-        <span className="w-16 text-right tabular-nums">{displayVal(summary.totals.balance)}</span>
-      </div>
     </section>
   );
 }

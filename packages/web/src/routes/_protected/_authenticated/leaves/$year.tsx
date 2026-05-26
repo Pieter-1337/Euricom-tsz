@@ -57,9 +57,10 @@ function LeaveOverviewPage() {
         </div>
       )}
 
-      <LeaveYearGrid year={year} bookings={bookings} holidays={holidays} />
-
-      <LeaveBalancePanel summary={summary} />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] lg:items-start">
+        <LeaveYearGrid year={year} bookings={bookings} holidays={holidays} />
+        <LeaveBalancePanel summary={summary} />
+      </div>
     </main>
   );
 }
