@@ -15,7 +15,7 @@ import {
   prevMonth,
   todayMonth,
 } from '#/features/timesheets/iso-week';
-import type { TimesheetMonth, TimesheetMonthDay } from '#/api/timesheets';
+import type { TimesheetMonth, TimesheetMonthDay, TimesheetMonthWeek } from '#/api/timesheets';
 import type { CurrentUser } from '#/server/current-user';
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -233,31 +233,30 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
   );
 }
 
-function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
-  if (!monthData) {
-    return (
-      <section className="rounded-[12px] border border-black/[0.08] bg-white p-5 dark:border-white/[0.06] dark:bg-[#1D252D]">
-        <h2 className="text-base font-semibold">Totals (approved entries)</h2>
-      </section>
-    );
-  }
+interface BreakdownRow {
+  key: string;
+  label: string;
+  hours: number;
+  dot: string;
+}
 
-  const businessDaysInMonth = monthData.weeks
-    .flatMap((w) => w.days)
-    .filter((d) => d.isBusinessDay && d.date.startsWith(`${monthData.year}-${String(monthData.month).padStart(2, '0')}`))
-    .length;
-
-  const approvedWeeks = monthData.weeks.filter((w) => w.status === 'Approved');
+function buildBreakdown(
+  weeks: TimesheetMonthWeek[],
+  monthPrefix: string,
+): { rows: BreakdownRow[]; dayCount: number } {
   const workedHours = new Map<string, number>();
   const leaveHours = new Map<string, { name: string; hours: number }>();
-  let approvedTotalHours = 0;
+  const bookedDays = new Set<string>();
 
-  for (const week of approvedWeeks) {
+  for (const week of weeks) {
     for (const day of week.days) {
+      const hasEntries = day.timeEntries.length > 0 || day.leaveBookings.length > 0;
+      if (day.isBusinessDay && day.date.startsWith(monthPrefix) && hasEntries) {
+        bookedDays.add(day.date);
+      }
       for (const entry of day.timeEntries) {
         const cust = entry.customerName || 'Unknown';
         workedHours.set(cust, (workedHours.get(cust) ?? 0) + entry.durationHours);
-        approvedTotalHours += entry.durationHours;
       }
       for (const leave of day.leaveBookings) {
         const prev = leaveHours.get(leave.leaveTypeId);
@@ -265,44 +264,98 @@ function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
           name: leave.leaveTypeName,
           hours: (prev?.hours ?? 0) + leave.durationHours,
         });
-        approvedTotalHours += leave.durationHours;
       }
     }
   }
 
-  const approvedDays = Math.round((approvedTotalHours / 8) * 10) / 10;
-  const breakdownRows = [
+  const rows = [
     ...Array.from(workedHours, ([name, hours]) => ({ key: `c-${name}`, label: name, hours, dot: 'bg-green-600' })),
     ...Array.from(leaveHours, ([id, v]) => ({ key: `l-${id}`, label: v.name, hours: v.hours, dot: getLeaveColor(id).bg })),
   ].sort((a, b) => b.hours - a.hours);
 
+  return { rows, dayCount: bookedDays.size };
+}
+
+function BreakdownSection({
+  title,
+  rows,
+  days,
+  businessDays,
+}: {
+  title: string;
+  rows: BreakdownRow[];
+  days: number;
+  businessDays: number;
+}) {
+  return (
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6B7682] dark:text-white/40">
+        {title}
+      </p>
+      <div className="mt-2 border-b border-black/[0.06] pb-3 text-center text-sm font-semibold dark:border-white/[0.06]">
+        {days} / {businessDays} workdays
+      </div>
+      <ul className="pt-3 text-sm">
+        {rows.map((row) => (
+          <li key={row.key} className="flex items-center justify-between gap-2 py-1">
+            <span className="flex items-center gap-2 font-medium">
+              <span className={cn('inline-block size-2.5 shrink-0 rounded-sm', row.dot)} aria-hidden="true" />
+              {row.label}
+            </span>
+            <span className="text-[#6B7682] dark:text-white/60">
+              {Math.round(row.hours * 100) / 100}h
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
+  if (!monthData) {
+    return (
+      <section className="rounded-[12px] border border-black/[0.08] bg-white p-5 dark:border-white/[0.06] dark:bg-[#1D252D]">
+        <h2 className="text-base font-semibold">Totals</h2>
+      </section>
+    );
+  }
+
+  const monthPrefix = `${monthData.year}-${String(monthData.month).padStart(2, '0')}`;
+  const businessDaysInMonth = monthData.weeks
+    .flatMap((w) => w.days)
+    .filter((d) => d.isBusinessDay && d.date.startsWith(monthPrefix))
+    .length;
+
+  const approved = buildBreakdown(monthData.weeks.filter((w) => w.status === 'Approved'), monthPrefix);
+  const notApproved = buildBreakdown(monthData.weeks.filter((w) => w.status !== 'Approved'), monthPrefix);
+
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">
       <h2 className="border-b border-black/[0.06] px-5 py-4 text-base font-semibold dark:border-white/[0.06]">
-        Totals (approved entries)
+        Totals
       </h2>
-      <div className="px-5 py-4">
-        <div className="border-b border-black/[0.06] pb-3 text-center text-sm font-semibold dark:border-white/[0.06]">
-          {approvedDays} / {businessDaysInMonth} workdays
-        </div>
-        {breakdownRows.length === 0 ? (
-          <p className="pt-3 text-center text-xs text-[#6B7682] dark:text-white/40">
+      <div className="space-y-5 px-5 py-4">
+        {approved.rows.length === 0 ? (
+          <p className="text-center text-xs text-[#6B7682] dark:text-white/40">
             No approved entries this month.
           </p>
         ) : (
-          <ul className="pt-3 text-sm">
-            {breakdownRows.map((row) => (
-              <li key={row.key} className="flex items-center justify-between gap-2 py-1">
-                <span className="flex items-center gap-2 font-medium">
-                  <span className={cn('inline-block size-2.5 shrink-0 rounded-sm', row.dot)} aria-hidden="true" />
-                  {row.label}
-                </span>
-                <span className="text-[#6B7682] dark:text-white/60">
-                  {Math.round((row.hours / 8) * 10) / 10} days
-                </span>
-              </li>
-            ))}
-          </ul>
+          <BreakdownSection
+            title="Approved"
+            rows={approved.rows}
+            days={approved.dayCount}
+            businessDays={businessDaysInMonth}
+          />
+        )}
+
+        {notApproved.rows.length > 0 && (
+          <BreakdownSection
+            title="Not approved yet"
+            rows={notApproved.rows}
+            days={notApproved.dayCount}
+            businessDays={businessDaysInMonth}
+          />
         )}
       </div>
     </section>

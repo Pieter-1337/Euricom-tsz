@@ -2,6 +2,15 @@
 
 ## 2026-05-26
 
+### feat: split timesheet totals into approved and not-approved sections
+
+- Add a "Not approved yet" section to the Timesheets totals panel below the
+  approved one (built from Submitted + Draft weeks).
+- Count the workdays headline as distinct business days with any booking per
+  status, so Approved + Not approved add up to the booked workdays.
+- Show hours (not days) in the per customer/leave-type breakdown rows to avoid
+  the effort-vs-days confusion.
+
 ### feat: timesheet PDF export, colour-coded entries, Holidays rename
 
 - Add a printable monthly timesheet document (browser print-to-PDF) reached
