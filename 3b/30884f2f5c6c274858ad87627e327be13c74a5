@@ -1,0 +1,38 @@
+packages/web/src/features/timesheets/components/timesheet-print-doc.tsx
+  s_90e6912d908f70::t_e8b8c755d7647b 1
+  s_90e6912d908f70::t_1daca0b7233d95 34-35,38-42,47-57,60-64
+packages/web/src/routes/_protected/_authenticated/timesheets/index.tsx
+  s_90e6912d908f70::t_e8f4b4849cf0a8 48-52
+  s_90e6912d908f70::t_06bf99b1d81010 53-58,68,73,76
+  s_90e6912d908f70::t_362c2db6c52056 375-376,378-380,382-384,386-389,400-401
+  s_90e6912d908f70::t_d485e0056e03c8 459
+  s_90e6912d908f70::t_06929d03959939 461-464
+  s_90e6912d908f70::t_7321049fd24e94 318-324,333,337-365,381,390-399
+  s_90e6912d908f70::t_a212238c8ca55f 12
+  s_90e6912d908f70::t_813bbb145f8d9a 334-335
+  s_90e6912d908f70::t_100d2990240959 373,377
+  s_90e6912d908f70::t_3ed22a392a3b40 8
+  s_90e6912d908f70::t_25d94443beddc6 256,276
+CHANGELOG.md
+  s_90e6912d908f70::t_98f8c006094d59 5-18
+packages/web/src/routes/_protected/_authenticated/timesheets/print/$year/$month.tsx
+  s_90e6912d908f70::t_be4c24396928fa 31,33
+  s_90e6912d908f70::t_54bb9d20088d6f 49
+  s_90e6912d908f70::t_50d4a577f7d316 32,34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3b30884f2f5c6c274858ad87627e327be13c74a5",
+  "prompts": {},
+  "sessions": {
+    "s_90e6912d908f70": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5b0efc3e-0a5b-4816-bd3d-e11932e4e359",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
