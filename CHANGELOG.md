@@ -2,6 +2,21 @@
 
 ## 2026-05-26
 
+### feat: add /app-do-prd orchestrator skill; expand /app-do-work with iterate + reviewer
+
+Split the autonomous workflow into two skills so single-issue runs stay
+clean. `/app-do-prd <PRD>` is the new orchestrator: parses the child
+issues' `## Blocked by` DAG, spawns one worktree-isolated worker per
+ready slice, handles CI-red iterate re-spawns, recovers from failures
+with one diagnostic re-spawn and `--on-failure=continue-siblings` as
+the default. `/app-do-work <issue>` keeps its single-issue surface but
+gains two behaviours: it detects an existing open PR for the issue and
+enters iterate mode (push to the existing branch instead of starting
+fresh), and it runs a `reviewer` sub-agent pass before commit (default
+on, `--reviewer=false` to opt out). Cross-link the three workflow docs
+so the autonomous surface command (`/app-do-prd`) is consistent
+everywhere.
+
 ### docs: document the autonomous PRD-implementation workflow
 
 Add `docs/agents/workflow-autonomous.md` describing the multi-issue

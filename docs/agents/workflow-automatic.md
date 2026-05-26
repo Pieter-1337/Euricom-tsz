@@ -90,6 +90,6 @@ matt-to-issues ──► slice issues ─►───┴─ workflow-autonomous.
 |---|---|---|---|
 | Manual | [workflow-manual.md](./workflow-manual.md) | `/implement` → `/validate` → `/verify` → `/simplify` → `/commit` | Scope unclear, risk high, or you want to control pacing phase-by-phase |
 | Automatic | [workflow-automatic.md](./workflow-automatic.md) | `/app-do-work <issue>` (one issue, linear chain) | Scope captured in an issue and you trust the implementer not to need pacing |
-| Autonomous | [workflow-autonomous.md](./workflow-autonomous.md) | `/app-do-work <PRD>` (orchestrator across slices, worktrees, parallel) | You want to walk away while a whole PRD unwinds |
+| Autonomous | [workflow-autonomous.md](./workflow-autonomous.md) | `/app-do-prd <PRD>` (orchestrator across slices, worktrees, parallel) | You want to walk away while a whole PRD unwinds |
 
 Typical pattern: think with the manual chain, ship with autopilot, return to the manual chain when scope changes.

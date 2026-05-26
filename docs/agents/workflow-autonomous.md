@@ -19,7 +19,7 @@ If any of those aren't true, use [workflow-manual.md](./workflow-manual.md) per 
 Prerequisite: PRD + child issues on the tracker, each with "## Blocked by"
               and a clear scope. (See workflow-manual.md → matt-to-issues.)
 
-  /app-do-work <PRD-ref>
+  /app-do-prd <PRD-ref>
         │
         ├─ fetch PRD + child issues
         ├─ build DAG from each child's "## Blocked by"
@@ -40,20 +40,20 @@ The orchestrator never edits code. Per-issue work happens inside [the linear `/a
 ## Surface
 
 ```
-/app-do-work <target> [--worktrees=auto] [--parallel=true] [--reviewer=true]
-                      [--agent=auto] [--on-failure=continue-siblings]
+/app-do-prd <target> [--worktrees=true] [--parallel=true] [--reviewer=true]
+                     [--agent=auto] [--on-failure=continue-siblings]
 ```
 
 | Parameter | Type | Default | Meaning |
 |---|---|---|---|
-| `target` | issue ref / URL / file path | **required** | A single slice issue OR a PRD (the parent of several slices) |
-| `worktrees` | `auto` / `true` / `false` | `auto` = `true` when target is a multi-issue PRD, else `false` | Isolate each agent in its own git worktree + branch; open one PR per issue |
+| `target` | PRD issue ref / URL | **required** | A PRD (the parent of several slice issues, each referencing it via `## Parent`) |
+| `worktrees` | bool | `true` | Isolate each worker in its own git worktree + branch; open one PR per issue. Disable only when you want the orchestrator to run workers in the current checkout serially |
 | `parallel` | bool | `true` | When the DAG allows it, launch ready issues concurrently |
-| `reviewer` | bool | `true` | Bolt a `reviewer` sub-agent into each issue's commit step (see [Per-issue quality gate](#per-issue-quality-gate)) |
-| `agent` | enum or `auto` | `auto` | Override per-issue agent selection (see [Agent auto-routing](#agent-auto-routing)) |
+| `reviewer` | bool | `true` | Each spawned worker (which runs `/app-do-work`) gets a `reviewer` sub-agent pass before commit. Cascades into the worker (see [Per-issue quality gate](#per-issue-quality-gate)) |
+| `agent` | enum or `auto` | `auto` | Override per-issue agent selection (see [Agent auto-routing](#agent-auto-routing)). Cascades into each worker |
 | `on-failure` | `continue-siblings` / `halt` | `continue-siblings` | What to do when a slice fails after autonomous recovery (see [Failure mode](#failure-mode)) |
 
-`target = single issue` collapses to the linear chain in `workflow-automatic.md`. Everything below applies when `target` is a PRD.
+For single-issue runs, use `/app-do-work <issue>` directly — that's documented in [workflow-automatic.md](./workflow-automatic.md). The orchestrator spawns one such `/app-do-work` invocation per ready slice.
 
 ## How it works internally
 
@@ -263,6 +263,6 @@ matt-to-issues ──► slice issues ─►───┴─ workflow-autonomous.
 |---|---|---|---|
 | Manual | [workflow-manual.md](./workflow-manual.md) | `/implement` → `/validate` → `/verify` → `/simplify` → `/commit` | Scope unclear, risk high, or you want to control pacing phase-by-phase |
 | Automatic | [workflow-automatic.md](./workflow-automatic.md) | `/app-do-work <issue>` (one issue, linear chain) | Scope captured in an issue and you trust the implementer not to need pacing |
-| Autonomous | [workflow-autonomous.md](./workflow-autonomous.md) | `/app-do-work <PRD>` (orchestrator across slices, worktrees, parallel) | You want to walk away while a whole PRD unwinds |
+| Autonomous | [workflow-autonomous.md](./workflow-autonomous.md) | `/app-do-prd <PRD>` (orchestrator across slices, worktrees, parallel) | You want to walk away while a whole PRD unwinds |
 
 Typical pattern: think with the plan-side chain, ship with whichever implement-side mode fits the slice's risk profile. Escalate _toward_ manual when a slice rejects autopilot or scope changes mid-flight; de-escalate _toward_ autonomous as the PRD's remaining slices become well-defined and low-risk.
