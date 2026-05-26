@@ -1,0 +1,51 @@
+packages/web/src/features/timesheets/components/week-grid/use-week-flush.ts
+  s_ffa601bf653c55::t_da86cd60d2043b 11-12
+packages/web/src/features/timesheets/components/week-grid/booking-row.tsx
+  s_ffa601bf653c55::t_5a289073bc87e9 126-127
+  s_ffa601bf653c55::t_620107ffb52a15 39-42
+  s_ffa601bf653c55::t_2aab16acfb6030 96
+  s_ffa601bf653c55::t_e26f49b29cbe1d 144
+  s_ffa601bf653c55::t_70c50e04392ef9 129
+  s_ffa601bf653c55::t_ae7680c8c97ac2 95
+  s_ffa601bf653c55::t_fddcff3909e12f 5-6
+packages/web/src/lib/utils.ts
+  s_ffa601bf653c55::t_317b8bdf44ef95 17-21
+packages/web/src/features/timesheets/components/week-grid/week-table.tsx
+  s_ffa601bf653c55::t_04fffea6c47ad4 1
+  s_ffa601bf653c55::t_b3f3746f93c8e1 161-165
+  s_ffa601bf653c55::t_7a6d83d622e6ff 170
+packages/web/src/features/timesheets/components/week-grid/timesheet-week-grid.spec.tsx
+  s_ffa601bf653c55::t_949fb601273a82 117
+packages/web/src/features/timesheets/components/week-grid/week-actions-bar.tsx
+  s_ffa601bf653c55::t_8b8edb014501dc 39
+  s_ffa601bf653c55::t_ed1ef8f0c81666 101
+  s_ffa601bf653c55::t_f92f449d878e20 108
+  s_ffa601bf653c55::t_4e77b74101ed91 21
+packages/web/src/features/timesheets/iso-week.ts
+  s_ffa601bf653c55::t_9e102c0dd25620 51-53,55-65
+  s_ffa601bf653c55::t_36b3992e3ab8e0 67,70-78
+packages/web/src/features/timesheets/components/week-grid/timesheet-week-grid.tsx
+  s_ffa601bf653c55::t_38cd4a9629aba6 154
+  s_ffa601bf653c55::t_1e34a185afcc77 175-179
+  s_ffa601bf653c55::t_5d42f48ca8c8fe 155
+  s_ffa601bf653c55::t_1cbee52ee3503a 59-61,66-67,70-71
+  s_ffa601bf653c55::t_de00a68cd65788 7-12
+  s_ffa601bf653c55::t_c324b83e27578c 13
+  s_ffa601bf653c55::t_4349fd6fed7c6d 78-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e93b38a15e5f0b0edb55a5e0fb0d4ee15f1c5da9",
+  "prompts": {},
+  "sessions": {
+    "s_ffa601bf653c55": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a91acfe9-5052-4392-9783-d06c4a2451d0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
