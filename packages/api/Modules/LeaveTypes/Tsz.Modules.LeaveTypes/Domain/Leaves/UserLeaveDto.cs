@@ -10,9 +10,7 @@ public sealed record UserLeaveDto(
     string LeaveTypeName,
     LeaveAllowed DefaultAllowed,
     int Year,
-    decimal? TotalDays,
-    decimal? TakenDays,
-    decimal? BalanceDays)
+    decimal? TotalDays)
     : IEntityDto<UserLeave, UserLeaveDto>
 {
     public static Expression<Func<UserLeave, UserLeaveDto>> Project =>
@@ -22,13 +20,11 @@ public sealed record UserLeaveDto(
             string.Empty,
             LeaveAllowed.NotAllowed,
             ul.Year,
-            ul.TotalDays,
-            null,
-            null);
+            ul.TotalDays);
 
     public static UserLeaveDto ToDto(UserLeave entity) =>
-        new(entity.Id, entity.LeaveTypeId, string.Empty, LeaveAllowed.NotAllowed, entity.Year, entity.TotalDays, null, null);
+        new(entity.Id, entity.LeaveTypeId, string.Empty, LeaveAllowed.NotAllowed, entity.Year, entity.TotalDays);
 
     public static UserLeaveDto ToDto(UserLeave entity, string leaveTypeName, LeaveAllowed defaultAllowed) =>
-        new(entity.Id, entity.LeaveTypeId, leaveTypeName, defaultAllowed, entity.Year, entity.TotalDays, null, null);
+        new(entity.Id, entity.LeaveTypeId, leaveTypeName, defaultAllowed, entity.Year, entity.TotalDays);
 }

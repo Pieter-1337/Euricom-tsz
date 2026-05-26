@@ -12,11 +12,9 @@ public static class LeaveTypeEndpoints
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        var adminGroup = app.MapApiGroup("users")
-            .MapGroup("")
-            .RequireAuthorization(AuthorizationPolicies.RequireAdmin);
+        var usersGroup = app.MapApiGroup("users").MapGroup("");
 
-        adminGroup.MapGet("/{userId:guid}/leaves", async (
+        usersGroup.MapGet("/{userId:guid}/leaves", async (
             Guid userId,
             int? year,
             TimeProvider timeProvider,
@@ -25,9 +23,9 @@ public static class LeaveTypeEndpoints
         {
             var resolvedYear = year ?? timeProvider.GetUtcNow().Year;
             return TypedResults.Ok(await dispatcher.SendAsync(new GetUserLeavesQuery(userId, resolvedYear), ct));
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdminOrSelf);
 
-        adminGroup.MapPut("/{userId:guid}/leaves", async Task<Ok<IReadOnlyList<UserLeaveDto>>> (
+        usersGroup.MapPut("/{userId:guid}/leaves", async Task<Ok<IReadOnlyList<UserLeaveDto>>> (
             Guid userId,
             UpdateUserLeavesBody body,
             IDispatcher dispatcher,
@@ -36,6 +34,6 @@ public static class LeaveTypeEndpoints
             var command = new UpdateUserLeavesCommand(userId, body.Year, body.Items);
             var dtos = await dispatcher.SendAsync(command, ct);
             return TypedResults.Ok(dtos);
-        });
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
     }
 }
