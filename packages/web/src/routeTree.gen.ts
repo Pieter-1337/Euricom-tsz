@@ -21,8 +21,10 @@ import { Route as ProtectedAuthenticatedContractsRouteImport } from './routes/_p
 import { Route as ProtectedAuthenticatedAdminRouteImport } from './routes/_protected/_authenticated/admin'
 import { Route as ProtectedAuthenticatedTimesheetsIndexRouteImport } from './routes/_protected/_authenticated/timesheets/index'
 import { Route as ProtectedAuthenticatedTimeEntryIndexRouteImport } from './routes/_protected/_authenticated/time-entry/index'
+import { Route as ProtectedAuthenticatedLeavesIndexRouteImport } from './routes/_protected/_authenticated/leaves/index'
 import { Route as ProtectedAuthenticatedCustomersIndexRouteImport } from './routes/_protected/_authenticated/customers/index'
 import { Route as ProtectedAuthenticatedContractsIndexRouteImport } from './routes/_protected/_authenticated/contracts/index'
+import { Route as ProtectedAuthenticatedLeavesYearRouteImport } from './routes/_protected/_authenticated/leaves/$year'
 import { Route as ProtectedAuthenticatedCustomersNewRouteImport } from './routes/_protected/_authenticated/customers/new'
 import { Route as ProtectedAuthenticatedCustomersIdRouteImport } from './routes/_protected/_authenticated/customers/$id'
 import { Route as ProtectedAuthenticatedContractsNewRouteImport } from './routes/_protected/_authenticated/contracts/new'
@@ -101,6 +103,12 @@ const ProtectedAuthenticatedTimeEntryIndexRoute =
     path: '/',
     getParentRoute: () => ProtectedAuthenticatedTimeEntryRoute,
   } as any)
+const ProtectedAuthenticatedLeavesIndexRoute =
+  ProtectedAuthenticatedLeavesIndexRouteImport.update({
+    id: '/leaves/',
+    path: '/leaves/',
+    getParentRoute: () => ProtectedAuthenticatedRoute,
+  } as any)
 const ProtectedAuthenticatedCustomersIndexRoute =
   ProtectedAuthenticatedCustomersIndexRouteImport.update({
     id: '/',
@@ -112,6 +120,12 @@ const ProtectedAuthenticatedContractsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => ProtectedAuthenticatedContractsRoute,
+  } as any)
+const ProtectedAuthenticatedLeavesYearRoute =
+  ProtectedAuthenticatedLeavesYearRouteImport.update({
+    id: '/leaves/$year',
+    path: '/leaves/$year',
+    getParentRoute: () => ProtectedAuthenticatedRoute,
   } as any)
 const ProtectedAuthenticatedCustomersNewRoute =
   ProtectedAuthenticatedCustomersNewRouteImport.update({
@@ -200,8 +214,10 @@ export interface FileRoutesByFullPath {
   '/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
   '/customers/$id': typeof ProtectedAuthenticatedCustomersIdRoute
   '/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
+  '/leaves/$year': typeof ProtectedAuthenticatedLeavesYearRoute
   '/contracts/': typeof ProtectedAuthenticatedContractsIndexRoute
   '/customers/': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/leaves/': typeof ProtectedAuthenticatedLeavesIndexRoute
   '/time-entry/': typeof ProtectedAuthenticatedTimeEntryIndexRoute
   '/timesheets/': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
@@ -221,8 +237,10 @@ export interface FileRoutesByTo {
   '/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
   '/customers/$id': typeof ProtectedAuthenticatedCustomersIdRoute
   '/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
+  '/leaves/$year': typeof ProtectedAuthenticatedLeavesYearRoute
   '/contracts': typeof ProtectedAuthenticatedContractsIndexRoute
   '/customers': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/leaves': typeof ProtectedAuthenticatedLeavesIndexRoute
   '/time-entry': typeof ProtectedAuthenticatedTimeEntryIndexRoute
   '/timesheets': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
@@ -250,8 +268,10 @@ export interface FileRoutesById {
   '/_protected/_authenticated/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
   '/_protected/_authenticated/customers/$id': typeof ProtectedAuthenticatedCustomersIdRoute
   '/_protected/_authenticated/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
+  '/_protected/_authenticated/leaves/$year': typeof ProtectedAuthenticatedLeavesYearRoute
   '/_protected/_authenticated/contracts/': typeof ProtectedAuthenticatedContractsIndexRoute
   '/_protected/_authenticated/customers/': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/_protected/_authenticated/leaves/': typeof ProtectedAuthenticatedLeavesIndexRoute
   '/_protected/_authenticated/time-entry/': typeof ProtectedAuthenticatedTimeEntryIndexRoute
   '/_protected/_authenticated/timesheets/': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/_protected/_authenticated/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
@@ -278,8 +298,10 @@ export interface FileRouteTypes {
     | '/contracts/new'
     | '/customers/$id'
     | '/customers/new'
+    | '/leaves/$year'
     | '/contracts/'
     | '/customers/'
+    | '/leaves/'
     | '/time-entry/'
     | '/timesheets/'
     | '/admin/users/$id'
@@ -299,8 +321,10 @@ export interface FileRouteTypes {
     | '/contracts/new'
     | '/customers/$id'
     | '/customers/new'
+    | '/leaves/$year'
     | '/contracts'
     | '/customers'
+    | '/leaves'
     | '/time-entry'
     | '/timesheets'
     | '/admin/users/$id'
@@ -327,8 +351,10 @@ export interface FileRouteTypes {
     | '/_protected/_authenticated/contracts/new'
     | '/_protected/_authenticated/customers/$id'
     | '/_protected/_authenticated/customers/new'
+    | '/_protected/_authenticated/leaves/$year'
     | '/_protected/_authenticated/contracts/'
     | '/_protected/_authenticated/customers/'
+    | '/_protected/_authenticated/leaves/'
     | '/_protected/_authenticated/time-entry/'
     | '/_protected/_authenticated/timesheets/'
     | '/_protected/_authenticated/admin/users/$id'
@@ -432,6 +458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryIndexRouteImport
       parentRoute: typeof ProtectedAuthenticatedTimeEntryRoute
     }
+    '/_protected/_authenticated/leaves/': {
+      id: '/_protected/_authenticated/leaves/'
+      path: '/leaves'
+      fullPath: '/leaves/'
+      preLoaderRoute: typeof ProtectedAuthenticatedLeavesIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedRoute
+    }
     '/_protected/_authenticated/customers/': {
       id: '/_protected/_authenticated/customers/'
       path: '/'
@@ -445,6 +478,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/contracts/'
       preLoaderRoute: typeof ProtectedAuthenticatedContractsIndexRouteImport
       parentRoute: typeof ProtectedAuthenticatedContractsRoute
+    }
+    '/_protected/_authenticated/leaves/$year': {
+      id: '/_protected/_authenticated/leaves/$year'
+      path: '/leaves/$year'
+      fullPath: '/leaves/$year'
+      preLoaderRoute: typeof ProtectedAuthenticatedLeavesYearRouteImport
+      parentRoute: typeof ProtectedAuthenticatedRoute
     }
     '/_protected/_authenticated/customers/new': {
       id: '/_protected/_authenticated/customers/new'
@@ -659,6 +699,8 @@ interface ProtectedAuthenticatedRouteChildren {
   ProtectedAuthenticatedCustomersRoute: typeof ProtectedAuthenticatedCustomersRouteWithChildren
   ProtectedAuthenticatedTimeEntryRoute: typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   ProtectedAuthenticatedTimesheetsRoute: typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
+  ProtectedAuthenticatedLeavesYearRoute: typeof ProtectedAuthenticatedLeavesYearRoute
+  ProtectedAuthenticatedLeavesIndexRoute: typeof ProtectedAuthenticatedLeavesIndexRoute
 }
 
 const ProtectedAuthenticatedRouteChildren: ProtectedAuthenticatedRouteChildren =
@@ -673,6 +715,10 @@ const ProtectedAuthenticatedRouteChildren: ProtectedAuthenticatedRouteChildren =
       ProtectedAuthenticatedTimeEntryRouteWithChildren,
     ProtectedAuthenticatedTimesheetsRoute:
       ProtectedAuthenticatedTimesheetsRouteWithChildren,
+    ProtectedAuthenticatedLeavesYearRoute:
+      ProtectedAuthenticatedLeavesYearRoute,
+    ProtectedAuthenticatedLeavesIndexRoute:
+      ProtectedAuthenticatedLeavesIndexRoute,
   }
 
 const ProtectedAuthenticatedRouteWithChildren =

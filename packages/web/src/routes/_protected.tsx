@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router'
 import {
   Building2,
   CalendarDays,
+  CalendarRange,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -134,6 +135,7 @@ function Sidebar({
           <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
           <NavLink to="/time-entry" icon={Clock} label="Time Entry" collapsed={collapsed} />
           <NavLink to="/timesheets" icon={CalendarDays} label="Timesheets" collapsed={collapsed} />
+          <NavLink to="/leaves" icon={CalendarRange} label="Leave overview" collapsed={collapsed} />
           {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />}
