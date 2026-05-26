@@ -797,7 +797,9 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["TimesheetMonthDto"];
+                    };
                 };
             };
         };
@@ -885,6 +887,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/timesheet-weeks/{userId}/leave-bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    year?: number;
+                };
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LeaveBookingForYearDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workdays/holidays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    year?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HolidayDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -894,6 +972,23 @@ export interface components {
             zip: null | string;
             city: null | string;
             country: null | string;
+        };
+        HolidayDto: {
+            /** Format: date */
+            date: string;
+            name: string;
+            type: components["schemas"]["HolidayType"];
+        };
+        /** @enum {unknown} */
+        HolidayType: "Public" | "Bank";
+        LeaveBookingForYearDto: {
+            /** Format: date */
+            date: string;
+            /** Format: uuid */
+            leaveTypeId: string;
+            leaveTypeName: string;
+            /** Format: double */
+            durationHours: number;
         };
         AnonymousTypeOfstringAndstring: {
             name: null | string;
@@ -1067,6 +1162,64 @@ export interface components {
             date: string;
             /** Format: double */
             durationHours: number;
+        };
+        TimesheetMonthDto: {
+            /** Format: uuid */
+            userId: string;
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            month: number;
+            weeks: components["schemas"]["TimesheetMonthWeekDto"][];
+            /** Format: double */
+            monthTotalHours: number;
+        };
+        TimesheetMonthWeekDto: {
+            /** Format: int32 */
+            isoYear: number;
+            /** Format: int32 */
+            isoWeek: number;
+            status: string;
+            days: components["schemas"]["TimesheetMonthDayDto"][];
+            perTaskSummary: components["schemas"]["TimesheetMonthPerTaskSummaryDto"][];
+            perLeaveTypeSummary: components["schemas"]["TimesheetMonthPerLeaveTypeSummaryDto"][];
+        };
+        TimesheetMonthDayDto: {
+            /** Format: date */
+            date: string;
+            isBusinessDay: boolean;
+            holidayName?: null | string;
+            timeEntries: components["schemas"]["TimesheetMonthTimeEntryDto"][];
+            leaveBookings: components["schemas"]["TimesheetMonthLeaveBookingDto"][];
+            /** Format: double */
+            totalHours: number;
+        };
+        TimesheetMonthTimeEntryDto: {
+            /** Format: uuid */
+            taskId: string;
+            taskName: string;
+            contractName: string;
+            customerName: string;
+            /** Format: double */
+            durationHours: number;
+        };
+        TimesheetMonthLeaveBookingDto: {
+            /** Format: uuid */
+            leaveTypeId: string;
+            leaveTypeName: string;
+            /** Format: double */
+            durationHours: number;
+        };
+        TimesheetMonthPerTaskSummaryDto: {
+            contractName: string;
+            taskName: string;
+            /** Format: double */
+            totalHours: number;
+        };
+        TimesheetMonthPerLeaveTypeSummaryDto: {
+            leaveTypeName: string;
+            /** Format: double */
+            totalHours: number;
         };
         TimesheetWeekDto: {
             /** Format: uuid */
