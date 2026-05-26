@@ -2,6 +2,15 @@
 
 ## 2026-05-26
 
+### feat: self-service Leave overview page with year grid
+
+Consultants get a new **Leave overview** page (linked in the primary sidebar, visible to everyone) showing their leave year at a glance:
+
+- A 12-month compact calendar shades weekends, public holidays, and booking days. Each leave type gets a stable colour; half-days render as a partial fill; days with two leave types split top/bottom and three-or-more show a hatched "mixed" cell.
+- Today's cell is highlighted. Clicking any day jumps to that week's Time Entry page.
+- A balance panel lists Total / Taken / Balance per leave type (with `—` for unlimited types), a Feestdagen row, and a Limited-only totals row.
+- Previous / next year navigation is unbounded; a year with no configured leave shows a "No leave configured" banner over an otherwise-working calendar.
+
 ### feat: Leave Overview Slice 3 — computeLeaveSummary + useLeaveSummary + retrofit admin form
 
 New folder packages/web/src/features/leaves/ with:
