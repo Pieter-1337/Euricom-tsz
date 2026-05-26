@@ -1,4 +1,4 @@
-namespace Tsz.Modules.Workdays.Contracts;
+namespace Tsz.Modules.Timesheets.Domain.Holidays;
 
 public enum HolidayType
 {

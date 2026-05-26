@@ -4,7 +4,6 @@ using Tsz.Modules.Customers;
 using Tsz.Modules.LeaveTypes;
 using Tsz.Modules.Timesheets;
 using Tsz.Modules.Users;
-using Tsz.Modules.Workdays;
 
 namespace Tsz.Api.Persistence;
 
@@ -20,7 +19,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomersModule).Assembly);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContractsModule).Assembly);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LeaveTypesModule).Assembly);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(WorkdaysModule).Assembly);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TimesheetsModule).Assembly);
     }
 }

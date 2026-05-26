@@ -2,8 +2,8 @@ using System.Globalization;
 using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
-using Tsz.Modules.Workdays.Contracts;
 
 namespace Tsz.Modules.Timesheets.Features;
 
@@ -13,7 +13,7 @@ internal static class TimesheetWeekDtoBuilder
         TimesheetWeek week,
         int isoYear,
         int isoWeek,
-        IWorkdaysAccessModule workdays,
+        IBusinessDayService businessDayService,
         IContractsAccessModule contracts,
         ILeaveTypesAccessModule leaveTypes,
         CancellationToken ct)
@@ -23,7 +23,7 @@ internal static class TimesheetWeekDtoBuilder
             .Select(i => DateOnly.FromDateTime(weekStart.AddDays(i)))
             .ToArray();
 
-        var dayKinds = await workdays.GetDayKindsAsync(days, ct);
+        var dayKinds = await businessDayService.GetDayKindsAsync(days, ct);
         var dayInfos = dayKinds.Select(dk => new DayInfoDto(dk.Date, dk.IsBusinessDay, dk.HolidayName)).ToList();
 
         var contractTaskIds = week.Entries.Select(e => e.ContractTaskId).Distinct().ToList();

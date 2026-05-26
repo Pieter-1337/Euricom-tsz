@@ -5,8 +5,8 @@ using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.LeaveTypes.Contracts.Queries;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
-using Tsz.Modules.Workdays.Contracts;
 
 namespace Tsz.Modules.Timesheets.Features;
 
@@ -19,7 +19,7 @@ public sealed record GetTimesheetMonthQuery(
 public sealed class GetTimesheetMonthHandler(
     IUnitOfWork uow,
     IContractsAccessModule contracts,
-    IWorkdaysAccessModule workdays,
+    IBusinessDayService businessDayService,
     ILeaveTypesAccessModule leaveTypes)
     : IQueryHandler<GetTimesheetMonthQuery, TimesheetMonthDto>
 {
@@ -72,7 +72,7 @@ public sealed class GetTimesheetMonthHandler(
             .Select(i => firstDay.AddDays(i))
             .ToArray();
 
-        var dayKindsTask = workdays.GetDayKindsAsync(allDays, ct);
+        var dayKindsTask = businessDayService.GetDayKindsAsync(allDays, ct);
 
         await Task.WhenAll(displayInfoTask, leaveTypesTask, dayKindsTask);
 

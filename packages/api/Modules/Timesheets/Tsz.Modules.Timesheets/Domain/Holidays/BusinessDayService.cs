@@ -1,10 +1,8 @@
 using Tsz.Infrastructure.Abstractions;
-using Tsz.Modules.Workdays.Contracts;
-using Tsz.Modules.Workdays.Domain.Holidays;
 
-namespace Tsz.Modules.Workdays;
+namespace Tsz.Modules.Timesheets.Domain.Holidays;
 
-internal sealed class WorkdaysAccessModule(IUnitOfWork uow) : IWorkdaysAccessModule
+internal sealed class BusinessDayService(IUnitOfWork uow) : IBusinessDayService
 {
     public async Task<bool> IsBusinessDay(DateOnly date, CancellationToken ct = default)
     {

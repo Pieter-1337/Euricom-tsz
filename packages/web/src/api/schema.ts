@@ -1148,6 +1148,10 @@ export interface components {
             year: number;
             /** Format: double */
             totalDays: null | number;
+            /** Format: double */
+            takenDays: null | number;
+            /** Format: double */
+            balanceDays: null | number;
         };
         /** @enum {unknown} */
         UserRole: "User" | "Admin" | "ClientManager";

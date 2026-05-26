@@ -3,13 +3,11 @@ using Moq;
 using Shouldly;
 using Tsz.Api.Tests.Builders;
 using Tsz.Infrastructure.Abstractions;
-using Tsz.Modules.Workdays;
-using Tsz.Modules.Workdays.Contracts;
-using Tsz.Modules.Workdays.Domain.Holidays;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 
-namespace Tsz.Api.Tests.Modules.Workdays;
+namespace Tsz.Api.Tests.Modules.Timesheets.Features;
 
-public class WorkdaysAccessModuleTests
+public class BusinessDayServiceTests
 {
     private static (Mock<IUnitOfWork> uow, Mock<IRepository<Holiday>> repo) BuildMocks(bool holidayExists = false)
     {
@@ -47,9 +45,9 @@ public class WorkdaysAccessModuleTests
     public async Task IsBusinessDay_WeekdayWithNoHoliday_ReturnsTrue(int year, int month, int day)
     {
         var (uow, _) = BuildMocks(holidayExists: false);
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.IsBusinessDay(new DateOnly(year, month, day));
+        var result = await service.IsBusinessDay(new DateOnly(year, month, day));
 
         result.ShouldBeTrue();
     }
@@ -62,9 +60,9 @@ public class WorkdaysAccessModuleTests
     public async Task IsBusinessDay_Weekend_ReturnsFalse(int year, int month, int day)
     {
         var (uow, repo) = BuildMocks();
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.IsBusinessDay(new DateOnly(year, month, day));
+        var result = await service.IsBusinessDay(new DateOnly(year, month, day));
 
         result.ShouldBeFalse();
         repo.Verify(r => r.ExistsAsync(
@@ -77,9 +75,9 @@ public class WorkdaysAccessModuleTests
     public async Task IsBusinessDay_BelgianHolidayDate_ReturnsFalse()
     {
         var (uow, _) = BuildMocks(holidayExists: true);
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.IsBusinessDay(new DateOnly(2026, 1, 1)); // New Year
+        var result = await service.IsBusinessDay(new DateOnly(2026, 1, 1)); // New Year
 
         result.ShouldBeFalse();
     }
@@ -88,9 +86,9 @@ public class WorkdaysAccessModuleTests
     public async Task IsBusinessDay_WeekdayWithNoSeedEntry_ReturnsTrue()
     {
         var (uow, _) = BuildMocks(holidayExists: false);
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.IsBusinessDay(new DateOnly(2030, 6, 17)); // Far future weekday (Monday)
+        var result = await service.IsBusinessDay(new DateOnly(2030, 6, 17)); // Far future weekday (Monday)
 
         result.ShouldBeTrue();
     }
@@ -100,9 +98,9 @@ public class WorkdaysAccessModuleTests
     {
         var saturday = new DateOnly(2026, 5, 23);
         var (uow, _) = BuildMocksWithHolidays([]);
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.GetDayKindsAsync([saturday]);
+        var result = await service.GetDayKindsAsync([saturday]);
 
         result.Count.ShouldBe(1);
         result[0].Date.ShouldBe(saturday);
@@ -116,9 +114,9 @@ public class WorkdaysAccessModuleTests
         var ascensionDay = new DateOnly(2026, 5, 14); // Thursday — Ascension Day 2026
         var holiday = Holiday.Create(ascensionDay, "Ascension Day", "BE", HolidayType.Public);
         var (uow, _) = BuildMocksWithHolidays([holiday]);
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.GetDayKindsAsync([ascensionDay]);
+        var result = await service.GetDayKindsAsync([ascensionDay]);
 
         result.Count.ShouldBe(1);
         result[0].IsBusinessDay.ShouldBeFalse();
@@ -130,9 +128,9 @@ public class WorkdaysAccessModuleTests
     {
         var monday = new DateOnly(2026, 5, 18);
         var (uow, _) = BuildMocksWithHolidays([]);
-        var module = new WorkdaysAccessModule(uow.Object);
+        var service = new BusinessDayService(uow.Object);
 
-        var result = await module.GetDayKindsAsync([monday]);
+        var result = await service.GetDayKindsAsync([monday]);
 
         result.Count.ShouldBe(1);
         result[0].IsBusinessDay.ShouldBeTrue();

@@ -4,9 +4,9 @@ using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.LeaveTypes.Contracts.Queries;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Timesheets.Features;
-using Tsz.Modules.Workdays.Contracts;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Tests.Modules.Timesheets.Features;
@@ -33,8 +33,8 @@ public class GetTimesheetMonthHandlerTests
         var uow = new Mock<IUnitOfWork>();
         uow.Setup(u => u.RepositoryFor<TimesheetWeek>()).Returns(repo.Object);
 
-        var workdays = new Mock<IWorkdaysAccessModule>();
-        workdays.Setup(w => w.GetDayKindsAsync(
+        var businessDayService = new Mock<IBusinessDayService>();
+        businessDayService.Setup(w => w.GetDayKindsAsync(
                 It.IsAny<IReadOnlyCollection<DateOnly>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((IReadOnlyCollection<DateOnly> dates, CancellationToken _) =>
@@ -55,7 +55,7 @@ public class GetTimesheetMonthHandlerTests
         leaveTypesModule.Setup(l => l.GetActiveLeaveTypesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(activeLeaveTypes ?? []);
 
-        return new GetTimesheetMonthHandler(uow.Object, contracts.Object, workdays.Object, leaveTypesModule.Object);
+        return new GetTimesheetMonthHandler(uow.Object, contracts.Object, businessDayService.Object, leaveTypesModule.Object);
     }
 
     [Fact]

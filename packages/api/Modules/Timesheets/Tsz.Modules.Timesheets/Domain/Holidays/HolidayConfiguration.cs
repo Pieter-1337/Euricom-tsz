@@ -1,8 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Tsz.Modules.Workdays.Contracts;
 
-namespace Tsz.Modules.Workdays.Domain.Holidays;
+namespace Tsz.Modules.Timesheets.Domain.Holidays;
 
 public class HolidayConfiguration : IEntityTypeConfiguration<Holiday>
 {
