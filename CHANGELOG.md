@@ -2,6 +2,22 @@
 
 ## 2026-05-26
 
+### feat: split Time Entry and Timesheets into separate pages
+
+Reorganize routing and UI to separate the Time Entry (data entry) workflow
+from the Timesheets (submission tracking) view. Key changes:
+
+- Move /timesheets/week/* and /timesheets/month/* → /time-entry/* namespace
+- Create new /timesheets overview page with month calendar, approved totals
+  panel, and submitted timesheets list table
+- Calendar shows days with color-coded entry bars (green/amber/dark), prev/
+  today/next navigation, and approved status indicators
+- Add fast Radix-based tooltip component (100ms delay) replacing slow native
+  browser tooltips
+- Update navbar to reflect distinct routes: Time Entry vs Timesheets
+
+Internal: update all navigation references, remove unused params in grids.
+
 ### chore: fix worktree line-ending churn and strengthen orchestration contracts
 
 Add `* text=auto eol=lf` to `.gitattributes` to normalize all text files to LF on checkout, preventing fresh worktree creations (with `core.autocrlf=true`) from expanding files to CRLF and leaving ~hundreds of phantom line-ending modifications versus the LF-stored index.
