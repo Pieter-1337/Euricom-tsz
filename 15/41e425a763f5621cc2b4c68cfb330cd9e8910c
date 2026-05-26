@@ -1,0 +1,48 @@
+packages/web/src/features/timesheets/components/week-grid/add-row-popover.tsx
+  s_ffa601bf653c55::t_f79fc3e7edab5f 31
+  s_ffa601bf653c55::t_0a77e7cd5bf5b5 44
+CHANGELOG.md
+  s_6849e960e37b83::t_aa1d63ba66c076 93-102
+packages/web/src/features/timesheets/components/week-grid/week-actions-bar.tsx
+  s_ffa601bf653c55::t_30c08e3e99de64 22
+  s_ffa601bf653c55::t_7ae5de41bdb306 41
+  s_ffa601bf653c55::t_ca01a177183646 94
+packages/web/src/features/timesheets/components/week-grid/timesheet-week-grid.tsx
+  s_ffa601bf653c55::t_3bb1c31711a9df 162-189
+  s_ffa601bf653c55::t_358d6174e7aef6 161
+packages/web/src/components/ui/info-tooltip.tsx
+  s_ffa601bf653c55::t_6ec190c871f020 1-39
+packages/web/src/features/timesheets/components/week-grid/booking-row.tsx
+  s_ffa601bf653c55::t_f2c0a852fed420 74,76
+  s_ffa601bf653c55::t_7fdc9444ef14ef 102
+  s_ffa601bf653c55::t_b92b6a70939228 98,109
+  s_ffa601bf653c55::t_0c807570f283d8 99
+  s_ffa601bf653c55::t_da9b75ff8f0278 124
+packages/web/src/features/timesheets/components/week-grid/week-table.tsx
+  s_ffa601bf653c55::t_db73af16f363d2 4
+  s_ffa601bf653c55::t_e5061d735a4184 91-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "1541e425a763f5621cc2b4c68cfb330cd9e8910c",
+  "prompts": {},
+  "sessions": {
+    "s_6849e960e37b83": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f88f28b2-ac9c-4828-9463-58f9d2a0c0cc",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": null
+    },
+    "s_ffa601bf653c55": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a91acfe9-5052-4392-9783-d06c4a2451d0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
