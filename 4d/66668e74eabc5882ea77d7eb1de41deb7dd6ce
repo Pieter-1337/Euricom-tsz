@@ -1,0 +1,51 @@
+packages/web/src/components/ui/tooltip.tsx
+  s_4a37a4cde6b267::t_abcea943a9b26e 1-48
+packages/web/src/routes/_protected/_authenticated/time-entry/week/$year/$week.tsx
+  s_4a37a4cde6b267::t_4e616581d480d6 11
+packages/web/src/features/timesheets/components/timesheet-month-grid.tsx
+  s_4a37a4cde6b267::t_7b584d248f2a5f 204
+  s_4a37a4cde6b267::t_c46619d7da9980 144
+  s_4a37a4cde6b267::t_7c33e4c9f9307d 35
+  s_4a37a4cde6b267::t_70d546df9236ff 151
+  s_4a37a4cde6b267::t_821fc860520b99 42
+packages/web/src/features/timesheets/components/week-grid/timesheet-week-grid.tsx
+  s_4a37a4cde6b267::t_5e29a314ff1d69 102
+packages/web/src/routes/_protected/_authenticated/time-entry/index.tsx
+  s_4a37a4cde6b267::t_4e171cfb3a52ec 1-9
+packages/web/src/routes/_protected/_authenticated/time-entry.tsx
+  s_4a37a4cde6b267::t_9ee01be4be6a9b 1-5
+packages/web/src/routes/_protected/_authenticated/time-entry/week/index.tsx
+  s_4a37a4cde6b267::t_eae54e0eabc885 4-7
+packages/web/src/routes/_protected.tsx
+  s_4a37a4cde6b267::t_2d1a32d99b3272 4
+  s_4a37a4cde6b267::t_0e370d50a9cfe2 135-136
+packages/web/src/routes/_protected/_authenticated/timesheets/index.tsx
+  s_4a37a4cde6b267::t_488e14ec81b5d1 7
+  s_4a37a4cde6b267::t_5f93c173a7f9c4 194,196,198-207,210-215,218-222
+  s_4a37a4cde6b267::t_d1b7bbbd94c956 46-48,50-60,62-64
+  s_4a37a4cde6b267::t_54f56122a5e9bf 1-6,8-20,23-29,31,33-45,49,61,65-193,195,197,208-209,216-217,223-367
+packages/web/src/routes/_protected/_authenticated/time-entry/month/$year/$month.tsx
+  s_4a37a4cde6b267::t_25f291d41a2f5d 32
+  s_4a37a4cde6b267::t_e890668881c1b6 6
+  s_4a37a4cde6b267::t_4b15505e334b7f 1-5,7-31,33-35
+packages/web/src/routes/_protected/_authenticated/time-entry/month/index.tsx
+  s_4a37a4cde6b267::t_d97cdfdb8d1bf7 4-7
+packages/web/src/routeTree.gen.ts
+  s_4a37a4cde6b267::t_d80eba7276e995 18,23,31-32,36-37,68-73,98-103,146-157,176-177,180,182-183,186,195,205,210-213,226,231-234,245,255,260-263,273,283,288-291,304,309-312,322,332,337-340,393-399,428-434,484-497,519-520,522-524,526-527,529-531,614-640,660,672-673
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4d66668e74eabc5882ea77d7eb1de41deb7dd6ce",
+  "prompts": {},
+  "sessions": {
+    "s_4a37a4cde6b267": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a0e2410-4195-4382-afbd-37ce0d946498",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
