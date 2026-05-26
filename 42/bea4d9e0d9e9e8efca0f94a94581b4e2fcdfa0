@@ -1,0 +1,23 @@
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/GetLeaveBookingsForYearHandlerTests.cs
+  s_057d5dcbf695aa::t_350445eb5be8c2 67-70
+packages/api/Tsz.Api.Tests.Integration/LeaveBookingsForYearEndpointsTests.cs
+  s_057d5dcbf695aa::t_afe04b2e670207 148,150-152
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetHolidaysInYear.cs
+  s_057d5dcbf695aa::t_b46972ed4e22c9 16-18,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "42bea4d9e0d9e9e8efca0f94a94581b4e2fcdfa0",
+  "prompts": {},
+  "sessions": {
+    "s_057d5dcbf695aa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f97c48e2-398c-484d-b0d1-76b40c505a89",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
