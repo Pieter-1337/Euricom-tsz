@@ -1,1 +1,9 @@
+# Normalize all text files to LF in the working tree.
+# Without this, autocrlf=true on Windows expands files to CRLF on fresh
+# worktree checkouts, leaving ~hundreds of files in a phantom-"modified"
+# state versus the LF-stored index — which derailed an autonomous /app-do-prd
+# run on 2026-05-26 (worker couldn't commit clean diff).
+* text=auto eol=lf
+
+# Explicit override kept for clarity (file is already covered by the rule above).
 packages/web/src/routeTree.gen.ts text eol=lf

@@ -70,10 +70,18 @@ while any issue in {pending, in-flight}:
             prompt = "Run /app-do-work {issue-ref}
                       [--reviewer={inherited}]
                       [--agent={inherited if --agent was passed}].
-                      When the commit lands, push the branch and open a PR.
-                      Report the PR URL and worker summary."
+                      Completion contract: you are NOT done until `gh pr view <num>`
+                      returns an open PR for this issue. Report the PR URL as the
+                      final line of your reply. A successful reviewer pass is NOT
+                      a substitute for opening the PR."
         mark issue = in-flight
         record { issue → worker handle, branch (when known), PR URL (when known) }
+
+    # 4a-verify. After a worker returns, before treating it as in-flight,
+    #            confirm the PR exists:
+    #     gh pr list --repo <repo> --search "<issue-ref> in:body" --state open --json url
+    # If no PR is found, treat the return as an §7 failure (worker terminated
+    # prematurely). Do NOT advance dependents until the worker has shipped a PR.
 
     # 4b. React to events
     wait for the next of:

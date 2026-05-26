@@ -2,6 +2,14 @@
 
 ## 2026-05-26
 
+### chore: fix worktree line-ending churn and strengthen orchestration contracts
+
+Add `* text=auto eol=lf` to `.gitattributes` to normalize all text files to LF on checkout, preventing fresh worktree creations (with `core.autocrlf=true`) from expanding files to CRLF and leaving ~hundreds of phantom line-ending modifications versus the LF-stored index.
+
+Strengthen `/app-do-work` step 7 completion contract: a successful reviewer pass is NOT a substitute for opening a PR. Workers must push the branch, open the PR, verify it exists, and report its URL as the final line of output. Commit the work only if the working tree shows only the intended changes.
+
+Strengthen `/app-do-prd` scheduling loop (§4a-verify): after a worker returns, verify the PR exists before advancing. Treat a missing PR as a worker failure, not a success-to-advance on dependent slices.
+
 ### feat: agent-driven auto-merge and one-attempt iterate budget for /app-do-prd
 
 Add `--auto-merge` flag (default off): when enabled, the orchestrator

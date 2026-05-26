@@ -78,12 +78,17 @@ Once static analysis and tests pass cleanly:
 - Update `CHANGELOG.md` under today's date with functional, user-facing bullet points. Each bullet answers "what can a user now do?" or "what behavior changed?" — not "what was built". No class/method names, no test counts, no migration names.
 - Commit the work via `Skill('commit')` so the project's conventions (Conventional Commits, no scope, signed Co-Authored-By footer) are applied.
 
-### 7. Push branch and open PR
+### 7. Push branch and open PR — REQUIRED for completion
+
+**This step is non-negotiable.** A successful reviewer pass in §5 is NOT a substitute for opening a PR. If you exit this skill without an open PR for the issue, your caller (a human user or `/app-do-prd`) will treat the run as a failure and may discard the worktree.
+
+Before pushing, sanity-check the working tree: `git status` should show only the files you intended to change. If you see hundreds of unrelated files (typically a line-ending mass-rewrite from a misconfigured worktree), **stop and report** — do not commit the noise.
 
 - Push the branch to the remote.
 - Open a PR with `gh pr create --base master --title "<derived from issue title>" --body "Fixes #<issue-num>\n\n<short summary>"`.
 - If the §5 reviewer pass produced findings you chose not to address, include them in the PR body under a "Reviewer notes" section so they don't get lost.
-- Report the PR URL back.
+- **Verify the PR exists** via `gh pr view <num>` before returning.
+- Report the PR URL as the final line of your reply.
 
 ### 8. Iterate mode (when step 1 detected an existing open PR)
 
