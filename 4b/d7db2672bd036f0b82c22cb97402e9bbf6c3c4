@@ -1,0 +1,46 @@
+packages/web/src/lib/utils.ts
+  s_0f7fa78e97333b::t_feb4de730460e3 9-16
+CHANGELOG.md
+  s_0f7fa78e97333b::t_d862fdd9bc5669 3-14
+packages/web/src/features/timesheets/components/timesheet-week-grid.tsx
+  s_0f7fa78e97333b::t_f37e383aa7b3bb 403-404
+  s_0f7fa78e97333b::t_49cd77d5ccb8c0 162-163
+  s_0f7fa78e97333b::t_f3ca93811fc79f 759
+  s_0f7fa78e97333b::t_7df0d236cf59fd 73,79,81,87-96
+  s_0f7fa78e97333b::t_f7538e625d733d 337
+  s_0f7fa78e97333b::t_b7e9f713f34a0a 127-129
+  s_0f7fa78e97333b::t_ebc0aa53a3d862 7
+  s_0f7fa78e97333b::t_2556c1f5ac240f 500,502
+  s_0f7fa78e97333b::t_980e2a6f3c64b6 458,465-469
+  s_0f7fa78e97333b::t_b2e21ea22dca29 1
+  s_0f7fa78e97333b::t_0ae8dd7b442280 793
+packages/web/src/routes/_protected.tsx
+  s_0f7fa78e97333b::t_1844d1f9de0e13 134
+packages/web/src/routes/_protected/_authenticated/timesheets/week/$year/$week.tsx
+  h_9ef4f126c6bd1c 33
+packages/web/src/routes/_protected/_authenticated/timesheets/month/$year/$month.tsx
+  h_9ef4f126c6bd1c 31
+packages/web/src/features/timesheets/components/timesheet-week-grid.spec.tsx
+  s_0f7fa78e97333b::t_b5088a1f4a1555 141-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4bd7db2672bd036f0b82c22cb97402e9bbf6c3c4",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_0f7fa78e97333b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9f5a0e05-45cf-4235-b05f-f37f035c9787",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
