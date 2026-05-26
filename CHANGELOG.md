@@ -2,6 +2,12 @@
 
 ## 2026-05-26
 
+### refactor: drop Status column from the Timesheets list
+
+- Remove the Status column from the bottom Timesheets list: it reflected
+  internal week-approval, not customer document approval (out of scope), and
+  was misleading. The list now shows Customer, Contract and the Download action.
+
 ### feat: split timesheet totals into approved and not-approved sections
 
 - Add a "Not approved yet" section to the Timesheets totals panel below the

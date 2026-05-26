@@ -366,14 +366,12 @@ interface TimesheetListRow {
   key: string;
   customer: string;
   contract: string;
-  status: 'Waiting for approval' | 'Approved';
   canDownload: boolean;
 }
 
 function buildTimesheetRows(monthData: TimesheetMonth): TimesheetListRow[] {
-  const contractMap = new Map<string, { customer: string; contract: string; weekStatuses: Set<string> }>();
+  const contractMap = new Map<string, { customer: string; contract: string }>();
   let hasLeaveOnlyWeek = false;
-  const leaveOnlyStatuses = new Set<string>();
 
   for (const week of monthData.weeks) {
     if (week.status !== 'Submitted' && week.status !== 'Approved') continue;
@@ -385,43 +383,25 @@ function buildTimesheetRows(monthData: TimesheetMonth): TimesheetListRow[] {
         const customer = entry.customerName || '—';
         const contract = entry.contractName || '';
         const key = `${customer}|${contract}`;
-        const existing = contractMap.get(key);
-        if (existing) {
-          existing.weekStatuses.add(week.status);
-        } else {
-          contractMap.set(key, { customer, contract, weekStatuses: new Set([week.status]) });
+        if (!contractMap.has(key)) {
+          contractMap.set(key, { customer, contract });
         }
       }
     }
 
     if (!hasTimeEntries) {
       hasLeaveOnlyWeek = true;
-      leaveOnlyStatuses.add(week.status);
     }
   }
 
   const rows: TimesheetListRow[] = [];
 
   for (const [key, entry] of contractMap) {
-    const allApproved = entry.weekStatuses.size === 1 && entry.weekStatuses.has('Approved');
-    rows.push({
-      key,
-      customer: entry.customer,
-      contract: entry.contract,
-      status: allApproved ? 'Approved' : 'Waiting for approval',
-      canDownload: true,
-    });
+    rows.push({ key, customer: entry.customer, contract: entry.contract, canDownload: true });
   }
 
   if (hasLeaveOnlyWeek) {
-    const allApproved = leaveOnlyStatuses.size === 1 && leaveOnlyStatuses.has('Approved');
-    rows.push({
-      key: 'leave-only',
-      customer: '—',
-      contract: '',
-      status: allApproved ? 'Approved' : 'Waiting for approval',
-      canDownload: false,
-    });
+    rows.push({ key: 'leave-only', customer: '—', contract: '', canDownload: false });
   }
 
   return rows;
@@ -442,14 +422,13 @@ function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null })
           <TableRow>
             <TableHead>Customer</TableHead>
             <TableHead>Contract</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead className="w-[60px]" />
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
+              <TableCell colSpan={3} className="py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
                 No submitted timesheets this month.
               </TableCell>
             </TableRow>
@@ -458,7 +437,6 @@ function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null })
               <TableRow key={r.key}>
                 <TableCell>{r.customer}</TableCell>
                 <TableCell>{r.contract}</TableCell>
-                <TableCell>{r.status}</TableCell>
                 <TableCell>
                   {r.canDownload && (
                     <Button variant="ghost" size="sm" asChild className="h-7 px-2">
