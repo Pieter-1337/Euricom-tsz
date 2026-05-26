@@ -2,6 +2,27 @@
 
 ## 2026-05-26
 
+### feat: agent-driven auto-merge and one-attempt iterate budget for /app-do-prd
+
+Add `--auto-merge` flag (default off): when enabled, the orchestrator
+itself merges each PR once readiness conditions hold — CI green, every
+review thread resolved, no reviewer-pass findings outstanding, mergeable
+state — by running `gh pr merge`. Imperative, not GitHub's declarative
+auto-merge.
+
+Iterate mode now handles every kind of blocker (CI red, unresolved
+comments, unaddressed reviewer notes, merge conflicts), not just CI red,
+with a budget of one extra attempt beyond the initial implementation.
+If that single iterate attempt still doesn't bring the PR to a mergeable
+state, the slice waits for human attention (failure mode under the
+default `continue-siblings` policy).
+
+Also: rename SKILL section 6½ to clean numbering (Auto-merge §6, Failure
+recovery §7, Final report §8); strip cross-references between the
+workflow docs in the autonomous doc body so each doc stands on its own;
+restructure Stacking & merge cadence around `--auto-merge=false/true`
+rather than default-vs-alternative framing.
+
 ### feat: add /app-do-prd orchestrator skill; expand /app-do-work with iterate + reviewer
 
 Split the autonomous workflow into two skills so single-issue runs stay

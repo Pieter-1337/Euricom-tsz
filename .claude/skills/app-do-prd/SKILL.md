@@ -83,31 +83,79 @@ while any issue in {pending, in-flight}:
 
       • PR CI turns red on an open PR
             → re-spawn the same worker on the same branch in iterate mode (see §5)
+            (when --auto-merge=true, the same trigger also fires when threads
+             stay unresolved or reviewer findings stay unaddressed — see §6)
 
-      • PR merged by human
+      • PR merged (by human, or by orchestrator when --auto-merge=true)
             → mark issue = merged
             → recompute the ready set; loop continues
 
-      • Worker halts with explicit failure (no PR opened, or stuck mid-work, or CI red after iterate-mode retries)
-            → invoke autonomous recovery (see §6)
+      • Worker halts with explicit failure (no PR opened, or stuck mid-work,
+        or iterate-mode budget exhausted without making the PR mergeable)
+            → invoke autonomous recovery (see §7)
 
       • All workers idle AND no pending issue is ready
             → loop ends (some issues may be in failed state — see final report)
 ```
 
-### 5. Iterate mode on CI red
+### 5. Iterate mode (resolve blockers on an open PR)
 
-When a PR's head SHA shows failed checks, the orchestrator re-spawns the **same agent type** with the **same worktree / branch** and a prompt like:
+When a PR isn't immediately mergeable — CI red, unresolved review threads, unaddressed reviewer-pass findings, or merge conflicts — the orchestrator gives the worker **one attempt** to resolve the blockers.
 
-> "PR {url} for issue #{n} has CI red on {head-sha}. Re-launch /app-do-work #{n} — the skill will detect the open PR and enter iterate mode automatically. Diagnose from the failing checks and PR diff, push a fix. Report the new HEAD."
+Re-spawn the **same agent type** with the **same worktree / branch** and a prompt like:
 
-Bound iterate-mode retries to **2 per slice per orchestrator run**. After that, mark the slice as failed and route to §6.
+> "PR {url} for issue #{n} has blockers: {summary — CI failures with logs, unresolved threads, reviewer findings, etc.}. Re-launch /app-do-work #{n} — the skill detects the open PR and enters iterate mode automatically. Diagnose, push a fix to the same branch. Report the new HEAD."
+
+After the attempt:
+- Validate runs again locally inside the worker.
+- CI re-runs on the new push.
+- The orchestrator re-checks readiness on the PR.
+
+**Budget: 1 iterate attempt per slice per orchestrator run** — *in addition to* the initial implementation that opened the PR. So a slice in autonomous mode sees at most two worker spawns: the original implementer + the iterator. The initial implementation does NOT count toward the iterate budget.
+
+If the PR is still not mergeable after the single iterate attempt, the slice goes to failure mode (§7). The human takes over from there — typically by responding to review threads, fixing the build themselves, or signalling the orchestrator to re-launch after they've cleared the blocker.
+
+Note: the worker can push commits that *address* review comments but cannot *resolve* the review threads themselves — that resolution stays the reviewer's call (see [Iterating on an open PR](../../../docs/agents/workflow-autonomous.md#iterating-on-an-open-pr)). After the worker's one attempt, if comments remain unresolved, the slice waits.
 
 (The per-slice iterate-mode loop is inside `/app-do-work` itself — see that skill's step 1, which detects an open PR and switches to iterate mode.)
 
-### 6. Autonomous failure recovery
+### 6. Auto-merge (when `--auto-merge=true`)
 
-When a worker halts with an unrecoverable failure (NOT CI red — that's §5):
+The orchestrator merges PRs itself once it has confirmed all readiness conditions. Not GitHub's declarative auto-merge — the orchestrator runs `gh pr merge` actively, so the conditions it applies are its own (not just whatever branch protection happens to enforce).
+
+For each in-flight PR, in the scheduling loop:
+
+```
+ready_to_merge(pr) =
+    pr.statusCheckRollup is "SUCCESS"             # CI green
+    AND every reviewThread.isResolved == true     # all review threads resolved
+    AND no reviewer-pass-from-app-do-work-step-5 finding is still unaddressed
+    AND pr.mergeStateStatus is "CLEAN"            # mergeable, no conflicts
+
+if ready_to_merge(pr):
+    gh pr merge <pr-num> --squash --delete-branch --repo <repo>
+    # (--squash / --merge / --rebase per the repo's default; check via
+    #  `gh repo view --json mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed`)
+else:
+    # Trigger iterate mode (§5) — one attempt to resolve the blockers.
+    # After that single attempt, re-check readiness; if still not met,
+    # the slice falls into failure mode (§7).
+```
+
+Fetch PR state via `gh pr view <num> --json statusCheckRollup,reviewThreads,mergeStateStatus,reviews`.
+
+Edge cases:
+
+- **No human has reviewed yet, no comments left.** `reviewThreads` is empty → `every isResolved` is vacuously true → orchestrator merges as soon as CI is green. That's the most autonomous path; it's what `--auto-merge=true` is *for*.
+- **Human left review comments and hasn't resolved them.** Iterate mode (§5) runs once: the worker addresses the comments by pushing fix commits. After that one attempt, if the threads are still unresolved (resolution stays the reviewer's call), the slice waits — orchestrator does not try again on its own.
+- **CI red.** Iterate mode (§5) runs once. If it brings CI back to green AND all other readiness conditions hold, the orchestrator merges. If CI is still red, slice → failure mode (§7).
+- **Reviewer-pass findings unaddressed** (in the PR's "Reviewer notes" section). Iterate mode runs once: the worker either addresses them or confirms they're intentional. After the attempt, if findings remain "unaddressed" in the PR body, the slice waits for human direction — explicit approval or manual fix.
+
+`--auto-merge` does not change failure-mode behaviour. It only changes what happens on the *happy* path: instead of pausing for human merge, the orchestrator runs the merge once all gates pass.
+
+### 7. Autonomous failure recovery
+
+When a worker halts with an unrecoverable failure (NOT a one-attempt iterate-mode blocker — that's §5):
 
 1. **One diagnostic re-spawn.** Re-launch the same worker against the same issue, passing the previous attempt's last error / "stuck" summary explicitly in the prompt. Often a second attempt with diagnostic context succeeds where the first didn't.
 2. **If still failing**, branch on `--on-failure`:
@@ -115,7 +163,7 @@ When a worker halts with an unrecoverable failure (NOT CI red — that's §5):
    - `halt`: stop all launches, surface immediately.
 3. **Halt unconditionally** when every remaining `pending` issue transitively depends on a failed slice — there's nothing useful left to launch.
 
-### 7. Final report
+### 8. Final report
 
 When the loop ends, emit a structured report:
 
@@ -132,11 +180,12 @@ When the loop ends, emit a structured report:
 | `--parallel` | bool | `true` | Launch ready workers concurrently when the DAG allows |
 | `--reviewer` | bool | `true` | Cascades to each worker; each `/app-do-work` invocation runs its reviewer sub-agent pass before commit |
 | `--agent` | enum or `auto` | `auto` | Override the per-issue agent routing. Cascades to every worker |
-| `--on-failure` | `continue-siblings` / `halt` | `continue-siblings` | Behaviour after autonomous recovery (§6) gives up |
+| `--on-failure` | `continue-siblings` / `halt` | `continue-siblings` | Behaviour after autonomous recovery (§7) gives up |
+| `--auto-merge` | bool | `false` | When true, the orchestrator merges PRs itself once all readiness conditions are met: CI green, every review thread resolved, no reviewer-pass findings outstanding, GitHub reports mergeable. Imperative — the orchestrator runs `gh pr merge` actively rather than relying on GitHub's declarative auto-merge. If conditions aren't met, iterate mode (§5) runs once; if still not mergeable, the slice goes to failure mode (§7). See §6 for the full conditions and edge cases. |
 
 ## What this skill does not do
 
-- It does not auto-merge PRs. Human review stays in the loop on every slice — see [Stacking and merge cadence](../../../docs/agents/workflow-autonomous.md#stacking-and-merge-cadence).
+- It does not auto-merge PRs by default. Human review stays in the loop on every slice unless `--auto-merge=true` is passed (see §6), in which case the orchestrator merges each PR itself once CI is green, all review threads are resolved, and no reviewer-pass findings sit unaddressed.
 - It does not file new issues. It only runs against pre-existing tracker issues created by `/matt-to-prd` + `/matt-to-issues`.
 - It does not edit `CONTEXT.md` / ADRs / `CHANGELOG.md` directly — those changes come only via individual workers acting on their assigned slices.
 - It does not decompose a single issue across multiple parallel workers. If an issue is too big for one worker, that's a signal to re-slice via `/matt-to-issues`, not to bolt on intra-issue swarms.

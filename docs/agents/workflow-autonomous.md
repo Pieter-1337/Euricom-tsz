@@ -1,8 +1,6 @@
 # Autonomous Workflow
 
-Product Requirement Document implementation, end-to-end. Hand the orchestrator a PRD (or a single issue) and it spawns one agent per ready slice — auto-routed by work type, isolated in its own worktree + PR, respecting the `## Blocked by` dependency graph, in parallel where the DAG allows.
-
-The single-issue chain (`/app-do-work <issue>`) is documented in [workflow-automatic.md](./workflow-automatic.md). **This doc covers the multi-issue / team layer that sits on top.**
+Product Requirement Document implementation, end-to-end. Hand the orchestrator a PRD and it spawns one agent per ready slice — auto-routed by work type, isolated in its own worktree + PR, respecting the `## Blocked by` dependency graph, in parallel where the DAG allows.
 
 ## When to use this flow
 
@@ -35,202 +33,114 @@ Prerequisite: PRD + child issues on the tracker, each with "## Blocked by"
   human review (PR-by-PR, between batches)
 ```
 
-The orchestrator never edits code. Per-issue work happens inside [the linear `/app-do-work` chain](./workflow-automatic.md), one invocation per issue.
+The orchestrator never edits code itself — per-slice work happens inside the worker spawned for each ready slice.
 
 ## Surface
 
 ```
 /app-do-prd <target> [--worktrees=true] [--parallel=true] [--reviewer=true]
                      [--agent=auto] [--on-failure=continue-siblings]
+                     [--auto-merge=false]
 ```
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `target` | PRD issue ref / URL | **required** | A PRD (the parent of several slice issues, each referencing it via `## Parent`) |
-| `worktrees` | bool | `true` | Isolate each worker in its own git worktree + branch; open one PR per issue. Disable only when you want the orchestrator to run workers in the current checkout serially |
-| `parallel` | bool | `true` | When the DAG allows it, launch ready issues concurrently |
-| `reviewer` | bool | `true` | Each spawned worker (which runs `/app-do-work`) gets a `reviewer` sub-agent pass before commit. Cascades into the worker (see [Per-issue quality gate](#per-issue-quality-gate)) |
-| `agent` | enum or `auto` | `auto` | Override per-issue agent selection (see [Agent auto-routing](#agent-auto-routing)). Cascades into each worker |
-| `on-failure` | `continue-siblings` / `halt` | `continue-siblings` | What to do when a slice fails after autonomous recovery (see [Failure mode](#failure-mode)) |
+- `target` — a PRD issue (parent of slice issues, each linking back via `## Parent`)
+- `--worktrees` / `--parallel` — isolation + concurrency for spawned workers
+- `--reviewer` — cascades to every worker; each `/app-do-work` runs a reviewer sub-agent pass before commit
+- `--agent` — override per-issue agent routing
+- `--on-failure` — `continue-siblings` (default) vs `halt`
+- `--auto-merge` — when true, the orchestrator merges PRs itself once readiness conditions are met (CI green + threads resolved + reviewer findings addressed); see [Stacking and merge cadence](#stacking-and-merge-cadence)
 
-For single-issue runs, use `/app-do-work <issue>` directly — that's documented in [workflow-automatic.md](./workflow-automatic.md). The orchestrator spawns one such `/app-do-work` invocation per ready slice.
+Full parameter semantics live in [`app-do-prd/SKILL.md`](../../.claude/skills/app-do-prd/SKILL.md).
 
-## How it works internally
+## Per-issue states
 
-### 1. Resolve target → build the issue set
-
-- If `target` is a PRD issue, fetch the PRD body + all child issues that reference it as `## Parent`.
-- If `target` is a single issue, treat it as a one-node set.
-- Read each child's `## Blocked by` section; parse issue refs (`#N` or full URLs) into a dependency graph.
-- Sanity-check: the graph must be acyclic. If it isn't, abort and surface the cycle.
-
-### 2. Schedule loop
-
-A slice is not "done" when the PR opens — it's done when the PR merges. The orchestrator tracks each issue's state through that whole arc.
-
-Per-issue states:
+A slice is not "done" when the PR opens — it's done when the PR merges. The orchestrator tracks each issue through:
 
 - **pending** — at least one blocker is still unmerged
-- **in-flight** — agent is running, or PR is open but unmerged
-- **failed** — agent halted with no recoverable path; needs human rescue
+- **in-flight** — a worker is running, or the PR is open but unmerged
+- **failed** — autonomous recovery exhausted; needs human rescue
 - **merged** — done
-
-Loop:
-
-```
-while any issue is not yet merged:
-    for each issue with all blockers merged AND no agent currently running:
-        agent_type = pick_agent(issue)            # see Agent auto-routing
-        isolation  = worktrees ? "worktree" : "current"
-        spawn agent → /app-do-work <issue> [--reviewer=...]
-        # agent commits, pushes branch, opens PR, returns PR URL
-
-    wait for events:
-        - PR's CI turns red on an open PR
-              → re-spawn the agent for that issue in "iterate" mode
-                (see Iterating on an open PR)
-        - PR merged by human
-              → recompute ready set (newly-unblocked issues become eligible)
-        - agent halted with explicit failure
-              → escalate to manual rescue (see Failure mode)
-```
 
 The orchestrator does not auto-merge. PRs go through human review like any other change — see [Stacking and merge cadence](#stacking-and-merge-cadence).
 
-### 3. Each spawned agent runs the linear chain
-
-For each ready issue, the orchestrator spawns one Agent with:
-- `subagent_type` set to the chosen agent
-- `isolation: "worktree"` when worktrees are enabled
-- Prompt: roughly *"Run `/app-do-work <issue-ref>`. When the commit lands, push the branch and open a PR. Report the PR URL."*
-
-That linear chain is unmodified — it explores, implements, validates, simplifies (then re-validates), optionally inserts a [reviewer pass](#per-issue-quality-gate), updates `CHANGELOG.md`, commits via the `commit` skill, and reports QA.
-
 ## Agent auto-routing
 
-Per-issue agent selection scans the issue body's file paths and keywords. The rules pick a specialist — never a generic fallback. First match wins:
+Each ready slice gets routed to a **specialist** primary agent based on the paths it touches — `backend-engineer`, `frontend-engineer`, or `documenter`. There is no generic fallback. Mixed BE+FE issues default to `backend-engineer` (FE typically consumes BE), which self-spawns `frontend-engineer` sub-agents in-band when the work crosses domains.
 
-| Condition | Primary agent |
-|---|---|
-| Paths in `packages/api/**` AND none in `packages/web/**` | `backend-engineer` |
-| Paths in `packages/web/**` AND none in `packages/api/**` | `frontend-engineer` |
-| Paths only in `docs/**`, `CHANGELOG.md`, `CONTEXT.md`, or other `*.md` | `documenter` |
-| Mixed paths (backend + frontend) | `backend-engineer` — typically the leading dependency (FE consumes BE); self-spawns `frontend-engineer` sub-agents when the work crosses into `packages/web/**` |
+When the primary needs cross-skill help, it recruits a specialist sub-agent using the same rules — **recursively**, in-band, never falling back to a generic agent. Sub-agents themselves can recruit further sub-sub-agents. The primary stays in charge of the slice end-to-end and integrates sub-agent reports.
 
-The routing applies **recursively at the sub-agent level**. When the primary agent hits work outside its specialty, it re-applies the same rules to pick a specialist sub-agent — never falls back to a generic one. The primary stays in charge of the issue; the sub-agent reports back as a tool result. See [Sub-agent self-recruitment](#sub-agent-self-recruitment) for examples.
+If a slice's body has no path signal that matches any rule, the orchestrator halts and surfaces it — that's a signal the issue is under-specified and needs human re-scoping, not a guess.
 
-You can force a specific primary via `--agent=...` to override the rules. If no rule matches (extremely rare — paths don't fit any of the patterns above), that's a signal the issue is under-specified; surface it for human re-scoping rather than guessing.
-
-## Sub-agent self-recruitment
-
-Every spawned agent has full access to the `Agent` tool. When a primary agent realises it needs cross-skill help mid-issue, it recruits a sub-agent in-band using the same [routing rules](#agent-auto-routing) — never a generic fallback:
-
-- A `backend-engineer` slice that needs a quick FE schema regen + spec update → spawns a `frontend-engineer` sub-agent for that narrow step.
-- A `frontend-engineer` slice that hits an unfamiliar backend constraint → spawns a `backend-engineer` sub-agent to investigate.
-- Any agent at any time → spawns `Explore` for codebase queries to keep its own context light.
-
-Sub-agents themselves can recruit further sub-sub-agents using the same rule, so the routing is genuinely recursive. The primary agent stays in charge of the issue end-to-end and integrates sub-agent reports.
-
-When a primary genuinely cannot fit the issue's scope inside its single agent run, it should write a clear "needs follow-up" line in its return summary. The orchestrator then surfaces it for human decision — possibly filing a new issue, not retry-spawning blindly.
+Concrete rules and `--agent` override behaviour live in [`app-do-prd/SKILL.md` §3](../../.claude/skills/app-do-prd/SKILL.md).
 
 ## Per-issue quality gate
 
-When `--reviewer=true` (the default), each spawned agent inserts a step before the `commit` skill:
+Each worker runs a `reviewer` sub-agent pass on its diff before committing (default on; `--reviewer=false` opts out). The reviewer returns prioritised findings; the worker addresses high-priority ones, re-validates, and includes the rest in the PR's "Reviewer notes" section so they don't get lost during human review.
 
-```
-/app-do-work <issue>
-  ├─ explore
-  ├─ implement
-  ├─ validate
-  ├─ simplify
-  ├─ validate                              ← original linear chain
-  ├─ spawn `reviewer` sub-agent            ← reviewer pass
-  │     reviewer reads the diff + tests, returns prioritised findings
-  ├─ address findings (if any), re-validate
-  └─ commit, push, open PR
-```
-
-Cost: roughly +30 % tokens for the reviewer to read the diff once. Catches issues before they hit a PR and saves a review round-trip with the human. Disable with `--reviewer=false` for trivially small changes.
-
-This is orthogonal to the scope axis — single-issue runs benefit from it too.
+Roughly +30 % tokens per slice; catches issues pre-PR and saves a review round-trip.
 
 ## Iterating on an open PR
 
-A slice's PR is the slice's body of work until it merges. The agent stays available to push more commits as long as the PR is open. Two paths back into the work:
+A slice's PR is its body of work until merge. When a PR isn't immediately mergeable, the worker gets **one** attempt to resolve the blockers — *in addition to* the initial implementation that opened the PR. So a slice in autonomous mode sees at most two worker spawns: the original implementer + the iterator. After that single iterate attempt, if the PR still isn't mergeable, the slice waits for human attention (via [Failure mode](#failure-mode)). Not a retry loop.
 
-### Automatic: CI flip on the PR
+Triggers for the one iterate attempt:
 
-When the PR's CI turns red on its head SHA, the orchestrator re-spawns the same agent against the same issue in **iterate mode**:
+- **CI flipped red on the PR's head SHA.** Orchestrator re-spawns the same worker; `/app-do-work` detects the open PR and enters iterate mode (diagnose, push a fix to the same branch). After the push, CI re-runs. If green, the slice continues toward merge (or waits for human merge if `--auto-merge=false`). If still red, the slice goes to failure mode — human takes over.
+- **`--auto-merge=true` and the readiness check has unresolved blockers.** Unresolved review threads, unaddressed reviewer-pass findings, or merge conflicts each trigger the same one-attempt iterate. The worker addresses what it can (pushes fix commits for comments; updates the PR body to address reviewer notes; rebases to clear conflicts). After the attempt, the orchestrator re-checks readiness. If everything is now clean, it merges. If not, the slice goes to failure mode.
+- **Manual re-launch by a human.** Outside of `--auto-merge` mode, human review comments don't trigger an automatic iterate — they're conversational and the orchestrator doesn't speak for the reviewer's intent. To get the worker to address comments, re-invoke `/app-do-work <issue>` explicitly; the skill detects the open PR and enters iterate mode. No automatic budget applies — each manual re-launch is one human-initiated attempt.
 
-```
-agent (iterate mode):
-  ├─ fetch PR diff, PR comments, CI logs for the failing run
-  ├─ check out the PR's branch into the same (or a fresh) worktree
-  ├─ diagnose: which check failed, what the logs say
-  ├─ implement the fix
-  ├─ run local validate (matching what CI runs)
-  ├─ commit + push to the same branch
-  └─ return: new HEAD + summary of what changed
-```
+Note: workers can push commits that *address* review comments but cannot *resolve* the review threads themselves — that resolution stays the reviewer's call. After the worker's one automatic attempt, if comments remain unresolved, the slice waits.
 
-CI then re-runs. If it goes green, the slice waits for human review/merge as usual. If it stays red after a small bounded number of iterations (default: 2), the orchestrator halts the slice and surfaces it via the [Manual rescue path](#manual-rescue-path) — endless thrash is worse than a clean human escalation.
-
-### Manual: re-launch on review comments
-
-Human review comments don't trigger an automatic re-spawn — they're conversational and the agent shouldn't speak for the reviewer's intent. When you want the agent to address comments, re-invoke `/app-do-work <issue>` explicitly. The skill notices the open PR and enters iterate mode (same as above), reads the comment threads and the PR diff, and pushes follow-up commits to the same branch.
-
-Convention: leave the review comment thread open; the agent's follow-up commit addresses the points raised but does not resolve threads. Resolving stays the reviewer's call.
+Iterate-mode pseudocode lives in [`app-do-work/SKILL.md` §8](../../.claude/skills/app-do-work/SKILL.md).
 
 ## Stacking and merge cadence
 
-**Default: wait for human merge between dependent PRs.**
+Who closes the merge — human or orchestrator — depends on the `--auto-merge` flag.
 
-When the orchestrator launches issue #34 and #34's PR opens, the orchestrator pauses on any issue that has #34 in its `## Blocked by` set. After you review and merge #34, the orchestrator picks the freshly-unblocked issue (#35) and launches it from updated master.
+### `--auto-merge=false` (default): wait for human merge
 
-Each PR is independently reviewable. Slower but safer; matches what the team's merge history already shows. This default applies whether `parallel=true` or not — issues with no remaining unmerged blockers run in parallel, issues blocked by an open PR wait.
+When a slice's PR opens, the orchestrator pauses any downstream slice that has it in `## Blocked by`. After the human reviews and merges, the orchestrator picks the freshly-unblocked slice and launches it from updated master.
 
-**Alternative: stacked PRs.** Some teams branch each PR from the previous one rather than from master, so the chain can keep moving while reviews queue. Stacked PRs are powerful but the team's current review tooling doesn't make them friction-free. Stacking is documented here for completeness; it's not the default.
+Each PR is independently reviewable. Slower but safer; matches the team's existing merge history. Applies whether `parallel=true` or not — slices with no remaining unmerged blockers run in parallel, slices blocked by an open PR wait.
+
+### `--auto-merge=true`: orchestrator merges
+
+The orchestrator merges PRs itself once it has confirmed all readiness conditions. It does NOT use GitHub's declarative auto-merge — it runs `gh pr merge` actively, so the criteria it applies are its own (not just whatever branch protection enforces).
+
+Readiness conditions per PR:
+- CI status is green
+- Every review thread is resolved (or none exist)
+- No reviewer-pass findings sit unaddressed in the PR's "Reviewer notes" section
+- GitHub reports the PR mergeable (no conflicts, branch protection satisfied)
+
+Edge cases (each triggers a single iterate attempt per the [Iterating on an open PR](#iterating-on-an-open-pr) policy; if not resolved by that one attempt, the slice goes to failure mode and the human takes over):
+
+- **No human has reviewed and no comments are left** → conditions trivially pass once CI is green; orchestrator merges. Most autonomous path; what `--auto-merge=true` is for.
+- **Human left review comments and hasn't resolved them** → one iterate attempt: worker pushes fix commits addressing the comments. If after that the threads are still unresolved (resolution stays the reviewer's call), slice waits for human.
+- **CI flips red** → one iterate attempt to bring it back to green. If still red, slice → failure mode.
+- **Reviewer pass found issues the worker chose not to address** (logged in the PR's "Reviewer notes" section) → one iterate attempt to address them. After the attempt, if findings remain in the PR body, slice waits — a human can resolve by fixing them or explicitly approving the PR (interpreted as "ship the notes").
+
+### Stacked PRs (orthogonal alternative to both flag values)
+
+Some teams branch each PR from the previous one rather than from master, so the chain can keep moving while reviews queue. Stacked PRs are powerful but the team's current review tooling doesn't make them friction-free. Documented for completeness; not the default. Independent of the `--auto-merge` flag — could in principle combine with either mode.
 
 ## Failure mode
 
 Human intervention is the last resort, not the first. The orchestrator exhausts its own recovery options before halting.
 
-A *failure* — distinct from CI red on an open PR, which [iterate mode](#iterating-on-an-open-pr) handles — is one of:
+A *failure* is distinct from a one-attempt iterate-mode blocker (which §5 handles). The categories the orchestrator treats as failure, and the autonomous recovery sequence that follows — one diagnostic re-spawn, then continue-siblings (or halt) — live in [`app-do-prd/SKILL.md` §7](../../.claude/skills/app-do-prd/SKILL.md).
 
-- The agent returned an explicit "I cannot complete this" summary (no PR opened, scope unclear, ran out of skill, etc.)
-- The agent's local validate never went green after its in-slice retries (and never reached the push step)
-- Iterate mode hit its retry bound (default 2) without bringing CI back to green
-- The agent process died / context exhausted before reaching commit
-- The PR was opened, CI is green, the agent reported done, but a human spots a *bad result* during review (the only case the orchestrator can't detect autonomously)
+**The philosophy:** prefer throughput. The chain keeps moving through localised failures rather than blocking the whole PRD on one stuck slice. `--on-failure=halt` is the conservative override for teams that don't yet trust autopilot for the PRD's domain.
 
-### Autonomous recovery sequence
-
-For each detected failure (except the human-spotted bad-result case), the orchestrator runs this sequence:
-
-1. **One diagnostic re-spawn.** Re-launch the same agent against the same issue with explicit context about the previous attempt's symptoms (last error / "stuck" summary / CI diagnosis). Often a second attempt with diagnostic context succeeds where the first didn't.
-2. **If still failing, mark the slice failed and continue with independent siblings.** The DAG knows which open issues don't transitively depend on the failed one — those keep running. The failed slice's worktree + branch + last summary are preserved and reported at the end of the run, not surface-and-halt immediately.
-3. **If every remaining open issue depends on a failed slice**, the orchestrator has nothing useful left to launch — that's when it halts and surfaces (see [Manual rescue path](#manual-rescue-path)).
-
-This default prefers throughput. The chain keeps moving through localised failures rather than blocking the whole PRD on one stuck slice.
-
-### `--on-failure` knob
-
-| Value | Behaviour |
-|---|---|
-| `continue-siblings` (default) | The sequence above. Keep running independent siblings; halt only when fully blocked. |
-| `halt` | Conservative. Stop on any failure, surface immediately. Use when you don't yet trust autopilot for the PRD's domain or when you want PR-by-PR review cadence. |
-
-The bad-result case (agent reported done, PR is green, but the feature doesn't work) always escalates manually — the orchestrator has no signal that anything is wrong until a human looks. The [Per-issue quality gate](#per-issue-quality-gate) (reviewer pass) catches most of these pre-PR; the rest land at human review.
+The *bad result* case (agent reported done, PR is green, but the feature doesn't actually work) is the one thing the orchestrator can't detect autonomously — the [Per-issue quality gate](#per-issue-quality-gate) catches most of these pre-PR; the rest get caught at human PR review and trigger the [Manual rescue path](#manual-rescue-path) below.
 
 ## Manual rescue path
 
-When a slice fails — see [Failure mode](#failure-mode) for what counts as failure — the orchestrator halts and surfaces:
+When a slice fails after autonomous recovery — see [Failure mode](#failure-mode) for what counts — the orchestrator halts and surfaces:
 
 - the failing PR URL (if a PR was opened), and/or
 - the worktree path + branch (the harness preserves it on failure), and/or
 - the agent's last summary (containing whatever it managed to report before bailing)
-
-A *bad result* (agent reported success, PR is green, but the feature doesn't work — what `/verify` would have caught) won't trigger an automatic halt; you'll find it during human PR review or QA. Treat it the same as a stall once spotted.
 
 From there:
 
