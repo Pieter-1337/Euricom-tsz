@@ -2,6 +2,20 @@
 
 ## 2026-05-26
 
+### docs: document the autonomous PRD-implementation workflow
+
+Add `docs/agents/workflow-autonomous.md` describing the multi-issue
+orchestrator: PRD or single-issue target, DAG-driven scheduling from
+`## Blocked by`, worktree isolation per slice, per-issue agent
+auto-routing (with recursive sub-spawning of specialists, no
+general-purpose fallback), iterate mode on open PRs (auto re-spawn on
+CI red, manual re-launch for review comments), and `--on-failure`
+defaulting to continue-siblings rather than halt. Cross-link
+`workflow-automatic.md` and `workflow-manual.md` with a shared three-
+mode "Relationship to the other workflows" view. Promote `/simplify`
+from optional to required in the manual chain. Fix three stale
+references to `/matt-grill-me` (skill is `/matt-grill-with-docs`).
+
 ### refactor: tighten timesheet week grid dirty state and error display
 
 Derive `isDirty` from a saved-bookings snapshot instead of a manual flag,

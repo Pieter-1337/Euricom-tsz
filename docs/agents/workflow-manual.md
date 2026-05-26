@@ -13,7 +13,7 @@ Step-by-step chain from idea to commit. Use when you want a human in the loop at
 
 ```
 PLAN SIDE
-  /matt-grill-me           interview-style planning
+  /matt-grill-with-docs           interview-style planning
   /matt-to-prd             publish PRD as draft issue to tracker
   human review
   /matt-to-issues          break PRD into tracer-bullet issues
@@ -27,13 +27,13 @@ IMPLEMENT / VALIDATE SIDE
   /implement               step-by-step build from PLAN.md or issue
   /validate                typecheck + tests + plan-coverage + diff review
   /verify                  run the app, observe behavior
-  /simplify                (optional) review changes for reuse/quality
+  /simplify                review changes for reuse/quality, then re-validate
   /commit                  changelog + git commit
 ```
 
 ## Plan side — step by step
 
-### 1. `/matt-grill-me`
+### 1. `/matt-grill-with-docs`
 
 Interview-style discovery. The skill asks questions one at a time, walking down the decision tree, recommending an answer for each.
 
@@ -86,9 +86,9 @@ Built-in skill. Actually launches the app and observes runtime behavior. Catches
 
 Skip for pure backend / library changes; essential for UI work.
 
-### 4. `/simplify` _(optional)_
+### 4. `/simplify`
 
-Reviews the diff for reuse opportunities and code quality, then fixes what it finds. Built-in skill.
+Reviews the diff for reuse opportunities and code quality, then fixes what it finds, then re-runs `/validate`. Built-in skill. Always run — autopilot runs it too, the manual chain shouldn't ship a lower bar than autopilot.
 
 ### 5. `/commit`
 
@@ -98,4 +98,30 @@ Updates `CHANGELOG.md` with user-facing bullets and creates the git commit.
 
 - `karpathy-guidelines` runs passively in the background during all phases — keeps changes surgical and surfaces hidden assumptions.
 - `matt-handoff` is **not** in this chain. Use it only for unplanned context breaks (running out of context mid-session, switching agents during investigation), not at the planned plan→implement boundary.
-- For architectural refactors (not feature work), start with `/matt-improve-codebase-architecture` instead of `/matt-grill-me`.
+- For architectural refactors (not feature work), start with `/matt-improve-codebase-architecture` instead of `/matt-grill-with-docs`.
+
+## Relationship to the other workflows
+
+There is one plan-side chain (always manual — humans hold the pen on architecture) and three implement-side modes that vary by autonomy. This doc covers the **fully manual** path on both sides:
+
+```
+PLAN SIDE                            IMPLEMENT SIDE  (pick one mode per slice)
+──────────────────────────           ───────────────────────────────────────
+matt-grill-with-docs                 ┌─ workflow-manual.md       step-by-step
+  │                                  │                           (this doc)
+  ▼                                  │
+matt-to-prd ──► PRD issue            ├─ workflow-automatic.md    one-shot
+  │                                  │                           per issue
+  ▼                                  │
+matt-to-issues ──► slice issues ─►───┴─ workflow-autonomous.md   Product Requirement
+                                                                 Document implementation
+                       handover via the tracker issue
+```
+
+| Mode | Doc | Surface | When |
+|---|---|---|---|
+| Manual | [workflow-manual.md](./workflow-manual.md) | `/implement` → `/validate` → `/verify` → `/simplify` → `/commit` | Scope unclear, risk high, or you want to control pacing phase-by-phase |
+| Automatic | [workflow-automatic.md](./workflow-automatic.md) | `/app-do-work <issue>` (one issue, linear chain) | Scope captured in an issue and you trust the implementer not to need pacing |
+| Autonomous | [workflow-autonomous.md](./workflow-autonomous.md) | `/app-do-work <PRD>` (orchestrator across slices, worktrees, parallel) | You want to walk away while a whole PRD unwinds |
+
+Escalate _toward_ manual when a slice rejects autopilot or scope changes mid-flight; de-escalate _toward_ autonomous as the PRD's remaining slices become well-defined and low-risk.
