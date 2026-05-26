@@ -1,4 +1,4 @@
-import type { TimesheetMonth, TimesheetMonthDay } from '#/api/timesheets';
+import type { TimesheetMonth } from '#/api/timesheets';
 
 interface TimesheetPrintDocProps {
   monthData: TimesheetMonth;
@@ -31,45 +31,37 @@ function buildPrintDays(
   customer: string,
   contract: string,
 ): PrintDay[] {
-  const prefix = `${year}-${String(month).padStart(2, '0')}`;
-
-  const dayMap = new Map<string, TimesheetMonthDay>();
+  // Index this customer/contract's entries by date.
+  const entriesByDate = new Map<string, { taskName: string; hours: number; days: number }[]>();
   for (const week of monthData.weeks) {
     for (const day of week.days) {
-      if (day.date.startsWith(prefix) && !dayMap.has(day.date)) {
-        dayMap.set(day.date, day);
+      for (const e of day.timeEntries) {
+        if (e.customerName !== customer || e.contractName !== contract) continue;
+        const arr = entriesByDate.get(day.date) ?? [];
+        arr.push({ taskName: e.taskName, hours: e.durationHours, days: e.durationHours / 8 });
+        entriesByDate.set(day.date, arr);
       }
     }
   }
 
-  const sorted = Array.from(dayMap.values()).sort((a, b) => a.date.localeCompare(b.date));
-
-  return sorted.map((day) => {
-    const d = new Date(day.date + 'T00:00:00');
-    const dow = d.getDay();
-    const isWeekend = dow === 0 || dow === 6;
-
-    const matchingEntries = day.timeEntries.filter(
-      (e) => e.customerName === customer && e.contractName === contract,
-    );
-
-    const entries = matchingEntries.map((e) => ({
-      taskName: e.taskName,
-      hours: e.durationHours,
-      days: e.durationHours / 8,
-    }));
-
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-
-    return {
-      isoDate: day.date,
+  // Always render every day of the month, entries or not.
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const result: PrintDay[] = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month - 1, d);
+    const dow = date.getDay();
+    const mm = String(month).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    const iso = `${year}-${mm}-${dd}`;
+    result.push({
+      isoDate: iso,
       dayLabel: WEEKDAY_NAMES[dow],
       ddmm: `${dd}/${mm}`,
-      isWeekend,
-      entries,
-    };
-  });
+      isWeekend: dow === 0 || dow === 6,
+      entries: entriesByDate.get(iso) ?? [],
+    });
+  }
+  return result;
 }
 
 export function TimesheetPrintDoc({

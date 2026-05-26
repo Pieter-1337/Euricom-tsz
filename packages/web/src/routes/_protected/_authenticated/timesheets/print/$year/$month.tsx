@@ -28,7 +28,10 @@ function TimesheetPrintPage() {
 
   const consultantName = `${currentUser.firstName} ${currentUser.lastName}`;
 
-  const emptyMonth = { userId: currentUser.id, year, month, weeks: [], monthTotalHours: 0 };
+  // Only approved weeks appear on the printable customer document.
+  const docMonthData = monthData
+    ? { ...monthData, weeks: monthData.weeks.filter((w) => w.status === 'Approved') }
+    : { userId: currentUser.id, year, month, weeks: [], monthTotalHours: 0 };
 
   return (
     <div className="mx-auto max-w-[820px]">
@@ -43,7 +46,7 @@ function TimesheetPrintPage() {
 
       <div className="rounded-lg bg-white p-10 shadow-lg ring-1 ring-black/5 print:max-w-none print:rounded-none print:p-0 print:shadow-none print:ring-0">
         <TimesheetPrintDoc
-          monthData={monthData ?? emptyMonth}
+          monthData={docMonthData}
           year={year}
           month={month}
           customer={customer}

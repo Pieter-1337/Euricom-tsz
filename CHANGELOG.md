@@ -2,6 +2,20 @@
 
 ## 2026-05-26
 
+### feat: refine timesheet totals sections and approved-only PDF
+
+- Always show three totals sections (Approved / Not approved yet / Not
+  submitted yet), each as `n / X workdays`, with `0` when empty.
+- Use the full month's workdays (Mon–Fri minus holidays) as the shared
+  denominator so the three day-counts add up; "Not submitted yet" lists the
+  empty workday dates.
+- Omit Draft (saved-but-not-submitted) weeks from the overview and its totals;
+  those days surface under "Not submitted yet".
+- PDF: render every day of the month (not starting at the first entry) and
+  include only approved entries; add an info tooltip on the Timesheets list
+  heading explaining the document only contains approved, customer-relevant
+  entries.
+
 ### refactor: drop Status column from the Timesheets list
 
 - Remove the Status column from the bottom Timesheets list: it reflected

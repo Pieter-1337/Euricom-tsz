@@ -5,9 +5,11 @@ import { useState } from 'react';
 import { Button } from '#/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 import { Tooltip, TooltipProvider } from '#/components/ui/tooltip';
+import { InfoTooltip } from '#/components/ui/info-tooltip';
 import { cn } from '#/lib/utils';
 import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
+import { fetchHolidaysForYear } from '#/features/leaves/server-fns';
 import {
   formatIsoDate,
   formatMonthLabel,
@@ -43,6 +45,17 @@ function TimesheetsOverviewPage() {
     initialData: isInitial ? initialMonthData ?? undefined : undefined,
   });
 
+  const { data: holidays } = useQuery({
+    queryKey: ['holidays', year],
+    queryFn: () => fetchHolidaysForYear({ data: { year } }),
+  });
+
+  // Draft (saved-but-not-submitted) weeks are omitted from the overview and
+  // its totals; those days then surface under "Not submitted yet".
+  const viewMonthData = monthData
+    ? { ...monthData, weeks: monthData.weeks.filter((w) => w.status !== 'Draft') }
+    : null;
+
   return (
     <TooltipProvider delayDuration={100} skipDelayDuration={200}>
       <main className="space-y-4">
@@ -52,15 +65,15 @@ function TimesheetsOverviewPage() {
           <CalendarCard
             year={year}
             month={month}
-            monthData={monthData ?? null}
+            monthData={viewMonthData}
             onPrev={() => setYM(prevMonth(year, month))}
             onNext={() => setYM(nextMonth(year, month))}
             onToday={() => setYM(todayMonth())}
           />
-          <TotalsCard monthData={monthData ?? null} />
+          <TotalsCard monthData={viewMonthData} holidayDates={(holidays ?? []).map((h) => h.date)} />
         </div>
 
-        <TimesheetsListCard monthData={monthData ?? null} />
+        <TimesheetsListCard monthData={viewMonthData} />
       </main>
     </TooltipProvider>
   );
@@ -240,20 +253,12 @@ interface BreakdownRow {
   dot: string;
 }
 
-function buildBreakdown(
-  weeks: TimesheetMonthWeek[],
-  monthPrefix: string,
-): { rows: BreakdownRow[]; dayCount: number } {
+function buildBreakdownRows(weeks: TimesheetMonthWeek[]): BreakdownRow[] {
   const workedHours = new Map<string, number>();
   const leaveHours = new Map<string, { name: string; hours: number }>();
-  const bookedDays = new Set<string>();
 
   for (const week of weeks) {
     for (const day of week.days) {
-      const hasEntries = day.timeEntries.length > 0 || day.leaveBookings.length > 0;
-      if (day.isBusinessDay && day.date.startsWith(monthPrefix) && hasEntries) {
-        bookedDays.add(day.date);
-      }
       for (const entry of day.timeEntries) {
         const cust = entry.customerName || 'Unknown';
         workedHours.set(cust, (workedHours.get(cust) ?? 0) + entry.durationHours);
@@ -268,12 +273,10 @@ function buildBreakdown(
     }
   }
 
-  const rows = [
+  return [
     ...Array.from(workedHours, ([name, hours]) => ({ key: `c-${name}`, label: name, hours, dot: 'bg-green-600' })),
     ...Array.from(leaveHours, ([id, v]) => ({ key: `l-${id}`, label: v.name, hours: v.hours, dot: getLeaveColor(id).bg })),
   ].sort((a, b) => b.hours - a.hours);
-
-  return { rows, dayCount: bookedDays.size };
 }
 
 function BreakdownSection({
@@ -312,7 +315,13 @@ function BreakdownSection({
   );
 }
 
-function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
+function formatNoEntryDate(iso: string): string {
+  const d = new Date(iso + 'T00:00:00');
+  const weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+  return `${weekday} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function TotalsCard({ monthData, holidayDates }: { monthData: TimesheetMonth | null; holidayDates: string[] }) {
   if (!monthData) {
     return (
       <section className="rounded-[12px] border border-black/[0.08] bg-white p-5 dark:border-white/[0.06] dark:bg-[#1D252D]">
@@ -321,14 +330,39 @@ function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
     );
   }
 
-  const monthPrefix = `${monthData.year}-${String(monthData.month).padStart(2, '0')}`;
-  const businessDaysInMonth = monthData.weeks
-    .flatMap((w) => w.days)
-    .filter((d) => d.isBusinessDay && d.date.startsWith(monthPrefix))
-    .length;
+  const { year, month } = monthData;
+  const approvedRows = buildBreakdownRows(monthData.weeks.filter((w) => w.status === 'Approved'));
+  const notApprovedRows = buildBreakdownRows(monthData.weeks.filter((w) => w.status !== 'Approved'));
 
-  const approved = buildBreakdown(monthData.weeks.filter((w) => w.status === 'Approved'), monthPrefix);
-  const notApproved = buildBreakdown(monthData.weeks.filter((w) => w.status !== 'Approved'), monthPrefix);
+  // Which dates have any booking, and under which approval bucket.
+  const approvedDates = new Set<string>();
+  const bookedDates = new Set<string>();
+  for (const week of monthData.weeks) {
+    for (const day of week.days) {
+      if (day.timeEntries.length === 0 && day.leaveBookings.length === 0) continue;
+      bookedDates.add(day.date);
+      if (week.status === 'Approved') approvedDates.add(day.date);
+    }
+  }
+
+  // Enumerate the full month's workdays (Mon–Fri, excluding holidays) so the
+  // denominator and the empty-day list cover untouched weeks too.
+  const holidaySet = new Set(holidayDates);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  let approvedDays = 0;
+  let notApprovedDays = 0;
+  const emptyDates: string[] = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month - 1, d);
+    const dow = date.getDay();
+    if (dow === 0 || dow === 6) continue;
+    const iso = formatIsoDate(date);
+    if (holidaySet.has(iso)) continue;
+    if (approvedDates.has(iso)) approvedDays++;
+    else if (bookedDates.has(iso)) notApprovedDays++;
+    else emptyDates.push(iso);
+  }
+  const totalWorkdays = approvedDays + notApprovedDays + emptyDates.length;
 
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">
@@ -336,27 +370,35 @@ function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
         Totals
       </h2>
       <div className="space-y-5 px-5 py-4">
-        {approved.rows.length === 0 ? (
-          <p className="text-center text-xs text-[#6B7682] dark:text-white/40">
-            No approved entries this month.
-          </p>
-        ) : (
-          <BreakdownSection
-            title="Approved"
-            rows={approved.rows}
-            days={approved.dayCount}
-            businessDays={businessDaysInMonth}
-          />
-        )}
+        <BreakdownSection title="Approved" rows={approvedRows} days={approvedDays} businessDays={totalWorkdays} />
 
-        {notApproved.rows.length > 0 && (
-          <BreakdownSection
-            title="Not approved yet"
-            rows={notApproved.rows}
-            days={notApproved.dayCount}
-            businessDays={businessDaysInMonth}
-          />
-        )}
+        <BreakdownSection
+          title="Not approved yet"
+          rows={notApprovedRows}
+          days={notApprovedDays}
+          businessDays={totalWorkdays}
+        />
+
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6B7682] dark:text-white/40">
+            Not submitted yet
+          </p>
+          <div className="mt-2 border-b border-black/[0.06] pb-3 text-center text-sm font-semibold dark:border-white/[0.06]">
+            {emptyDates.length} / {totalWorkdays} workdays
+          </div>
+          {emptyDates.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-3">
+              {emptyDates.map((iso) => (
+                <span
+                  key={iso}
+                  className="rounded-sm bg-black/[0.04] px-1.5 py-0.5 text-xs text-[#6B7682] dark:bg-white/[0.06] dark:text-white/60"
+                >
+                  {formatNoEntryDate(iso)}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -414,8 +456,12 @@ function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null })
 
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">
-      <h2 className="border-b border-black/[0.06] px-5 py-4 text-base font-semibold dark:border-white/[0.06]">
+      <h2 className="flex items-center gap-2 border-b border-black/[0.06] px-5 py-4 text-base font-semibold dark:border-white/[0.06]">
         Timesheets
+        <InfoTooltip
+          content="Document will only contain approved entries that are relevant for the customer"
+          className="cursor-pointer"
+        />
       </h2>
       <Table>
         <TableHeader>
