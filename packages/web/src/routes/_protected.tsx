@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
 import {
   Building2,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -131,7 +132,8 @@ function Sidebar({
       >
         <div className={cn('flex flex-col', collapsed ? 'items-center gap-1' : 'gap-0.5')}>
           <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
-          <NavLink to="/timesheets" icon={Clock} label="Time Entry" collapsed={collapsed} />
+          <NavLink to="/time-entry" icon={Clock} label="Time Entry" collapsed={collapsed} />
+          <NavLink to="/timesheets" icon={CalendarDays} label="Timesheets" collapsed={collapsed} />
           {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />}

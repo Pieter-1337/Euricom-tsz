@@ -30,17 +30,16 @@ interface TimesheetMonthGridProps {
   month: TimesheetMonth;
   year: number;
   monthNum: number;
-  userId: string;
 }
 
-function WeekSection({ week, userId }: { week: TimesheetMonthWeek; userId: string }) {
+function WeekSection({ week }: { week: TimesheetMonthWeek }) {
   const navigate = useNavigate();
   const badge = weekStatusBadge(week.status);
 
   const handleDayClick = async (isoDate: string) => {
     const d = new Date(isoDate + 'T00:00:00');
     const { year, week: isoWeek } = dateToIsoWeek(d);
-    await navigate({ to: '/timesheets/week/$year/$week', params: { year: String(year), week: String(isoWeek) } });
+    await navigate({ to: '/time-entry/week/$year/$week', params: { year: String(year), week: String(isoWeek) } });
   };
 
   return (
@@ -142,14 +141,14 @@ function WeekSection({ week, userId }: { week: TimesheetMonthWeek; userId: strin
   );
 }
 
-export function TimesheetMonthGrid({ month, year, monthNum, userId }: TimesheetMonthGridProps) {
+export function TimesheetMonthGrid({ month, year, monthNum }: TimesheetMonthGridProps) {
   const navigate = useNavigate();
   const { year: prevY, month: prevM } = prevMonth(year, monthNum);
   const { year: nextY, month: nextM } = nextMonth(year, monthNum);
   const { year: todayY, month: todayM } = todayMonth();
 
   const navigateToMonth = async (y: number, m: number) => {
-    await navigate({ to: '/timesheets/month/$year/$month', params: { year: String(y), month: String(m) } });
+    await navigate({ to: '/time-entry/month/$year/$month', params: { year: String(y), month: String(m) } });
   };
 
   return (
@@ -202,7 +201,7 @@ export function TimesheetMonthGrid({ month, year, monthNum, userId }: TimesheetM
           No timesheet data for this month.
         </div>
       ) : (
-        month.weeks.map((week) => <WeekSection key={`${week.isoYear}-${week.isoWeek}`} week={week} userId={userId} />)
+        month.weeks.map((week) => <WeekSection key={`${week.isoYear}-${week.isoWeek}`} week={week} />)
       )}
 
       {/* Monthly summary panel */}

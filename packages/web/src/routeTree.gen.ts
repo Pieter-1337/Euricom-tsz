@@ -15,10 +15,12 @@ import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedAuthenticatedRouteImport } from './routes/_protected/_authenticated'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedAuthenticatedTimesheetsRouteImport } from './routes/_protected/_authenticated/timesheets'
+import { Route as ProtectedAuthenticatedTimeEntryRouteImport } from './routes/_protected/_authenticated/time-entry'
 import { Route as ProtectedAuthenticatedCustomersRouteImport } from './routes/_protected/_authenticated/customers'
 import { Route as ProtectedAuthenticatedContractsRouteImport } from './routes/_protected/_authenticated/contracts'
 import { Route as ProtectedAuthenticatedAdminRouteImport } from './routes/_protected/_authenticated/admin'
 import { Route as ProtectedAuthenticatedTimesheetsIndexRouteImport } from './routes/_protected/_authenticated/timesheets/index'
+import { Route as ProtectedAuthenticatedTimeEntryIndexRouteImport } from './routes/_protected/_authenticated/time-entry/index'
 import { Route as ProtectedAuthenticatedCustomersIndexRouteImport } from './routes/_protected/_authenticated/customers/index'
 import { Route as ProtectedAuthenticatedContractsIndexRouteImport } from './routes/_protected/_authenticated/contracts/index'
 import { Route as ProtectedAuthenticatedCustomersNewRouteImport } from './routes/_protected/_authenticated/customers/new'
@@ -26,11 +28,13 @@ import { Route as ProtectedAuthenticatedCustomersIdRouteImport } from './routes/
 import { Route as ProtectedAuthenticatedContractsNewRouteImport } from './routes/_protected/_authenticated/contracts/new'
 import { Route as ProtectedAuthenticatedContractsContractIdRouteImport } from './routes/_protected/_authenticated/contracts/$contractId'
 import { Route as ProtectedAuthenticatedAdminUsersRouteImport } from './routes/_protected/_authenticated/admin/users'
+import { Route as ProtectedAuthenticatedTimeEntryWeekIndexRouteImport } from './routes/_protected/_authenticated/time-entry/week/index'
+import { Route as ProtectedAuthenticatedTimeEntryMonthIndexRouteImport } from './routes/_protected/_authenticated/time-entry/month/index'
 import { Route as ProtectedAuthenticatedAdminUsersIndexRouteImport } from './routes/_protected/_authenticated/admin/users/index'
 import { Route as ProtectedAuthenticatedAdminUsersNewRouteImport } from './routes/_protected/_authenticated/admin/users/new'
 import { Route as ProtectedAuthenticatedAdminUsersIdRouteImport } from './routes/_protected/_authenticated/admin/users/$id'
-import { Route as ProtectedAuthenticatedTimesheetsWeekYearWeekRouteImport } from './routes/_protected/_authenticated/timesheets/week/$year/$week'
-import { Route as ProtectedAuthenticatedTimesheetsMonthYearMonthRouteImport } from './routes/_protected/_authenticated/timesheets/month/$year/$month'
+import { Route as ProtectedAuthenticatedTimeEntryWeekYearWeekRouteImport } from './routes/_protected/_authenticated/time-entry/week/$year/$week'
+import { Route as ProtectedAuthenticatedTimeEntryMonthYearMonthRouteImport } from './routes/_protected/_authenticated/time-entry/month/$year/$month'
 
 const NoAccessRoute = NoAccessRouteImport.update({
   id: '/no-access',
@@ -61,6 +65,12 @@ const ProtectedAuthenticatedTimesheetsRoute =
     path: '/timesheets',
     getParentRoute: () => ProtectedAuthenticatedRoute,
   } as any)
+const ProtectedAuthenticatedTimeEntryRoute =
+  ProtectedAuthenticatedTimeEntryRouteImport.update({
+    id: '/time-entry',
+    path: '/time-entry',
+    getParentRoute: () => ProtectedAuthenticatedRoute,
+  } as any)
 const ProtectedAuthenticatedCustomersRoute =
   ProtectedAuthenticatedCustomersRouteImport.update({
     id: '/customers',
@@ -84,6 +94,12 @@ const ProtectedAuthenticatedTimesheetsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => ProtectedAuthenticatedTimesheetsRoute,
+  } as any)
+const ProtectedAuthenticatedTimeEntryIndexRoute =
+  ProtectedAuthenticatedTimeEntryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProtectedAuthenticatedTimeEntryRoute,
   } as any)
 const ProtectedAuthenticatedCustomersIndexRoute =
   ProtectedAuthenticatedCustomersIndexRouteImport.update({
@@ -127,6 +143,18 @@ const ProtectedAuthenticatedAdminUsersRoute =
     path: '/users',
     getParentRoute: () => ProtectedAuthenticatedAdminRoute,
   } as any)
+const ProtectedAuthenticatedTimeEntryWeekIndexRoute =
+  ProtectedAuthenticatedTimeEntryWeekIndexRouteImport.update({
+    id: '/week/',
+    path: '/week/',
+    getParentRoute: () => ProtectedAuthenticatedTimeEntryRoute,
+  } as any)
+const ProtectedAuthenticatedTimeEntryMonthIndexRoute =
+  ProtectedAuthenticatedTimeEntryMonthIndexRouteImport.update({
+    id: '/month/',
+    path: '/month/',
+    getParentRoute: () => ProtectedAuthenticatedTimeEntryRoute,
+  } as any)
 const ProtectedAuthenticatedAdminUsersIndexRoute =
   ProtectedAuthenticatedAdminUsersIndexRouteImport.update({
     id: '/',
@@ -145,17 +173,17 @@ const ProtectedAuthenticatedAdminUsersIdRoute =
     path: '/$id',
     getParentRoute: () => ProtectedAuthenticatedAdminUsersRoute,
   } as any)
-const ProtectedAuthenticatedTimesheetsWeekYearWeekRoute =
-  ProtectedAuthenticatedTimesheetsWeekYearWeekRouteImport.update({
+const ProtectedAuthenticatedTimeEntryWeekYearWeekRoute =
+  ProtectedAuthenticatedTimeEntryWeekYearWeekRouteImport.update({
     id: '/week/$year/$week',
     path: '/week/$year/$week',
-    getParentRoute: () => ProtectedAuthenticatedTimesheetsRoute,
+    getParentRoute: () => ProtectedAuthenticatedTimeEntryRoute,
   } as any)
-const ProtectedAuthenticatedTimesheetsMonthYearMonthRoute =
-  ProtectedAuthenticatedTimesheetsMonthYearMonthRouteImport.update({
+const ProtectedAuthenticatedTimeEntryMonthYearMonthRoute =
+  ProtectedAuthenticatedTimeEntryMonthYearMonthRouteImport.update({
     id: '/month/$year/$month',
     path: '/month/$year/$month',
-    getParentRoute: () => ProtectedAuthenticatedTimesheetsRoute,
+    getParentRoute: () => ProtectedAuthenticatedTimeEntryRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -164,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
   '/contracts': typeof ProtectedAuthenticatedContractsRouteWithChildren
   '/customers': typeof ProtectedAuthenticatedCustomersRouteWithChildren
+  '/time-entry': typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   '/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/users': typeof ProtectedAuthenticatedAdminUsersRouteWithChildren
@@ -173,12 +202,15 @@ export interface FileRoutesByFullPath {
   '/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
   '/contracts/': typeof ProtectedAuthenticatedContractsIndexRoute
   '/customers/': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/time-entry/': typeof ProtectedAuthenticatedTimeEntryIndexRoute
   '/timesheets/': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAuthenticatedAdminUsersNewRoute
   '/admin/users/': typeof ProtectedAuthenticatedAdminUsersIndexRoute
-  '/timesheets/month/$year/$month': typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
-  '/timesheets/week/$year/$week': typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
+  '/time-entry/month/': typeof ProtectedAuthenticatedTimeEntryMonthIndexRoute
+  '/time-entry/week/': typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
+  '/time-entry/month/$year/$month': typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
+  '/time-entry/week/$year/$week': typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
 }
 export interface FileRoutesByTo {
   '/no-access': typeof NoAccessRoute
@@ -191,12 +223,15 @@ export interface FileRoutesByTo {
   '/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
   '/contracts': typeof ProtectedAuthenticatedContractsIndexRoute
   '/customers': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/time-entry': typeof ProtectedAuthenticatedTimeEntryIndexRoute
   '/timesheets': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
   '/admin/users/new': typeof ProtectedAuthenticatedAdminUsersNewRoute
   '/admin/users': typeof ProtectedAuthenticatedAdminUsersIndexRoute
-  '/timesheets/month/$year/$month': typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
-  '/timesheets/week/$year/$week': typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
+  '/time-entry/month': typeof ProtectedAuthenticatedTimeEntryMonthIndexRoute
+  '/time-entry/week': typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
+  '/time-entry/month/$year/$month': typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
+  '/time-entry/week/$year/$week': typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -207,6 +242,7 @@ export interface FileRoutesById {
   '/_protected/_authenticated/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
   '/_protected/_authenticated/contracts': typeof ProtectedAuthenticatedContractsRouteWithChildren
   '/_protected/_authenticated/customers': typeof ProtectedAuthenticatedCustomersRouteWithChildren
+  '/_protected/_authenticated/time-entry': typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   '/_protected/_authenticated/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_protected/_authenticated/admin/users': typeof ProtectedAuthenticatedAdminUsersRouteWithChildren
@@ -216,12 +252,15 @@ export interface FileRoutesById {
   '/_protected/_authenticated/customers/new': typeof ProtectedAuthenticatedCustomersNewRoute
   '/_protected/_authenticated/contracts/': typeof ProtectedAuthenticatedContractsIndexRoute
   '/_protected/_authenticated/customers/': typeof ProtectedAuthenticatedCustomersIndexRoute
+  '/_protected/_authenticated/time-entry/': typeof ProtectedAuthenticatedTimeEntryIndexRoute
   '/_protected/_authenticated/timesheets/': typeof ProtectedAuthenticatedTimesheetsIndexRoute
   '/_protected/_authenticated/admin/users/$id': typeof ProtectedAuthenticatedAdminUsersIdRoute
   '/_protected/_authenticated/admin/users/new': typeof ProtectedAuthenticatedAdminUsersNewRoute
   '/_protected/_authenticated/admin/users/': typeof ProtectedAuthenticatedAdminUsersIndexRoute
-  '/_protected/_authenticated/timesheets/month/$year/$month': typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
-  '/_protected/_authenticated/timesheets/week/$year/$week': typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
+  '/_protected/_authenticated/time-entry/month/': typeof ProtectedAuthenticatedTimeEntryMonthIndexRoute
+  '/_protected/_authenticated/time-entry/week/': typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
+  '/_protected/_authenticated/time-entry/month/$year/$month': typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
+  '/_protected/_authenticated/time-entry/week/$year/$week': typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -231,6 +270,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contracts'
     | '/customers'
+    | '/time-entry'
     | '/timesheets'
     | '/api/auth/$'
     | '/admin/users'
@@ -240,12 +280,15 @@ export interface FileRouteTypes {
     | '/customers/new'
     | '/contracts/'
     | '/customers/'
+    | '/time-entry/'
     | '/timesheets/'
     | '/admin/users/$id'
     | '/admin/users/new'
     | '/admin/users/'
-    | '/timesheets/month/$year/$month'
-    | '/timesheets/week/$year/$week'
+    | '/time-entry/month/'
+    | '/time-entry/week/'
+    | '/time-entry/month/$year/$month'
+    | '/time-entry/week/$year/$week'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/no-access'
@@ -258,12 +301,15 @@ export interface FileRouteTypes {
     | '/customers/new'
     | '/contracts'
     | '/customers'
+    | '/time-entry'
     | '/timesheets'
     | '/admin/users/$id'
     | '/admin/users/new'
     | '/admin/users'
-    | '/timesheets/month/$year/$month'
-    | '/timesheets/week/$year/$week'
+    | '/time-entry/month'
+    | '/time-entry/week'
+    | '/time-entry/month/$year/$month'
+    | '/time-entry/week/$year/$week'
   id:
     | '__root__'
     | '/_protected'
@@ -273,6 +319,7 @@ export interface FileRouteTypes {
     | '/_protected/_authenticated/admin'
     | '/_protected/_authenticated/contracts'
     | '/_protected/_authenticated/customers'
+    | '/_protected/_authenticated/time-entry'
     | '/_protected/_authenticated/timesheets'
     | '/api/auth/$'
     | '/_protected/_authenticated/admin/users'
@@ -282,12 +329,15 @@ export interface FileRouteTypes {
     | '/_protected/_authenticated/customers/new'
     | '/_protected/_authenticated/contracts/'
     | '/_protected/_authenticated/customers/'
+    | '/_protected/_authenticated/time-entry/'
     | '/_protected/_authenticated/timesheets/'
     | '/_protected/_authenticated/admin/users/$id'
     | '/_protected/_authenticated/admin/users/new'
     | '/_protected/_authenticated/admin/users/'
-    | '/_protected/_authenticated/timesheets/month/$year/$month'
-    | '/_protected/_authenticated/timesheets/week/$year/$week'
+    | '/_protected/_authenticated/time-entry/month/'
+    | '/_protected/_authenticated/time-entry/week/'
+    | '/_protected/_authenticated/time-entry/month/$year/$month'
+    | '/_protected/_authenticated/time-entry/week/$year/$week'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -340,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsRouteImport
       parentRoute: typeof ProtectedAuthenticatedRoute
     }
+    '/_protected/_authenticated/time-entry': {
+      id: '/_protected/_authenticated/time-entry'
+      path: '/time-entry'
+      fullPath: '/time-entry'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryRouteImport
+      parentRoute: typeof ProtectedAuthenticatedRoute
+    }
     '/_protected/_authenticated/customers': {
       id: '/_protected/_authenticated/customers'
       path: '/customers'
@@ -367,6 +424,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/timesheets/'
       preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsIndexRouteImport
       parentRoute: typeof ProtectedAuthenticatedTimesheetsRoute
+    }
+    '/_protected/_authenticated/time-entry/': {
+      id: '/_protected/_authenticated/time-entry/'
+      path: '/'
+      fullPath: '/time-entry/'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimeEntryRoute
     }
     '/_protected/_authenticated/customers/': {
       id: '/_protected/_authenticated/customers/'
@@ -417,6 +481,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedAdminUsersRouteImport
       parentRoute: typeof ProtectedAuthenticatedAdminRoute
     }
+    '/_protected/_authenticated/time-entry/week/': {
+      id: '/_protected/_authenticated/time-entry/week/'
+      path: '/week'
+      fullPath: '/time-entry/week/'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryWeekIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimeEntryRoute
+    }
+    '/_protected/_authenticated/time-entry/month/': {
+      id: '/_protected/_authenticated/time-entry/month/'
+      path: '/month'
+      fullPath: '/time-entry/month/'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryMonthIndexRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimeEntryRoute
+    }
     '/_protected/_authenticated/admin/users/': {
       id: '/_protected/_authenticated/admin/users/'
       path: '/'
@@ -438,19 +516,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedAdminUsersIdRouteImport
       parentRoute: typeof ProtectedAuthenticatedAdminUsersRoute
     }
-    '/_protected/_authenticated/timesheets/week/$year/$week': {
-      id: '/_protected/_authenticated/timesheets/week/$year/$week'
+    '/_protected/_authenticated/time-entry/week/$year/$week': {
+      id: '/_protected/_authenticated/time-entry/week/$year/$week'
       path: '/week/$year/$week'
-      fullPath: '/timesheets/week/$year/$week'
-      preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRouteImport
-      parentRoute: typeof ProtectedAuthenticatedTimesheetsRoute
+      fullPath: '/time-entry/week/$year/$week'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimeEntryRoute
     }
-    '/_protected/_authenticated/timesheets/month/$year/$month': {
-      id: '/_protected/_authenticated/timesheets/month/$year/$month'
+    '/_protected/_authenticated/time-entry/month/$year/$month': {
+      id: '/_protected/_authenticated/time-entry/month/$year/$month'
       path: '/month/$year/$month'
-      fullPath: '/timesheets/month/$year/$month'
-      preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRouteImport
-      parentRoute: typeof ProtectedAuthenticatedTimesheetsRoute
+      fullPath: '/time-entry/month/$year/$month'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimeEntryRoute
     }
   }
 }
@@ -533,20 +611,41 @@ const ProtectedAuthenticatedCustomersRouteWithChildren =
     ProtectedAuthenticatedCustomersRouteChildren,
   )
 
+interface ProtectedAuthenticatedTimeEntryRouteChildren {
+  ProtectedAuthenticatedTimeEntryIndexRoute: typeof ProtectedAuthenticatedTimeEntryIndexRoute
+  ProtectedAuthenticatedTimeEntryMonthIndexRoute: typeof ProtectedAuthenticatedTimeEntryMonthIndexRoute
+  ProtectedAuthenticatedTimeEntryWeekIndexRoute: typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
+  ProtectedAuthenticatedTimeEntryMonthYearMonthRoute: typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
+  ProtectedAuthenticatedTimeEntryWeekYearWeekRoute: typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
+}
+
+const ProtectedAuthenticatedTimeEntryRouteChildren: ProtectedAuthenticatedTimeEntryRouteChildren =
+  {
+    ProtectedAuthenticatedTimeEntryIndexRoute:
+      ProtectedAuthenticatedTimeEntryIndexRoute,
+    ProtectedAuthenticatedTimeEntryMonthIndexRoute:
+      ProtectedAuthenticatedTimeEntryMonthIndexRoute,
+    ProtectedAuthenticatedTimeEntryWeekIndexRoute:
+      ProtectedAuthenticatedTimeEntryWeekIndexRoute,
+    ProtectedAuthenticatedTimeEntryMonthYearMonthRoute:
+      ProtectedAuthenticatedTimeEntryMonthYearMonthRoute,
+    ProtectedAuthenticatedTimeEntryWeekYearWeekRoute:
+      ProtectedAuthenticatedTimeEntryWeekYearWeekRoute,
+  }
+
+const ProtectedAuthenticatedTimeEntryRouteWithChildren =
+  ProtectedAuthenticatedTimeEntryRoute._addFileChildren(
+    ProtectedAuthenticatedTimeEntryRouteChildren,
+  )
+
 interface ProtectedAuthenticatedTimesheetsRouteChildren {
   ProtectedAuthenticatedTimesheetsIndexRoute: typeof ProtectedAuthenticatedTimesheetsIndexRoute
-  ProtectedAuthenticatedTimesheetsMonthYearMonthRoute: typeof ProtectedAuthenticatedTimesheetsMonthYearMonthRoute
-  ProtectedAuthenticatedTimesheetsWeekYearWeekRoute: typeof ProtectedAuthenticatedTimesheetsWeekYearWeekRoute
 }
 
 const ProtectedAuthenticatedTimesheetsRouteChildren: ProtectedAuthenticatedTimesheetsRouteChildren =
   {
     ProtectedAuthenticatedTimesheetsIndexRoute:
       ProtectedAuthenticatedTimesheetsIndexRoute,
-    ProtectedAuthenticatedTimesheetsMonthYearMonthRoute:
-      ProtectedAuthenticatedTimesheetsMonthYearMonthRoute,
-    ProtectedAuthenticatedTimesheetsWeekYearWeekRoute:
-      ProtectedAuthenticatedTimesheetsWeekYearWeekRoute,
   }
 
 const ProtectedAuthenticatedTimesheetsRouteWithChildren =
@@ -558,6 +657,7 @@ interface ProtectedAuthenticatedRouteChildren {
   ProtectedAuthenticatedAdminRoute: typeof ProtectedAuthenticatedAdminRouteWithChildren
   ProtectedAuthenticatedContractsRoute: typeof ProtectedAuthenticatedContractsRouteWithChildren
   ProtectedAuthenticatedCustomersRoute: typeof ProtectedAuthenticatedCustomersRouteWithChildren
+  ProtectedAuthenticatedTimeEntryRoute: typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   ProtectedAuthenticatedTimesheetsRoute: typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
 }
 
@@ -569,6 +669,8 @@ const ProtectedAuthenticatedRouteChildren: ProtectedAuthenticatedRouteChildren =
       ProtectedAuthenticatedContractsRouteWithChildren,
     ProtectedAuthenticatedCustomersRoute:
       ProtectedAuthenticatedCustomersRouteWithChildren,
+    ProtectedAuthenticatedTimeEntryRoute:
+      ProtectedAuthenticatedTimeEntryRouteWithChildren,
     ProtectedAuthenticatedTimesheetsRoute:
       ProtectedAuthenticatedTimesheetsRouteWithChildren,
   }

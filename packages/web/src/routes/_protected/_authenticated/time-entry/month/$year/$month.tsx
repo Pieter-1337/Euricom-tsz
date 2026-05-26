@@ -3,7 +3,7 @@ import { TimesheetMonthGrid } from '#/features/timesheets/components/timesheet-m
 import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
 import type { CurrentUser } from '#/server/current-user';
 
-export const Route = createFileRoute('/_protected/_authenticated/timesheets/month/$year/$month')({
+export const Route = createFileRoute('/_protected/_authenticated/time-entry/month/$year/$month')({
   loader: async ({ params, context }) => {
     const { currentUser } = context as { currentUser: CurrentUser };
     const userId = currentUser.id;
@@ -29,7 +29,7 @@ function TimesheetMonthPage() {
   return (
     <main>
       <h1 className="mb-6 text-2xl font-bold">Time Entry</h1>
-      <TimesheetMonthGrid month={monthData ?? emptyMonth} year={year} monthNum={month} userId={userId} />
+      <TimesheetMonthGrid month={monthData ?? emptyMonth} year={year} monthNum={month} />
     </main>
   );
 }

@@ -8,7 +8,7 @@ import {
 import type { CurrentUser } from '#/server/current-user';
 import { UserRole } from '#/api/users';
 
-export const Route = createFileRoute('/_protected/_authenticated/timesheets/week/$year/$week')({
+export const Route = createFileRoute('/_protected/_authenticated/time-entry/week/$year/$week')({
   loader: async ({ params, context }) => {
     const { currentUser } = context as { currentUser: CurrentUser };
     const userId = currentUser.id;

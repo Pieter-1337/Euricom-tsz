@@ -99,7 +99,7 @@ export function TimesheetWeekGrid({
   const navigateToWeek = async (y: number, w: number) => {
     const saved = await flush();
     if (!saved) return;
-    await navigate({ to: '/timesheets/week/$year/$week', params: { year: String(y), week: String(w) } });
+    await navigate({ to: '/time-entry/week/$year/$week', params: { year: String(y), week: String(w) } });
   };
 
   const handleSubmit = async () => {
