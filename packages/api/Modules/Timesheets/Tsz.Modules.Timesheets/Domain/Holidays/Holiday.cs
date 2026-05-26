@@ -1,7 +1,6 @@
 using Tsz.Infrastructure.Abstractions;
-using Tsz.Modules.Workdays.Contracts;
 
-namespace Tsz.Modules.Workdays.Domain.Holidays;
+namespace Tsz.Modules.Timesheets.Domain.Holidays;
 
 public class Holiday : IEntityBase
 {

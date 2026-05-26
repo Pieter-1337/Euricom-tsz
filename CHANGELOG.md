@@ -18,6 +18,15 @@ from the Timesheets (submission tracking) view. Key changes:
 
 Internal: update all navigation references, remove unused params in grids.
 
+### feat: year-scoped leave bookings and holidays endpoints
+
+Two new read endpoints for the upcoming year-at-a-glance Leave Overview:
+
+- `GET /timesheet-weeks/{userId}/leave-bookings?year=YYYY` returns the user's `LeaveBooking` rows for the year (sorted by date then leave-type id, projecting `leaveTypeName`). Gated by the `RequireAdminOrSelf` policy.
+- `GET /workdays/holidays?year=YYYY` returns the year's public holidays from the seeded 2026-2028 BE list. Available to any authenticated user.
+
+The `Tsz.Modules.Workdays` module has been folded into `Tsz.Modules.Timesheets` (per ADR-0002: Holiday data has only one cross-module C# consumer, so it lives inside its host module). The `IWorkdaysAccessModule` facade is gone; the bulk-flush validator now calls an intra-Timesheets `BusinessDayService` directly. No DB migration was needed — the `Holidays` table is unchanged.
+
 ### feat: consultants can read their own leave allowance
 
 Consultants no longer need admin access to read their own `UserLeave` rows. `GET /users/{userId}/leaves?year=YYYY` now accepts any caller whose authenticated user id matches the route, in addition to admins reading any user. `PUT /users/{userId}/leaves` stays admin-only — consultants cannot grant themselves leave.

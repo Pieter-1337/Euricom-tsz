@@ -1,5 +1,4 @@
-using Tsz.Modules.Workdays.Contracts;
-using Tsz.Modules.Workdays.Domain.Holidays;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 
 namespace Tsz.Api.Tests.Builders;
 

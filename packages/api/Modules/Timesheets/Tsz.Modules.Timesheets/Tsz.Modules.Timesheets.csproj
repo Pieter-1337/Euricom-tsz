@@ -26,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Tsz.Modules.Timesheets.Contracts\Tsz.Modules.Timesheets.Contracts.csproj" />
     <ProjectReference Include="..\..\Contracts\Tsz.Modules.Contracts.Contracts\Tsz.Modules.Contracts.Contracts.csproj" />
-    <ProjectReference Include="..\..\Workdays\Tsz.Modules.Workdays.Contracts\Tsz.Modules.Workdays.Contracts.csproj" />
     <ProjectReference Include="..\..\LeaveTypes\Tsz.Modules.LeaveTypes.Contracts\Tsz.Modules.LeaveTypes.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Tsz.SharedKernel\Tsz.SharedKernel.csproj" />
     <ProjectReference Include="..\..\..\Tsz.Infrastructure\Tsz.Infrastructure.csproj" />

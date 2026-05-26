@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Features;
 
 namespace Tsz.Modules.Timesheets.Endpoints;
@@ -125,6 +126,28 @@ public static class TimesheetEndpoints
             var leaveTypes = await dispatcher.SendAsync(
                 new GetSelectableLeaveTypesQuery(userId), ct);
             return TypedResults.Ok(leaveTypes);
+        });
+
+        group.MapGet("/{userId:guid}/leave-bookings", async (
+            Guid userId,
+            int year,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            var dto = await dispatcher.SendAsync(new GetLeaveBookingsForYearQuery(userId, year), ct);
+            return TypedResults.Ok(dto);
+        }).RequireAuthorization(AuthorizationPolicies.RequireAdminOrSelf);
+
+        var workdaysGroup = app.MapApiGroup("workdays")
+            .RequireAuthorization();
+
+        workdaysGroup.MapGet("/holidays", async (
+            int year,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+        {
+            var dto = await dispatcher.SendAsync(new GetHolidaysInYearQuery(year), ct);
+            return TypedResults.Ok(dto);
         });
     }
 }

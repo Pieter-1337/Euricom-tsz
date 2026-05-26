@@ -3,9 +3,9 @@ using Shouldly;
 using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Timesheets.Features;
-using Tsz.Modules.Workdays.Contracts;
 using Tsz.Infrastructure.Abstractions;
 
 namespace Tsz.Api.Tests.Modules.Timesheets.Features;
@@ -45,8 +45,8 @@ public class ApplyTimesheetWeekBookingsValidatorTests
             .ReturnsAsync((IEnumerable<TimesheetWeek>)(otherWeeks ?? []));
         uow.Setup(u => u.RepositoryFor<TimesheetWeek>()).Returns(repo.Object);
 
-        var workdays = new Mock<IWorkdaysAccessModule>();
-        workdays.Setup(w => w.IsBusinessDay(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+        var businessDayService = new Mock<IBusinessDayService>();
+        businessDayService.Setup(w => w.IsBusinessDay(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(isBusinessDay);
 
         var contracts = new Mock<IContractsAccessModule>();
@@ -65,7 +65,7 @@ public class ApplyTimesheetWeekBookingsValidatorTests
                 It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(leaveAllowanceDays);
 
-        return new ApplyTimesheetWeekBookingsValidator(uow.Object, workdays.Object, contracts.Object, leaveTypes.Object);
+        return new ApplyTimesheetWeekBookingsValidator(uow.Object, businessDayService.Object, contracts.Object, leaveTypes.Object);
     }
 
     private static ApplyTimesheetWeekBookingsCommand ValidCmd(
@@ -305,8 +305,8 @@ public class ApplyTimesheetWeekBookingsValidatorTests
             .ReturnsAsync((IEnumerable<TimesheetWeek>)[]);
         uow.Setup(u => u.RepositoryFor<TimesheetWeek>()).Returns(repo.Object);
 
-        var workdays = new Mock<IWorkdaysAccessModule>();
-        workdays.Setup(w => w.IsBusinessDay(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+        var businessDayService = new Mock<IBusinessDayService>();
+        businessDayService.Setup(w => w.IsBusinessDay(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         var contracts = new Mock<IContractsAccessModule>();
@@ -315,7 +315,7 @@ public class ApplyTimesheetWeekBookingsValidatorTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((IReadOnlyList<SelectableContractTaskDto>)[]);
 
-        var validator = new ApplyTimesheetWeekBookingsValidator(uow.Object, workdays.Object, contracts.Object, leaveTypes.Object);
+        var validator = new ApplyTimesheetWeekBookingsValidator(uow.Object, businessDayService.Object, contracts.Object, leaveTypes.Object);
 
         var cmd = new ApplyTimesheetWeekBookingsCommand(
             UserId, Year, Week,

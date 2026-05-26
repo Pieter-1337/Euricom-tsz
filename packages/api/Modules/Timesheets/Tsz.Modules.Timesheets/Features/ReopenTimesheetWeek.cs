@@ -4,8 +4,8 @@ using Tsz.Infrastructure.Abstractions;
 using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
-using Tsz.Modules.Workdays.Contracts;
 
 namespace Tsz.Modules.Timesheets.Features;
 
@@ -32,7 +32,7 @@ public sealed class ReopenTimesheetWeekValidator : AbstractValidator<ReopenTimes
 public sealed class ReopenTimesheetWeekHandler(
     IUnitOfWork uow,
     IContractsAccessModule contracts,
-    IWorkdaysAccessModule workdays,
+    IBusinessDayService businessDayService,
     ILeaveTypesAccessModule leaveTypes)
     : ICommandHandler<ReopenTimesheetWeekCommand, TimesheetWeekDto>
 {
@@ -50,6 +50,6 @@ public sealed class ReopenTimesheetWeekHandler(
         week.Reopen();
         await uow.SaveChangesAsync(ct);
 
-        return await TimesheetWeekDtoBuilder.BuildAsync(week, command.IsoYear, command.IsoWeek, workdays, contracts, leaveTypes, ct);
+        return await TimesheetWeekDtoBuilder.BuildAsync(week, command.IsoYear, command.IsoWeek, businessDayService, contracts, leaveTypes, ct);
     }
 }

@@ -4,8 +4,8 @@ using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.LeaveTypes.Contracts;
 using Tsz.Modules.LeaveTypes.Contracts.Queries;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
-using Tsz.Modules.Workdays.Contracts;
 
 namespace Tsz.Modules.Timesheets.Features;
 
@@ -18,7 +18,7 @@ public sealed record GetTimesheetWeekQuery(
 public sealed class GetTimesheetWeekHandler(
     IUnitOfWork uow,
     IContractsAccessModule contracts,
-    IWorkdaysAccessModule workdays,
+    IBusinessDayService businessDayService,
     ILeaveTypesAccessModule leaveTypes)
     : IQueryHandler<GetTimesheetWeekQuery, TimesheetWeekDto>
 {
@@ -36,7 +36,7 @@ public sealed class GetTimesheetWeekHandler(
             .Select(i => DateOnly.FromDateTime(weekStart.AddDays(i)))
             .ToArray();
 
-        var dayKinds = await workdays.GetDayKindsAsync(days, ct);
+        var dayKinds = await businessDayService.GetDayKindsAsync(days, ct);
         var dayInfos = dayKinds.Select(dk => new DayInfoDto(dk.Date, dk.IsBusinessDay, dk.HolidayName)).ToList();
 
         if (week is null)

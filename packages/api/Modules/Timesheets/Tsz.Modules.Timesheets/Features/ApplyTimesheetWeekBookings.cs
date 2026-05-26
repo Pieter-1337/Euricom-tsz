@@ -5,8 +5,8 @@ using Tsz.Infrastructure.Validation;
 using Tsz.Modules.Contracts.Contracts;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.LeaveTypes.Contracts;
+using Tsz.Modules.Timesheets.Domain.Holidays;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
-using Tsz.Modules.Workdays.Contracts;
 
 namespace Tsz.Modules.Timesheets.Features;
 
@@ -33,7 +33,7 @@ public sealed class ApplyTimesheetWeekBookingsValidator
 {
     public ApplyTimesheetWeekBookingsValidator(
         IUnitOfWork uow,
-        IWorkdaysAccessModule workdays,
+        IBusinessDayService businessDayService,
         IContractsAccessModule contracts,
         ILeaveTypesAccessModule leaveTypes)
     {
@@ -73,7 +73,7 @@ public sealed class ApplyTimesheetWeekBookingsValidator
             .MustAsync(async (cmd, entries, ctx, ct) =>
             {
                 if (!entries.Any()) return true;
-                var checks = await Task.WhenAll(entries.Select(b => workdays.IsBusinessDay(b.Date, ct)));
+                var checks = await Task.WhenAll(entries.Select(b => businessDayService.IsBusinessDay(b.Date, ct)));
                 return checks.All(r => r);
             })
             .WithError(TimesheetErrors.DateNotBusinessDay)
@@ -121,7 +121,7 @@ public sealed class ApplyTimesheetWeekBookingsValidator
             .MustAsync(async (cmd, leavs, ctx, ct) =>
             {
                 if (!leavs.Any()) return true;
-                var checks = await Task.WhenAll(leavs.Select(b => workdays.IsBusinessDay(b.Date, ct)));
+                var checks = await Task.WhenAll(leavs.Select(b => businessDayService.IsBusinessDay(b.Date, ct)));
                 return checks.All(r => r);
             })
             .WithError(TimesheetErrors.DateNotBusinessDay)
@@ -198,7 +198,7 @@ public sealed class ApplyTimesheetWeekBookingsValidator
 public sealed class ApplyTimesheetWeekBookingsHandler(
     IUnitOfWork uow,
     IContractsAccessModule contracts,
-    IWorkdaysAccessModule workdays,
+    IBusinessDayService businessDayService,
     ILeaveTypesAccessModule leaveTypes)
     : ICommandHandler<ApplyTimesheetWeekBookingsCommand, TimesheetWeekDto>
 {
@@ -234,7 +234,7 @@ public sealed class ApplyTimesheetWeekBookingsHandler(
             .Select(i => DateOnly.FromDateTime(weekStart.AddDays(i)))
             .ToArray();
 
-        var businessDayChecks = await Task.WhenAll(days.Select(d => workdays.IsBusinessDay(d, ct)));
+        var businessDayChecks = await Task.WhenAll(days.Select(d => businessDayService.IsBusinessDay(d, ct)));
         var dayInfos = days.Select((d, i) => new DayInfoDto(d, businessDayChecks[i])).ToList();
 
         var contractTaskIds = week.Entries.Select(e => e.ContractTaskId).Distinct().ToList();
