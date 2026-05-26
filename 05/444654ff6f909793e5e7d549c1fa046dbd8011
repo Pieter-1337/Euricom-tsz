@@ -1,0 +1,107 @@
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetTimesheetWeek.cs
+  s_0f7fa78e97333b::t_dc173e492603db 39-40
+  s_0f7fa78e97333b::t_595d3c32e23eba 84
+packages/web/src/features/timesheets/components/week-grid/add-row-popover.tsx
+  s_0f7fa78e97333b::t_95ca61d5967b34 1-69
+packages/web/src/routes/_protected/_authenticated/timesheets/week/$year/$week.tsx
+  s_0f7fa78e97333b::t_0953e5fa035ccf 2
+CONTEXT.md
+  s_c98e8b29757289::t_f8748196718e5e 78
+  s_c98e8b29757289::t_3856c2dd39961e 45-48
+packages/api/Tsz.Api/Persistence/Migrations/20260526102542_SeedBelgianHolidays2025.cs
+  s_0f7fa78e97333b::t_6749208ea24dac 1-88
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/GetTimesheetMonthHandlerTests.cs
+  s_0f7fa78e97333b::t_668ae8a7c6733b 37-38,40-46
+tsz.slnx
+  s_c98e8b29757289::t_e20d1265f65e0f 16-19
+packages/web/src/api/schema.ts
+  s_0f7fa78e97333b::t_5d6ce70c8bc5b2 1002
+  s_0f7fa78e97333b::t_9b39c9bc042519 934
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/TimesheetWeekDtoBuilder.cs
+  s_0f7fa78e97333b::t_69647f0b9eb5a4 26-27
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/WorkdaysAccessModule.cs
+  s_0f7fa78e97333b::t_40ba034e5f4c65 21-41
+packages/api/Tsz.Api.Tests.Integration/UserLeaveEndpointsTests.cs
+  s_0f7fa78e97333b::t_930b0a058baa61 114,124,130,142,208,231,266
+  s_0f7fa78e97333b::t_28ea8b78331132 185
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetTimesheetMonth.cs
+  s_0f7fa78e97333b::t_668e341caa079e 145
+  s_0f7fa78e97333b::t_eedb95e7ccf806 203
+  s_0f7fa78e97333b::t_3b7b2256ffbd54 83
+  s_0f7fa78e97333b::t_e85471f9683e62 110-112
+  s_0f7fa78e97333b::t_b5b6ece7eb2e93 75,77,81
+  s_0f7fa78e97333b::t_71096e7161a2fe 101
+packages/web/src/features/timesheets/components/week-grid/use-week-bookings.ts
+  s_0f7fa78e97333b::t_d8ca3457378001 1-163
+packages/api/Tsz.Api.Tests/Modules/Workdays/WorkdaysAccessModuleTests.cs
+  s_0f7fa78e97333b::t_0c19e81073c0ee 7,28-42
+  s_0f7fa78e97333b::t_21150a839a6fde 97-140
+packages/web/src/features/timesheets/components/week-grid/use-week-flush.ts
+  s_0f7fa78e97333b::t_0d4e55a9476ca3 1-107
+packages/api/Modules/Workdays/Tsz.Modules.Workdays.Contracts/IWorkdaysAccessModule.cs
+  s_0f7fa78e97333b::t_9825c8729bef84 3-4,8-11
+docs/product/requirements/leave-overview/plan.md
+  s_c98e8b29757289::t_4588808a8622f7 223
+  s_c98e8b29757289::t_23e0bec459c2ea 198-199
+  s_c98e8b29757289::t_cdbb09fcf54b9d 36,38-40,42-44
+  s_c98e8b29757289::t_71c71828ae4235 1-35,37,41,45-60,62-65,67,69-73,75-78,89-155,164-197,200-221,226
+  s_c98e8b29757289::t_aa89a6c7cbbbd0 68,74,81,83,85,87
+  s_c98e8b29757289::t_3870596bf2a0c7 156-163
+  s_c98e8b29757289::t_7aee288e22de91 61
+  s_c98e8b29757289::t_5f70f2d8d4d75b 66,79-80,82,84,86,88
+  s_c98e8b29757289::t_1e36dfac1f7bc5 222,224-225
+PLAN.md
+  s_0f7fa78e97333b::t_faa463e0629385 1-75
+packages/web/src/features/timesheets/components/week-grid/booking-row.tsx
+  s_0f7fa78e97333b::t_c5810cf499fb9b 3
+  s_0f7fa78e97333b::t_3920bb7a933452 132
+  s_0f7fa78e97333b::t_e00a132ea01dd5 153,156,163,165,175,177
+  s_0f7fa78e97333b::t_8d97cefa648290 4
+  s_0f7fa78e97333b::t_7d06d1f81e50b5 1-2,5-89,91-96,98-104,106-113,115-123,126,128,130-131,133-134,136-138,140-152,154-155,157-162,164,166-174,176,178-179
+  s_0f7fa78e97333b::t_be4210904b4312 114
+  s_0f7fa78e97333b::t_9a5516066266b5 124-125,127,129
+  s_0f7fa78e97333b::t_39358877ce2bc6 135,139
+  s_0f7fa78e97333b::t_b61df28c879484 90,97,105
+packages/api/Modules/Workdays/Tsz.Modules.Workdays/Domain/Holidays/HolidayConfiguration.cs
+  s_0f7fa78e97333b::t_6ade39d4cdfe78 34-45
+packages/web/src/features/timesheets/components/week-grid/week-table.tsx
+  s_0f7fa78e97333b::t_ecbbf2a7bf0f4c 63-66,68,73,97,100,102-106,108-112,114-115,151-154,156,161,170,173,175-179
+  s_0f7fa78e97333b::t_f546b82ffc17cf 71,75-79,81-86,89-96
+  s_0f7fa78e97333b::t_5d57623161635c 1-3,5-57,59-62,67,69-70,72,74,80,87-88,98-99,101,107,113,116-150,155,157-160,162-169,171-172,174,180-182
+  s_0f7fa78e97333b::t_4a01b6e33ae9f1 4
+  s_0f7fa78e97333b::t_99d572cdd0b0ae 58
+packages/api/Tsz.Api/Persistence/Migrations/20260526102542_SeedBelgianHolidays2025.Designer.cs
+  s_0f7fa78e97333b::t_6749208ea24dac 1-809
+packages/api/Tsz.Api/Persistence/Migrations/AppDbContextModelSnapshot.cs
+  s_0f7fa78e97333b::t_6749208ea24dac 120,127,134,140,271-350
+packages/api/Modules/LeaveTypes/Tsz.Modules.LeaveTypes/Domain/LeaveTypes/LeaveTypeConfiguration.cs
+  s_0f7fa78e97333b::t_ea5a90a0ac69a1 38-41
+packages/web/src/features/timesheets/components/week-grid/week-actions-bar.tsx
+  s_0f7fa78e97333b::t_b55db9be6e2086 1-123
+packages/web/src/features/timesheets/components/week-grid/timesheet-week-grid.tsx
+  s_0f7fa78e97333b::t_6d22f2a4ce5fa5 1-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "05444654ff6f909793e5e7d549c1fa046dbd8011",
+  "prompts": {},
+  "sessions": {
+    "s_0f7fa78e97333b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9f5a0e05-45cf-4235-b05f-f37f035c9787",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_c98e8b29757289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58fc29c9-0f36-4e0c-bceb-35902252b4e1",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
