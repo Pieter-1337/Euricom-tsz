@@ -14,3 +14,8 @@ export function areMapsEqual<K, V>(a: Map<K, V>, b: Map<K, V>): boolean {
   }
   return true;
 }
+
+/** Format an hours value: keep up to 2 decimals, drop trailing zeros, append `h`. */
+export function formatHours(n: number): string {
+  return `${parseFloat(n.toFixed(2))}h`;
+}

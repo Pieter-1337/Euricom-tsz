@@ -8,6 +8,8 @@ import type { LeaveCellKey, TaskCellKey } from './use-week-bookings';
 /** Mirrors backend `TimesheetWeek.WorkdayCapacity`. */
 export const WORKDAY_CAPACITY = 8;
 export const DAY_CAPACITY_ERROR_MESSAGE = 'One or more days exceed the daily capacity.';
+export const CELL_INVALID_ERROR_MESSAGE =
+  'One or more cells contain an invalid value (must be a multiple of 0.25 between 0.25 and 8).';
 
 interface UseWeekFlushParams {
   userId: string;

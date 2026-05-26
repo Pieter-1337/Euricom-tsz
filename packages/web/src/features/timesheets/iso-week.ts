@@ -48,13 +48,36 @@ export function formatDayHeader(isoDate: string): { day: string; label: string }
   };
 }
 
-export function parseDurationInput(raw: string): number | null {
+export type DurationValidation = 'valid' | 'exceeds' | 'invalid';
+
+export function validateDurationInput(raw: string): DurationValidation {
   const n = parseFloat(raw.replace(',', '.'));
-  if (isNaN(n)) return null;
-  if (n < 0.25 || n > 8) return null;
-  if (Math.round(n * 4) !== n * 4) return null;
-  return n;
+  if (isNaN(n)) return 'invalid';
+  if (n < 0.25) return 'invalid';
+  if (Math.round(n * 4) !== n * 4) return 'invalid';
+  if (n > 8) return 'exceeds';
+  return 'valid';
 }
+
+export function parseDurationInput(raw: string): number | null {
+  if (validateDurationInput(raw) !== 'valid') return null;
+  return parseFloat(raw.replace(',', '.'));
+}
+
+/**
+ * Display value used for totals (day / row / week). Prefers the user's raw
+ * input — even when it doesn't satisfy {@link validateDurationInput} — so
+ * totals reflect what the viewer sees in the cells. Falls back to the
+ * committed stored value when no raw input exists or it can't be parsed.
+ */
+export function displayDuration(raw: string | undefined, stored: number | undefined): number {
+  if (raw !== undefined && raw !== '') {
+    const parsed = parseFloat(raw.replace(',', '.'));
+    if (!isNaN(parsed)) return parsed;
+  }
+  return stored ?? 0;
+}
+
 
 export function isValidDuration(val: number): boolean {
   return val >= 0.25 && val <= 8 && Math.round(val * 4) === val * 4;

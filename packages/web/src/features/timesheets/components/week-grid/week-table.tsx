@@ -1,4 +1,4 @@
-import { cn } from '#/lib/utils';
+import { cn, formatHours } from '#/lib/utils';
 import { formatDayHeader } from '#/features/timesheets/iso-week';
 import type { TimesheetWeek } from '#/api/timesheets';
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '#/components/ui/table';
@@ -22,8 +22,6 @@ interface WeekTableProps {
   status: Status;
   cellInputs: Map<CellKey, string>;
   setCellInputs: React.Dispatch<React.SetStateAction<Map<CellKey, string>>>;
-  editingCell: CellKey | null;
-  setEditingCell: React.Dispatch<React.SetStateAction<CellKey | null>>;
   setTaskCell: (taskId: string, date: string, value: number | null) => void;
   setLeaveCell: (leaveTypeId: string, date: string, value: number | null) => void;
   onRemoveTaskRow: (taskId: string) => void;
@@ -42,8 +40,6 @@ export function WeekTable({
   status,
   cellInputs,
   setCellInputs,
-  editingCell,
-  setEditingCell,
   setTaskCell,
   setLeaveCell,
   onRemoveTaskRow,
@@ -126,8 +122,6 @@ export function WeekTable({
               onCellChange={(date, value) => setTaskCell(row.id, date, value)}
               cellInputs={cellInputs}
               setCellInputs={setCellInputs}
-              editingCell={editingCell}
-              setEditingCell={setEditingCell}
               onRemove={() => onRemoveTaskRow(row.id)}
             />
           ))}
@@ -143,8 +137,6 @@ export function WeekTable({
               onCellChange={(date, value) => setLeaveCell(row.id, date, value)}
               cellInputs={cellInputs}
               setCellInputs={setCellInputs}
-              editingCell={editingCell}
-              setEditingCell={setEditingCell}
               onRemove={() => onRemoveLeaveRow(row.id)}
             />
           ))}
@@ -166,12 +158,16 @@ export function WeekTable({
                   )}
                   data-testid={`day-total-${d.date}`}
                 >
-                  {overCap ? `${total}h / ${WORKDAY_CAPACITY}h max` : total > 0 ? total : ''}
+                  {overCap
+                    ? `${formatHours(total)} / ${WORKDAY_CAPACITY}h max`
+                    : total > 0
+                      ? formatHours(total)
+                      : ''}
                 </TableCell>
               );
             })}
             <TableCell className="px-2 py-2 text-center font-bold text-sm text-[#3A4651] dark:text-white">
-              {weekTotal > 0 ? weekTotal : ''}
+              {weekTotal > 0 ? formatHours(weekTotal) : ''}
             </TableCell>
             {isDraft && <TableCell />}
           </TableRow>

@@ -18,6 +18,7 @@ interface WeekActionsBarProps {
   isFlushing: boolean;
   isLifecycleLoading: boolean;
   hasDayCapacityError: boolean;
+  hasInvalidCellInput: boolean;
   onNavigateToWeek: (year: number, week: number) => void;
   onSave: () => void;
   onSubmit: () => void;
@@ -35,6 +36,7 @@ export function WeekActionsBar({
   isFlushing,
   isLifecycleLoading,
   hasDayCapacityError,
+  hasInvalidCellInput,
   onNavigateToWeek,
   onSave,
   onSubmit,
@@ -96,14 +98,14 @@ export function WeekActionsBar({
           <Button
             variant="outline"
             size="sm"
-            disabled={!isDirty || isFlushing || isLifecycleLoading || hasDayCapacityError}
+            disabled={!isDirty || isFlushing || isLifecycleLoading || hasDayCapacityError || hasInvalidCellInput}
             onClick={onSave}
           >
             Save
           </Button>
         )}
         {isDraft && (
-          <Button size="sm" disabled={isLifecycleLoading || hasDayCapacityError} onClick={onSubmit}>
+          <Button size="sm" disabled={isLifecycleLoading || hasDayCapacityError || hasInvalidCellInput} onClick={onSubmit}>
             Submit
           </Button>
         )}

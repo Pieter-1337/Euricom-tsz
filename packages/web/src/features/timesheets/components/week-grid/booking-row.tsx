@@ -2,8 +2,8 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { TableCell, TableRow } from '#/components/ui/table';
-import { cn } from '#/lib/utils';
-import { parseDurationInput } from '#/features/timesheets/iso-week';
+import { cn, formatHours } from '#/lib/utils';
+import { displayDuration, parseDurationInput } from '#/features/timesheets/iso-week';
 import type { TimesheetWeek } from '#/api/timesheets';
 import type { BookingRow as BookingRowData, CellKey } from './use-week-bookings';
 import { taskCellKey, leaveCellKey } from './use-week-bookings';
@@ -19,8 +19,6 @@ interface BookingRowProps {
   onCellChange: (date: string, value: number | null) => void;
   cellInputs: Map<CellKey, string>;
   setCellInputs: React.Dispatch<React.SetStateAction<Map<CellKey, string>>>;
-  editingCell: CellKey | null;
-  setEditingCell: React.Dispatch<React.SetStateAction<CellKey | null>>;
   onRemove: () => void;
 }
 
@@ -33,14 +31,15 @@ export function BookingRow({
   onCellChange,
   cellInputs,
   setCellInputs,
-  editingCell,
-  setEditingCell,
   onRemove,
 }: BookingRowProps) {
   const isLeave = variant === 'leave';
   const keyFor = (date: string): CellKey => (isLeave ? leaveCellKey(row.id, date) : taskCellKey(row.id, date));
 
-  const rowTotal = days.reduce((sum, d) => sum + (getValue(d.date) ?? 0), 0);
+  const rowTotal = days.reduce(
+    (sum, d) => sum + displayDuration(cellInputs.get(keyFor(d.date)), getValue(d.date)),
+    0,
+  );
 
   const handleRawChange = (date: string, raw: string) => {
     const key = keyFor(date);
@@ -71,21 +70,6 @@ export function BookingRow({
     }
   };
 
-  const handleBlur = (date: string, stored: number | undefined) => {
-    const key = keyFor(date);
-    setEditingCell(null);
-    const raw = cellInputs.get(key) ?? '';
-    if (raw === '') return;
-    const val = parseDurationInput(raw);
-    if (val === null) {
-      setCellInputs((prev) => {
-        const next = new Map(prev);
-        next.set(key, stored !== undefined ? String(stored) : '');
-        return next;
-      });
-    }
-  };
-
   return (
     <TableRow
       className={cn(
@@ -106,9 +90,10 @@ export function BookingRow({
       {days.map((d) => {
         const key = keyFor(d.date);
         const stored = getValue(d.date);
-        const isEditing = editingCell === key;
         const rawInput = cellInputs.get(key) ?? (stored !== undefined ? String(stored) : '');
         const isReadOnly = !isDraft || !d.isBusinessDay;
+        const isInvalidInput =
+          rawInput !== '' && rawInput !== '0' && parseDurationInput(rawInput) === null;
 
         return (
           <TableCell
@@ -138,15 +123,12 @@ export function BookingRow({
                     : 'border-black/[0.10] bg-white dark:border-white/[0.10] dark:bg-transparent text-[#3A4651] dark:text-white/90',
                   'focus-visible:ring-0 focus-visible:border-input focus-visible:outline-[#00FF00] focus-visible:outline-2 focus-visible:outline-offset-1',
                   stored !== undefined && 'font-semibold',
+                  isInvalidInput &&
+                    'border-red-500 bg-red-50 text-red-700 dark:border-red-500 dark:bg-red-950/30 dark:text-red-400 focus-visible:outline-red-500',
                 )}
-                value={isEditing ? rawInput : stored !== undefined ? String(stored) : ''}
+                value={rawInput}
                 placeholder=""
-                onFocus={() => {
-                  setEditingCell(key);
-                  setCellInputs((prev) => new Map(prev).set(key, stored !== undefined ? String(stored) : ''));
-                }}
                 onChange={(e) => handleRawChange(d.date, e.target.value)}
-                onBlur={() => handleBlur(d.date, stored)}
                 onKeyDown={(e) => handleKeyDown(d.date, e)}
               />
             )}
@@ -159,7 +141,7 @@ export function BookingRow({
           isLeave ? 'text-amber-700 dark:text-amber-400' : 'text-[#3A4651] dark:text-white/80',
         )}
       >
-        {rowTotal > 0 ? rowTotal : ''}
+        {rowTotal > 0 ? formatHours(rowTotal) : ''}
       </TableCell>
       {isDraft && (
         <TableCell className="px-1 py-2 text-center">

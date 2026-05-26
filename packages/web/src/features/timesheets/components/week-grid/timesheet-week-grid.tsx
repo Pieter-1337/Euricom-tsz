@@ -4,7 +4,13 @@ import { cn } from '#/lib/utils';
 import type { TimesheetWeek, SelectableContractTask, SelectableLeaveType } from '#/api/timesheets';
 import { taskCellKey, leaveCellKey, useWeekBookings } from './use-week-bookings';
 import type { CellKey } from './use-week-bookings';
-import { DAY_CAPACITY_ERROR_MESSAGE, WORKDAY_CAPACITY, useWeekFlush } from './use-week-flush';
+import {
+  CELL_INVALID_ERROR_MESSAGE,
+  DAY_CAPACITY_ERROR_MESSAGE,
+  WORKDAY_CAPACITY,
+  useWeekFlush,
+} from './use-week-flush';
+import { displayDuration, validateDurationInput } from '#/features/timesheets/iso-week';
 import { approveWeekLifecycle, reopenWeekLifecycle, submitWeekLifecycle } from '#/features/timesheets/server-fns';
 import { WeekActionsBar } from './week-actions-bar';
 import { WeekTable } from './week-table';
@@ -48,25 +54,41 @@ export function TimesheetWeekGrid({
   });
 
   const [isLifecycleLoading, setIsLifecycleLoading] = useState(false);
-  const [editingCell, setEditingCell] = useState<CellKey | null>(null);
   const [cellInputs, setCellInputs] = useState<Map<CellKey, string>>(new Map());
 
-  // Day totals: sum task bookings + leave bookings
+  // Day totals: sum what the user sees in each cell (raw input when present,
+  // falling back to committed stored value). Invalid-but-numeric inputs like
+  // "44" or "0.15" contribute to the total even though they can't be saved.
   const dayTotals = new Map<string, number>();
   days.forEach((d) => {
     let total = 0;
     bookings.taskRows.forEach((r) => {
-      total += bookings.taskBookings.get(taskCellKey(r.id, d.date)) ?? 0;
+      const key = taskCellKey(r.id, d.date);
+      total += displayDuration(cellInputs.get(key), bookings.taskBookings.get(key));
     });
     bookings.leaveRows.forEach((r) => {
-      total += bookings.leaveBookings.get(leaveCellKey(r.id, d.date)) ?? 0;
+      const key = leaveCellKey(r.id, d.date);
+      total += displayDuration(cellInputs.get(key), bookings.leaveBookings.get(key));
     });
     dayTotals.set(d.date, total);
   });
 
   const weekTotal = Array.from(dayTotals.values()).reduce((a, b) => a + b, 0);
   const hasDayCapacityError = Array.from(dayTotals.values()).some((t) => t > WORKDAY_CAPACITY);
-  const errorMessage = hasDayCapacityError ? DAY_CAPACITY_ERROR_MESSAGE : flushError;
+
+  const cellValidations = Array.from(cellInputs.values())
+    .filter((raw) => raw !== '' && raw !== '0')
+    .map(validateDurationInput);
+  const hasInvalidCellInput = cellValidations.includes('invalid');
+  const hasExceedsCellInput = cellValidations.includes('exceeds');
+
+  const showExceedsError = hasDayCapacityError || hasExceedsCellInput;
+  const showInvalidError = hasInvalidCellInput;
+
+  const errorMessages: string[] = [];
+  if (showInvalidError) errorMessages.push(CELL_INVALID_ERROR_MESSAGE);
+  if (showExceedsError) errorMessages.push(DAY_CAPACITY_ERROR_MESSAGE);
+  if (errorMessages.length === 0 && flushError) errorMessages.push(flushError);
 
   const addableTaskIds = new Set(bookings.taskRows.map((r) => r.id));
   const availableTasksToAdd = selectableTasks.filter((t) => !addableTaskIds.has(t.contractTaskId));
@@ -129,7 +151,8 @@ export function TimesheetWeekGrid({
         isDirty={bookings.isDirty}
         isFlushing={isFlushing}
         isLifecycleLoading={isLifecycleLoading}
-        hasDayCapacityError={hasDayCapacityError}
+        hasDayCapacityError={showExceedsError}
+        hasInvalidCellInput={showInvalidError}
         onNavigateToWeek={(y, w) => void navigateToWeek(y, w)}
         onSave={() => void flush()}
         onSubmit={() => void handleSubmit()}
@@ -149,9 +172,11 @@ export function TimesheetWeekGrid({
         </div>
       )}
 
-      {errorMessage && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
-          {errorMessage}
+      {errorMessages.length > 0 && (
+        <div className="flex flex-col gap-1 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+          {errorMessages.map((m) => (
+            <div key={m}>{m}</div>
+          ))}
         </div>
       )}
 
@@ -167,8 +192,6 @@ export function TimesheetWeekGrid({
         status={status}
         cellInputs={cellInputs}
         setCellInputs={setCellInputs}
-        editingCell={editingCell}
-        setEditingCell={setEditingCell}
         setTaskCell={bookings.setTaskCell}
         setLeaveCell={bookings.setLeaveCell}
         onRemoveTaskRow={bookings.removeTaskRow}

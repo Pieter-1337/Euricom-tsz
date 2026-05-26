@@ -114,7 +114,7 @@ describe('TimesheetWeekGrid — day capacity', () => {
     );
 
     const cell = screen.getByTestId('day-total-2026-05-18');
-    expect(cell.textContent).toBe('8');
+    expect(cell.textContent).toBe('8h');
     expect(cell.className).not.toContain('text-red-600');
   });
 
