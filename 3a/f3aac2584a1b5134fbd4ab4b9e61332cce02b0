@@ -1,0 +1,31 @@
+.claude/skills/app-do-prd/SKILL.md
+  s_c98e8b29757289::t_713eb30b9ad12e 1-150
+docs/agents/workflow-autonomous.md
+  s_c98e8b29757289::t_96ba598bf337e4 22
+  s_c98e8b29757289::t_1da7f7e879127e 43-44,49-50,52-53,56
+  s_c98e8b29757289::t_e88b581350b581 266
+docs/agents/workflow-automatic.md
+  s_c98e8b29757289::t_cbccc67652df3b 93
+docs/agents/workflow-manual.md
+  s_c98e8b29757289::t_3d94dff43cd877 125
+.claude/skills/app-do-work/SKILL.md
+  s_c98e8b29757289::t_25f325eb686eb1 3-4,10-14,18,20,26-37,46-47,54-56,65-106,108,110,112-116,118,120-123
+CHANGELOG.md
+  s_c98e8b29757289::t_71ff9e7a65e22a 5-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3af3aac2584a1b5134fbd4ab4b9e61332cce02b0",
+  "prompts": {},
+  "sessions": {
+    "s_c98e8b29757289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "58fc29c9-0f36-4e0c-bceb-35902252b4e1",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
