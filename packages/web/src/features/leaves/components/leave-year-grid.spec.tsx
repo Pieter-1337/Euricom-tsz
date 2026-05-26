@@ -55,7 +55,10 @@ const makeHoliday = (date: string, name = 'Holiday'): HolidayDto => ({
 });
 
 describe('LeaveYearGrid', () => {
-  afterEach(() => cleanup());
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
 
   it('renders 12 month sections', () => {
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={[]} holidays={[]} />);
@@ -82,6 +85,14 @@ describe('LeaveYearGrid', () => {
     expect(ringEl).not.toBeNull();
 
     vi.useRealTimers();
+  });
+
+  it('shades weekend cells when they have no booking', () => {
+    const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={[]} holidays={[]} />);
+
+    // Regression guard: weekend shading must apply on no-booking days.
+    const shaded = container.querySelectorAll('[class*="bg-black/[0.04]"]');
+    expect(shaded.length).toBeGreaterThan(0);
   });
 
   it('renders booking colour for a single-type booking day', () => {

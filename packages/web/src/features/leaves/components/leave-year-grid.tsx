@@ -115,7 +115,7 @@ function DayCellContent({
         'relative flex h-full min-h-[32px] flex-col overflow-hidden rounded-sm',
         cell.isToday && 'ring-2 ring-inset ring-[#00FF00]',
         cell.outside && 'opacity-30',
-        cell.isWeekend && !type && 'bg-black/[0.04] dark:bg-white/[0.04]',
+        cell.isWeekend && type === 'none' && 'bg-black/[0.04] dark:bg-white/[0.04]',
         cell.isHoliday && type === 'none' && 'bg-[#3A4651]/20 dark:bg-white/[0.08]',
       )}
     >

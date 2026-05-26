@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '#/components/ui/button';
 import { LeaveYearGrid } from '#/features/leaves/components/leave-year-grid';
@@ -7,6 +7,17 @@ import { useLeaveSummary } from '#/features/leaves/use-leave-summary';
 import type { CurrentUser } from '#/server/current-user';
 
 export const Route = createFileRoute('/_protected/_authenticated/leaves/$year')({
+  beforeLoad: ({ params }) => {
+    const parsed = Number(params.year);
+    // Guard against non-numeric or absurd years (e.g. /leaves/foo) that would
+    // otherwise produce NaN and break the year-scoped queries.
+    if (!Number.isInteger(parsed) || parsed < 1900 || parsed > 2200) {
+      throw redirect({
+        to: '/leaves/$year',
+        params: { year: String(new Date().getFullYear()) },
+      });
+    }
+  },
   component: LeaveOverviewPage,
 });
 
