@@ -145,8 +145,11 @@ public class LeaveBookingsForYearEndpointsTests : IntegrationTestBase, IAsyncLif
     }
 
     [Fact]
-    public async Task GetLeaveBookingsForYear_SortedByDateThenLeaveTypeId()
+    public async Task GetLeaveBookingsForYear_SortedByDateAscending()
     {
+        // Secondary `(date, leaveTypeId)` ordering is exercised at the handler level
+        // (see GetLeaveBookingsForYearHandlerTests.SortOrder_ByDateThenLeaveTypeId);
+        // this integration test only verifies the outermost date-ascending guarantee.
         var userId = await SeedCallerAsAsync(UserRole.User);
         await SeedLeaveWeekAsync(userId, new DateOnly(2026, 5, 20), 4m);
         await SeedLeaveWeekAsync(userId, new DateOnly(2026, 5, 18), 8m);

@@ -13,9 +13,12 @@ public sealed class GetHolidaysInYearHandler(IUnitOfWork uow)
         GetHolidaysInYearQuery query,
         CancellationToken ct = default)
     {
+        var yearStart = new DateOnly(query.Year, 1, 1);
+        var yearEnd = new DateOnly(query.Year + 1, 1, 1);
+
         var holidays = await uow.RepositoryFor<Holiday>()
             .GetAllAsListAsync(
-                h => h.Country == "BE" && h.Date.Year == query.Year,
+                h => h.Country == "BE" && h.Date >= yearStart && h.Date < yearEnd,
                 ct);
 
         return holidays

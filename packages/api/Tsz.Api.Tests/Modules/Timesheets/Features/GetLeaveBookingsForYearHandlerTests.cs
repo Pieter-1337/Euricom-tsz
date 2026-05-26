@@ -64,9 +64,10 @@ public class GetLeaveBookingsForYearHandlerTests
     [Fact]
     public async Task YearFilter_ExcludesBookingsFromOtherCalendarYear()
     {
-        // Week 53 of 2026 can spill into Jan 2027 (but IsoYear is still 2026).
-        // Conversely a booking with Date.Year == 2027 inside week 53 of 2026 should be excluded
-        // when querying for year 2026.
+        // Bookings are filtered by `booking.Date.Year`, NOT by the parent
+        // TimesheetWeek's IsoYear. A booking dated 2027 belongs to year 2027 even
+        // if its containing week has IsoYear 2026 (or vice-versa around year
+        // boundaries). This guards against accidentally filtering by week year.
         var week = TimesheetWeek.Create(UserId, 2026, 21);
         week.ApplyBookings([], [
             new LeaveBookingDto(LeaveTypeId, new DateOnly(2026, 5, 18), 8m),
