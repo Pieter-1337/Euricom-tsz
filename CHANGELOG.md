@@ -2,6 +2,21 @@
 
 ## 2026-05-26
 
+### feat: timesheet PDF export, colour-coded entries, Holidays rename
+
+- Add a printable monthly timesheet document (browser print-to-PDF) reached
+  from the aggregated Timesheets list, with Date / Task / Hours / Days columns
+  and combined totals.
+- Aggregate the Timesheets list to one row per customer+contract for the month
+  (combined status) instead of one row per week.
+- Colour-code leave entries by leave type (matching the balance panel) and map
+  holidays to amber across the month calendar, week grid, add-row dropdowns and
+  the approved-totals panel; worked entries stay green.
+- Show hours on leave entries in the month calendar, like worked entries.
+- Rename the synthesized "Feestdagen" row to "Holidays".
+- Make Timesheets the landing page: redirect / to /timesheets, move it first in
+  the sidebar, and drop the redundant Home page.
+
 ### feat: refine leave overview, timesheet totals and form field layout
 
 - Count leave bookings in the timesheet month totals so approved leave days

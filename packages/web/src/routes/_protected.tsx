@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Clock,
   FileText,
-  Home as HomeIcon,
   User as UserIcon,
   Users as UsersIcon,
 } from 'lucide-react';
@@ -59,7 +58,7 @@ function ProtectedLayout() {
   return (
     <TooltipProvider delayDuration={100} skipDelayDuration={200}>
     <div className="flex min-h-screen flex-col">
-      <header className="bg-euri-charcoal flex h-14 flex-shrink-0 items-center justify-between border-b border-white/[0.06] px-5 text-white">
+      <header className="print:hidden bg-euri-charcoal flex h-14 flex-shrink-0 items-center justify-between border-b border-white/[0.06] px-5 text-white">
         <div className="flex items-center gap-3">
           <Brandmark className="h-[22px] w-[22px]" />
           <span className="text-sm font-semibold tracking-[0.01em]">Timesheet Zone</span>
@@ -121,7 +120,7 @@ function Sidebar({
       aria-label="Primary navigation"
       style={{ width: collapsed ? 64 : 240 }}
       className={cn(
-        'flex flex-shrink-0 flex-col overflow-hidden',
+        'print:hidden flex flex-shrink-0 flex-col overflow-hidden',
         'bg-euri-steel-light border-r border-black/[0.06]',
         'dark:bg-euri-sidebar-dark dark:border-white/[0.06]',
         '[transition:width_220ms_cubic-bezier(.22,.61,.36,1)]',
@@ -135,9 +134,8 @@ function Sidebar({
         )}
       >
         <div className={cn('flex flex-col', collapsed ? 'items-center gap-1' : 'gap-0.5')}>
-          <NavLink to="/" icon={HomeIcon} label="Home" collapsed={collapsed} exact />
-          <NavLink to="/time-entry" icon={Clock} label="Time Entry" collapsed={collapsed} />
           <NavLink to="/timesheets" icon={CalendarDays} label="Timesheets" collapsed={collapsed} />
+          <NavLink to="/time-entry" icon={Clock} label="Time Entry" collapsed={collapsed} />
           <NavLink to="/leaves" icon={CalendarRange} label="Leave overview" collapsed={collapsed} />
           {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />}

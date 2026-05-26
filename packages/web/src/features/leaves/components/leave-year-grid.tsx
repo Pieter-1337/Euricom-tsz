@@ -103,8 +103,8 @@ function DayCellContent({
         'relative flex h-full min-h-[32px] flex-col overflow-hidden rounded-sm',
         cell.isToday && 'ring-2 ring-inset ring-[#00FF00]',
         cell.outside && 'opacity-30',
-        cell.isWeekend && !hasBookings && 'bg-black/[0.04] dark:bg-white/[0.04]',
-        cell.isHoliday && !hasBookings && 'bg-[#3A4651]/20 dark:bg-white/[0.08]',
+        cell.isWeekend && !hasBookings && !cell.isHoliday && 'bg-black/[0.04] dark:bg-white/[0.04]',
+        cell.isHoliday && !hasBookings && 'bg-amber-600/90',
       )}
     >
       <span

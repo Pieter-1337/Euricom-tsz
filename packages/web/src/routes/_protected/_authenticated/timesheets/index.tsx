@@ -1,11 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileDown } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '#/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 import { Tooltip, TooltipProvider } from '#/components/ui/tooltip';
 import { cn } from '#/lib/utils';
+import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
 import {
   formatIsoDate,
@@ -197,7 +198,7 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
             >
               <div
                 className={cn(
-                  'cursor-default truncate rounded-sm px-1.5 py-0.5 text-[10.5px] text-white',
+                  'cursor-pointer truncate rounded-sm px-1.5 py-0.5 text-[10.5px] text-white',
                   approved ? 'bg-green-700 dark:bg-green-700' : 'bg-green-600 dark:bg-green-600',
                 )}
               >
@@ -208,15 +209,20 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
           ))}
           {cell.day.leaveBookings.map((leave, i) => (
             <Tooltip key={`l-${i}`} content={`${leave.leaveTypeName} (${leave.durationHours}h)`}>
-              <div className="cursor-default truncate rounded-sm bg-amber-600/90 px-1.5 py-0.5 text-[10.5px] text-white">
-                {leave.leaveTypeName}
+              <div
+                className={cn(
+                  'cursor-pointer truncate rounded-sm px-1.5 py-0.5 text-[10.5px] text-white',
+                  getLeaveColor(leave.leaveTypeId).bg,
+                )}
+              >
+                {leave.durationHours} - {leave.leaveTypeName}
                 {showAsterisk && '*'}
               </div>
             </Tooltip>
           ))}
           {cell.day.holidayName && (
             <Tooltip content={cell.day.holidayName}>
-              <div className="cursor-default truncate rounded-sm bg-[#3A4651] px-1.5 py-0.5 text-[10.5px] text-white dark:bg-[#4A5560]">
+              <div className="cursor-pointer truncate rounded-sm bg-amber-600/90 px-1.5 py-0.5 text-[10.5px] text-white">
                 {cell.day.holidayName}
               </div>
             </Tooltip>
@@ -242,25 +248,33 @@ function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
     .length;
 
   const approvedWeeks = monthData.weeks.filter((w) => w.status === 'Approved');
-  const breakdownHours = new Map<string, number>();
+  const workedHours = new Map<string, number>();
+  const leaveHours = new Map<string, { name: string; hours: number }>();
   let approvedTotalHours = 0;
 
   for (const week of approvedWeeks) {
     for (const day of week.days) {
       for (const entry of day.timeEntries) {
         const cust = entry.customerName || 'Unknown';
-        breakdownHours.set(cust, (breakdownHours.get(cust) ?? 0) + entry.durationHours);
+        workedHours.set(cust, (workedHours.get(cust) ?? 0) + entry.durationHours);
         approvedTotalHours += entry.durationHours;
       }
       for (const leave of day.leaveBookings) {
-        breakdownHours.set(leave.leaveTypeName, (breakdownHours.get(leave.leaveTypeName) ?? 0) + leave.durationHours);
+        const prev = leaveHours.get(leave.leaveTypeId);
+        leaveHours.set(leave.leaveTypeId, {
+          name: leave.leaveTypeName,
+          hours: (prev?.hours ?? 0) + leave.durationHours,
+        });
         approvedTotalHours += leave.durationHours;
       }
     }
   }
 
   const approvedDays = Math.round((approvedTotalHours / 8) * 10) / 10;
-  const customerRows = Array.from(breakdownHours.entries()).sort((a, b) => b[1] - a[1]);
+  const breakdownRows = [
+    ...Array.from(workedHours, ([name, hours]) => ({ key: `c-${name}`, label: name, hours, dot: 'bg-green-600' })),
+    ...Array.from(leaveHours, ([id, v]) => ({ key: `l-${id}`, label: v.name, hours: v.hours, dot: getLeaveColor(id).bg })),
+  ].sort((a, b) => b.hours - a.hours);
 
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">
@@ -271,18 +285,21 @@ function TotalsCard({ monthData }: { monthData: TimesheetMonth | null }) {
         <div className="border-b border-black/[0.06] pb-3 text-center text-sm font-semibold dark:border-white/[0.06]">
           {approvedDays} / {businessDaysInMonth} workdays
         </div>
-        {customerRows.length === 0 ? (
+        {breakdownRows.length === 0 ? (
           <p className="pt-3 text-center text-xs text-[#6B7682] dark:text-white/40">
             No approved entries this month.
           </p>
         ) : (
           <ul className="pt-3 text-sm">
-            {customerRows.map(([customer, hours]) => (
-              <li key={customer} className="flex justify-between py-1">
-                <span className="text-[#6B7682] dark:text-white/60">
-                  {Math.round((hours / 8) * 10) / 10} days
+            {breakdownRows.map((row) => (
+              <li key={row.key} className="flex items-center justify-between gap-2 py-1">
+                <span className="flex items-center gap-2 font-medium">
+                  <span className={cn('inline-block size-2.5 shrink-0 rounded-sm', row.dot)} aria-hidden="true" />
+                  {row.label}
                 </span>
-                <span className="font-medium">{customer}</span>
+                <span className="text-[#6B7682] dark:text-white/60">
+                  {Math.round((row.hours / 8) * 10) / 10} days
+                </span>
               </li>
             ))}
           </ul>
@@ -297,43 +314,70 @@ interface TimesheetListRow {
   customer: string;
   contract: string;
   status: 'Waiting for approval' | 'Approved';
+  canDownload: boolean;
 }
 
-function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null }) {
-  const rows: TimesheetListRow[] = [];
+function buildTimesheetRows(monthData: TimesheetMonth): TimesheetListRow[] {
+  const contractMap = new Map<string, { customer: string; contract: string; weekStatuses: Set<string> }>();
+  let hasLeaveOnlyWeek = false;
+  const leaveOnlyStatuses = new Set<string>();
 
-  if (monthData) {
-    for (const week of monthData.weeks) {
-      if (week.status !== 'Submitted' && week.status !== 'Approved') continue;
-      const pairs = new Map<string, { customer: string; contract: string }>();
-      for (const day of week.days) {
-        for (const entry of day.timeEntries) {
-          const customer = entry.customerName || '—';
-          const contract = entry.contractName || '';
-          const key = `${customer}|${contract}`;
-          if (!pairs.has(key)) pairs.set(key, { customer, contract });
-        }
-      }
-      const statusLabel = week.status === 'Approved' ? 'Approved' : 'Waiting for approval';
-      if (pairs.size === 0) {
-        rows.push({
-          key: `${week.isoYear}-W${week.isoWeek}-leave`,
-          customer: '—',
-          contract: '',
-          status: statusLabel,
-        });
-      } else {
-        for (const [k, p] of pairs) {
-          rows.push({
-            key: `${week.isoYear}-W${week.isoWeek}-${k}`,
-            customer: p.customer,
-            contract: p.contract,
-            status: statusLabel,
-          });
+  for (const week of monthData.weeks) {
+    if (week.status !== 'Submitted' && week.status !== 'Approved') continue;
+
+    let hasTimeEntries = false;
+    for (const day of week.days) {
+      for (const entry of day.timeEntries) {
+        hasTimeEntries = true;
+        const customer = entry.customerName || '—';
+        const contract = entry.contractName || '';
+        const key = `${customer}|${contract}`;
+        const existing = contractMap.get(key);
+        if (existing) {
+          existing.weekStatuses.add(week.status);
+        } else {
+          contractMap.set(key, { customer, contract, weekStatuses: new Set([week.status]) });
         }
       }
     }
+
+    if (!hasTimeEntries) {
+      hasLeaveOnlyWeek = true;
+      leaveOnlyStatuses.add(week.status);
+    }
   }
+
+  const rows: TimesheetListRow[] = [];
+
+  for (const [key, entry] of contractMap) {
+    const allApproved = entry.weekStatuses.size === 1 && entry.weekStatuses.has('Approved');
+    rows.push({
+      key,
+      customer: entry.customer,
+      contract: entry.contract,
+      status: allApproved ? 'Approved' : 'Waiting for approval',
+      canDownload: true,
+    });
+  }
+
+  if (hasLeaveOnlyWeek) {
+    const allApproved = leaveOnlyStatuses.size === 1 && leaveOnlyStatuses.has('Approved');
+    rows.push({
+      key: 'leave-only',
+      customer: '—',
+      contract: '',
+      status: allApproved ? 'Approved' : 'Waiting for approval',
+      canDownload: false,
+    });
+  }
+
+  return rows;
+}
+
+function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null }) {
+  const rows = monthData ? buildTimesheetRows(monthData) : [];
+  const yearStr = monthData ? String(monthData.year) : '';
+  const monthStr = monthData ? String(monthData.month) : '';
 
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">
@@ -346,12 +390,13 @@ function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null })
             <TableHead>Customer</TableHead>
             <TableHead>Contract</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="w-[60px]" />
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={3} className="py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
+              <TableCell colSpan={4} className="py-8 text-center text-sm text-[#6B7682] dark:text-white/40">
                 No submitted timesheets this month.
               </TableCell>
             </TableRow>
@@ -361,6 +406,20 @@ function TimesheetsListCard({ monthData }: { monthData: TimesheetMonth | null })
                 <TableCell>{r.customer}</TableCell>
                 <TableCell>{r.contract}</TableCell>
                 <TableCell>{r.status}</TableCell>
+                <TableCell>
+                  {r.canDownload && (
+                    <Button variant="ghost" size="sm" asChild className="h-7 px-2">
+                      <Link
+                        to="/timesheets/print/$year/$month"
+                        params={{ year: yearStr, month: monthStr }}
+                        search={{ customer: r.customer, contract: r.contract }}
+                      >
+                        <FileDown className="size-4" strokeWidth={1.75} />
+                        <span className="sr-only">Download PDF</span>
+                      </Link>
+                    </Button>
+                  )}
+                </TableCell>
               </TableRow>
             ))
           )}

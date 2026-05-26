@@ -3,6 +3,7 @@ import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { TableCell, TableRow } from '#/components/ui/table';
 import { cn, formatHours } from '#/lib/utils';
+import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import { displayDuration, parseDurationInput } from '#/features/timesheets/iso-week';
 import type { TimesheetWeek } from '#/api/timesheets';
 import type { BookingRow as BookingRowData, CellKey } from './use-week-bookings';
@@ -73,10 +74,16 @@ export function BookingRow({
   return (
     <TableRow className="hover:bg-black/[0.01] dark:hover:bg-white/[0.01]">
       <TableCell
-        className="px-4 py-2 font-medium text-[13px] truncate max-w-[192px] text-[#3A4651] dark:text-white/80"
+        className="px-4 py-2 font-medium text-[13px] max-w-[192px] text-[#3A4651] dark:text-white/80"
         title={row.name}
       >
-        {row.name}
+        <div className="flex items-center gap-2">
+          <span
+            className={cn('inline-block size-2.5 shrink-0 rounded-sm', isLeave ? getLeaveColor(row.id).bg : 'bg-green-600')}
+            aria-hidden="true"
+          />
+          <span className="truncate">{row.name}</span>
+        </div>
       </TableCell>
       {days.map((d) => {
         const key = keyFor(d.date);

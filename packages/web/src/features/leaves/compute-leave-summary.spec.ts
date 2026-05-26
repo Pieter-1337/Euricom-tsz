@@ -96,7 +96,7 @@ describe('computeLeaveSummary', () => {
 
     const row = result.rows.find((r) => r.leaveTypeId === '__feestdagen__');
     expect(row).toBeDefined();
-    expect(row?.name).toBe('Feestdagen');
+    expect(row?.name).toBe('Holidays');
     expect(row?.total).toBe('—');
     expect(row?.taken).toBe(3);
     expect(row?.balance).toBe('—');

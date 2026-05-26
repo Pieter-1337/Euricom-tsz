@@ -15,7 +15,10 @@ interface ColorDotProps {
 }
 
 function ColorDot({ leaveTypeId }: ColorDotProps) {
-  if (!leaveTypeId || leaveTypeId === '__feestdagen__') {
+  if (leaveTypeId === '__feestdagen__') {
+    return <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-600/90" aria-hidden="true" />;
+  }
+  if (!leaveTypeId) {
     return (
       <span
         className="inline-block h-2.5 w-2.5 rounded-sm bg-[#3A4651]/40 dark:bg-white/25"

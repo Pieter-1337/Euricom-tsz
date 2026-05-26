@@ -73,7 +73,7 @@ export function computeLeaveSummary(
 
   rows.push({
     leaveTypeId: FEESTDAGEN_KEY,
-    name: 'Feestdagen',
+    name: 'Holidays',
     total: '—',
     taken: holidays.length,
     balance: '—',

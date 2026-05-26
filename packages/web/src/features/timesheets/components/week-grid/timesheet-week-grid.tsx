@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useRouter } from '@tanstack/react-router';
 import { cn } from '#/lib/utils';
+import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import type { TimesheetWeek, SelectableContractTask, SelectableLeaveType } from '#/api/timesheets';
 import { taskCellKey, leaveCellKey, useWeekBookings } from './use-week-bookings';
 import type { CellKey } from './use-week-bookings';
@@ -166,10 +167,13 @@ export function TimesheetWeekGrid({
                 items={availableTasksToAdd}
                 getKey={(t) => t.contractTaskId}
                 renderItem={(t) => (
-                  <>
-                    <div className="font-medium text-[#3A4651] dark:text-white/90">{t.taskName}</div>
-                    <div className="text-xs text-[#6B7682] dark:text-white/40">{t.contractSubject}</div>
-                  </>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block size-2.5 shrink-0 rounded-sm bg-green-600" aria-hidden="true" />
+                    <div className="font-medium text-[#3A4651] dark:text-white/90">
+                      {t.taskName}{' '}
+                      <span className="text-xs text-[#6B7682] dark:text-white/40">({t.contractSubject})</span>
+                    </div>
+                  </div>
                 )}
                 onAdd={bookings.addTaskRow}
                 emptyMessage="No more tasks available for this week."
@@ -179,7 +183,12 @@ export function TimesheetWeekGrid({
                 triggerLabel="Add leave"
                 items={availableLeaveToAdd}
                 getKey={(lt) => lt.id}
-                renderItem={(lt) => <div className="font-medium text-[#3A4651] dark:text-white/90">{lt.name}</div>}
+                renderItem={(lt) => (
+                  <div className="flex items-center gap-2">
+                    <span className={cn('inline-block size-2.5 shrink-0 rounded-sm', getLeaveColor(lt.id).bg)} aria-hidden="true" />
+                    <div className="font-medium text-[#3A4651] dark:text-white/90">{lt.name}</div>
+                  </div>
+                )}
                 onAdd={bookings.addLeaveRow}
                 emptyMessage="No more leave types available."
                 contentWidth="w-64"

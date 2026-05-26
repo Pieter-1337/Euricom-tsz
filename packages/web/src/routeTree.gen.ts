@@ -35,6 +35,7 @@ import { Route as ProtectedAuthenticatedTimeEntryMonthIndexRouteImport } from '.
 import { Route as ProtectedAuthenticatedAdminUsersIndexRouteImport } from './routes/_protected/_authenticated/admin/users/index'
 import { Route as ProtectedAuthenticatedAdminUsersNewRouteImport } from './routes/_protected/_authenticated/admin/users/new'
 import { Route as ProtectedAuthenticatedAdminUsersIdRouteImport } from './routes/_protected/_authenticated/admin/users/$id'
+import { Route as ProtectedAuthenticatedTimesheetsPrintYearMonthRouteImport } from './routes/_protected/_authenticated/timesheets/print/$year/$month'
 import { Route as ProtectedAuthenticatedTimeEntryWeekYearWeekRouteImport } from './routes/_protected/_authenticated/time-entry/week/$year/$week'
 import { Route as ProtectedAuthenticatedTimeEntryMonthYearMonthRouteImport } from './routes/_protected/_authenticated/time-entry/month/$year/$month'
 
@@ -187,6 +188,12 @@ const ProtectedAuthenticatedAdminUsersIdRoute =
     path: '/$id',
     getParentRoute: () => ProtectedAuthenticatedAdminUsersRoute,
   } as any)
+const ProtectedAuthenticatedTimesheetsPrintYearMonthRoute =
+  ProtectedAuthenticatedTimesheetsPrintYearMonthRouteImport.update({
+    id: '/print/$year/$month',
+    path: '/print/$year/$month',
+    getParentRoute: () => ProtectedAuthenticatedTimesheetsRoute,
+  } as any)
 const ProtectedAuthenticatedTimeEntryWeekYearWeekRoute =
   ProtectedAuthenticatedTimeEntryWeekYearWeekRouteImport.update({
     id: '/week/$year/$week',
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/time-entry/week/': typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
   '/time-entry/month/$year/$month': typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
   '/time-entry/week/$year/$week': typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
+  '/timesheets/print/$year/$month': typeof ProtectedAuthenticatedTimesheetsPrintYearMonthRoute
 }
 export interface FileRoutesByTo {
   '/no-access': typeof NoAccessRoute
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/time-entry/week': typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
   '/time-entry/month/$year/$month': typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
   '/time-entry/week/$year/$week': typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
+  '/timesheets/print/$year/$month': typeof ProtectedAuthenticatedTimesheetsPrintYearMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -281,6 +290,7 @@ export interface FileRoutesById {
   '/_protected/_authenticated/time-entry/week/': typeof ProtectedAuthenticatedTimeEntryWeekIndexRoute
   '/_protected/_authenticated/time-entry/month/$year/$month': typeof ProtectedAuthenticatedTimeEntryMonthYearMonthRoute
   '/_protected/_authenticated/time-entry/week/$year/$week': typeof ProtectedAuthenticatedTimeEntryWeekYearWeekRoute
+  '/_protected/_authenticated/timesheets/print/$year/$month': typeof ProtectedAuthenticatedTimesheetsPrintYearMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/time-entry/week/'
     | '/time-entry/month/$year/$month'
     | '/time-entry/week/$year/$week'
+    | '/timesheets/print/$year/$month'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/no-access'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/time-entry/week'
     | '/time-entry/month/$year/$month'
     | '/time-entry/week/$year/$week'
+    | '/timesheets/print/$year/$month'
   id:
     | '__root__'
     | '/_protected'
@@ -364,6 +376,7 @@ export interface FileRouteTypes {
     | '/_protected/_authenticated/time-entry/week/'
     | '/_protected/_authenticated/time-entry/month/$year/$month'
     | '/_protected/_authenticated/time-entry/week/$year/$week'
+    | '/_protected/_authenticated/timesheets/print/$year/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedAuthenticatedAdminUsersIdRouteImport
       parentRoute: typeof ProtectedAuthenticatedAdminUsersRoute
     }
+    '/_protected/_authenticated/timesheets/print/$year/$month': {
+      id: '/_protected/_authenticated/timesheets/print/$year/$month'
+      path: '/print/$year/$month'
+      fullPath: '/timesheets/print/$year/$month'
+      preLoaderRoute: typeof ProtectedAuthenticatedTimesheetsPrintYearMonthRouteImport
+      parentRoute: typeof ProtectedAuthenticatedTimesheetsRoute
+    }
     '/_protected/_authenticated/time-entry/week/$year/$week': {
       id: '/_protected/_authenticated/time-entry/week/$year/$week'
       path: '/week/$year/$week'
@@ -680,12 +700,15 @@ const ProtectedAuthenticatedTimeEntryRouteWithChildren =
 
 interface ProtectedAuthenticatedTimesheetsRouteChildren {
   ProtectedAuthenticatedTimesheetsIndexRoute: typeof ProtectedAuthenticatedTimesheetsIndexRoute
+  ProtectedAuthenticatedTimesheetsPrintYearMonthRoute: typeof ProtectedAuthenticatedTimesheetsPrintYearMonthRoute
 }
 
 const ProtectedAuthenticatedTimesheetsRouteChildren: ProtectedAuthenticatedTimesheetsRouteChildren =
   {
     ProtectedAuthenticatedTimesheetsIndexRoute:
       ProtectedAuthenticatedTimesheetsIndexRoute,
+    ProtectedAuthenticatedTimesheetsPrintYearMonthRoute:
+      ProtectedAuthenticatedTimesheetsPrintYearMonthRoute,
   }
 
 const ProtectedAuthenticatedTimesheetsRouteWithChildren =

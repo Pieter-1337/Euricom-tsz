@@ -170,8 +170,8 @@ describe('LeaveYearGrid', () => {
 
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={[]} holidays={holidays} />);
 
-    // Holiday name is surfaced via the hover tooltip; the cell itself is shaded.
-    const shaded = container.querySelector('[class*="3A4651"]');
+    // Holiday name is surfaced via the hover tooltip; the cell itself is amber-filled.
+    const shaded = container.querySelector('[class*="amber"]');
     expect(shaded).not.toBeNull();
   });
 });
