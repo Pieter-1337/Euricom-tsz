@@ -90,6 +90,16 @@ Docs:
 - Capture rationale that "Feestdag" is a Workdays.Holiday, not a
   LeaveType — the balance panel row is FE-synthesized.
 
+### refactor: simplify timesheet UI with shared AddRowPopover
+
+Remove variant prop from AddRowPopover and consolidate styling by:
+- Moving add row buttons to week-actions-bar navExtras
+- Removing variant-specific (task/leave) styling differences
+- Replacing title attribute with InfoTooltip for holidays
+- Unifying cell styling across task and leave rows
+
+Add info-tooltip component for displaying holiday names on hover.
+
 ## 2026-05-24
 
 ### Timesheets — day-capacity rule

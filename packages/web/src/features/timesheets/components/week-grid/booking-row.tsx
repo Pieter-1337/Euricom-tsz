@@ -71,18 +71,9 @@ export function BookingRow({
   };
 
   return (
-    <TableRow
-      className={cn(
-        isLeave
-          ? 'hover:bg-amber-50/50 dark:hover:bg-amber-900/10'
-          : 'hover:bg-black/[0.01] dark:hover:bg-white/[0.01]',
-      )}
-    >
+    <TableRow className="hover:bg-black/[0.01] dark:hover:bg-white/[0.01]">
       <TableCell
-        className={cn(
-          'px-4 py-2 font-medium text-[13px] truncate max-w-[192px]',
-          isLeave ? 'text-amber-700 dark:text-amber-400' : 'text-[#3A4651] dark:text-white/80',
-        )}
+        className="px-4 py-2 font-medium text-[13px] truncate max-w-[192px] text-[#3A4651] dark:text-white/80"
         title={row.name}
       >
         {row.name}
@@ -104,23 +95,18 @@ export function BookingRow({
               <div
                 className={cn(
                   'h-8 w-full rounded text-center text-sm flex items-center justify-center',
-                  stored !== undefined &&
-                    (isLeave ? 'font-semibold text-amber-700 dark:text-amber-400' : 'font-semibold text-[#3A4651] dark:text-white/90'),
-                  stored === undefined && d.holidayName && 'font-medium text-amber-700 dark:text-amber-400 truncate px-1',
-                  stored === undefined && !d.holidayName && 'text-[#6B7682]/40',
+                  stored !== undefined && 'font-semibold text-[#3A4651] dark:text-white/90',
+                  stored === undefined && 'text-[#6B7682]/40',
                 )}
-                title={d.holidayName ?? undefined}
               >
-                {stored !== undefined ? stored : d.holidayName ? d.holidayName : !d.isBusinessDay ? '—' : ''}
+                {stored !== undefined ? stored : !d.isBusinessDay ? '—' : ''}
               </div>
             ) : (
               <Input
                 type="text"
                 className={cn(
                   'h-8 w-16 px-1 py-0 text-center text-sm shadow-none',
-                  isLeave
-                    ? 'border-amber-300/60 bg-amber-50 dark:border-amber-700/40 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300'
-                    : 'border-black/[0.10] bg-white dark:border-white/[0.10] dark:bg-transparent text-[#3A4651] dark:text-white/90',
+                  'border-black/[0.10] bg-white dark:border-white/[0.10] dark:bg-transparent text-[#3A4651] dark:text-white/90',
                   'focus-visible:ring-0 focus-visible:border-input focus-visible:outline-[#00FF00] focus-visible:outline-2 focus-visible:outline-offset-1',
                   stored !== undefined && 'font-semibold',
                   isInvalidInput &&
@@ -135,12 +121,7 @@ export function BookingRow({
           </TableCell>
         );
       })}
-      <TableCell
-        className={cn(
-          'px-2 py-2 text-center font-semibold text-sm',
-          isLeave ? 'text-amber-700 dark:text-amber-400' : 'text-[#3A4651] dark:text-white/80',
-        )}
-      >
+      <TableCell className="px-2 py-2 text-center font-semibold text-sm text-[#3A4651] dark:text-white/80">
         {rowTotal > 0 ? formatHours(rowTotal) : ''}
       </TableCell>
       {isDraft && (

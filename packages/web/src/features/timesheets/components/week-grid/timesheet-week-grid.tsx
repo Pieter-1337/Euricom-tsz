@@ -158,6 +158,35 @@ export function TimesheetWeekGrid({
         onSubmit={() => void handleSubmit()}
         onApprove={() => void handleApprove()}
         onReopen={() => void handleReopen()}
+        navExtras={
+          isDraft ? (
+            <>
+              <AddRowPopover
+                triggerLabel="Add task"
+                items={availableTasksToAdd}
+                getKey={(t) => t.contractTaskId}
+                renderItem={(t) => (
+                  <>
+                    <div className="font-medium text-[#3A4651] dark:text-white/90">{t.taskName}</div>
+                    <div className="text-xs text-[#6B7682] dark:text-white/40">{t.contractSubject}</div>
+                  </>
+                )}
+                onAdd={bookings.addTaskRow}
+                emptyMessage="No more tasks available for this week."
+                contentWidth="w-72"
+              />
+              <AddRowPopover
+                triggerLabel="Add leave"
+                items={availableLeaveToAdd}
+                getKey={(lt) => lt.id}
+                renderItem={(lt) => <div className="font-medium text-[#3A4651] dark:text-white/90">{lt.name}</div>}
+                onAdd={bookings.addLeaveRow}
+                emptyMessage="No more leave types available."
+                contentWidth="w-64"
+              />
+            </>
+          ) : undefined
+        }
       />
 
       {status !== 'Draft' && (
@@ -198,36 +227,6 @@ export function TimesheetWeekGrid({
         onRemoveLeaveRow={bookings.removeLeaveRow}
       />
 
-      {isDraft && (
-        <div className="flex items-center gap-2">
-          <AddRowPopover
-            variant="task"
-            triggerLabel="Add task"
-            items={availableTasksToAdd}
-            getKey={(t) => t.contractTaskId}
-            renderItem={(t) => (
-              <>
-                <div className="font-medium text-[#3A4651] dark:text-white/90">{t.taskName}</div>
-                <div className="text-xs text-[#6B7682] dark:text-white/40">{t.contractSubject}</div>
-              </>
-            )}
-            onAdd={bookings.addTaskRow}
-            emptyMessage="No more tasks available for this week."
-            contentWidth="w-72"
-          />
-
-          <AddRowPopover
-            variant="leave"
-            triggerLabel="Add leave"
-            items={availableLeaveToAdd}
-            getKey={(lt) => lt.id}
-            renderItem={(lt) => <div className="font-medium text-amber-700 dark:text-amber-400">{lt.name}</div>}
-            onAdd={bookings.addLeaveRow}
-            emptyMessage="No more leave types available."
-            contentWidth="w-64"
-          />
-        </div>
-      )}
     </div>
   );
 }

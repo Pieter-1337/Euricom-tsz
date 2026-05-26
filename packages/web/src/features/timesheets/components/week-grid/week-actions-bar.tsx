@@ -19,6 +19,7 @@ interface WeekActionsBarProps {
   isLifecycleLoading: boolean;
   hasDayCapacityError: boolean;
   hasInvalidCellInput: boolean;
+  navExtras?: React.ReactNode;
   onNavigateToWeek: (year: number, week: number) => void;
   onSave: () => void;
   onSubmit: () => void;
@@ -37,6 +38,7 @@ export function WeekActionsBar({
   isLifecycleLoading,
   hasDayCapacityError,
   hasInvalidCellInput,
+  navExtras,
   onNavigateToWeek,
   onSave,
   onSubmit,
@@ -89,6 +91,7 @@ export function WeekActionsBar({
             />
           </PopoverContent>
         </Popover>
+        {navExtras}
       </div>
 
       <div className="flex items-center gap-2">

@@ -1,6 +1,7 @@
 import { cn, formatHours } from '#/lib/utils';
 import { formatDayHeader } from '#/features/timesheets/iso-week';
 import type { TimesheetWeek } from '#/api/timesheets';
+import { InfoTooltip } from '#/components/ui/info-tooltip';
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '#/components/ui/table';
 import { BookingRow } from './booking-row';
 import { taskCellKey, leaveCellKey } from './use-week-bookings';
@@ -72,7 +73,6 @@ export function WeekTable({
                     'h-auto min-w-[72px] px-2 py-3 text-center',
                     !d.isBusinessDay && !isHoliday && 'opacity-40',
                   )}
-                  title={d.holidayName ?? undefined}
                 >
                   <div
                     className={cn(
@@ -88,7 +88,16 @@ export function WeekTable({
                       isHoliday ? 'text-amber-600 dark:text-amber-400' : 'text-[#3A4651] dark:text-white/70',
                     )}
                   >
-                    {label}
+                    <span className="relative inline-flex items-center">
+                      {label}
+                      {isHoliday && d.holidayName && (
+                        <InfoTooltip
+                          content={d.holidayName}
+                          ariaLabel={`Holiday: ${d.holidayName}`}
+                          className="absolute left-full ml-1 top-1/2 -translate-y-1/2 text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 [&_svg]:stroke-[2.5]"
+                        />
+                      )}
+                    </span>
                   </div>
                 </TableHead>
               );
