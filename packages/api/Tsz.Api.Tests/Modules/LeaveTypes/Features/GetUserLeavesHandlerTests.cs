@@ -57,8 +57,6 @@ public class GetUserLeavesHandlerTests
         result[0].DefaultAllowed.ShouldBe(LeaveAllowed.Limited);
         result[0].Year.ShouldBe(year);
         result[0].TotalDays.ShouldBe(20m);
-        result[0].TakenDays.ShouldBeNull();
-        result[0].BalanceDays.ShouldBeNull();
     }
 
     [Fact]

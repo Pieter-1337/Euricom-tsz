@@ -25,6 +25,7 @@ public sealed class UsersModule : IModule
         services.AddScoped<IDataScopeAccessor, DataScopeAccessor>();
         services.AddScoped<IAuthorizationHandler, RequireAdminAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, RequireAdminOrAnyClientManagerAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, RequireAdminOrSelfAuthorizationHandler>();
         services.AddScoped<UserSeeder>();
     }
 
