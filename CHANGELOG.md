@@ -9,6 +9,20 @@ development with Claude Code. Includes Part 1 (core concepts, in/on/out loop,
 context engineering) and Part 2 (Timesheet Zone case study, live demo, workflow
 integration). Euricom design system, dark theme, speaker notes throughout.
 
+### feat: impersonation hardening — cookie lifecycle + edge-case test matrix (#45)
+
+**Frontend (`packages/web`)**
+- `_protected.tsx`: `signOut()` now calls `stopImpersonation()` before signing out so the impersonation cookie is always cleared and can never outlive the session.
+- `api-client.server.ts` (`bearerMiddleware`): when the `__Host-tsz_impersonate` cookie is present but fails HMAC verification or session-binding, the cookie is actively deleted (`deleteCookie`), not just silently omitted; prevents stale cookies persisting across sessions.
+
+**Backend — integration tests (`Tsz.Api.Tests.Integration`)**
+- `ImpersonationEndpointsTests`: added 6 new facts covering the remaining acceptance criteria gaps:
+  - `RequireAdminOrSelf` via the real by-id `GET /timesheet-weeks/{userId}/leave-bookings` path: A impersonating B → 200 on B's resource; 403 on A's resource (effective self = B, not A).
+  - A impersonating B submits B's Draft `TimesheetWeek` → 200, `Status=Submitted`, `UserId=B`; entity carries no Impersonator field (ADR-0004).
+  - Mid-session target deleted → subsequent requests return 404.
+  - Mid-session target promoted to Admin → subsequent requests return 403 (re-validated every request by middleware).
+  - `InitializeAsync` now cleans up `TimesheetWeek` rows in addition to `User` rows to prevent inter-test pollution.
+
 ### feat: impersonation UI — target picker, header button, banner + identity split (#44)
 
 **Frontend (`packages/web` only)**

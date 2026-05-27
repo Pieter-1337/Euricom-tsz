@@ -3,7 +3,7 @@ import type { paths } from '#/api/schema';
 import { ApiRequestError } from '#/api/client';
 import { env } from '#/env.server';
 import { auth } from './auth.server';
-import { getRequest, getCookie } from '@tanstack/react-start/server';
+import { getRequest, getCookie, deleteCookie } from '@tanstack/react-start/server';
 import { getVerifiedImpersonationTargetId } from './impersonation.server';
 
 const bearerMiddleware: Middleware = {
@@ -18,13 +18,16 @@ const bearerMiddleware: Middleware = {
     }
 
     // Emit X-Impersonate-User only when the cookie is signed and session-bound.
+    // If the cookie is present but fails verification, delete it so it doesn't persist stale.
     try {
-      const session = await auth.api.getSession({ headers: incoming.headers });
-      if (session?.user?.id) {
-        const cookieValue = getCookie('__Host-tsz_impersonate');
-        const targetId = getVerifiedImpersonationTargetId(cookieValue, session.user.id);
+      const cookieValue = getCookie('__Host-tsz_impersonate');
+      if (cookieValue) {
+        const session = await auth.api.getSession({ headers: incoming.headers });
+        const targetId = session?.user?.id ? getVerifiedImpersonationTargetId(cookieValue, session.user.id) : null;
         if (targetId) {
           request.headers.set('X-Impersonate-User', targetId);
+        } else {
+          deleteCookie('__Host-tsz_impersonate', { path: '/' });
         }
       }
     } catch {

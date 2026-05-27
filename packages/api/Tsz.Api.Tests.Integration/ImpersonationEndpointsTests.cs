@@ -3,6 +3,8 @@ using System.Net.Http.Json;
 using Tsz.Api.Auth;
 using Tsz.Api.Tests.Integration.TestAuth;
 using Tsz.Infrastructure.Common.Pagination;
+using Tsz.Modules.Timesheets.Domain.Timesheets;
+using Tsz.Modules.Timesheets.Features;
 using Tsz.Modules.Users.Contracts;
 using Tsz.Modules.Users.Domain.Users;
 using Tsz.Modules.Users.Features;
@@ -31,6 +33,7 @@ public class ImpersonationEndpointsTests : IntegrationTestBase, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        await WithUowAsync(uow => uow.RepositoryFor<TimesheetWeek>().BatchHardDeleteAsync(_ => true));
         await WithUowAsync(uow => uow.RepositoryFor<User>().BatchHardDeleteAsync(_ => true));
 
         _adminAId = await SeedUserAsync(AdminAOid, AdminAEmail, UserRole.Admin);
@@ -236,18 +239,112 @@ public class ImpersonationEndpointsTests : IntegrationTestBase, IAsyncLifetime
                 u.Email.Contains("alice", StringComparison.OrdinalIgnoreCase)));
     }
 
-    // ── RequireAdminOrSelf: "self" = effective (impersonated) user ──
+    // ── RequireAdminOrSelf: "self" = effective (impersonated) user — tested via a real by-id path ──
+    // GET /api/timesheet-weeks/{userId}/leave-bookings requires RequireAdminOrSelf with {userId} route param.
 
     [Fact]
-    public async Task AdminImpersonatingB_GetUserById_EffectiveSelfIsB()
+    public async Task AdminImpersonatingB_GetLeaveBookingsByBId_EffectiveSelfIsB_Returns200()
     {
-        // /api/users/{id} requires admin — test that impersonated user loses admin-only access
-        // but the effective identity is B when checking /api/users/me
+        // While A impersonates B, the effective identity is B.
+        // RequireAdminOrSelf sees effective user = B; route param = B → "self" match → 200.
         var response = await Client.SendAsync(
-            AsAdminImpersonatingB(HttpMethod.Get, "/api/users/me"));
+            AsAdminImpersonatingB(HttpMethod.Get, $"/api/timesheet-weeks/{_userBId}/leave-bookings?year=2026"));
 
         response.EnsureSuccessStatusCode();
-        var dto = await response.Content.ReadFromJsonAsync<UserDto>(Json);
-        Assert.Equal(_userBId, dto!.Id);
+    }
+
+    [Fact]
+    public async Task AdminImpersonatingB_GetLeaveBookingsByAId_EffectiveSelfIsB_NotSelf_Returns403()
+    {
+        // While A impersonates B, the effective identity is B.
+        // RequireAdminOrSelf sees effective user = B (no Admin role); route param = A → not self → 403.
+        var response = await Client.SendAsync(
+            AsAdminImpersonatingB(HttpMethod.Get, $"/api/timesheet-weeks/{_adminAId}/leave-bookings?year=2026"));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // ── Admin impersonating consultant B submits B's Draft week; persisted week carries no Impersonator trace ──
+
+    [Fact]
+    public async Task AdminImpersonatingB_SubmitBsDraftWeek_SucceedsAndWeekIsOwnedByBWithNoImpersonatorTrace()
+    {
+        // Seed a Draft TimesheetWeek for B (isoYear=2026, isoWeek=22).
+        await WithUowAsync(async uow =>
+        {
+            var week = TimesheetWeek.Create(_userBId, 2026, 22);
+            uow.RepositoryFor<TimesheetWeek>().Add(week);
+            await uow.SaveChangesAsync();
+        });
+
+        // A impersonates B and submits B's week.
+        // The submit endpoint checks: effective caller.Id == userId (route), which is B == B → allowed.
+        var response = await Client.SendAsync(
+            AsAdminImpersonatingB(HttpMethod.Post, $"/api/timesheet-weeks/{_userBId}/2026/22/submit"));
+
+        response.EnsureSuccessStatusCode();
+        var dto = await response.Content.ReadFromJsonAsync<TimesheetWeekDto>(Json);
+        Assert.NotNull(dto);
+        Assert.Equal(_userBId, dto.UserId);
+        Assert.Equal(nameof(TimesheetStatus.Submitted), dto.Status);
+
+        // Verify the persisted week: owned by B, Submitted, no Impersonator column by entity design.
+        await WithUowAsync(async uow =>
+        {
+            var week = await uow.RepositoryFor<TimesheetWeek>()
+                .FirstOrDefaultAsync(w => w.UserId == _userBId && w.IsoYear == 2026 && w.IsoWeek == 22);
+            Assert.NotNull(week);
+            Assert.Equal(_userBId, week.UserId);
+            Assert.Equal(TimesheetStatus.Submitted, week.Status);
+            // ADR-0004: no Impersonator column exists on TimesheetWeek by deliberate design.
+        });
+    }
+
+    // ── Mid-session re-validation: target deleted → 404 ──
+
+    [Fact]
+    public async Task MidSession_TargetDeleted_Returns404()
+    {
+        // First request succeeds: A impersonates B.
+        var first = await Client.SendAsync(
+            AsAdminImpersonatingB(HttpMethod.Get, "/api/users/me"));
+        first.EnsureSuccessStatusCode();
+
+        // Delete user B.
+        await WithUowAsync(async uow =>
+        {
+            var repo = uow.RepositoryFor<User>();
+            await repo.BatchHardDeleteAsync(u => u.Id == _userBId);
+        });
+
+        // Second request: same impersonation header, but B no longer exists → 404.
+        var second = await Client.SendAsync(
+            AsAdminImpersonatingB(HttpMethod.Get, "/api/users/me"));
+        Assert.Equal(HttpStatusCode.NotFound, second.StatusCode);
+    }
+
+    // ── Mid-session re-validation: target promoted to Admin → 403 ──
+
+    [Fact]
+    public async Task MidSession_TargetPromotedToAdmin_Returns403()
+    {
+        // First request succeeds: A impersonates B (B is a plain User).
+        var first = await Client.SendAsync(
+            AsAdminImpersonatingB(HttpMethod.Get, "/api/users/me"));
+        first.EnsureSuccessStatusCode();
+
+        // Promote B to Admin (no-Admin-target rule enforced per-request by the middleware).
+        await WithUowAsync(async uow =>
+        {
+            var repo = uow.RepositoryFor<User>();
+            var userB = await repo.GetByIdAsync(_userBId);
+            userB!.AddRole(UserRole.Admin);
+            await uow.SaveChangesAsync();
+        });
+
+        // Second request: middleware re-checks target's role every request → 403.
+        var second = await Client.SendAsync(
+            AsAdminImpersonatingB(HttpMethod.Get, "/api/users/me"));
+        Assert.Equal(HttpStatusCode.Forbidden, second.StatusCode);
     }
 }
