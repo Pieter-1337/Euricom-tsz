@@ -19,9 +19,14 @@ public static class TimesheetEndpoints
             Guid userId,
             int year,
             int week,
+            ICurrentUserResolver currentUserResolver,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
+            var caller = await currentUserResolver.ResolveAsync(ct);
+            if (caller is null || (caller.Id != userId && !caller.HasRole(AuthorizationPolicies.AdminRoleName)))
+                return Results.Forbid();
+
             var dto = await dispatcher.SendAsync(new GetTimesheetWeekQuery(userId, year, week), ct);
             return TypedResults.Ok(dto);
         });
@@ -31,9 +36,14 @@ public static class TimesheetEndpoints
             int year,
             int week,
             ApplyBookingsRequest body,
+            ICurrentUserResolver currentUserResolver,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
+            var caller = await currentUserResolver.ResolveAsync(ct);
+            if (caller is null || caller.Id != userId)
+                return Results.Forbid();
+
             var command = new ApplyTimesheetWeekBookingsCommand(
                 userId, year, week, body.TimeEntries, body.LeaveBookings);
             var dto = await dispatcher.SendAsync(command, ct);
