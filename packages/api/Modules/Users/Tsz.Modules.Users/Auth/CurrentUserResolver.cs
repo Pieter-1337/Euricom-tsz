@@ -17,7 +17,7 @@ public interface ICurrentUserAccount
 /// otherwise falls through to the real caller via <see cref="IRealUserResolver"/>.
 /// Per-request caching prevents redundant DB hits.
 public sealed class CurrentUserResolver(
-    IRealUserResolver real,
+    RealUserResolver real,
     IImpersonationContext impersonation,
     IUnitOfWork uow)
     : ICurrentUserResolver, ICurrentUserAccount
@@ -44,7 +44,7 @@ public sealed class CurrentUserResolver(
         }
         else
         {
-            _cached = await ((RealUserResolver)real).GetRealAsync(ct);
+            _cached = await real.GetRealAsync(ct);
         }
 
         _loaded = true;

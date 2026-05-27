@@ -90,47 +90,59 @@ public class ImpersonationMiddlewareTests
     public async Task NonAdminCaller_Returns403()
     {
         var nonAdmin = new ResolvedUser(Guid.NewGuid(), [nameof(UserRole.User)]);
-        var (ctx, _) = BuildContext(Guid.NewGuid().ToString(), nonAdmin, targetUser: null);
+        var (ctx, impCtx) = BuildContext(Guid.NewGuid().ToString(), nonAdmin, targetUser: null);
         var middleware = new ImpersonationMiddleware(NullLogger<ImpersonationMiddleware>.Instance);
+        var nextCalled = false;
 
-        await middleware.InvokeAsync(ctx, _ => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, _ => { nextCalled = true; return Task.CompletedTask; });
 
         ctx.Response.StatusCode.ShouldBe(StatusCodes.Status403Forbidden);
+        nextCalled.ShouldBeFalse();
+        ((IImpersonationContext)impCtx).IsImpersonating.ShouldBeFalse();
     }
 
     [Fact]
     public async Task NoRealUser_Returns403()
     {
-        var (ctx, _) = BuildContext(Guid.NewGuid().ToString(), realUser: null, targetUser: null);
+        var (ctx, impCtx) = BuildContext(Guid.NewGuid().ToString(), realUser: null, targetUser: null);
         var middleware = new ImpersonationMiddleware(NullLogger<ImpersonationMiddleware>.Instance);
+        var nextCalled = false;
 
-        await middleware.InvokeAsync(ctx, _ => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, _ => { nextCalled = true; return Task.CompletedTask; });
 
         ctx.Response.StatusCode.ShouldBe(StatusCodes.Status403Forbidden);
+        nextCalled.ShouldBeFalse();
+        ((IImpersonationContext)impCtx).IsImpersonating.ShouldBeFalse();
     }
 
     [Fact]
     public async Task MalformedGuid_Returns400()
     {
         var admin = new ResolvedUser(Guid.NewGuid(), [nameof(UserRole.Admin)]);
-        var (ctx, _) = BuildContext("not-a-guid", admin, targetUser: null);
+        var (ctx, impCtx) = BuildContext("not-a-guid", admin, targetUser: null);
         var middleware = new ImpersonationMiddleware(NullLogger<ImpersonationMiddleware>.Instance);
+        var nextCalled = false;
 
-        await middleware.InvokeAsync(ctx, _ => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, _ => { nextCalled = true; return Task.CompletedTask; });
 
         ctx.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
+        nextCalled.ShouldBeFalse();
+        ((IImpersonationContext)impCtx).IsImpersonating.ShouldBeFalse();
     }
 
     [Fact]
     public async Task TargetNotFound_Returns404()
     {
         var admin = new ResolvedUser(Guid.NewGuid(), [nameof(UserRole.Admin)]);
-        var (ctx, _) = BuildContext(Guid.NewGuid().ToString(), admin, targetUser: null);
+        var (ctx, impCtx) = BuildContext(Guid.NewGuid().ToString(), admin, targetUser: null);
         var middleware = new ImpersonationMiddleware(NullLogger<ImpersonationMiddleware>.Instance);
+        var nextCalled = false;
 
-        await middleware.InvokeAsync(ctx, _ => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, _ => { nextCalled = true; return Task.CompletedTask; });
 
         ctx.Response.StatusCode.ShouldBe(StatusCodes.Status404NotFound);
+        nextCalled.ShouldBeFalse();
+        ((IImpersonationContext)impCtx).IsImpersonating.ShouldBeFalse();
     }
 
     [Fact]
@@ -139,12 +151,15 @@ public class ImpersonationMiddlewareTests
         var adminCaller = new ResolvedUser(Guid.NewGuid(), [nameof(UserRole.Admin)]);
         var adminTarget = MakeUser(UserRole.Admin);
 
-        var (ctx, _) = BuildContext(adminTarget.Id.ToString(), adminCaller, adminTarget);
+        var (ctx, impCtx) = BuildContext(adminTarget.Id.ToString(), adminCaller, adminTarget);
         var middleware = new ImpersonationMiddleware(NullLogger<ImpersonationMiddleware>.Instance);
+        var nextCalled = false;
 
-        await middleware.InvokeAsync(ctx, _ => Task.CompletedTask);
+        await middleware.InvokeAsync(ctx, _ => { nextCalled = true; return Task.CompletedTask; });
 
         ctx.Response.StatusCode.ShouldBe(StatusCodes.Status403Forbidden);
+        nextCalled.ShouldBeFalse();
+        ((IImpersonationContext)impCtx).IsImpersonating.ShouldBeFalse();
     }
 
     [Fact]

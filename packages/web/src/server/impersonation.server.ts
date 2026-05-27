@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { getCookie, setCookie, deleteCookie } from '@tanstack/react-start/server';
-import { createHmac } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { env } from '#/env.server';
 import { auth } from './auth.server';
@@ -30,7 +30,9 @@ function verify(value: string): ImpersonationPayload | null {
     const sig = value.slice(dotIdx + 1);
     const body = Buffer.from(bodyB64, 'base64url').toString('utf8');
     const expected = createHmac('sha256', env.BETTER_AUTH_SECRET).update(body).digest('base64url');
-    if (sig !== expected) return null;
+    const sigBuf = Buffer.from(sig);
+    const expectedBuf = Buffer.from(expected);
+    if (sigBuf.length !== expectedBuf.length || !timingSafeEqual(sigBuf, expectedBuf)) return null;
     return payloadSchema.parse(JSON.parse(body));
   } catch {
     return null;

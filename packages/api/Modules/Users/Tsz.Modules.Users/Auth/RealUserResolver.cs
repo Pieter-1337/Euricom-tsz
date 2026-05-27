@@ -40,7 +40,7 @@ public sealed class RealUserResolver(ICurrentUser currentUser, IUnitOfWork uow) 
 
         if (email is not null)
         {
-            var lowered = email.ToLower();
+            var lowered = email.ToLowerInvariant();
             var emailMatch = await repo.FirstOrDefaultAsync(u => u.Email.ToLower() == lowered, ct);
 
             if (emailMatch is not null && emailMatch.EntraOid is null && oid is not null)

@@ -61,7 +61,7 @@ public sealed class ImpersonationMiddleware(ILogger<ImpersonationMiddleware> log
         impersonationContext.SetTarget(targetId);
 
         logger.LogInformation(
-            "Impersonation engaged: real oid={RealOid} target={TargetId}",
+            "Impersonation engaged: realUserId={RealUserId} target={TargetId}",
             realUser.Id,
             targetId);
 
