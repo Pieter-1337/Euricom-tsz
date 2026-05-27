@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Tsz.Api.Auth;
 using Tsz.Api.Extensions;
 using Tsz.Api.Infrastructure;
 using Tsz.Api.Persistence;
@@ -45,6 +46,8 @@ builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavi
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+builder.Services.AddScoped<IImpersonationContext, ImpersonationContext>();
+builder.Services.AddScoped<ImpersonationMiddleware>();
 
 IReadOnlyList<IModule> modules = [new UsersModule(), new CustomersModule(), new ContractsModule(), new LeaveTypesModule(), new TimesheetsModule()];
 foreach (var m in modules) m.RegisterServices(builder.Services, builder.Configuration);
@@ -68,6 +71,7 @@ using (var scope = app.Services.CreateScope())
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<ImpersonationMiddleware>();
 app.UseAuthorization();
 
 app.MapTszOpenApi();

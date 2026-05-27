@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-05-27
+
+### feat: impersonation tracer — end-to-end golden path + full trust boundary (#43)
+
+**Backend**
+- `Tsz.Infrastructure/Auth`: `IImpersonationContext` + `ImpersonationContext` (scoped, request-scoped setter), `IRealUserResolver` (claims-based, impersonation-unaware).
+- `Tsz.Api/Auth`: `ImpersonationHeader.Name = "X-Impersonate-User"`, `ImpersonationMiddleware` (between UseAuthentication/UseAuthorization) enforcing all four trust-boundary checks (real caller Admin? target Guid valid? target exists? target not Admin?) → 403/400/404/403; sets context + structured log on success; no-op on absent header.
+- `Tsz.Modules.Users/Auth`: `RealUserResolver : IRealUserResolver` (claims + email→oid auto-link, extracted from prior `CurrentUserResolver`); `CurrentUserResolver` rewritten as effective wrapper over `IRealUserResolver` + `IImpersonationContext` — public `ICurrentUserResolver`/`ICurrentUserAccount` surface unchanged.
+- `UsersModule.cs`: registers `RealUserResolver` and new `ImpersonationContext`/`ImpersonationMiddleware`.
+- `Program.cs`: inserts `UseMiddleware<ImpersonationMiddleware>()` between auth and authz.
+- `GetImpersonationTargets`: new query + handler + `GET /api/users/impersonation-targets` (admin-only) returning non-Admin users with search/sort/pagination.
+
+**Frontend**
+- `impersonation.server.ts`: `startImpersonation` / `stopImpersonation` / `getImpersonation` using `__Host-tsz_impersonate` HMAC-SHA256-signed session-bound cookie.
+- `bearerMiddleware` in `api-client.server.ts` emits `X-Impersonate-User` only when cookie signature is valid and `impersonatorId === live session user id`.
+- `users-list.tsx`: per-row Impersonate action (skipped for Admin targets) calls `startImpersonation` then reloads to `/`.
+
+**Tests**
+- Unit: `CurrentUserResolverTests` (swap to target / real fallback), `ImpersonationMiddlewareTests` (all gate paths: no header, non-admin, malformed, not-found, admin-target, valid).
+- Integration: `ImpersonationEndpointsTests` (non-admin→403, admin→admin→403, malformed→400, not-found→404, no-header regression, admin impersonating user→/me returns target, targets endpoint excludes admins + search, non-admin forbidden from targets endpoint); `TestAuthHandler` extended to accept `X-Test-Oid` / `X-Test-Email` per-request headers.
+
 ## 2026-05-26
 
 ### feat: refine timesheet totals sections and approved-only PDF

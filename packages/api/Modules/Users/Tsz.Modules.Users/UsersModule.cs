@@ -18,6 +18,8 @@ public sealed class UsersModule : IModule
     {
         services.AddHandlersFromAssembly(typeof(UsersModule).Assembly);
         services.AddValidatorsFromAssembly(typeof(UsersModule).Assembly);
+        services.AddScoped<RealUserResolver>();
+        services.AddScoped<IRealUserResolver>(sp => sp.GetRequiredService<RealUserResolver>());
         services.AddScoped<CurrentUserResolver>();
         services.AddScoped<ICurrentUserResolver>(sp => sp.GetRequiredService<CurrentUserResolver>());
         services.AddScoped<ICurrentUserAccount>(sp => sp.GetRequiredService<CurrentUserResolver>());

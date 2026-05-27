@@ -52,6 +52,22 @@ public static class UserEndpoints
                 new GetUsersPagedQuery(search, sortBy, dir, pageSize, cursor, deletedOnly), ct));
         });
 
+        adminGroup.MapGet("/impersonation-targets", async (
+            IDispatcher dispatcher,
+            CancellationToken ct,
+            string? search = null,
+            string? sortBy = null,
+            string? sortDir = null,
+            int pageSize = 0,
+            string? cursor = null) =>
+        {
+            var dir = Enum.TryParse<SortDirection>(sortDir, ignoreCase: true, out var parsed)
+                ? parsed
+                : SortDirection.Asc;
+            return TypedResults.Ok(await dispatcher.SendAsync(
+                new GetImpersonationTargetsQuery(search, sortBy, dir, pageSize, cursor), ct));
+        });
+
         adminGroup.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
         {
             var user = await dispatcher.SendAsync(new GetUserByIdQuery(id), ct);
