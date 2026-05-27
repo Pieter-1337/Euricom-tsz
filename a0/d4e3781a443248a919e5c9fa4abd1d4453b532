@@ -1,0 +1,51 @@
+packages/api/Tsz.Api.Tests.Integration/TimesheetEndpointsTests.cs
+  s_24fb6c49d1eedd::t_5bf713094a2943 665
+  s_24fb6c49d1eedd::t_c8e03906011dcd 643
+  s_24fb6c49d1eedd::t_d9b492a4b83416 706
+  s_24fb6c49d1eedd::t_68089e0f83fb48 94,113,128,145,165,195,211,227,241
+  s_24fb6c49d1eedd::t_1ca11f6c8fe3c5 773
+  s_24fb6c49d1eedd::t_960af384b9cbfe 800
+  s_24fb6c49d1eedd::t_2e528eb378c6ad 498-627
+  s_24fb6c49d1eedd::t_d67063f8b79734 3
+  s_24fb6c49d1eedd::t_c979d813758de4 727
+  s_24fb6c49d1eedd::t_87b67f64da48e6 750
+packages/web/src/features/users/components/users-list.tsx
+  s_48b8ffcc44fbe3::t_2225ec1fbdd616 14
+packages/web/src/server/api-client.server.ts
+  s_48b8ffcc44fbe3::t_3a541e4b54230f 7
+packages/web/src/server/impersonation-cookie.server.ts
+  s_48b8ffcc44fbe3::t_9a56d445f294c5 2,17-21,55-57,59-63,65-69,71,73,75,78-86,88
+packages/web/src/routes/_protected.tsx
+  s_48b8ffcc44fbe3::t_e3af475ce412e5 24
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_24fb6c49d1eedd::t_e4fff0a80abcfa 22,26-29,39,43-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a0d4e3781a443248a919e5c9fa4abd1d4453b532",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_24fb6c49d1eedd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c99f2554-3958-4136-8235-58b32d88f504",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_48b8ffcc44fbe3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c977636-e2b6-4a19-97ae-20ce3e261e09",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
