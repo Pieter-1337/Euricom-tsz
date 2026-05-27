@@ -61,3 +61,18 @@ export const updateUser = async (id: string, body: UpdateUserRequest): Promise<U
 export const removeUser = async (id: string): Promise<void> => {
   await client.DELETE('/api/users/{id}', { params: { path: { id } } });
 };
+
+export const getImpersonationTargets = async (params: KeysetQueryParams<UserSortKey>): Promise<KeysetPage<User>> => {
+  const resp = await client.GET('/api/users/impersonation-targets', {
+    params: {
+      query: {
+        search: params.search,
+        sortBy: params.sortBy,
+        sortDir: params.sortDir,
+        pageSize: params.pageSize,
+        cursor: params.cursor,
+      },
+    },
+  });
+  return resp.data ?? { items: [], nextCursor: null, total: 0 };
+};
