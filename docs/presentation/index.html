@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4 Weeks of AI-Empowered Development</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
+
+    <style>
+      :root {
+        --accent: #8cc63f; /* Euricom lime */
+        --accent-soft: #b6e07f;
+        --ink: #e6edf3;
+        --muted: #8b98a5;
+        --panel: #16202b;
+        --in: #6ee7b7; /* green  - in the loop */
+        --on: #fcd34d; /* amber  - on the loop */
+        --out: #f87171; /* red    - out of the loop */
+      }
+
+      .reveal {
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        color: var(--ink);
+        font-size: 32px;
+      }
+      .reveal .slides {
+        text-align: left;
+      }
+      .reveal section {
+        background: transparent;
+      }
+
+      .reveal h1,
+      .reveal h2,
+      .reveal h3 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        text-transform: none;
+        color: #fff;
+        line-height: 1.1;
+      }
+      .reveal h1 {
+        font-size: 1.9em;
+      }
+      .reveal h2 {
+        font-size: 1.45em;
+      }
+      .reveal h3 {
+        font-size: 1.05em;
+        color: var(--accent);
+      }
+      .reveal a {
+        color: var(--accent);
+      }
+      .reveal strong {
+        color: var(--accent-soft);
+      }
+      .reveal em {
+        color: var(--accent);
+        font-style: normal;
+      }
+
+      /* backgrounds */
+      .reveal .backgrounds {
+        background: radial-gradient(circle at 30% 20%, #1b2733 0%, #0c141c 70%);
+      }
+
+      /* kicker label */
+      .kicker {
+        display: inline-block;
+        font-size: 0.5em;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        border-radius: 100px;
+        padding: 4px 16px;
+        margin-bottom: 24px;
+      }
+
+      .lead {
+        color: var(--muted);
+        font-size: 0.85em;
+      }
+
+      .reveal ul {
+        margin-left: 0.4em;
+      }
+      .reveal li {
+        margin: 0.35em 0;
+      }
+
+      /* big single statement slide */
+      .punch {
+        font-size: 1.5em;
+        line-height: 1.25;
+        font-weight: 700;
+        color: #fff;
+      }
+      .punch .hl {
+        color: var(--accent);
+      }
+
+      /* the two-ladder loop diagram ---------------------------------- */
+      .loop {
+        display: flex;
+        gap: 24px;
+        margin-top: 30px;
+        align-items: stretch;
+      }
+      .stage {
+        flex: 1;
+        background: var(--panel);
+        border: 2px solid #233141;
+        border-radius: 18px;
+        padding: 28px 22px;
+        text-align: center;
+        opacity: 0.32;
+        filter: grayscale(0.6);
+        transition: all 0.3s ease;
+      }
+      .stage .emoji {
+        font-size: 2.2em;
+        line-height: 1;
+      }
+      .stage .name {
+        font-weight: 700;
+        font-size: 0.92em;
+        margin: 14px 0 4px;
+        color: #fff;
+      }
+      .stage .trust {
+        font-size: 0.62em;
+        color: var(--ink);
+        margin-top: 14px;
+      }
+      .stage .ctx {
+        font-size: 0.62em;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .stage .lbl {
+        font-size: 0.42em;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .loop[data-active='in'] .stage.in,
+      .loop[data-active='on'] .stage.on,
+      .loop[data-active='out'] .stage.out,
+      .loop[data-active='all'] .stage {
+        opacity: 1;
+        filter: none;
+        transform: translateY(-6px);
+        border-color: var(--accent);
+        box-shadow: 0 12px 40px -12px var(--accent);
+      }
+
+      .loop[data-active='in'] .stage.in .name,
+      .loop[data-active='on'] .stage.on .name,
+      .loop[data-active='out'] .stage.out .name,
+      .loop[data-active='all'] .stage .name {
+        color: var(--accent);
+      }
+
+      .maps {
+        font-size: 0.55em;
+        color: var(--muted);
+        margin-top: 22px;
+      }
+      .maps code {
+        color: var(--accent-soft);
+        background: #0d161e;
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+
+      /* two column */
+      .cols {
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+      }
+      .cols > div {
+        flex: 1;
+      }
+
+      /* stat row */
+      .stats {
+        display: flex;
+        gap: 28px;
+        margin-top: 24px;
+      }
+      .stat {
+        flex: 1;
+        background: var(--panel);
+        border-radius: 16px;
+        padding: 22px;
+        text-align: center;
+        border: 1px solid #233141;
+      }
+      .stat .num {
+        font-size: 1.8em;
+        font-weight: 800;
+        color: var(--accent);
+      }
+      .stat .cap {
+        font-size: 0.55em;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* chips */
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .chip {
+        background: var(--panel);
+        border: 1px solid #2a3a4a;
+        border-radius: 100px;
+        padding: 8px 18px;
+        font-size: 0.6em;
+        color: var(--ink);
+      }
+
+      /* demo cue */
+      .demo-cue {
+        border: 2px dashed var(--accent);
+        border-radius: 18px;
+        padding: 40px;
+        text-align: center;
+        background: rgba(140, 198, 63, 0.06);
+      }
+      .demo-cue .big {
+        font-size: 1.6em;
+        font-weight: 800;
+        color: var(--accent);
+      }
+
+      .reveal .slide-number {
+        background: transparent;
+        color: var(--muted);
+      }
+      .footer {
+        position: fixed;
+        bottom: 14px;
+        left: 24px;
+        font-size: 14px;
+        color: #3f5061;
+        z-index: 30;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- 1 — TITLE ------------------------------------------------- -->
+        <section data-auto-animate>
+          <span class="kicker">Euricom Masterclass</span>
+          <h1>4 Weeks of <span style="color: var(--accent)">AI-Empowered</span><br />Development</h1>
+          <p class="lead">Building software <em>with</em> Claude Code</p>
+          <p style="margin-top: 40px; font-size: 0.7em; color: var(--muted)">Pieter Bracke</p>
+          <aside class="notes">
+            Welcome. 4 weeks, mainly Claude Code (touched GitHub Copilot briefly). The talk has two halves: first the
+            concepts I learned, then a case I built applying them. Core message: the shift is from "AI gives me code" to
+            "I direct AI to build software".
+          </aside>
+        </section>
+
+        <!-- 2 — AGENDA ------------------------------------------------ -->
+        <section>
+          <h2>Two parts</h2>
+          <div class="cols" style="margin-top: 30px">
+            <div>
+              <h3>Part 1 — The concepts</h3>
+              <ul style="font-size: 0.8em">
+                <li>What Claude Code &amp; LLMs are</li>
+                <li>Prompt vs. context engineering</li>
+                <li>The loop: in → on → out</li>
+                <li>Why understanding context is everything</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Part 2 — Putting it to work</h3>
+              <ul style="font-size: 0.8em">
+                <li>Case: Timesheet Zone</li>
+                <li>Live demo</li>
+                <li>How the AI actually built it</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="notes">Quick roadmap. Don't dwell — one breath per half.</aside>
+        </section>
+
+        <!-- 3 — WHAT IS CLAUDE CODE / LLM ----------------------------- -->
+        <section>
+          <span class="kicker">Part 1 · Concepts</span>
+          <h2>What are we even talking about?</h2>
+          <div class="cols" style="margin-top: 24px">
+            <div>
+              <h3>An LLM — the brain 🧠</h3>
+              <p style="font-size: 0.78em">
+                A model that predicts text. Incredibly capable — but it only knows what you feed it.
+              </p>
+            </div>
+            <div>
+              <h3>Claude Code — the agent 🤖</h3>
+              <p style="font-size: 0.78em">
+                Lives in your terminal &amp; repo. It can read files, run commands, and write code — with your
+                permission.
+              </p>
+            </div>
+          </div>
+          <aside class="notes">
+            Make the distinction explicit — Claude Code is NOT the AI. The LLM (Claude) is the AI: the brain that
+            reasons. But a brain alone can't act and only knows what you feed it. Claude Code is the agent — the body /
+            harness around the model that gives it hands: tools to read your files, run commands, edit code, in a loop,
+            in your actual repo. The intelligence is the model; Claude Code is what lets it act and what feeds it
+            context. Plant the caveat "the brain only knows what you show it" — it sets up context engineering on the
+            next slide.
+          </aside>
+        </section>
+
+        <!-- 4 — PROMPT vs CONTEXT ENGINEERING ------------------------- -->
+        <section>
+          <h2>Prompt <span style="color: var(--muted)">vs.</span> context engineering</h2>
+          <div class="cols" style="margin-top: 24px">
+            <div>
+              <h3>Prompt</h3>
+              <p style="font-size: 0.8em">What you <em>ask</em>.</p>
+            </div>
+            <div>
+              <h3>Context</h3>
+              <p style="font-size: 0.8em">What the AI can <em>see</em> while answering.</p>
+            </div>
+          </div>
+          <p class="punch" style="margin-top: 36px; font-size: 1.05em">
+            Managing prompts &amp; context is <span class="hl">the real skill.</span>
+          </p>
+          <aside class="notes">
+            This is the spine of the whole act. Anyone can write a prompt. The craft is curating context: the right
+            files, conventions, decisions, domain language. Tell them: we went DEEP on context — skills, conventions
+            docs, delegating to subagents. Foreshadow: you'll see context strategy climb a ladder alongside trust.
+          </aside>
+        </section>
+
+        <!-- 5 — IN THE LOOP ------------------------------------------- -->
+        <section>
+          <span class="kicker">Stage 1</span>
+          <h2 style="color: var(--accent)">In the loop</h2>
+          <div class="loop" data-active="in">
+            <div class="stage in">
+              <div class="emoji">🧑‍✈️</div>
+              <div class="name">In the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">You drive every step</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">One context window</div>
+            </div>
+            <div class="stage on">
+              <div class="emoji">👀</div>
+              <div class="name">On the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">AI implements, you supervise</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">Delegates to subagents</div>
+            </div>
+            <div class="stage out">
+              <div class="emoji">🚶</div>
+              <div class="name">Out of the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">AI runs, you review the result</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">Orchestrator runs whole Product requirements</div>
+            </div>
+          </div>
+          <p class="maps">Hands on the wheel. You approve every change. &nbsp;→&nbsp; <code>manual</code> workflow</p>
+          <aside class="notes">
+            First rung of BOTH ladders. You're in the driver's seat — plan, approve, repeat. Context lives in one window
+            that you curate by hand. In the repo this is the manual workflow: grill → PRD → review → implement →
+            validate → commit. Slow, but you learn the controls and you catch everything. Next slide: the concrete tools
+            you use while in the loop.
+          </aside>
+        </section>
+
+        <!-- 6 — FIRST STEPS: PLAN MODE & COMMANDS --------------------- -->
+        <section>
+          <h2>First steps: plan mode &amp; commands</h2>
+          <div class="chips">
+            <span class="chip">📝 Plan mode — agree the approach before any code</span>
+            <span class="chip">⚡ Commands — small, repeatable everyday tasks</span>
+          </div>
+          <p class="lead" style="margin-top: 30px; font-size: 0.72em">
+            Walk before you run. That is how trust is built.
+          </p>
+          <aside class="notes">
+            What living "in the loop" actually looks like. Plan mode = read-only, propose a plan, you approve. No
+            surprises. Commands = your first taste of automating repeatable steps. You still approve everything — pure
+            stage 1.
+          </aside>
+        </section>
+
+        <!-- 7 — EXTENDING: SKILLS / PLUGINS / MCP / SUBAGENTS --------- -->
+        <section>
+          <h2>Extending the agentic layer</h2>
+          <div class="chips">
+            <span class="chip">🧩 Skills — teach it your workflows</span>
+            <span class="chip">🔌 Plugins — bundle &amp; share them</span>
+            <span class="chip">🔗 MCPs — connect outside tools &amp; data</span>
+            <span class="chip">🤝 Subagents — delegate work to fresh context</span>
+          </div>
+          <p class="lead" style="margin-top: 30px; font-size: 0.72em">
+            Stop repeating yourself and start <em>delegating</em> context.
+          </p>
+          <aside class="notes">
+            Skills = reusable, named procedures (in this repo: scaffold a backend slice, a frontend feature, an EF
+            migration). Plugins = packaged skills. MCPs = bridges to databases, trackers, docs. Subagents = the big one
+            for the context story: spin up a helper with its OWN clean context window, hand it a task, get back just the
+            result. That keeps the main thread focused. This slide unlocks the next two rungs of the ladder.
+          </aside>
+        </section>
+
+        <!-- 8 — ON THE LOOP ------------------------------------------- -->
+        <section>
+          <span class="kicker">Stage 2</span>
+          <h2 style="color: var(--accent)">On the loop</h2>
+          <div class="loop" data-active="on">
+            <div class="stage in">
+              <div class="emoji">🧑‍✈️</div>
+              <div class="name">In the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">You drive every step</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">One context window</div>
+            </div>
+            <div class="stage on">
+              <div class="emoji">👀</div>
+              <div class="name">On the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">AI implements, you supervise</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">Delegate to subagents</div>
+            </div>
+            <div class="stage out">
+              <div class="emoji">🚶</div>
+              <div class="name">Out of the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">AI runs, you review the result</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">Orchestrator runs whole Product requirements</div>
+            </div>
+          </div>
+          <p class="maps">Step back and intervene when needed. &nbsp;→&nbsp; <code>automatic</code> workflow</p>
+          <aside class="notes">
+            Second rung. The AI implements a whole slice in one go; you supervise and course-correct. Context: it leans
+            on subagents to do focused chunks without polluting the main thread. In the repo: /app-do-work on an issue —
+            explore → implement → validate → review → commit, one shot. You're not touching every line anymore, but
+            you're watching live.
+          </aside>
+        </section>
+
+        <!-- 9 — OUT OF THE LOOP --------------------------------------- -->
+        <section>
+          <span class="kicker">Stage 3</span>
+          <h2 style="color: var(--accent)">Out of the loop</h2>
+          <div class="loop" data-active="out">
+            <div class="stage in">
+              <div class="emoji">🧑‍✈️</div>
+              <div class="name">In the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">You drive every step</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">One context window</div>
+            </div>
+            <div class="stage on">
+              <div class="emoji">👀</div>
+              <div class="name">On the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">AI implements, you supervise</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">Delegate to subagents</div>
+            </div>
+            <div class="stage out">
+              <div class="emoji">🚶</div>
+              <div class="name">Out of the loop</div>
+              <div class="lbl">Trust</div>
+              <div class="trust">AI runs, you review the result</div>
+              <div class="lbl" style="margin-top: 14px">Context</div>
+              <div class="ctx">Orchestrator runs whole Product requirements</div>
+            </div>
+          </div>
+          <p class="maps">Walk away — review & test when finished. &nbsp;→&nbsp; my <code>autonomous</code> workflow</p>
+          <aside class="notes">
+            Third rung. You hand over a whole PRD. An orchestrator splits it into slices, spins up an agent per slice in
+            its own worktree, respects dependencies, opens PRs. Context: the main window now manages OTHER context
+            windows — delegation all the way down. In the repo: /app-do-prd. You come back to reviewed, mergeable PRs.
+            BUT — this only works if... (next slide).
+          </aside>
+        </section>
+
+        <!-- 10 — THE PATTERN: TRUST + CONTEXT MOVE TOGETHER ----------- -->
+        <section>
+          <h2>The more you guide, the more you hand over</h2>
+          <div class="loop" data-active="all">
+            <div class="stage in">
+              <div class="emoji">🧑‍✈️</div>
+              <div class="name">In the loop</div>
+              <div class="trust">You drive</div>
+              <div class="ctx">One context window</div>
+            </div>
+            <div class="stage on">
+              <div class="emoji">👀</div>
+              <div class="name">On the loop</div>
+              <div class="trust">You supervise</div>
+              <div class="ctx">Subagents</div>
+            </div>
+            <div class="stage out">
+              <div class="emoji">🚶</div>
+              <div class="name">Out of the loop</div>
+              <div class="trust">You review</div>
+              <div class="ctx">Orchestrated Product requirements</div>
+            </div>
+          </div>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 16px;
+              margin-top: 24px;
+              font-size: 0.6em;
+              color: var(--muted);
+            "
+          >
+            <span>👋 Hand holding</span>
+            <span
+              style="
+                flex: 1;
+                height: 3px;
+                border-radius: 3px;
+                background: linear-gradient(90deg, #2a3a4a, var(--accent));
+              "
+            ></span>
+            <span style="color: var(--accent-soft)">🤖 Delegated</span>
+          </div>
+          <aside class="notes">
+            Payoff slide — but keep it concrete. Don't say "two ladders". Just walk the diagram left to right out loud:
+            "First I drive and hold all the context myself. Then I supervise while it uses subagents. Finally I review
+            while it runs whole PRDs on its own." Same direction, every step — more trust, more delegated context. And
+            you can only move right because you learned to set up context deliberately. Then hard pivot to the catch.
+          </aside>
+        </section>
+
+        <!-- 11 — THE CATCH (PUNCHLINE) -------------------------------- -->
+        <section data-background-gradient="radial-gradient(circle at 50% 40%, #2a1414 0%, #0c141c 70%)">
+          <span class="kicker" style="border-color: var(--out); color: var(--out)">The catch</span>
+          <p class="punch">
+            None of this works unless <span class="hl">you understand the context</span> —<br />
+            <span style="font-size: 0.7em; color: var(--muted)">- domain, architecture, technicalities...</span>
+          </p>
+          <p style="margin-top: 30px; font-size: 0.72em; color: var(--ink)">
+            If you don't, the AI quietly will take the lead —<br />and you get bad results
+            <em>without even noticing.</em>
+          </p>
+          <aside class="notes">
+            THE emotional punchline of Part 1. Slow down, let it land. The further you move out of the loop, the more
+            you must already understand — the domain (conceptually) AND the codebase (technically). The danger isn't the
+            AI failing loudly. It's the AI confidently doing the wrong thing while you nod along, because you couldn't
+            tell the difference. You are the quality bar. The AI amplifies your judgment — it doesn't replace it. This
+            is the bridge to Part 2: here's where I had to know my stuff.
+          </aside>
+        </section>
+
+        <!-- 12 — PART 2 TITLE / MEET THE APP -------------------------- -->
+        <section data-auto-animate>
+          <span class="kicker">Part 2 · Putting it to work</span>
+          <h1>Case: Timesheet Zone</h1>
+          <p class="lead">Built across the masterclass — applying the concepts from Part 1.</p>
+          <aside class="notes">
+            Transition. "Enough theory — here's what it actually produced." Timesheet Zone: consultants book hours
+            against client contracts, track leave, submit weekly timesheets for approval, export PDFs. A real internal
+            tool.
+          </aside>
+        </section>
+
+        <!-- 13 — WHAT IT IS + STACK ----------------------------------- -->
+        <section>
+          <h2>What it is</h2>
+          <ul style="font-size: 0.78em; margin-top: 14px">
+            <li>Users book work hours against client <strong>contracts</strong></li>
+            <li>Track <strong>leave</strong> &amp; <strong>balances</strong></li>
+            <li>Submit weekly <strong>timesheets</strong> for approval</li>
+            <li>Admins manage users, customers, contracts &amp; approve <strong>timesheets</strong></li>
+          </ul>
+          <div class="chips">
+            <span class="chip">React</span>
+            <span class="chip">.NET 10 · C# 14</span>
+            <span class="chip">Azure AD</span>
+          </div>
+          <aside class="notes">
+            One breath on what it does, one on the stack. Don't read every chip aloud — just "modern full-stack:
+            TypeScript front, .NET back, all in one monorepo." Then move to the demo — that's the real evidence.
+          </aside>
+        </section>
+
+        <!-- 14 — LIVE DEMO -------------------------------------------- -->
+        <section data-background-gradient="radial-gradient(circle at 50% 50%, #14241a 0%, #0c141c 70%)">
+          <div class="demo-cue">
+            <div style="font-size: 2em">🖥️</div>
+            <div class="big">LIVE DEMO</div>
+            <p style="font-size: 0.62em; color: var(--muted); margin-top: 14px">
+              resource management - Time entry · weekly timesheet &amp; approval · leave overview · PDF export
+            </p>
+          </div>
+          <aside class="notes">
+            SWITCH TO THE APP HERE. Suggested 3-minute path: 1. Log in, land on time entry — book a few hours against a
+            contract task (show the 8h/day capacity rule). 2. Open the weekly timesheet — submit it for approval. 3.
+            Leave overview — the year calendar + balances. 4. Export the approved PDF. Keep it tight. If anything
+            breaks, narrate what it should do and move on — don't debug live.
+          </aside>
+        </section>
+
+        <!-- 15 — HOW IT WAS ACTUALLY BUILT ---------------------------- -->
+        <section>
+          <h2>How the AI actually built it</h2>
+          <p style="font-size: 0.8em; margin-top: 10px; color: var(--ink)">
+            <span style="color: var(--accent)">Idea</span> → grill it → <strong>PRD</strong> → split into
+            <strong>issues</strong> → agents build slices → <strong>reviewed PRs</strong> → merge
+          </p>
+          <p class="lead" style="margin-top: 24px; font-size: 0.7em">
+            Every feature you just saw climbed the same loop — most of it built <em>out of the loop</em>, because the
+            groundwork made it safe to.
+          </p>
+          <div class="chips" style="margin-top: 18px">
+            <span class="chip">CONTEXT.md — the domain language</span>
+            <span class="chip">ADRs — decisions on record</span>
+            <span class="chip">conventions docs — the house style</span>
+          </div>
+          <aside class="notes">
+            Tie it all back. The reason I could go autonomous: I'd invested in context. CONTEXT.md teaches the AI our
+            domain words. ADRs record the decisions so it doesn't re-litigate them. Conventions docs = our coding style,
+            so output looks like ours. THIS is "understanding the context" made concrete — the punchline from Part 1, in
+            practice.
+          </aside>
+        </section>
+
+        <!-- 16 — TAKEAWAYS -------------------------------------------- -->
+        <section>
+          <h2>Key takeaways</h2>
+          <ul style="font-size: 0.85em; margin-top: 18px">
+            <li><strong>Direct the AI</strong> — don't just ask it for code.</li>
+            <li><strong>Context is the craft</strong> — feed it well, delegate it deliberately.</li>
+            <li><strong>Earn your way out of the loop</strong> — baby steps is the way to go.</li>
+          </ul>
+          <aside class="notes">
+            Three things, said slowly. These are the whole talk in one slide. Land "trust follows understanding" as the
+            last line — it ties both acts together.
+          </aside>
+        </section>
+
+        <!-- 17 — THANKS / Q&A ----------------------------------------- -->
+        <section data-background-gradient="radial-gradient(circle at 30% 30%, #1b2733 0%, #0c141c 70%)">
+          <h1>Thanks 🙌</h1>
+          <p class="lead">Questions?</p>
+          <p style="margin-top: 30px; font-size: 0.62em; color: var(--muted)">Pieter Bracke · Euricom</p>
+          <aside class="notes">
+            Open the floor. Have the repo open in a tab in case anyone wants to see the skills/ADRs.
+          </aside>
+        </section>
+      </div>
+    </div>
+
+    <div class="footer">AI-Empowered Development · Euricom</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: 'c/t',
+        transition: 'slide',
+        width: 1280,
+        height: 720,
+        margin: 0.08,
+        plugins: [RevealNotes, RevealHighlight],
+      });
+    </script>
+  </body>
+</html>

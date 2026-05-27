@@ -2,6 +2,13 @@
 
 ## 2026-05-27
 
+### docs: add AI-Empowered Development presentation
+
+Add a Reveal.js presentation covering the 4-week masterclass on AI-powered
+development with Claude Code. Includes Part 1 (core concepts, in/on/out loop,
+context engineering) and Part 2 (Timesheet Zone case study, live demo, workflow
+integration). Euricom design system, dark theme, speaker notes throughout.
+
 ### feat: impersonation UI — target picker, header button, banner + identity split (#44)
 
 **Frontend (`packages/web` only)**
