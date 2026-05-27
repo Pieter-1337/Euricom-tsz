@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Tsz.Api.Auth;
 using Tsz.Api.Tests.Integration.TestAuth;
 using Tsz.Modules.Contracts.Contracts.Queries;
 using Tsz.Modules.Contracts.Domain.Contracts;
@@ -90,7 +91,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task GetTimesheetWeek_NoExistingRow_ReturnsEmptyDraft()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
 
         var response = await Client.GetAsync($"/api/timesheet-weeks/{userId}/2026/21");
 
@@ -109,7 +110,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task GetTimesheetWeek_Days_HaveCorrectDates()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
 
         var response = await Client.GetAsync($"/api/timesheet-weeks/{userId}/2026/21");
 
@@ -124,7 +125,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task GetTimesheetWeek_WeekendCells_NotBusinessDay()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
 
         var response = await Client.GetAsync($"/api/timesheet-weeks/{userId}/2026/21");
 
@@ -141,7 +142,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_NewWeek_CreatesAndReturns200()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
 
@@ -161,7 +162,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_RoundTrip_AddUpdateRemove()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
 
@@ -191,7 +192,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_DateOutsideWeek_Returns400()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
 
@@ -207,7 +208,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_InvalidDurationHours_Returns400()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
 
@@ -223,7 +224,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_InvalidContractTask_Returns400()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
 
         var response = await Client.PutAsJsonAsync(
             $"/api/timesheet-weeks/{userId}/2026/21/bookings",
@@ -237,7 +238,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task GetTimesheetWeek_AfterPut_ReturnsPersistedData()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
 
@@ -494,6 +495,136 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
         Assert.Equal(TimesheetErrors.NotDraft.Code, body.GetProperty("code").GetString());
     }
 
+    // --- Week read / booking write access-control matrix ---
+
+    private const string AdminOid = "admin-oid";
+    private const string AdminEmail = "admin@test.com";
+    private const string OtherUserOid = "other-user-oid";
+    private const string OtherUserEmail = "other-user@test.com";
+
+    private async Task<Guid> SeedUserWithOidAsync(string oid, string email, UserRole role)
+    {
+        var id = Guid.NewGuid();
+        await WithUowAsync(async uow =>
+        {
+            var user = User.Create("Test", "User", email, [role]);
+            user.Id = id;
+            user.LinkEntraOid(oid);
+            uow.RepositoryFor<User>().Add(user);
+            await uow.SaveChangesAsync();
+        });
+        return id;
+    }
+
+    // Read: self → 200
+
+    [Fact]
+    public async Task GetTimesheetWeek_AsSelf_Returns200()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+
+        var response = await Client.GetAsync($"/api/timesheet-weeks/{userId}/2026/21");
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    // Read: admin reading another user's week → 200
+
+    [Fact]
+    public async Task GetTimesheetWeek_AsAdmin_AnyUser_Returns200()
+    {
+        var ownerId = await SeedUserWithOidAsync(OtherUserOid, OtherUserEmail, UserRole.User);
+        await SeedUserWithOidAsync(AdminOid, AdminEmail, UserRole.Admin);
+
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/api/timesheet-weeks/{ownerId}/2026/21");
+        req.Headers.Add("X-Test-Oid", AdminOid);
+        req.Headers.Add("X-Test-Email", AdminEmail);
+        var response = await Client.SendAsync(req);
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    // Read: non-admin reading another user's week → 403
+
+    [Fact]
+    public async Task GetTimesheetWeek_AsOtherUser_NonAdmin_Returns403()
+    {
+        var ownerId = await SeedUserWithOidAsync(OtherUserOid, OtherUserEmail, UserRole.User);
+        await SeedCallerAsAsync(UserRole.User); // caller is not ownerId
+
+        var response = await Client.GetAsync($"/api/timesheet-weeks/{ownerId}/2026/21");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // Write bookings: self → 200 (2xx)
+
+    [Fact]
+    public async Task PutBookings_AsSelf_Returns200()
+    {
+        var userId = await SeedCallerAsAsync(UserRole.User);
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{userId}/2026/21/bookings",
+            new { timeEntries = Array.Empty<object>(), leaveBookings = Array.Empty<object>() });
+
+        response.EnsureSuccessStatusCode();
+    }
+
+    // Write bookings: admin targeting another user → 403 (self-only, not admin-or-self)
+
+    [Fact]
+    public async Task PutBookings_AsAdmin_OtherUser_Returns403()
+    {
+        var ownerId = await SeedUserWithOidAsync(OtherUserOid, OtherUserEmail, UserRole.User);
+        await SeedUserWithOidAsync(AdminOid, AdminEmail, UserRole.Admin);
+
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/api/timesheet-weeks/{ownerId}/2026/21/bookings")
+        {
+            Content = JsonContent.Create(new { timeEntries = Array.Empty<object>(), leaveBookings = Array.Empty<object>() })
+        };
+        req.Headers.Add("X-Test-Oid", AdminOid);
+        req.Headers.Add("X-Test-Email", AdminEmail);
+        var response = await Client.SendAsync(req);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // Write bookings: non-admin targeting another user → 403
+
+    [Fact]
+    public async Task PutBookings_AsOtherUser_NonAdmin_Returns403()
+    {
+        var ownerId = await SeedUserWithOidAsync(OtherUserOid, OtherUserEmail, UserRole.User);
+        await SeedCallerAsAsync(UserRole.User); // caller is not ownerId
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/timesheet-weeks/{ownerId}/2026/21/bookings",
+            new { timeEntries = Array.Empty<object>(), leaveBookings = Array.Empty<object>() });
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    // Write bookings: admin impersonating user B, targeting B's week → 200 (effective caller is B)
+
+    [Fact]
+    public async Task PutBookings_AdminImpersonatingUser_TargetingImpersonatedWeek_Returns200()
+    {
+        var userBId = await SeedUserWithOidAsync(OtherUserOid, OtherUserEmail, UserRole.User);
+        await SeedUserWithOidAsync(AdminOid, AdminEmail, UserRole.Admin);
+
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/api/timesheet-weeks/{userBId}/2026/21/bookings")
+        {
+            Content = JsonContent.Create(new { timeEntries = Array.Empty<object>(), leaveBookings = Array.Empty<object>() })
+        };
+        req.Headers.Add("X-Test-Oid", AdminOid);
+        req.Headers.Add("X-Test-Email", AdminEmail);
+        req.Headers.Add(ImpersonationHeader.Name, userBId.ToString());
+        var response = await Client.SendAsync(req);
+
+        response.EnsureSuccessStatusCode();
+    }
+
     // --- Leave booking integration tests ---
 
     private async Task SeedUserLeaveAsync(Guid userId, Guid leaveTypeId, decimal? totalDays)
@@ -509,7 +640,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutLeaveBookings_UnderAllowance_Returns200()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         await SeedUserLeaveAsync(userId, VerlofId, 5m); // 5 days = 40h
 
         var response = await Client.PutAsJsonAsync(
@@ -531,7 +662,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_DayCapacityExceeded_TimeOnly_Returns400()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
 
@@ -572,7 +703,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_DayCapacityExceeded_TimePlusLeave_Returns400()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
         await SeedUserLeaveAsync(userId, VerlofId, 5m);
@@ -593,7 +724,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutBookings_ExactlyAtCap_Returns200()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
         await SeedUserLeaveAsync(userId, VerlofId, 5m);
@@ -616,7 +747,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutLeaveBookings_OverAllowance_Returns400LeaveAllowanceExceeded()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         await SeedUserLeaveAsync(userId, VerlofId, 1m); // 1 day = 8h
 
         var response = await Client.PutAsJsonAsync(
@@ -639,7 +770,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutLeaveBookings_NullAllowance_Unlimited_Returns200()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         await SeedUserLeaveAsync(userId, VerlofId, null); // unlimited
 
         var response = await Client.PutAsJsonAsync(
@@ -666,7 +797,7 @@ public class TimesheetEndpointsTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task PutLeaveBookings_MixedWithTimeEntries_RoundTrips()
     {
-        var userId = await SeedUserAsync(UserRole.User);
+        var userId = await SeedCallerAsAsync(UserRole.User);
         var customerId = await SeedCustomerAsync();
         var (_, taskId) = await SeedContractWithTaskAsync(userId, customerId);
         await SeedUserLeaveAsync(userId, VerlofId, 5m);
