@@ -43,6 +43,9 @@ public sealed class RealUserResolver(ICurrentUser currentUser, IUnitOfWork uow) 
             var lowered = email.ToLowerInvariant();
             var emailMatch = await repo.FirstOrDefaultAsync(u => u.Email.ToLower() == lowered, ct);
 
+            // Never resolve to an account already bound to a different Entra identity (email reuse/collision); oid is authoritative.
+            if (emailMatch is not null && emailMatch.EntraOid is not null && emailMatch.EntraOid != oid) emailMatch = null;
+
             if (emailMatch is not null && emailMatch.EntraOid is null && oid is not null)
             {
                 emailMatch.LinkEntraOid(oid);
