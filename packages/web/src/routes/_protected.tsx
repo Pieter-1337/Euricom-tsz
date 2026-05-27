@@ -104,7 +104,11 @@ function ProtectedLayout() {
               size="sm"
               className="focus-visible:outline-euri-green h-8 px-2.5 text-[12.5px] font-normal text-white/65 hover:bg-white/[0.04] hover:text-white focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2"
               onClick={async () => {
-                await stopImpersonation();
+                try {
+                  await stopImpersonation();
+                } catch {
+                  // Best-effort cookie clear; never block sign-out on it.
+                }
                 authClient.signOut({
                   fetchOptions: { onSuccess: () => window.location.assign('/') },
                 });
