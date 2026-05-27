@@ -19,6 +19,26 @@ existed on C# UserLeaveDto, FE computes them locally.
 
 ## 2026-05-27
 
+### feat: admin read-only week view via ?userId search param (#54)
+
+- Add optional `userId` search param (UUID) to the week route; honoured
+  only for Admins, everyone else falls back to their own week.
+- Loader resolves target user's display name via new `fetchUserById`
+  server fn when viewing another user.
+- Page shows a "Name — Week N, YYYY — read only" header in
+  admin-viewing-other mode.
+- Introduce `isReadOnly` prop to `TimesheetWeekGrid`; derive
+  `canEdit = !isReadOnly && isDraft` to decouple editability from status.
+- `WeekActionsBar`: hide Save/Submit/add-row popovers and
+  unsaved-changes indicators when `isReadOnly`; Approve/Reopen remain
+  available and functional.
+- `WeekTable` + `BookingRow`: replace `isDraft` with `canEdit` so inputs
+  are disabled and remove-row column is hidden in read-only mode.
+- Week navigation preserves `userId` search param via
+  `search: (prev) => prev`.
+- Week index redirect forwards `userId` search param to the dated route.
+- Update DESIGN.md components table.
+
 ### docs: add AI-Empowered Development presentation
 
 Add a Reveal.js presentation covering the 4-week masterclass on AI-powered
