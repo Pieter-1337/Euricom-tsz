@@ -81,6 +81,11 @@ public static class TimesheetEndpoints
             return TypedResults.Ok(dto);
         });
 
+        adminGroup.MapGet("/pending-approvals", async (
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
+                TypedResults.Ok(await dispatcher.SendAsync(new GetPendingApprovalsQuery(), ct)));
+
         var monthGroup = app.MapApiGroup("timesheets")
             .RequireAuthorization();
 
