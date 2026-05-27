@@ -1,0 +1,23 @@
+packages/web/src/routes/_protected.tsx
+  s_48b8ffcc44fbe3::t_221755ef07120e 65-69
+packages/web/src/features/users/components/impersonate-dialog.tsx
+  s_48b8ffcc44fbe3::t_caf6827b7044b7 1
+  s_48b8ffcc44fbe3::t_a02fdb699fe87a 18,20-26,30
+  s_48b8ffcc44fbe3::t_9f40e1f7ffdcfd 69-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8d0d4b692dd195852089dda8e2ec8c263ea04dd6",
+  "prompts": {},
+  "sessions": {
+    "s_48b8ffcc44fbe3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c977636-e2b6-4a19-97ae-20ce3e261e09",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
