@@ -12,7 +12,14 @@ public interface ICurrentUserAccount
     Task<User?> GetAsync(CancellationToken ct = default);
 }
 
-public sealed class CurrentUserResolver(ICurrentUser currentUser, IUnitOfWork uow)
+/// Effective identity wrapper: returns the <em>impersonated</em> user when an active
+/// <see cref="IImpersonationContext"/> has a target set by <c>ImpersonationMiddleware</c>;
+/// otherwise falls through to the real caller via <see cref="IRealUserResolver"/>.
+/// Per-request caching prevents redundant DB hits.
+public sealed class CurrentUserResolver(
+    RealUserResolver real,
+    IImpersonationContext impersonation,
+    IUnitOfWork uow)
     : ICurrentUserResolver, ICurrentUserAccount
 {
     private User? _cached;
@@ -30,32 +37,14 @@ public sealed class CurrentUserResolver(ICurrentUser currentUser, IUnitOfWork uo
     {
         if (_loaded) return _cached;
 
-        var repo = uow.RepositoryFor<User>();
-        var oid = currentUser.EntraOid;
-        var email = currentUser.Email;
-
-        if (oid is not null)
+        if (impersonation.IsImpersonating)
         {
-            _cached = await repo.FirstOrDefaultAsync(u => u.EntraOid == oid, ct);
-            if (_cached is not null)
-            {
-                _loaded = true;
-                return _cached;
-            }
+            _cached = await uow.RepositoryFor<User>()
+                .FirstOrDefaultAsync(u => u.Id == impersonation.TargetUserId!.Value, ct);
         }
-
-        if (email is not null)
+        else
         {
-            var lowered = email.ToLower();
-            var emailMatch = await repo.FirstOrDefaultAsync(u => u.Email.ToLower() == lowered, ct);
-
-            if (emailMatch is not null && emailMatch.EntraOid is null && oid is not null)
-            {
-                emailMatch.LinkEntraOid(oid);
-                await uow.SaveChangesAsync(ct);
-            }
-
-            _cached = emailMatch;
+            _cached = await real.GetRealAsync(ct);
         }
 
         _loaded = true;

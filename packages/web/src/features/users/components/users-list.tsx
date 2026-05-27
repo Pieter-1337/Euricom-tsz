@@ -2,6 +2,7 @@ import { Link, useRouter } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Users as UsersIcon } from 'lucide-react';
 import type { User } from '#/api/users';
+import { UserRole } from '#/api/users';
 import { Badge } from '#/components/ui/badge';
 import { Button } from '#/components/ui/button';
 import { EmptyState } from '#/components/list/empty-state';
@@ -10,35 +11,70 @@ import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
 import { useListQuery } from '#/hooks/use-list-query';
 import { fetchUsersPaged } from '#/features/users/server-fns';
 import type { UserSortKey } from '#/features/users/schemas';
+import { startImpersonation } from '#/server/impersonation.server';
 
-const columns: ColumnDef<User, unknown>[] = [
-  {
-    id: 'name' satisfies UserSortKey,
-    header: ({ column }) => <SortableHeaderCell column={column} label="Name" />,
-    cell: ({ row }) => `${row.original.firstName} ${row.original.lastName}`,
-  },
-  {
-    id: 'email' satisfies UserSortKey,
-    accessorKey: 'email',
-    header: ({ column }) => <SortableHeaderCell column={column} label="Email" />,
-  },
-  {
-    id: 'roles',
-    header: 'Roles',
-    cell: ({ row }) => (
-      <div className="flex flex-wrap gap-1">
-        {row.original.roles.map((r) => (
-          <Badge key={r} variant="secondary">
-            {r}
-          </Badge>
-        ))}
-      </div>
-    ),
-  },
-];
+function buildColumns(onImpersonate: (u: User) => void): ColumnDef<User, unknown>[] {
+  return [
+    {
+      id: 'name' satisfies UserSortKey,
+      header: ({ column }) => <SortableHeaderCell column={column} label="Name" />,
+      cell: ({ row }) => `${row.original.firstName} ${row.original.lastName}`,
+    },
+    {
+      id: 'email' satisfies UserSortKey,
+      accessorKey: 'email',
+      header: ({ column }) => <SortableHeaderCell column={column} label="Email" />,
+    },
+    {
+      id: 'roles',
+      header: 'Roles',
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.roles.map((r) => (
+            <Badge key={r} variant="secondary">
+              {r}
+            </Badge>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => {
+        const u = row.original;
+        if (u.roles.includes(UserRole.Admin)) return null;
+        return (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onImpersonate(u);
+            }}
+          >
+            Impersonate
+          </Button>
+        );
+      },
+    },
+  ];
+}
 
 export function UsersList() {
   const router = useRouter();
+
+  const handleImpersonate = async (u: User) => {
+    await startImpersonation({
+      data: {
+        targetUserId: u.id,
+        targetName: `${u.firstName} ${u.lastName}`,
+      },
+    });
+    window.location.assign('/');
+  };
+
+  const columns = buildColumns(handleImpersonate);
 
   const props = useListQuery<User, UserSortKey>({
     queryKey: ['users-paged'],

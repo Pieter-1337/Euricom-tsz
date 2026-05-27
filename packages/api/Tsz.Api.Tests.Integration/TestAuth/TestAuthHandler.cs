@@ -10,6 +10,12 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
 {
     public const string SchemeName = "Test";
 
+    /// Default oid used when <c>X-Test-Oid</c> header is absent.
+    public const string DefaultOid = "test-user-id";
+
+    /// Default email used when <c>X-Test-Email</c> header is absent.
+    public const string DefaultEmail = "test@test.com";
+
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
@@ -18,14 +24,26 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        // Per-request overrides let integration tests simulate different real callers
+        // (e.g. admin A vs non-admin B) while also sending X-Impersonate-User.
+        var oid = Request.Headers.TryGetValue("X-Test-Oid", out var oidValues)
+                  && !string.IsNullOrWhiteSpace(oidValues.FirstOrDefault())
+            ? oidValues.First()!
+            : DefaultOid;
+
+        var email = Request.Headers.TryGetValue("X-Test-Email", out var emailValues)
+                    && !string.IsNullOrWhiteSpace(emailValues.FirstOrDefault())
+            ? emailValues.First()!
+            : DefaultEmail;
+
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
-            new Claim("sub", "test-user-id"),
+            new Claim(ClaimTypes.NameIdentifier, oid),
+            new Claim("sub", oid),
             new Claim(ClaimTypes.Name, "Test User"),
             new Claim("name", "Test User"),
-            new Claim(ClaimTypes.Email, "test@test.com"),
-            new Claim("email", "test@test.com"),
+            new Claim(ClaimTypes.Email, email),
+            new Claim("email", email),
         };
 
         var identity = new ClaimsIdentity(claims, SchemeName);
