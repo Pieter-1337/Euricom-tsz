@@ -76,8 +76,7 @@ export function useWeekBookings(initialData: TimesheetWeek | null, isDraft: bool
     return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
   });
 
-  const isDirty =
-    !areMapsEqual(taskBookings, savedTaskBookings) || !areMapsEqual(leaveBookings, savedLeaveBookings);
+  const isDirty = !areMapsEqual(taskBookings, savedTaskBookings) || !areMapsEqual(leaveBookings, savedLeaveBookings);
 
   const setTaskCell = useCallback(
     (taskId: string, date: string, value: number | null) => {

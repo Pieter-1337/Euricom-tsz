@@ -51,9 +51,7 @@ function LeaveOverviewPage() {
 
       {hasNoLeaves && (
         <div className="rounded-[12px] border border-black/[0.08] bg-white px-5 py-6 text-center dark:border-white/[0.06] dark:bg-[#1D252D]">
-          <p className="text-sm text-[#6B7682] dark:text-white/50">
-            No leave configured for {year}.
-          </p>
+          <p className="text-sm text-[#6B7682] dark:text-white/50">No leave configured for {year}.</p>
         </div>
       )}
 

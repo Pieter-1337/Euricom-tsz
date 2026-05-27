@@ -6,9 +6,18 @@ import { useLeaveColors } from '#/features/leaves/use-leave-colors';
 import type { LeaveBookingForYear, HolidayDto } from '#/api/leaves';
 
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April',
-  'May', 'June', 'July', 'August',
-  'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 const DAY_LABELS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -122,9 +131,7 @@ function DayCellContent({
     </div>
   );
 
-  const tooltipLines: string[] = cell.bookings.map(
-    (b) => `${b.leaveTypeName} (${b.durationHours}h)`,
-  );
+  const tooltipLines: string[] = cell.bookings.map((b) => `${b.leaveTypeName} (${b.durationHours}h)`);
   if (cell.isHoliday) tooltipLines.push(cell.holidayName ?? 'Holiday');
 
   // Cells are clickable — navigate to the week containing this date
@@ -195,11 +202,7 @@ function MonthGrid({
       </div>
       <div className="grid grid-cols-7 gap-px p-1">
         {cells.map((cell) => (
-          <DayCellContent
-            key={cell.isoDate}
-            cell={cell}
-            colorMap={colorMap}
-          />
+          <DayCellContent key={cell.isoDate} cell={cell} colorMap={colorMap} />
         ))}
       </div>
     </section>

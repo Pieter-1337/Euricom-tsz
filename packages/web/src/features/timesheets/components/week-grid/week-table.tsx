@@ -167,11 +167,7 @@ export function WeekTable({
                   )}
                   data-testid={`day-total-${d.date}`}
                 >
-                  {overCap
-                    ? `${formatHours(total)} / ${WORKDAY_CAPACITY}h max`
-                    : total > 0
-                      ? formatHours(total)
-                      : ''}
+                  {overCap ? `${formatHours(total)} / ${WORKDAY_CAPACITY}h max` : total > 0 ? formatHours(total) : ''}
                 </TableCell>
               );
             })}

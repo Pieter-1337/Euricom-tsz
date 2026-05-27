@@ -19,20 +19,10 @@ function ColorDot({ leaveTypeId }: ColorDotProps) {
     return <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-600/90" aria-hidden="true" />;
   }
   if (!leaveTypeId) {
-    return (
-      <span
-        className="inline-block h-2.5 w-2.5 rounded-sm bg-[#3A4651]/40 dark:bg-white/25"
-        aria-hidden="true"
-      />
-    );
+    return <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#3A4651]/40 dark:bg-white/25" aria-hidden="true" />;
   }
   const color = getLeaveColor(leaveTypeId);
-  return (
-    <span
-      className={cn('inline-block h-2.5 w-2.5 rounded-sm', color.bg)}
-      aria-hidden="true"
-    />
-  );
+  return <span className={cn('inline-block h-2.5 w-2.5 rounded-sm', color.bg)} aria-hidden="true" />;
 }
 
 export interface LeaveBalancePanelProps {
@@ -74,7 +64,9 @@ export function LeaveBalancePanel({ summary }: LeaveBalancePanelProps) {
             <TableCell className="font-semibold">Total (limited)</TableCell>
             <TableCell className="text-right font-semibold tabular-nums">{displayVal(summary.totals.total)}</TableCell>
             <TableCell className="text-right font-semibold tabular-nums">{displayVal(summary.totals.taken)}</TableCell>
-            <TableCell className="text-right font-semibold tabular-nums">{displayVal(summary.totals.balance)}</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">
+              {displayVal(summary.totals.balance)}
+            </TableCell>
           </TableRow>
         </TableFooter>
       </Table>

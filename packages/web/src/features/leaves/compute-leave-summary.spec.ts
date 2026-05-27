@@ -5,7 +5,9 @@ import type { LeaveBookingForYear, HolidayDto } from '#/api/leaves';
 
 const CAPACITY = 8;
 
-const makeLeave = (overrides: Partial<UserLeave> & Pick<UserLeave, 'id' | 'leaveTypeId' | 'leaveTypeName' | 'defaultAllowed' | 'year'>): UserLeave => ({
+const makeLeave = (
+  overrides: Partial<UserLeave> & Pick<UserLeave, 'id' | 'leaveTypeId' | 'leaveTypeName' | 'defaultAllowed' | 'year'>,
+): UserLeave => ({
   totalDays: null,
   takenDays: null,
   balanceDays: null,
@@ -39,7 +41,14 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Limited row: numeric Total / Taken / Balance', () => {
-    const leave = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'Verlof', defaultAllowed: 'Limited', year: 2026, totalDays: 20 });
+    const leave = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'Verlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: 20,
+    });
     const booking = makeBooking(LT_A, 8);
 
     const result = computeLeaveSummary([leave], [booking], [], CAPACITY);
@@ -51,7 +60,13 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Unlimited row: numeric Taken; — for Total / Balance', () => {
-    const leave = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'ADV', defaultAllowed: 'Unlimited', year: 2026 });
+    const leave = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'ADV',
+      defaultAllowed: 'Unlimited',
+      year: 2026,
+    });
     const booking = makeBooking(LT_A, 16);
 
     const result = computeLeaveSummary([leave], [booking], [], CAPACITY);
@@ -63,7 +78,14 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Taken formula: sums multiple bookings of the same type', () => {
-    const leave = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'Verlof', defaultAllowed: 'Limited', year: 2026, totalDays: 25 });
+    const leave = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'Verlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: 25,
+    });
     const bookings = [makeBooking(LT_A, 4), makeBooking(LT_A, 4), makeBooking(LT_A, 8)];
 
     const result = computeLeaveSummary([leave], bookings, [], CAPACITY);
@@ -74,8 +96,22 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Multiple LeaveTypes: each gets its own row, no cross-contamination', () => {
-    const leaveA = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'Verlof', defaultAllowed: 'Limited', year: 2026, totalDays: 20 });
-    const leaveB = makeLeave({ id: '2', leaveTypeId: LT_B, leaveTypeName: 'Ziekteverlof', defaultAllowed: 'Limited', year: 2026, totalDays: 10 });
+    const leaveA = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'Verlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: 20,
+    });
+    const leaveB = makeLeave({
+      id: '2',
+      leaveTypeId: LT_B,
+      leaveTypeName: 'Ziekteverlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: 10,
+    });
     const bookings = [makeBooking(LT_A, 8), makeBooking(LT_B, 16)];
 
     const result = computeLeaveSummary([leaveA, leaveB], bookings, [], CAPACITY);
@@ -103,8 +139,21 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Totals row: sums Limited only, excludes Unlimited and Feestdagen', () => {
-    const limited = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'Verlof', defaultAllowed: 'Limited', year: 2026, totalDays: 20 });
-    const unlimited = makeLeave({ id: '2', leaveTypeId: LT_B, leaveTypeName: 'ADV', defaultAllowed: 'Unlimited', year: 2026 });
+    const limited = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'Verlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: 20,
+    });
+    const unlimited = makeLeave({
+      id: '2',
+      leaveTypeId: LT_B,
+      leaveTypeName: 'ADV',
+      defaultAllowed: 'Unlimited',
+      year: 2026,
+    });
     const bookings = [makeBooking(LT_A, 8), makeBooking(LT_B, 16)];
     const holidays = [makeHoliday('2026-01-01')];
 
@@ -116,8 +165,21 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Row ordering: user leave rows first in order, then Feestdagen', () => {
-    const leaveA = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'Verlof', defaultAllowed: 'Limited', year: 2026, totalDays: 20 });
-    const leaveB = makeLeave({ id: '2', leaveTypeId: LT_B, leaveTypeName: 'ADV', defaultAllowed: 'Unlimited', year: 2026 });
+    const leaveA = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'Verlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: 20,
+    });
+    const leaveB = makeLeave({
+      id: '2',
+      leaveTypeId: LT_B,
+      leaveTypeName: 'ADV',
+      defaultAllowed: 'Unlimited',
+      year: 2026,
+    });
 
     const result = computeLeaveSummary([leaveA, leaveB], [], [], CAPACITY);
 
@@ -127,7 +189,14 @@ describe('computeLeaveSummary', () => {
   });
 
   it('Limited row with null totalDays defaults to 0 total', () => {
-    const leave = makeLeave({ id: '1', leaveTypeId: LT_A, leaveTypeName: 'Verlof', defaultAllowed: 'Limited', year: 2026, totalDays: null });
+    const leave = makeLeave({
+      id: '1',
+      leaveTypeId: LT_A,
+      leaveTypeName: 'Verlof',
+      defaultAllowed: 'Limited',
+      year: 2026,
+      totalDays: null,
+    });
 
     const result = computeLeaveSummary([leave], [], [], CAPACITY);
 
