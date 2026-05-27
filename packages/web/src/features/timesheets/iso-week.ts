@@ -78,7 +78,6 @@ export function displayDuration(raw: string | undefined, stored: number | undefi
   return stored ?? 0;
 }
 
-
 export function isValidDuration(val: number): boolean {
   return val >= 0.25 && val <= 8 && Math.round(val * 4) === val * 4;
 }

@@ -10,13 +10,7 @@ import { cn } from '#/lib/utils';
 import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
 import { fetchHolidaysForYear } from '#/features/leaves/server-fns';
-import {
-  formatIsoDate,
-  formatMonthLabel,
-  nextMonth,
-  prevMonth,
-  todayMonth,
-} from '#/features/timesheets/iso-week';
+import { formatIsoDate, formatMonthLabel, nextMonth, prevMonth, todayMonth } from '#/features/timesheets/iso-week';
 import type { TimesheetMonth, TimesheetMonthDay, TimesheetMonthWeek } from '#/api/timesheets';
 import type { CurrentUser } from '#/server/current-user';
 
@@ -42,7 +36,7 @@ function TimesheetsOverviewPage() {
   const { data: monthData } = useQuery({
     queryKey: ['timesheet-month-overview', userId, year, month],
     queryFn: () => fetchTimesheetMonth({ data: { userId, year, month } }),
-    initialData: isInitial ? initialMonthData ?? undefined : undefined,
+    initialData: isInitial ? (initialMonthData ?? undefined) : undefined,
   });
 
   const { data: holidays } = useQuery({
@@ -52,9 +46,7 @@ function TimesheetsOverviewPage() {
 
   // Draft (saved-but-not-submitted) weeks are omitted from the overview and
   // its totals; those days then surface under "Not submitted yet".
-  const viewMonthData = monthData
-    ? { ...monthData, weeks: monthData.weeks.filter((w) => w.status !== 'Draft') }
-    : null;
+  const viewMonthData = monthData ? { ...monthData, weeks: monthData.weeks.filter((w) => w.status !== 'Draft') } : null;
 
   return (
     <TooltipProvider delayDuration={100} skipDelayDuration={200}>
@@ -87,11 +79,7 @@ interface CalendarCellData {
   weekStatus: string | null;
 }
 
-function buildCalendarCells(
-  year: number,
-  month: number,
-  monthData: TimesheetMonth | null,
-): CalendarCellData[] {
+function buildCalendarCells(year: number, month: number, monthData: TimesheetMonth | null): CalendarCellData[] {
   const firstOfMonth = new Date(year, month - 1, 1);
   const lastOfMonth = new Date(year, month, 0);
 
@@ -180,9 +168,7 @@ function CalendarCard({
         ))}
       </div>
 
-      <footer className="px-5 py-3 text-xs italic text-[#6B7682] dark:text-white/40">
-        * Not approved yet
-      </footer>
+      <footer className="px-5 py-3 text-xs italic text-[#6B7682] dark:text-white/40">* Not approved yet</footer>
     </section>
   );
 }
@@ -199,16 +185,11 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
         cell.outside && 'opacity-30',
       )}
     >
-      <div className="text-right text-[11px] font-medium text-[#6B7682] dark:text-white/50">
-        {cell.dayNumber}
-      </div>
+      <div className="text-right text-[11px] font-medium text-[#6B7682] dark:text-white/50">{cell.dayNumber}</div>
       {!cell.outside && cell.day && (
         <div className="flex flex-col gap-0.5">
           {cell.day.timeEntries.map((entry, i) => (
-            <Tooltip
-              key={`t-${i}`}
-              content={`${entry.customerName} — ${entry.taskName} (${entry.durationHours}h)`}
-            >
+            <Tooltip key={`t-${i}`} content={`${entry.customerName} — ${entry.taskName} (${entry.durationHours}h)`}>
               <div
                 className={cn(
                   'cursor-pointer truncate rounded-sm px-1.5 py-0.5 text-[10.5px] text-white',
@@ -275,7 +256,12 @@ function buildBreakdownRows(weeks: TimesheetMonthWeek[]): BreakdownRow[] {
 
   return [
     ...Array.from(workedHours, ([name, hours]) => ({ key: `c-${name}`, label: name, hours, dot: 'bg-green-600' })),
-    ...Array.from(leaveHours, ([id, v]) => ({ key: `l-${id}`, label: v.name, hours: v.hours, dot: getLeaveColor(id).bg })),
+    ...Array.from(leaveHours, ([id, v]) => ({
+      key: `l-${id}`,
+      label: v.name,
+      hours: v.hours,
+      dot: getLeaveColor(id).bg,
+    })),
   ].sort((a, b) => b.hours - a.hours);
 }
 
@@ -292,9 +278,7 @@ function BreakdownSection({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6B7682] dark:text-white/40">
-        {title}
-      </p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6B7682] dark:text-white/40">{title}</p>
       <div className="mt-2 border-b border-black/[0.06] pb-3 text-center text-sm font-semibold dark:border-white/[0.06]">
         {days} / {businessDays} workdays
       </div>
@@ -305,9 +289,7 @@ function BreakdownSection({
               <span className={cn('inline-block size-2.5 shrink-0 rounded-sm', row.dot)} aria-hidden="true" />
               {row.label}
             </span>
-            <span className="text-[#6B7682] dark:text-white/60">
-              {Math.round(row.hours * 100) / 100}h
-            </span>
+            <span className="text-[#6B7682] dark:text-white/60">{Math.round(row.hours * 100) / 100}h</span>
           </li>
         ))}
       </ul>

@@ -185,7 +185,10 @@ export function TimesheetWeekGrid({
                 getKey={(lt) => lt.id}
                 renderItem={(lt) => (
                   <div className="flex items-center gap-2">
-                    <span className={cn('inline-block size-2.5 shrink-0 rounded-sm', getLeaveColor(lt.id).bg)} aria-hidden="true" />
+                    <span
+                      className={cn('inline-block size-2.5 shrink-0 rounded-sm', getLeaveColor(lt.id).bg)}
+                      aria-hidden="true"
+                    />
                     <div className="font-medium text-[#3A4651] dark:text-white/90">{lt.name}</div>
                   </div>
                 )}
@@ -235,7 +238,6 @@ export function TimesheetWeekGrid({
         onRemoveTaskRow={bookings.removeTaskRow}
         onRemoveLeaveRow={bookings.removeLeaveRow}
       />
-
     </div>
   );
 }

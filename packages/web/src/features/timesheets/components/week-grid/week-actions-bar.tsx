@@ -108,7 +108,11 @@ export function WeekActionsBar({
           </Button>
         )}
         {isDraft && (
-          <Button size="sm" disabled={isLifecycleLoading || hasDayCapacityError || hasInvalidCellInput} onClick={onSubmit}>
+          <Button
+            size="sm"
+            disabled={isLifecycleLoading || hasDayCapacityError || hasInvalidCellInput}
+            onClick={onSubmit}
+          >
             Submit
           </Button>
         )}

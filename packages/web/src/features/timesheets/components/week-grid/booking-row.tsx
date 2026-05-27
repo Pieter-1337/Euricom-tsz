@@ -37,10 +37,7 @@ export function BookingRow({
   const isLeave = variant === 'leave';
   const keyFor = (date: string): CellKey => (isLeave ? leaveCellKey(row.id, date) : taskCellKey(row.id, date));
 
-  const rowTotal = days.reduce(
-    (sum, d) => sum + displayDuration(cellInputs.get(keyFor(d.date)), getValue(d.date)),
-    0,
-  );
+  const rowTotal = days.reduce((sum, d) => sum + displayDuration(cellInputs.get(keyFor(d.date)), getValue(d.date)), 0);
 
   const handleRawChange = (date: string, raw: string) => {
     const key = keyFor(date);
@@ -79,7 +76,10 @@ export function BookingRow({
       >
         <div className="flex items-center gap-2">
           <span
-            className={cn('inline-block size-2.5 shrink-0 rounded-sm', isLeave ? getLeaveColor(row.id).bg : 'bg-green-600')}
+            className={cn(
+              'inline-block size-2.5 shrink-0 rounded-sm',
+              isLeave ? getLeaveColor(row.id).bg : 'bg-green-600',
+            )}
             aria-hidden="true"
           />
           <span className="truncate">{row.name}</span>
@@ -90,8 +90,7 @@ export function BookingRow({
         const stored = getValue(d.date);
         const rawInput = cellInputs.get(key) ?? (stored !== undefined ? String(stored) : '');
         const isReadOnly = !isDraft || !d.isBusinessDay;
-        const isInvalidInput =
-          rawInput !== '' && rawInput !== '0' && parseDurationInput(rawInput) === null;
+        const isInvalidInput = rawInput !== '' && rawInput !== '0' && parseDurationInput(rawInput) === null;
 
         return (
           <TableCell

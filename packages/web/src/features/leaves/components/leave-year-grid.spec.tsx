@@ -111,10 +111,7 @@ describe('LeaveYearGrid', () => {
     '[class*="bg-amber-"], [class*="bg-blue-"], [class*="bg-violet-"], [class*="bg-rose-"], [class*="bg-cyan-"], [class*="bg-orange-"], [class*="bg-indigo-"], [class*="bg-teal-"]';
 
   it('splits the cell into equal halves on a 2-entry day', () => {
-    const bookings = [
-      makeBooking('2026-04-20', LT_A, 'Verlof', 4),
-      makeBooking('2026-04-20', LT_B, 'ADV', 4),
-    ];
+    const bookings = [makeBooking('2026-04-20', LT_A, 'Verlof', 4), makeBooking('2026-04-20', LT_B, 'ADV', 4)];
 
     const { container } = withRouter(<LeaveYearGrid year={YEAR} bookings={bookings} holidays={[]} />);
 
