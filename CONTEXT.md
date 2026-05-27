@@ -14,6 +14,20 @@ _Avoid_: Employee, Account, Person
 An organisation that Tsz invoices for consulting work.
 _Avoid_: Client, Account, Tenant
 
+### Impersonation
+
+**Impersonation**:
+A session in which an Admin assumes another User's identity, able to see and do **exactly** what that User could — no more (Admin-only powers do not carry over) and no less.
+_Avoid_: Sudo, Switch-user, Login-as
+
+**Impersonator**:
+The Admin User who has assumed another User's identity. Identified by the real authenticated identity behind the request, independent of who is being impersonated.
+_Avoid_: Actor, Operator
+
+**Impersonated User**:
+The target User whose identity an Impersonator has assumed for the session.
+_Avoid_: Victim, Subject, Target
+
 ### Contracts
 
 **Contract**:
@@ -75,4 +89,5 @@ _Avoid_: DefaultDayHours (implementation name), DailyBudget, DayTotalCap, MaxWor
 - *"time entry" vs "timesheet"* — colloquially overlap. Resolution: **TimeEntry** is one row of booked work; **TimesheetWeek** is the persisted week-level container with a Status; **Timesheet** is the month-level *view* (not persisted). Never persist a "Timesheet" row.
 - *"WeekApproval"* — there is no separate WeekApproval entity. Approval state is a `Status` field on **TimesheetWeek**.
 - *"leave"* alone is ambiguous (catalog vs allowance vs consumption). Use **LeaveType** (catalog), **UserLeave** (allowance), **LeaveBooking** (consumption).
+- *"who did this?"* under **Impersonation** — v1 decision: actions an **Impersonator** performs are attributed **solely** to the **Impersonated User** with no persisted trace of the Impersonator, including the `TimesheetWeek` Status transitions (Submit/Approve/Reopen). Capability-transparency was chosen over attestation-traceability. Revisit if accountability requirements arrive.
 - *"Feestdag"* — refers to a public **Workdays.Holiday**, NOT a LeaveType. The seed has no `Feestdag` LeaveType (Verlof, ADV dagen, Anciënniteit, Ziekte only). The "Feestdagen" row in the Leave Overview balance panel is FE-synthesized from Holiday counts.

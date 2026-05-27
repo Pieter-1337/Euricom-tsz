@@ -130,4 +130,4 @@ These complement steps 5, 9, 10, 11, 13 from `plan.md`:
 
 - Role-based UI gating (Phase 2 concern; add to a separate plan when roles exist)
 - Entra global sign-out (app-local cookie clear only, per `plan.md`)
-- Impersonation UI (listed as optional in `login.md`)
+- Impersonation UI — now scoped in its own plan (`impersonation/plan.md`): header "Impersonate" button, red impersonation banner, target picker. Not part of *this* login UI plan.

@@ -13,7 +13,7 @@ For each requirement: what is stable, what we expect to change, and which IDesig
 - **Volatile:**
   - Identity provider — Entra today; single-tenant. Multi-tenant or alternative providers (local accounts, Google) are plausible.
   - Role taxonomy — Admin / User / Client Manager today; HR / Finance / Manager-hierarchy plausible.
-  - Impersonation — listed as optional; will arrive or not based on support needs.
+  - Impersonation — landed as read-write, replace-not-union, **no audit trail** (ADR-0004). The deferred levers if accountability requirements arrive: a `StatusChangedUnderImpersonationBy` stamp, then a full audit log.
 - **Layer:** Utility (auth abstraction) + Resource (Entra).
 
 ### Users
