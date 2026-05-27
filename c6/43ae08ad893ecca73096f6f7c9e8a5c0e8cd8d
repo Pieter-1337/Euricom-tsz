@@ -1,0 +1,19 @@
+docs/presentation/index.html
+  s_48b8ffcc44fbe3::t_d9bff3d8fb8df4 1-697
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c643ae08ad893ecca73096f6f7c9e8a5c0e8cd8d",
+  "prompts": {},
+  "sessions": {
+    "s_48b8ffcc44fbe3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c977636-e2b6-4a19-97ae-20ce3e261e09",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
