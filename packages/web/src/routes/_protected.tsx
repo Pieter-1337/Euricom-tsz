@@ -62,8 +62,11 @@ function ProtectedLayout() {
   }, [collapsed]);
 
   const handleStop = async () => {
-    await stopImpersonation();
-    window.location.assign('/');
+    try {
+      await stopImpersonation();
+    } finally {
+      window.location.assign('/');
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
@@ -15,13 +15,19 @@ interface ImpersonateDialogProps {
 
 export function ImpersonateDialog({ open, onOpenChange }: ImpersonateDialogProps) {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['impersonation-targets', search],
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 250);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['impersonation-targets', debouncedSearch],
     queryFn: () =>
       fetchImpersonationTargets({
         data: {
-          search: search || undefined,
+          search: debouncedSearch || undefined,
           sortBy: 'name',
           sortDir: 'asc',
           pageSize: 50,
@@ -60,8 +66,11 @@ export function ImpersonateDialog({ open, onOpenChange }: ImpersonateDialogProps
                 Loading users...
               </div>
             )}
-            {!isLoading && targets.length === 0 && <CommandEmpty>No users found.</CommandEmpty>}
-            {!isLoading && targets.length > 0 && (
+            {!isLoading && isError && (
+              <div className="py-6 text-center text-sm text-destructive">Failed to load users. Please try again.</div>
+            )}
+            {!isLoading && !isError && targets.length === 0 && <CommandEmpty>No users found.</CommandEmpty>}
+            {!isLoading && !isError && targets.length > 0 && (
               <CommandGroup>
                 {targets.map((user) => (
                   <CommandItem key={user.id} value={user.id} onSelect={() => void handleSelect(user)}>
