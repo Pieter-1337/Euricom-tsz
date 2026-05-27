@@ -1,10 +1,8 @@
-import { createServerFn } from '@tanstack/react-start';
-import { getCookie, setCookie, deleteCookie } from '@tanstack/react-start/server';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { getCookie, setCookie, deleteCookie, getRequest } from '@tanstack/react-start/server';
 import { z } from 'zod';
 import { env } from '#/env.server';
 import { auth } from './auth.server';
-import { getRequest } from '@tanstack/react-start/server';
 
 const COOKIE_NAME = '__Host-tsz_impersonate';
 
@@ -15,6 +13,11 @@ const payloadSchema = z.object({
 });
 
 type ImpersonationPayload = z.infer<typeof payloadSchema>;
+
+export type ImpersonationInfo = {
+  targetId: string;
+  targetName: string;
+};
 
 function sign(payload: ImpersonationPayload): string {
   const body = JSON.stringify(payload);
@@ -49,49 +52,41 @@ async function getCurrentSessionUserId(): Promise<string | null> {
   }
 }
 
-export type ImpersonationInfo = {
-  targetId: string;
-  targetName: string;
-};
+export async function setImpersonationCookie(targetUserId: string, targetName: string): Promise<void> {
+  const sessionUserId = await getCurrentSessionUserId();
+  if (!sessionUserId) throw new Error('Not authenticated');
 
-export const startImpersonation = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ targetUserId: z.string().uuid(), targetName: z.string() }))
-  .handler(async ({ data }): Promise<void> => {
-    const sessionUserId = await getCurrentSessionUserId();
-    if (!sessionUserId) throw new Error('Not authenticated');
+  const payload: ImpersonationPayload = {
+    impersonatorId: sessionUserId,
+    targetId: targetUserId,
+    targetName,
+  };
 
-    const payload: ImpersonationPayload = {
-      impersonatorId: sessionUserId,
-      targetId: data.targetUserId,
-      targetName: data.targetName,
-    };
-
-    setCookie(COOKIE_NAME, sign(payload), {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/',
-    });
+  setCookie(COOKIE_NAME, sign(payload), {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    path: '/',
   });
+}
 
-export const stopImpersonation = createServerFn({ method: 'POST' }).handler(async (): Promise<void> => {
-  deleteCookie(COOKIE_NAME, { path: '/' });
-});
+export function clearImpersonationCookie(): void {
+  // __Host- cookies require Secure + Path=/ on every Set-Cookie, including deletion, or the browser ignores it.
+  deleteCookie(COOKIE_NAME, { path: '/', secure: true, sameSite: 'strict', httpOnly: true });
+}
 
 /// Returns the active impersonation target, or null when absent/invalid/stale.
-export const getImpersonation = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<ImpersonationInfo | null> => {
-    const raw = getCookie(COOKIE_NAME);
-    if (!raw) return null;
-    const payload = verify(raw);
-    if (!payload) return null;
-    const sessionUserId = await getCurrentSessionUserId();
-    if (!sessionUserId || payload.impersonatorId !== sessionUserId) return null;
-    return { targetId: payload.targetId, targetName: payload.targetName };
-  },
-);
+export async function readImpersonation(): Promise<ImpersonationInfo | null> {
+  const raw = getCookie(COOKIE_NAME);
+  if (!raw) return null;
+  const payload = verify(raw);
+  if (!payload) return null;
+  const sessionUserId = await getCurrentSessionUserId();
+  if (!sessionUserId || payload.impersonatorId !== sessionUserId) return null;
+  return { targetId: payload.targetId, targetName: payload.targetName };
+}
 
-/// Returns the verified target id for use in bearerMiddleware; no server fn overhead.
+/// Verifies the cookie value for use in bearerMiddleware; returns the target id when signed + session-bound.
 export function getVerifiedImpersonationTargetId(
   cookieValue: string | undefined,
   sessionUserId: string,

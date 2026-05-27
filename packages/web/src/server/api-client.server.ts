@@ -4,7 +4,7 @@ import { ApiRequestError } from '#/api/client';
 import { env } from '#/env.server';
 import { auth } from './auth.server';
 import { getRequest, getCookie, deleteCookie } from '@tanstack/react-start/server';
-import { getVerifiedImpersonationTargetId } from './impersonation.server';
+import { getVerifiedImpersonationTargetId } from './impersonation-cookie.server';
 
 const bearerMiddleware: Middleware = {
   async onRequest({ request }) {
@@ -27,7 +27,7 @@ const bearerMiddleware: Middleware = {
         if (targetId) {
           request.headers.set('X-Impersonate-User', targetId);
         } else {
-          deleteCookie('__Host-tsz_impersonate', { path: '/' });
+          deleteCookie('__Host-tsz_impersonate', { path: '/', secure: true, sameSite: 'strict', httpOnly: true });
         }
       }
     } catch {

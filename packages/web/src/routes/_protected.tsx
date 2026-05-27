@@ -21,7 +21,7 @@ import { authClient } from '#/lib/auth-client';
 import { cn } from '#/lib/utils';
 import type { SessionUser } from '#/server/auth-functions';
 import { getCurrentUser } from '#/server/current-user';
-import { getImpersonation, stopImpersonation, type ImpersonationInfo } from '#/server/impersonation.server';
+import { getImpersonation, stopImpersonation, type ImpersonationInfo } from '#/server/impersonation';
 import { ImpersonateDialog } from '#/features/users/components/impersonate-dialog';
 
 export const Route = createFileRoute('/_protected')({

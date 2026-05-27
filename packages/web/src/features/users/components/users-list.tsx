@@ -11,7 +11,7 @@ import { SortableHeaderCell } from '#/components/list/sortable-header-cell';
 import { useListQuery } from '#/hooks/use-list-query';
 import { fetchUsersPaged } from '#/features/users/server-fns';
 import type { UserSortKey } from '#/features/users/schemas';
-import { startImpersonation } from '#/server/impersonation.server';
+import { startImpersonation } from '#/server/impersonation';
 
 function buildColumns(onImpersonate: (u: User) => void): ColumnDef<User, unknown>[] {
   return [
@@ -28,15 +28,19 @@ function buildColumns(onImpersonate: (u: User) => void): ColumnDef<User, unknown
     {
       id: 'roles',
       header: 'Roles',
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          {row.original.roles.map((r) => (
-            <Badge key={r} variant="secondary">
-              {r}
-            </Badge>
-          ))}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const elevated = row.original.roles.filter((r) => r !== UserRole.User);
+        if (elevated.length === 0) return <span className="text-muted-foreground">—</span>;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {elevated.map((r) => (
+              <Badge key={r} variant="secondary">
+                {r}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
     },
     {
       id: 'actions',
