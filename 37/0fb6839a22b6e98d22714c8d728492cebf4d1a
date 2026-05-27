@@ -1,0 +1,65 @@
+packages/api/Tsz.Api/Program.cs
+  s_48b8ffcc44fbe3::t_add252aa3c25a7 5
+  s_48b8ffcc44fbe3::t_d27328b8acbf97 49-50
+  s_48b8ffcc44fbe3::t_a0dfec5b3e5c82 74
+packages/api/Modules/Users/Tsz.Modules.Users/Endpoints/UserEndpoints.cs
+  s_48b8ffcc44fbe3::t_2e3e318e587e22 55-70
+packages/api/Tsz.Api.Tests.Integration/TestAuth/TestAuthHandler.cs
+  s_48b8ffcc44fbe3::t_afca8732315a61 13-18,27-38,41-42,45-46
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/RealUserResolver.cs
+  s_48b8ffcc44fbe3::t_8b60664bab9d0a 1-58
+packages/api/Modules/Users/Tsz.Modules.Users/Auth/CurrentUserResolver.cs
+  s_48b8ffcc44fbe3::t_3c2581ed0000da 15-22,40,42-43,45,47
+packages/api/Modules/Users/Tsz.Modules.Users/Features/GetImpersonationTargets.cs
+  s_48b8ffcc44fbe3::t_1c5ec4d6b99249 1-43,45,47
+  s_48b8ffcc44fbe3::t_757b7206e6503d 44,46
+packages/api/Tsz.Api/Auth/ImpersonationMiddleware.cs
+  s_48b8ffcc44fbe3::t_d424781ba326a8 1-60,62-70
+  s_48b8ffcc44fbe3::t_a43edd0e33ca31 61
+packages/web/src/server/impersonation.server.ts
+  s_48b8ffcc44fbe3::t_8c0e5a9e327115 56
+  s_48b8ffcc44fbe3::t_d45d43ce32a73e 1-55,57-102
+packages/api/Tsz.Infrastructure/Auth/ImpersonationContext.cs
+  s_48b8ffcc44fbe3::t_f3c04a18be6c54 1-6,8
+  s_48b8ffcc44fbe3::t_0ffaf605d136fe 7
+CHANGELOG.md
+  s_48b8ffcc44fbe3::t_0e561d5839b943 3-23
+packages/api/Tsz.Api/Auth/ImpersonationHeader.cs
+  s_48b8ffcc44fbe3::t_10b53c89ca46c9 1-6
+packages/api/Tsz.Infrastructure/Auth/IRealUserResolver.cs
+  s_48b8ffcc44fbe3::t_fb82ae75b7d64f 1-11
+packages/api/Tsz.Api.Tests/Modules/Users/Auth/CurrentUserResolverTests.cs
+  s_48b8ffcc44fbe3::t_373a00b1ac825f 1-149
+packages/api/Tsz.Infrastructure/Auth/IImpersonationContext.cs
+  s_48b8ffcc44fbe3::t_17b3bc5d0368df 1-11,13
+  s_48b8ffcc44fbe3::t_41a19f28755916 12
+packages/web/src/server/api-client.server.ts
+  s_48b8ffcc44fbe3::t_8fc65ef52fc882 6-7,19-33
+packages/api/Tsz.Api.Tests/Modules/Users/Auth/ImpersonationMiddlewareTests.cs
+  s_48b8ffcc44fbe3::t_b3637bd5b19ed0 163
+  s_48b8ffcc44fbe3::t_046d4410b7c67d 1-85,87-162,164-166
+  s_48b8ffcc44fbe3::t_26b8e4d4ad43ed 86
+packages/api/Modules/Users/Tsz.Modules.Users/UsersModule.cs
+  s_48b8ffcc44fbe3::t_47c9bc8e255c46 21-22
+packages/api/Tsz.Api.Tests.Integration/ImpersonationEndpointsTests.cs
+  s_48b8ffcc44fbe3::t_c1d099af46fbd6 1-253
+packages/web/src/features/users/components/users-list.tsx
+  s_48b8ffcc44fbe3::t_d177dc29e7b7a9 5,14,16-62
+  s_48b8ffcc44fbe3::t_7bb98298617c4b 67-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "370fb6839a22b6e98d22714c8d728492cebf4d1a",
+  "prompts": {},
+  "sessions": {
+    "s_48b8ffcc44fbe3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c977636-e2b6-4a19-97ae-20ce3e261e09",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
