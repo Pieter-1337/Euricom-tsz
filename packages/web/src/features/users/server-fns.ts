@@ -1,6 +1,14 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { createUser, getUserById, getUsers, getUsersPaged, removeUser, updateUser } from '#/api/users.server';
+import {
+  createUser,
+  getImpersonationTargets,
+  getUserById,
+  getUsers,
+  getUsersPaged,
+  removeUser,
+  updateUser,
+} from '#/api/users.server';
 import { USER_ROLES, type User } from '#/api/users';
 import { getUserLeaves, updateUserLeaves } from '#/api/user-leaves.server';
 import type { UserLeave, UpdateUserLeavesBody } from '#/api/user-leaves';
@@ -17,6 +25,12 @@ import {
 export const fetchUsersPaged = createServerFn({ method: 'GET' })
   .inputValidator((input: unknown) => getUsersPagedParamsSchema.parse(input))
   .handler(async ({ data }): Promise<KeysetPage<User>> => getUsersPaged(data as KeysetQueryParams<UserSortKey>));
+
+export const fetchImpersonationTargets = createServerFn({ method: 'GET' })
+  .inputValidator((input: unknown) => getUsersPagedParamsSchema.parse(input))
+  .handler(
+    async ({ data }): Promise<KeysetPage<User>> => getImpersonationTargets(data as KeysetQueryParams<UserSortKey>),
+  );
 
 export const fetchUsersByRole = createServerFn({ method: 'GET' })
   .inputValidator(z.enum(USER_ROLES))

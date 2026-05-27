@@ -21,14 +21,16 @@ import { authClient } from '#/lib/auth-client';
 import { cn } from '#/lib/utils';
 import type { SessionUser } from '#/server/auth-functions';
 import { getCurrentUser } from '#/server/current-user';
+import { getImpersonation, stopImpersonation, type ImpersonationInfo } from '#/server/impersonation.server';
+import { ImpersonateDialog } from '#/features/users/components/impersonate-dialog';
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async ({ context }) => {
     const session = (context as any).session as { user: SessionUser } | null;
     if (!session) return;
-    const currentUser = await getCurrentUser();
+    const [currentUser, impersonation] = await Promise.all([getCurrentUser(), getImpersonation()]);
     if (!currentUser) throw redirect({ to: '/no-access' });
-    return { user: session.user, currentUser };
+    return { user: session.user, currentUser, impersonation };
   },
   component: ProtectedLayout,
 });
@@ -36,16 +38,20 @@ export const Route = createFileRoute('/_protected')({
 const SIDEBAR_KEY = 'tsz.sidebar.collapsed';
 
 function ProtectedLayout() {
-  const { currentUser } = Route.useRouteContext() as {
+  const { user, currentUser, impersonation } = Route.useRouteContext() as {
     user: SessionUser;
     currentUser: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+    impersonation: ImpersonationInfo | null;
   };
   const isAdmin = currentUser.roles.includes(UserRole.Admin);
   const isClientManager = currentUser.roles.includes(UserRole.ClientManager);
   const canManageClients = isAdmin || isClientManager;
-  const firstName = currentUser.firstName;
+
+  // Real identity for the header greeting: split on first space
+  const realFirstName = user.name?.split(' ')[0] ?? user.name;
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [impersonateOpen, setImpersonateOpen] = useState(false);
 
   useEffect(() => {
     setCollapsed(localStorage.getItem(SIDEBAR_KEY) === '1');
@@ -55,49 +61,85 @@ function ProtectedLayout() {
     localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0');
   }, [collapsed]);
 
+  const handleStop = async () => {
+    await stopImpersonation();
+    window.location.assign('/');
+  };
+
   return (
     <TooltipProvider delayDuration={100} skipDelayDuration={200}>
-    <div className="flex min-h-screen flex-col">
-      <header className="print:hidden bg-euri-charcoal flex h-14 flex-shrink-0 items-center justify-between border-b border-white/[0.06] px-5 text-white">
-        <div className="flex items-center gap-3">
-          <Brandmark className="h-[22px] w-[22px]" />
-          <span className="text-sm font-semibold tracking-[0.01em]">Timesheet Zone</span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <div className="flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] text-white/85">
-            <UserIcon className="stroke-euri-green h-3.5 w-3.5" strokeWidth={1.75} />
-            <span>
-              Hi, <strong className="font-semibold text-white">{firstName}</strong>
-            </span>
+      <div className="flex min-h-screen flex-col">
+        <header className="print:hidden bg-euri-charcoal flex h-14 flex-shrink-0 items-center justify-between border-b border-white/[0.06] px-5 text-white">
+          <div className="flex items-center gap-3">
+            <Brandmark className="h-[22px] w-[22px]" />
+            <span className="text-sm font-semibold tracking-[0.01em]">Timesheet Zone</span>
           </div>
-          <Separator orientation="vertical" className="mx-1.5 !h-4 bg-white/10" />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="focus-visible:outline-euri-green h-8 px-2.5 text-[12.5px] font-normal text-white/65 hover:bg-white/[0.04] hover:text-white focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2"
-            onClick={() =>
-              authClient.signOut({
-                fetchOptions: { onSuccess: () => window.location.assign('/') },
-              })
-            }
-          >
-            Sign out
-          </Button>
-          <ThemeToggle />
-        </div>
-      </header>
 
-      <div className="relative flex min-h-0 flex-1">
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={() => setCollapsed((c) => !c)}
-          isAdmin={isAdmin}
-          canManageClients={canManageClients}
-        />
-        <Main />
+          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2 rounded-full px-3 py-1.5 text-[13px] text-white/85">
+              <UserIcon className="stroke-euri-green h-3.5 w-3.5" strokeWidth={1.75} />
+              <span>
+                Hi, <strong className="font-semibold text-white">{realFirstName}</strong>
+              </span>
+            </div>
+            {isAdmin && !impersonation && (
+              <>
+                <Separator orientation="vertical" className="mx-1.5 !h-4 bg-white/10" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="focus-visible:outline-euri-green h-8 px-2.5 text-[12.5px] font-normal text-white/65 hover:bg-white/[0.04] hover:text-white focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2"
+                  onClick={() => setImpersonateOpen(true)}
+                >
+                  Impersonate
+                </Button>
+              </>
+            )}
+            <Separator orientation="vertical" className="mx-1.5 !h-4 bg-white/10" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="focus-visible:outline-euri-green h-8 px-2.5 text-[12.5px] font-normal text-white/65 hover:bg-white/[0.04] hover:text-white focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2"
+              onClick={() =>
+                authClient.signOut({
+                  fetchOptions: { onSuccess: () => window.location.assign('/') },
+                })
+              }
+            >
+              Sign out
+            </Button>
+            <ThemeToggle />
+          </div>
+        </header>
+
+        {impersonation && (
+          <div className="print:hidden flex items-center justify-between bg-destructive px-5 py-2 text-sm text-destructive-foreground">
+            <span>
+              You are impersonating <strong className="font-semibold">{impersonation.targetName}</strong>
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2.5 text-[12.5px] font-semibold text-destructive-foreground hover:bg-white/20 hover:text-destructive-foreground focus-visible:ring-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              onClick={() => void handleStop()}
+            >
+              Stop
+            </Button>
+          </div>
+        )}
+
+        <div className="relative flex min-h-0 flex-1">
+          <Sidebar
+            collapsed={collapsed}
+            onToggle={() => setCollapsed((c) => !c)}
+            isAdmin={isAdmin}
+            canManageClients={canManageClients}
+          />
+          <Main />
+        </div>
       </div>
-    </div>
+
+      <ImpersonateDialog open={impersonateOpen} onOpenChange={setImpersonateOpen} />
     </TooltipProvider>
   );
 }

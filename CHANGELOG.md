@@ -2,6 +2,20 @@
 
 ## 2026-05-27
 
+### feat: impersonation UI — target picker, header button, banner + identity split (#44)
+
+**Frontend (`packages/web` only)**
+- `schema.ts`: manually added `/api/users/impersonation-targets` path (matches #43 backend endpoint); preserves all existing type definitions.
+- `users.server.ts`: `getImpersonationTargets` API client function hitting `GET /api/users/impersonation-targets`.
+- `server-fns.ts`: `fetchImpersonationTargets` server-fn wrapping the above.
+- `impersonate-dialog.tsx`: new shadcn `Dialog` + `Command` searchable picker; fetches targets via TanStack Query (enabled only when open); selecting a user calls `startImpersonation` then navigates to `/`.
+- `_protected.tsx` — identity split + chrome:
+  1. `beforeLoad` calls `getImpersonation()` in parallel with `getCurrentUser()` and returns `impersonation` alongside `user`/`currentUser`.
+  2. Header greeting uses real session `user.name` (split to first name); nav gating + page data remain on effective `currentUser`.
+  3. Impersonate header button: visible only when `isAdmin && !impersonation`; opens `ImpersonateDialog`.
+  4. Red banner (`bg-destructive`) between `<header>` and content row when impersonating; shows target name + Stop button.
+  5. Stop button calls `stopImpersonation()` then reloads to `/`.
+
 ### feat: impersonation tracer — end-to-end golden path + full trust boundary (#43)
 
 **Backend**
