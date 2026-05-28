@@ -1,0 +1,45 @@
+docs/presentation/index.html
+  h_9ef4f126c6bd1c 638
+.claude/skills/app-do-prd/SKILL.md
+  s_48da09d75d5f8e::t_aefc631a33bd14 83-118
+  s_48da09d75d5f8e::t_b5b68c76c8070e 200
+  s_48da09d75d5f8e::t_7133c8cb18b992 232
+packages/web/src/routes/_protected/_authenticated/timesheets/index.tsx
+  s_cc33296005503e::t_2bcdbb4b658131 245
+  s_cc33296005503e::t_04214a5fe91f3b 192,195-198,202-203
+  s_cc33296005503e::t_8e2bc0eeac7f71 13-20
+.claude/skills/app-do-work/SKILL.md
+  h_9ef4f126c6bd1c 3,129
+  s_48da09d75d5f8e::t_4c2022318e9a56 87-97
+packages/web/src/routes/_protected/index.tsx
+  s_cc33296005503e::t_3a7aa4b717823d 2,7-10,12-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "0d2faa502114660a9e6a740e25d4086aaed9b7af",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_48da09d75d5f8e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab493622-940c-4718-8ee3-5e4c08fa3d41",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_cc33296005503e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "561104cc-cd14-43d5-925a-e4c14cffe268",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
