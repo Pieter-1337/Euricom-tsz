@@ -7,6 +7,8 @@ import type {
   ApplyBookingsRequest,
   PendingApproval,
 } from '#/api/timesheets';
+import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';
+import type { PendingApprovalSortKey, PendingApprovalsExtraParams } from '#/features/my-tasks/schemas';
 
 export const getTimesheetWeek = async (userId: string, year: number, week: number): Promise<TimesheetWeek | null> => {
   const resp = await client.GET('/api/timesheet-weeks/{userId}/{year}/{week}', {
@@ -75,7 +77,22 @@ export const getTimesheetMonth = async (
   return resp.data ?? null;
 };
 
-export const getPendingApprovals = async (): Promise<PendingApproval[]> => {
-  const resp = await client.GET('/api/timesheet-weeks/pending-approvals');
-  return resp.data ?? [];
+export const getPendingApprovals = async (
+  params: KeysetQueryParams<PendingApprovalSortKey> & PendingApprovalsExtraParams,
+): Promise<KeysetPage<PendingApproval>> => {
+  const resp = await client.GET('/api/timesheet-weeks/pending-approvals', {
+    params: {
+      query: {
+        search: params.search,
+        sortBy: params.sortBy,
+        sortDir: params.sortDir,
+        pageSize: params.pageSize,
+        cursor: params.cursor,
+        deletedOnly: params.deletedOnly,
+        dateFrom: params.dateFrom,
+        dateTo: params.dateTo,
+      },
+    },
+  });
+  return resp.data ?? { items: [], nextCursor: null, total: 0 };
 };

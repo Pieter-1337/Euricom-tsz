@@ -23,6 +23,10 @@ type ComboboxProps = Omit<React.ComponentProps<'button'>, 'value' | 'onChange'> 
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
+  /** Show a "Clear selection" item at the top of the dropdown when a value is selected. */
+  allowClear?: boolean;
+  /** Label for the clear item; only used when allowClear is true. */
+  clearLabel?: string;
 };
 
 function Combobox({
@@ -32,6 +36,8 @@ function Combobox({
   placeholder = 'Select…',
   searchPlaceholder = 'Search…',
   emptyMessage = 'No results.',
+  allowClear = false,
+  clearLabel = 'Clear selection',
   className,
   disabled,
   ...triggerProps
@@ -72,6 +78,19 @@ function Combobox({
           <CommandList>
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
+              {allowClear && value !== '' && (
+                <CommandItem
+                  value={clearLabel}
+                  onSelect={() => {
+                    onValueChange('');
+                    setOpen(false);
+                  }}
+                  className="text-muted-foreground"
+                >
+                  <CheckIcon className="size-4 opacity-0" />
+                  {clearLabel}
+                </CommandItem>
+              )}
               {options.map((o) => (
                 <CommandItem
                   key={o.value}

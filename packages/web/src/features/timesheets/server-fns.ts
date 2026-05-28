@@ -12,7 +12,13 @@ import {
   getPendingApprovals,
 } from '#/api/timesheets.server';
 import { throwApiError } from '#/lib/server-error';
-import type { ApplyBookingsRequest } from '#/api/timesheets';
+import type { ApplyBookingsRequest, PendingApproval } from '#/api/timesheets';
+import type { KeysetPage, KeysetQueryParams } from '#/api/pagination';
+import {
+  getPendingApprovalsPagedParamsSchema,
+  type PendingApprovalSortKey,
+  type PendingApprovalsExtraParams,
+} from '#/features/my-tasks/schemas';
 
 const weekParamsSchema = z.object({
   userId: z.string().uuid(),
@@ -103,6 +109,9 @@ export const fetchTimesheetMonth = createServerFn({ method: 'GET' })
   .inputValidator(monthParamsSchema)
   .handler(async ({ data }) => getTimesheetMonth(data.userId, data.year, data.month));
 
-export const fetchPendingApprovals = createServerFn({ method: 'GET' }).handler(async () =>
-  getPendingApprovals(),
-);
+export const fetchPendingApprovals = createServerFn({ method: 'GET' })
+  .inputValidator((input: unknown) => getPendingApprovalsPagedParamsSchema.parse(input))
+  .handler(
+    async ({ data }): Promise<KeysetPage<PendingApproval>> =>
+      getPendingApprovals(data as KeysetQueryParams<PendingApprovalSortKey> & PendingApprovalsExtraParams),
+  );

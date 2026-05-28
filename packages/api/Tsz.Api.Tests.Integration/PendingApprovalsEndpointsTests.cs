@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Tsz.Api.Tests.Integration.TestAuth;
+using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Modules.Timesheets.Domain.Timesheets;
 using Tsz.Modules.Timesheets.Features;
 using Tsz.Modules.Users.Contracts;
@@ -102,16 +103,17 @@ public class PendingApprovalsEndpointsTests : IntegrationTestBase, IAsyncLifetim
     }
 
     [Fact]
-    public async Task GetPendingApprovals_NoSubmittedWeeks_ReturnsEmptyList()
+    public async Task GetPendingApprovals_NoSubmittedWeeks_ReturnsEmptyPage()
     {
         await SeedCallerAsAsync(UserRole.Admin);
 
         var response = await Client.GetAsync("/api/timesheet-weeks/pending-approvals");
 
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<List<PendingApprovalDto>>(Json);
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
         Assert.NotNull(result);
-        Assert.Empty(result);
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.Total);
     }
 
     [Fact]
@@ -124,14 +126,15 @@ public class PendingApprovalsEndpointsTests : IntegrationTestBase, IAsyncLifetim
         var response = await Client.GetAsync("/api/timesheet-weeks/pending-approvals");
 
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<List<PendingApprovalDto>>(Json);
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
         Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal(consultantId, result[0].UserId);
-        Assert.Equal("Jane Doe", result[0].UserName);
-        Assert.Equal(2026, result[0].IsoYear);
-        Assert.Equal(21, result[0].IsoWeek);
-        Assert.Equal(0m, result[0].TotalHours);
+        Assert.Single(result.Items);
+        Assert.Equal(consultantId, result.Items[0].UserId);
+        Assert.Equal("Jane Doe", result.Items[0].UserName);
+        Assert.Equal(2026, result.Items[0].IsoYear);
+        Assert.Equal(21, result.Items[0].IsoWeek);
+        Assert.Equal(0m, result.Items[0].TotalHours);
+        Assert.Equal(1, result.Total);
     }
 
     [Fact]
@@ -147,9 +150,83 @@ public class PendingApprovalsEndpointsTests : IntegrationTestBase, IAsyncLifetim
         var response = await Client.GetAsync("/api/timesheet-weeks/pending-approvals");
 
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<List<PendingApprovalDto>>(Json);
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
         Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal(21, result[0].IsoWeek);
+        Assert.Single(result.Items);
+        Assert.Equal(21, result.Items[0].IsoWeek);
+    }
+
+    [Fact]
+    public async Task GetPendingApprovals_Search_FiltersByUserName()
+    {
+        await SeedCallerAsAsync(UserRole.Admin);
+        var aliceId = await SeedUserAsync("Alice", "Smith");
+        var bobId = await SeedUserAsync("Bob", "Jones");
+        await SeedWeekWithStatusAsync(aliceId, 2026, 21, TimesheetStatus.Submitted);
+        await SeedWeekWithStatusAsync(bobId, 2026, 21, TimesheetStatus.Submitted);
+
+        var response = await Client.GetAsync("/api/timesheet-weeks/pending-approvals?search=alice");
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal("Alice Smith", result.Items[0].UserName);
+    }
+
+    [Fact]
+    public async Task GetPendingApprovals_Search_MatchesWeekNumber()
+    {
+        await SeedCallerAsAsync(UserRole.Admin);
+        var userId = await SeedUserAsync("Alice", "Smith");
+        await SeedWeekWithStatusAsync(userId, 2026, 20, TimesheetStatus.Submitted);
+        await SeedWeekWithStatusAsync(userId, 2026, 21, TimesheetStatus.Submitted);
+
+        var response = await Client.GetAsync("/api/timesheet-weeks/pending-approvals?search=21");
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal(21, result.Items[0].IsoWeek);
+    }
+
+    [Fact]
+    public async Task GetPendingApprovals_DateRange_FiltersByOverlap()
+    {
+        await SeedCallerAsAsync(UserRole.Admin);
+        var userId = await SeedUserAsync("Alice", "Smith");
+        await SeedWeekWithStatusAsync(userId, 2026, 20, TimesheetStatus.Submitted);
+        await SeedWeekWithStatusAsync(userId, 2026, 21, TimesheetStatus.Submitted);
+        await SeedWeekWithStatusAsync(userId, 2026, 22, TimesheetStatus.Submitted);
+
+        // W21 = 2026-05-18 → 2026-05-24. Range 18..24 selects W21 only.
+        var response = await Client.GetAsync(
+            "/api/timesheet-weeks/pending-approvals?dateFrom=2026-05-18&dateTo=2026-05-24");
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal(21, result.Items[0].IsoWeek);
+    }
+
+    [Fact]
+    public async Task GetPendingApprovals_SortByEmployee_OrdersAscending()
+    {
+        await SeedCallerAsAsync(UserRole.Admin);
+        var zachId = await SeedUserAsync("Zach", "Adams");
+        var aliceId = await SeedUserAsync("Alice", "Brown");
+        await SeedWeekWithStatusAsync(zachId, 2026, 21, TimesheetStatus.Submitted);
+        await SeedWeekWithStatusAsync(aliceId, 2026, 21, TimesheetStatus.Submitted);
+
+        var response = await Client.GetAsync("/api/timesheet-weeks/pending-approvals?sortBy=employee&sortDir=asc");
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<KeysetPage<PendingApprovalDto>>(Json);
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Items.Count);
+        Assert.Equal("Alice Brown", result.Items[0].UserName);
+        Assert.Equal("Zach Adams", result.Items[1].UserName);
     }
 }

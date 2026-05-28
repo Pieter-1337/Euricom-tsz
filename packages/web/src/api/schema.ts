@@ -861,7 +861,16 @@ export interface paths {
     };
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
+          deletedOnly?: boolean;
+          dateFrom?: string;
+          dateTo?: string;
+        };
         header?: never;
         path?: never;
         cookie?: never;
@@ -874,7 +883,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['PendingApprovalDto'][];
+            'application/json': components['schemas']['KeysetPageOfPendingApprovalDto'];
           };
         };
       };
@@ -1159,6 +1168,12 @@ export interface components {
     };
     KeysetPageOfCustomerDto: {
       items: components['schemas']['CustomerDto'][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
+    };
+    KeysetPageOfPendingApprovalDto: {
+      items: components['schemas']['PendingApprovalDto'][];
       nextCursor: null | string;
       /** Format: int32 */
       total: number;

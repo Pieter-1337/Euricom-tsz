@@ -172,6 +172,8 @@ export function ContractsList({ canCreate }: { canCreate: boolean }) {
                 options={customerOptions}
                 placeholder="All customers"
                 emptyMessage="No customers found."
+                allowClear
+                clearLabel="All customers"
               />
             </div>
             {hasExtraFilters && (

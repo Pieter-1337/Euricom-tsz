@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { format, isValid, parse } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, XIcon } from 'lucide-react';
 
 import { Button } from '#/components/ui/button';
 import { Calendar } from '#/components/ui/calendar';
@@ -46,22 +46,45 @@ function DatePicker({
   const [open, setOpen] = React.useState(false);
   const selected = isoToDate(value);
 
+  const showClear = !!selected && !disabled;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          type="button"
-          variant="outline"
-          aria-invalid={ariaInvalid}
-          disabled={disabled}
-          onBlur={onBlur}
-          className={cn('h-9 w-full justify-between px-3 font-normal', !selected && 'text-muted-foreground', className)}
-        >
-          <span>{selected ? format(selected, DISPLAY) : placeholder}</span>
-          <CalendarIcon className="size-4 text-muted-foreground opacity-50" />
-        </Button>
-      </PopoverTrigger>
+      <div className={cn('relative w-full', className)}>
+        <PopoverTrigger asChild>
+          <Button
+            id={id}
+            type="button"
+            variant="outline"
+            aria-invalid={ariaInvalid}
+            disabled={disabled}
+            onBlur={onBlur}
+            className={cn(
+              'h-9 w-full justify-between px-3 font-normal',
+              !selected && 'text-muted-foreground',
+              showClear && 'pr-14',
+            )}
+          >
+            <span>{selected ? format(selected, DISPLAY) : placeholder}</span>
+            <CalendarIcon className="size-4 text-muted-foreground opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        {showClear && (
+          <button
+            type="button"
+            aria-label="Clear date"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onChange('');
+            }}
+            className="absolute top-1/2 right-8 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 text-muted-foreground opacity-60 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-ring"
+          >
+            <XIcon className="size-3.5" />
+          </button>
+        )}
+      </div>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"

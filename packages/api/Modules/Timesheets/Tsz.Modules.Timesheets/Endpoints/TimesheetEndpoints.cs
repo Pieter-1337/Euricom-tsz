@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Tsz.Infrastructure.Auth;
+using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
 using Tsz.Modules.Timesheets.Domain.Holidays;
@@ -92,10 +93,25 @@ public static class TimesheetEndpoints
             return TypedResults.Ok(dto);
         });
 
-        adminGroup.MapGet("/pending-approvals", async (
+        adminGroup.MapGet("/pending-approvals", async Task<Ok<KeysetPage<PendingApprovalDto>>> (
             IDispatcher dispatcher,
-            CancellationToken ct) =>
-                TypedResults.Ok(await dispatcher.SendAsync(new GetPendingApprovalsQuery(), ct)));
+            CancellationToken ct,
+            string? search = null,
+            string? sortBy = null,
+            string? sortDir = null,
+            int pageSize = 0,
+            string? cursor = null,
+            bool deletedOnly = false,
+            DateOnly? dateFrom = null,
+            DateOnly? dateTo = null) =>
+        {
+            var dir = Enum.TryParse<SortDirection>(sortDir, ignoreCase: true, out var parsed)
+                ? parsed
+                : SortDirection.Asc;
+            var result = await dispatcher.SendAsync(
+                new GetPendingApprovalsQuery(search, sortBy, dir, pageSize, cursor, deletedOnly, dateFrom, dateTo), ct);
+            return TypedResults.Ok(result);
+        });
 
         var monthGroup = app.MapApiGroup("timesheets")
             .RequireAuthorization();
