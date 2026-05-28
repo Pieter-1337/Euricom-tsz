@@ -10,7 +10,7 @@
 
 - **Commands**: Inject `IDispatcher`, call `await dispatcher.SendAsync(command, ct)`. Returns the DTO directly.
 - **Queries**: Inject `IQueryHandler<TQuery, TResponse>` directly, call `handler.HandleAsync(query, ct)`.
-- **Response mapping**: Translate handler responses using `Results.Created(...)`, `Results.Ok(dto)`, `Results.NoContent()`. No `.AddEndpointFilter<ValidationFilter<T>>()` — validation runs in the dispatcher pipeline.
+- **Response mapping**: Always use `TypedResults.*` (not `Results.*`) — e.g. `TypedResults.Ok(dto)`, `TypedResults.CreatedAtRoute(dto, "RouteName", new { id = dto.Id })`, `TypedResults.NoContent()`. Annotate the handler return type with the concrete `Ok<TDto>` / `CreatedAtRoute<TDto>` / `NoContent` (or `Results<…>` union for multi-status endpoints, e.g. `Task<Results<Ok<UserDto>, NotFound>>`). The untyped `Results.*` helpers return `IResult` and the OpenAPI pipeline can't infer the DTO — `bun --filter web gen:api` will silently drop it from `schema.ts`. No `.AddEndpointFilter<ValidationFilter<T>>()` — validation runs in the dispatcher pipeline.
 
 ## Soft-delete
 

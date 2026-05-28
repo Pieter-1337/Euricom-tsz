@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
+using Tsz.Modules.Customers.Domain.Customers;
 using Tsz.Modules.Customers.Features;
 
 namespace Tsz.Modules.Customers.Endpoints;
@@ -34,41 +36,44 @@ public static class CustomerEndpoints
                 new GetCustomersPagedQuery(search, sortBy, dir, pageSize, cursor, deletedOnly), ct));
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async Task<Results<Ok<CustomerDto>, NotFound>> (
+            Guid id,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
         {
             var customer = await dispatcher.SendAsync(new GetCustomerByIdQuery(id), ct);
-            return customer is not null ? Results.Ok(customer) : Results.NotFound();
+            return customer is not null ? TypedResults.Ok(customer) : TypedResults.NotFound();
         }).WithName("GetCustomerById");
 
-        group.MapPost("/", async (
+        group.MapPost("/", async Task<CreatedAtRoute<CustomerDto>> (
             CreateCustomerCommand command,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             var dto = await dispatcher.SendAsync(command, ct);
-            return Results.CreatedAtRoute("GetCustomerById", new { id = dto.Id }, dto);
+            return TypedResults.CreatedAtRoute(dto, "GetCustomerById", new { id = dto.Id });
         }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
-        group.MapPut("/{id:guid}", async (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<CustomerDto>, BadRequest<string>>> (
             Guid id,
             UpdateCustomerCommand command,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             if (command.Id != id)
-                return Results.BadRequest("Route id does not match command id.");
+                return TypedResults.BadRequest("Route id does not match command id.");
 
             var dto = await dispatcher.SendAsync(command, ct);
-            return Results.Ok(dto);
+            return TypedResults.Ok(dto);
         }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
-        group.MapDelete("/{id:guid}", async (
+        group.MapDelete("/{id:guid}", async Task<NoContent> (
             Guid id,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             await dispatcher.SendAsync(new DeleteCustomerCommand(id), ct);
-            return Results.NoContent();
+            return TypedResults.NoContent();
         }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
     }
 }

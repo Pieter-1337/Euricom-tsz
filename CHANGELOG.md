@@ -33,6 +33,19 @@ it as `deps.userId` inside the loader.
 Also ran `vp check --fix` to clear formatting issues in the same file,
 plus DESIGN.md and schema.ts.
 
+### refactor: standardize backend responses to TypedResults for proper OpenAPI inference
+
+Converted all untyped `Results.*` calls to `TypedResults.*` with explicit
+return type annotations across Customer, User, Contract, and Timesheet
+endpoints. Untyped helpers return `IResult`, preventing ASP.NET's OpenAPI
+generation from inferring the DTO shape — `bun --filter web gen:api`
+silently prunes them from schema.ts. TypedResults with concrete return
+types (e.g. `Task<Results<Ok<UserDto>, NotFound>>`) enables proper
+schema generation. Updated conventions-csharp.md to mandate this pattern.
+Fixed gen:api script with `--use-system-ca` for mkcert cert trust, and
+added openapi-typescript as a local devDep to avoid bunx temp-dir trust
+issues. Schema regenerated with now-properly-typed endpoints.
+
 ### fix: type month and week endpoints, restore TimesheetMonth schemas
 
 Type the month and week (GET, PUT bookings) timesheet endpoint lambdas
@@ -47,6 +60,17 @@ PUT bookings) that were stale in origin/master.
 
 Remove phantom takenDays/balanceDays fields from test fixtures — never
 existed on C# UserLeaveDto, FE computes them locally.
+
+### feat: add search, sort, and pagination to pending approvals
+
+Enhanced GetPendingApprovalsQuery with keyset pagination, full-text
+search across employee names and week numbers, sorting by employee,
+week, or total hours, and date range filtering. Handler loads all
+submitted weeks, enriches with user names via the Users module, then
+applies all filtering/sorting in memory. Schema updated with new
+response shape; frontend updated to consume filters and pass through
+endpoint parameters. Comprehensive tests added for validation rules
+and all filter combinations.
 
 ### chore: ignore unknown CSS at-rules in VS Code linter
 

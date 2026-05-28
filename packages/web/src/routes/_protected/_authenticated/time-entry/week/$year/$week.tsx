@@ -17,35 +17,41 @@ const weekSearchSchema = z.object({
 export const Route = createFileRoute('/_protected/_authenticated/time-entry/week/$year/$week')({
   validateSearch: weekSearchSchema,
   loaderDeps: ({ search }) => ({ userId: search.userId }),
-  loader: async ({ params, context, deps }) => {
-    const { currentUser } = context as { currentUser: CurrentUser };
-    const isAdmin = currentUser.roles.includes(UserRole.Admin);
-    const year = Number(params.year);
-    const week = Number(params.week);
+  // Block on revalidation: the inner grid's useState seeds from initialData on mount,
+  // so stale-while-revalidate would leave the UI stuck on pre-edit data after a round-trip
+  // navigation. Blocking guarantees the component mounts with the freshly-fetched week.
+  loader: {
+    staleReloadMode: 'blocking',
+    handler: async ({ params, context, deps }) => {
+      const { currentUser } = context as { currentUser: CurrentUser };
+      const isAdmin = currentUser.roles.includes(UserRole.Admin);
+      const year = Number(params.year);
+      const week = Number(params.week);
 
-    // Only honour the userId search param for admins; everyone else loads their own week.
-    const targetUserId = isAdmin && deps.userId && deps.userId !== currentUser.id ? deps.userId : currentUser.id;
+      // Only honour the userId search param for admins; everyone else loads their own week.
+      const targetUserId = isAdmin && deps.userId && deps.userId !== currentUser.id ? deps.userId : currentUser.id;
 
-    const isViewingOther = targetUserId !== currentUser.id;
+      const isViewingOther = targetUserId !== currentUser.id;
 
-    const [weekData, selectableTasks, selectableLeaveTypes, targetUser] = await Promise.all([
-      fetchTimesheetWeek({ data: { userId: targetUserId, year, week } }),
-      fetchSelectableContractTasks({ data: { userId: targetUserId, year, week } }),
-      fetchSelectableLeaveTypes({ data: { userId: targetUserId } }),
-      isViewingOther ? fetchUserById({ data: targetUserId }) : Promise.resolve(null),
-    ]);
+      const [weekData, selectableTasks, selectableLeaveTypes, targetUser] = await Promise.all([
+        fetchTimesheetWeek({ data: { userId: targetUserId, year, week } }),
+        fetchSelectableContractTasks({ data: { userId: targetUserId, year, week } }),
+        fetchSelectableLeaveTypes({ data: { userId: targetUserId } }),
+        isViewingOther ? fetchUserById({ data: targetUserId }) : Promise.resolve(null),
+      ]);
 
-    return {
-      userId: targetUserId,
-      year,
-      week,
-      weekData,
-      selectableTasks,
-      selectableLeaveTypes,
-      isAdmin,
-      isReadOnly: isViewingOther,
-      targetUserName: isViewingOther && targetUser ? `${targetUser.firstName} ${targetUser.lastName}`.trim() : null,
-    };
+      return {
+        userId: targetUserId,
+        year,
+        week,
+        weekData,
+        selectableTasks,
+        selectableLeaveTypes,
+        isAdmin,
+        isReadOnly: isViewingOther,
+        targetUserName: isViewingOther && targetUser ? `${targetUser.firstName} ${targetUser.lastName}`.trim() : null,
+      };
+    },
   },
   component: TimesheetWeekPage,
 });

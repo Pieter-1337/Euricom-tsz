@@ -5,6 +5,7 @@ using Tsz.Infrastructure.Common.Pagination;
 using Tsz.Infrastructure.Cqrs;
 using Tsz.Infrastructure.Endpoints;
 using Tsz.Modules.Users.Contracts;
+using Tsz.Modules.Users.Domain.Users;
 using Tsz.Modules.Users.Features;
 
 namespace Tsz.Modules.Users.Endpoints;
@@ -15,10 +16,12 @@ public static class UserEndpoints
     {
         var group = app.MapApiGroup("users");
 
-        group.MapGet("/me", async (IDispatcher dispatcher, CancellationToken ct) =>
+        group.MapGet("/me", async Task<Results<Ok<UserDto>, NotFound>> (
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
         {
             var user = await dispatcher.SendAsync(new GetCurrentUserQuery(), ct);
-            return user is not null ? Results.Ok(user) : Results.NotFound();
+            return user is not null ? TypedResults.Ok(user) : TypedResults.NotFound();
         });
 
         group.MapGet("/", async (
@@ -68,41 +71,44 @@ public static class UserEndpoints
                 new GetImpersonationTargetsQuery(search, sortBy, dir, pageSize, cursor), ct));
         });
 
-        adminGroup.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
+        adminGroup.MapGet("/{id:guid}", async Task<Results<Ok<UserDto>, NotFound>> (
+            Guid id,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
         {
             var user = await dispatcher.SendAsync(new GetUserByIdQuery(id), ct);
-            return user is not null ? Results.Ok(user) : Results.NotFound();
+            return user is not null ? TypedResults.Ok(user) : TypedResults.NotFound();
         }).WithName("GetUserById");
 
-        adminGroup.MapPost("/", async (
+        adminGroup.MapPost("/", async Task<CreatedAtRoute<UserDto>> (
             CreateUserCommand command,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             var dto = await dispatcher.SendAsync(command, ct);
-            return Results.CreatedAtRoute("GetUserById", new { id = dto.Id }, dto);
+            return TypedResults.CreatedAtRoute(dto, "GetUserById", new { id = dto.Id });
         });
 
-        adminGroup.MapPut("/{id:guid}", async (
+        adminGroup.MapPut("/{id:guid}", async Task<Results<Ok<UserDto>, BadRequest<string>>> (
             Guid id,
             UpdateUserCommand command,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             if (command.Id != id)
-                return Results.BadRequest("Route id does not match command id.");
+                return TypedResults.BadRequest("Route id does not match command id.");
 
             var dto = await dispatcher.SendAsync(command, ct);
-            return Results.Ok(dto);
+            return TypedResults.Ok(dto);
         });
 
-        adminGroup.MapDelete("/{id:guid}", async (
+        adminGroup.MapDelete("/{id:guid}", async Task<NoContent> (
             Guid id,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             await dispatcher.SendAsync(new DeleteUserCommand(id), ct);
-            return Results.NoContent();
+            return TypedResults.NoContent();
         });
     }
 }

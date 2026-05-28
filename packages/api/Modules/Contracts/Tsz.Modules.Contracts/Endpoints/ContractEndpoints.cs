@@ -35,10 +35,13 @@ public static class ContractEndpoints
                 new GetContractsPagedQuery(search, sortBy, dir, pageSize, cursor, deletedOnly, activeOnDate, customerId), ct));
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, IDispatcher dispatcher, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async Task<Results<Ok<ContractDto>, NotFound>> (
+            Guid id,
+            IDispatcher dispatcher,
+            CancellationToken ct) =>
         {
             var contract = await dispatcher.SendAsync(new GetContractByIdQuery(id), ct);
-            return contract is not null ? Results.Ok(contract) : Results.NotFound();
+            return contract is not null ? TypedResults.Ok(contract) : TypedResults.NotFound();
         }).WithName("GetContractById");
 
         group.MapPost("/", async Task<Created<ContractDto>> (
@@ -50,26 +53,26 @@ public static class ContractEndpoints
             return TypedResults.Created($"/api/contracts/{dto.Id}", dto);
         }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
 
-        group.MapPut("/{id:guid}", async (
+        group.MapPut("/{id:guid}", async Task<Results<Ok<ContractDto>, BadRequest<string>>> (
             Guid id,
             UpdateContractCommand command,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             if (command.Id != id)
-                return Results.BadRequest("Route id does not match command id.");
+                return TypedResults.BadRequest("Route id does not match command id.");
 
             var dto = await dispatcher.SendAsync(command, ct);
-            return Results.Ok(dto);
+            return TypedResults.Ok(dto);
         });
 
-        group.MapDelete("/{id:guid}", async (
+        group.MapDelete("/{id:guid}", async Task<NoContent> (
             Guid id,
             IDispatcher dispatcher,
             CancellationToken ct) =>
         {
             await dispatcher.SendAsync(new DeleteContractCommand(id), ct);
-            return Results.NoContent();
+            return TypedResults.NoContent();
         }).RequireAuthorization(AuthorizationPolicies.RequireAdmin);
     }
 }

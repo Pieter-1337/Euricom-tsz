@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useBlocker } from '@tanstack/react-router';
 import type { TimeEntryInput, LeaveBookingInput } from '#/api/timesheets';
 import { submitTimesheetBookings } from '#/features/timesheets/server-fns';
@@ -38,55 +38,70 @@ export function useWeekFlush({
 }: UseWeekFlushParams): UseWeekFlushResult {
   const [isFlushing, setIsFlushing] = useState(false);
   const [flushError, setFlushError] = useState<string | null>(null);
+  // Share a single in-flight save across concurrent callers (Save button, navigation, useBlocker)
+  // so they all await the same network round-trip instead of skipping past it.
+  const inFlightRef = useRef<Promise<boolean> | null>(null);
 
   const flush = useCallback(async (): Promise<boolean> => {
-    if (!isDirty || isFlushing) return true;
-    setIsFlushing(true);
-    setFlushError(null);
-    try {
-      const timeEntries: TimeEntryInput[] = [];
-      taskBookings.forEach((durationHours, key) => {
-        const [, contractTaskId, date] = key.split(':');
-        timeEntries.push({ contractTaskId, date, durationHours });
-      });
+    if (inFlightRef.current) return inFlightRef.current;
+    if (!isDirty) return true;
 
-      const leaveBookingInputs: LeaveBookingInput[] = [];
-      leaveBookings.forEach((durationHours, key) => {
-        const [, leaveTypeId, date] = key.split(':');
-        leaveBookingInputs.push({ leaveTypeId, date, durationHours });
-      });
+    const run = async (): Promise<boolean> => {
+      setIsFlushing(true);
+      setFlushError(null);
+      try {
+        const timeEntries: TimeEntryInput[] = [];
+        taskBookings.forEach((durationHours, key) => {
+          const [, contractTaskId, date] = key.split(':');
+          timeEntries.push({ contractTaskId, date, durationHours });
+        });
 
-      // Local pre-check: mirror the backend day-capacity invariant. Short-circuit
-      // without a network call so the whole week's save is blocked, not partially applied.
-      const perDay = new Map<string, number>();
-      for (const e of timeEntries) perDay.set(e.date, (perDay.get(e.date) ?? 0) + e.durationHours);
-      for (const b of leaveBookingInputs) perDay.set(b.date, (perDay.get(b.date) ?? 0) + b.durationHours);
-      for (const total of perDay.values()) {
-        if (total > WORKDAY_CAPACITY) {
-          setFlushError(DAY_CAPACITY_ERROR_MESSAGE);
-          return false;
+        const leaveBookingInputs: LeaveBookingInput[] = [];
+        leaveBookings.forEach((durationHours, key) => {
+          const [, leaveTypeId, date] = key.split(':');
+          leaveBookingInputs.push({ leaveTypeId, date, durationHours });
+        });
+
+        // Local pre-check: mirror the backend day-capacity invariant. Short-circuit
+        // without a network call so the whole week's save is blocked, not partially applied.
+        const perDay = new Map<string, number>();
+        for (const e of timeEntries) perDay.set(e.date, (perDay.get(e.date) ?? 0) + e.durationHours);
+        for (const b of leaveBookingInputs) perDay.set(b.date, (perDay.get(b.date) ?? 0) + b.durationHours);
+        for (const total of perDay.values()) {
+          if (total > WORKDAY_CAPACITY) {
+            setFlushError(DAY_CAPACITY_ERROR_MESSAGE);
+            return false;
+          }
         }
-      }
 
-      await submitTimesheetBookings({
-        data: { userId, year, week, timeEntries, leaveBookings: leaveBookingInputs },
-      });
-      markSaved();
-      return true;
-    } catch (e) {
-      const apiErr = parseServerError(e);
-      if (apiErr?.problem?.code === 'ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED') {
-        setFlushError(apiErr.problem.detail ?? 'Leave allowance exceeded.');
-      } else if (apiErr?.problem?.code === 'ERR_TIMESHEET_DAY_CAPACITY_EXCEEDED') {
-        setFlushError(apiErr.problem.detail ?? DAY_CAPACITY_ERROR_MESSAGE);
-      } else {
-        setFlushError(apiErr?.problem?.detail ?? 'Could not save changes — please try again');
+        await submitTimesheetBookings({
+          data: { userId, year, week, timeEntries, leaveBookings: leaveBookingInputs },
+        });
+        markSaved();
+        return true;
+      } catch (e) {
+        const apiErr = parseServerError(e);
+        if (apiErr?.problem?.code === 'ERR_TIMESHEET_LEAVE_ALLOWANCE_EXCEEDED') {
+          setFlushError(apiErr.problem.detail ?? 'Leave allowance exceeded.');
+        } else if (apiErr?.problem?.code === 'ERR_TIMESHEET_DAY_CAPACITY_EXCEEDED') {
+          setFlushError(apiErr.problem.detail ?? DAY_CAPACITY_ERROR_MESSAGE);
+        } else {
+          setFlushError(apiErr?.problem?.detail ?? 'Could not save changes — please try again');
+        }
+        return false;
+      } finally {
+        setIsFlushing(false);
       }
-      return false;
+    };
+
+    const promise = run();
+    inFlightRef.current = promise;
+    try {
+      return await promise;
     } finally {
-      setIsFlushing(false);
+      inFlightRef.current = null;
     }
-  }, [isDirty, isFlushing, taskBookings, leaveBookings, userId, year, week, markSaved]);
+  }, [isDirty, taskBookings, leaveBookings, userId, year, week, markSaved]);
 
   useBlocker({
     shouldBlockFn: async () => {

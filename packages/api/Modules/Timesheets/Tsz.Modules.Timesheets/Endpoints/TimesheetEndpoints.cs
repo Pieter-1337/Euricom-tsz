@@ -52,7 +52,7 @@ public static class TimesheetEndpoints
             return TypedResults.Ok(dto);
         });
 
-        group.MapPost("/{userId:guid}/{year:int}/{week:int}/submit", async (
+        group.MapPost("/{userId:guid}/{year:int}/{week:int}/submit", async Task<Results<ForbidHttpResult, Ok<TimesheetWeekDto>>> (
             Guid userId,
             int year,
             int week,
@@ -62,7 +62,7 @@ public static class TimesheetEndpoints
         {
             var caller = await currentUserResolver.ResolveAsync(ct);
             if (caller is null || caller.Id != userId)
-                return Results.Forbid();
+                return TypedResults.Forbid();
 
             var dto = await dispatcher.SendAsync(new SubmitTimesheetWeekCommand(userId, year, week), ct);
             return TypedResults.Ok(dto);

@@ -17,7 +17,7 @@
     "fallow:dupes": "fallow dupes",
     "fallow:health": "fallow health",
     "cleanup": "rimraf .tanstack dist",
-    "gen:api": "bunx openapi-typescript https://localhost:7215/openapi/v1.json -o ./src/api/schema.ts"
+    "gen:api": "bun run node --use-system-ca node_modules/openapi-typescript/bin/cli.js https://localhost:7215/openapi/v1.json -o ./src/api/schema.ts"
   },
   "dependencies": {
     "@tanstack/react-form": "^1.29.1",
@@ -60,6 +60,7 @@
     "eslint-plugin-security": "^4.0.0",
     "fallow": "^2.56.0",
     "jsdom": "^28.1.0",
+    "openapi-typescript": "^7.13.0",
     "oxlint": "^1.66.0",
     "typescript": "^5.7.2",
     "vite": "^8.0.12",
