@@ -185,10 +185,10 @@ function Sidebar({
         )}
       >
         <div className={cn('flex flex-col', collapsed ? 'items-center gap-1' : 'gap-0.5')}>
+          {isAdmin && <NavLink to="/my-tasks" icon={ListChecks} label="My Tasks" collapsed={collapsed} />}
           <NavLink to="/timesheets" icon={CalendarDays} label="Timesheets" collapsed={collapsed} />
           <NavLink to="/time-entry" icon={Clock} label="Time Entry" collapsed={collapsed} />
           <NavLink to="/leaves" icon={CalendarRange} label="Leave overview" collapsed={collapsed} />
-          {isAdmin && <NavLink to="/my-tasks" icon={ListChecks} label="My Tasks" collapsed={collapsed} />}
           {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />}
@@ -219,10 +219,7 @@ function Sidebar({
             {collapsed ? (
               <ChevronRight className="size-3.5" strokeWidth={1.75} />
             ) : (
-              <>
-                <ChevronLeft className="size-3.5" strokeWidth={1.75} />
-                <span>Collapse</span>
-              </>
+              <ChevronLeft className="size-3.5" strokeWidth={1.75} />
             )}
           </Button>
         </Tooltip>

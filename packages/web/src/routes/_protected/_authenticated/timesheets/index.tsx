@@ -12,6 +12,7 @@ import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
 import { fetchHolidaysForYear } from '#/features/leaves/server-fns';
 import { formatIsoDate, formatMonthLabel, nextMonth, prevMonth, todayMonth } from '#/features/timesheets/iso-week';
 import type { TimesheetMonth, TimesheetMonthDay, TimesheetMonthWeek } from '#/api/timesheets';
+import type { HolidayDto } from '#/api/leaves';
 import type { CurrentUser } from '#/server/current-user';
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -58,6 +59,7 @@ function TimesheetsOverviewPage() {
             year={year}
             month={month}
             monthData={viewMonthData}
+            holidays={holidays ?? []}
             onPrev={() => setYM(prevMonth(year, month))}
             onNext={() => setYM(nextMonth(year, month))}
             onToday={() => setYM(todayMonth())}
@@ -121,6 +123,7 @@ function CalendarCard({
   year,
   month,
   monthData,
+  holidays,
   onPrev,
   onNext,
   onToday,
@@ -128,11 +131,13 @@ function CalendarCard({
   year: number;
   month: number;
   monthData: TimesheetMonth | null;
+  holidays: HolidayDto[];
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
 }) {
   const cells = buildCalendarCells(year, month, monthData);
+  const holidaysByDate = new Map(holidays.map((h) => [h.date, h.name]));
 
   return (
     <section className="rounded-[12px] border border-black/[0.08] bg-white dark:border-white/[0.06] dark:bg-[#1D252D]">
@@ -164,7 +169,7 @@ function CalendarCard({
 
       <div className="grid grid-cols-7">
         {cells.map((cell) => (
-          <DayCell key={cell.isoDate} cell={cell} />
+          <DayCell key={cell.isoDate} cell={cell} holidayName={holidaysByDate.get(cell.isoDate) ?? null} />
         ))}
       </div>
 
@@ -173,9 +178,10 @@ function CalendarCard({
   );
 }
 
-function DayCell({ cell }: { cell: CalendarCellData }) {
+function DayCell({ cell, holidayName }: { cell: CalendarCellData; holidayName: string | null }) {
   const approved = cell.weekStatus === 'Approved';
   const showAsterisk = cell.weekStatus !== null && cell.weekStatus !== 'Approved';
+  const resolvedHolidayName = cell.day?.holidayName ?? holidayName;
 
   return (
     <div
@@ -186,9 +192,9 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
       )}
     >
       <div className="text-right text-[11px] font-medium text-[#6B7682] dark:text-white/50">{cell.dayNumber}</div>
-      {!cell.outside && cell.day && (
+      {!cell.outside && (
         <div className="flex flex-col gap-0.5">
-          {cell.day.timeEntries.map((entry, i) => (
+          {cell.day?.timeEntries.map((entry, i) => (
             <Tooltip key={`t-${i}`} content={`${entry.customerName} — ${entry.taskName} (${entry.durationHours}h)`}>
               <div
                 className={cn(
@@ -201,7 +207,7 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
               </div>
             </Tooltip>
           ))}
-          {cell.day.leaveBookings.map((leave, i) => (
+          {cell.day?.leaveBookings.map((leave, i) => (
             <Tooltip key={`l-${i}`} content={`${leave.leaveTypeName} (${leave.durationHours}h)`}>
               <div
                 className={cn(
@@ -214,10 +220,10 @@ function DayCell({ cell }: { cell: CalendarCellData }) {
               </div>
             </Tooltip>
           ))}
-          {cell.day.holidayName && (
-            <Tooltip content={cell.day.holidayName}>
+          {resolvedHolidayName && (
+            <Tooltip content={resolvedHolidayName}>
               <div className="cursor-pointer truncate rounded-sm bg-amber-600/90 px-1.5 py-0.5 text-[10.5px] text-white">
-                {cell.day.holidayName}
+                {resolvedHolidayName}
               </div>
             </Tooltip>
           )}
