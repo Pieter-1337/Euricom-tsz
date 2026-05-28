@@ -19,7 +19,7 @@ interface WeekTableProps {
   leaveBookings: Map<LeaveCellKey, number>;
   dayTotals: Map<string, number>;
   weekTotal: number;
-  isDraft: boolean;
+  canEdit: boolean;
   status: Status;
   cellInputs: Map<CellKey, string>;
   setCellInputs: React.Dispatch<React.SetStateAction<Map<CellKey, string>>>;
@@ -37,7 +37,7 @@ export function WeekTable({
   leaveBookings,
   dayTotals,
   weekTotal,
-  isDraft,
+  canEdit,
   status,
   cellInputs,
   setCellInputs,
@@ -47,7 +47,7 @@ export function WeekTable({
   onRemoveLeaveRow,
 }: WeekTableProps) {
   const hasRows = taskRows.length > 0 || leaveRows.length > 0;
-  const emptyColSpan = isDraft ? 10 : 9;
+  const emptyColSpan = canEdit ? 10 : 9;
 
   return (
     <div
@@ -105,7 +105,7 @@ export function WeekTable({
             <TableHead className="h-auto min-w-[60px] px-2 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6B7682] dark:text-white/40">
               Total
             </TableHead>
-            {isDraft && <TableHead className="w-10" />}
+            {canEdit && <TableHead className="w-10" />}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -126,7 +126,7 @@ export function WeekTable({
               variant="task"
               row={row}
               days={days}
-              isDraft={isDraft}
+              isDraft={canEdit}
               getValue={(date) => taskBookings.get(taskCellKey(row.id, date))}
               onCellChange={(date, value) => setTaskCell(row.id, date, value)}
               cellInputs={cellInputs}
@@ -141,7 +141,7 @@ export function WeekTable({
               variant="leave"
               row={row}
               days={days}
-              isDraft={isDraft}
+              isDraft={canEdit}
               getValue={(date) => leaveBookings.get(leaveCellKey(row.id, date))}
               onCellChange={(date, value) => setLeaveCell(row.id, date, value)}
               cellInputs={cellInputs}
@@ -174,7 +174,7 @@ export function WeekTable({
             <TableCell className="px-2 py-2 text-center font-bold text-sm text-[#3A4651] dark:text-white">
               {weekTotal > 0 ? formatHours(weekTotal) : ''}
             </TableCell>
-            {isDraft && <TableCell />}
+            {canEdit && <TableCell />}
           </TableRow>
         </TableFooter>
       </Table>

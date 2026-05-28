@@ -14,6 +14,7 @@ interface WeekActionsBarProps {
   status: Status;
   isDraft: boolean;
   isAdmin: boolean;
+  isReadOnly: boolean;
   isDirty: boolean;
   isFlushing: boolean;
   isLifecycleLoading: boolean;
@@ -33,6 +34,7 @@ export function WeekActionsBar({
   status,
   isDraft,
   isAdmin,
+  isReadOnly,
   isDirty,
   isFlushing,
   isLifecycleLoading,
@@ -95,9 +97,9 @@ export function WeekActionsBar({
       </div>
 
       <div className="flex items-center gap-2">
-        {isDirty && <span className="text-xs text-amber-500">Unsaved changes</span>}
-        {isFlushing && <span className="text-xs text-[#6B7682]">Saving...</span>}
-        {isDraft && (
+        {!isReadOnly && isDirty && <span className="text-xs text-amber-500">Unsaved changes</span>}
+        {!isReadOnly && isFlushing && <span className="text-xs text-[#6B7682]">Saving...</span>}
+        {!isReadOnly && isDraft && (
           <Button
             variant="outline"
             size="sm"
@@ -107,7 +109,7 @@ export function WeekActionsBar({
             Save
           </Button>
         )}
-        {isDraft && (
+        {!isReadOnly && isDraft && (
           <Button
             size="sm"
             disabled={isLifecycleLoading || hasDayCapacityError || hasInvalidCellInput}

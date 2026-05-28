@@ -25,6 +25,7 @@ interface TimesheetWeekGridProps {
   selectableTasks: SelectableContractTask[];
   selectableLeaveTypes: SelectableLeaveType[];
   isAdmin: boolean;
+  isReadOnly?: boolean;
 }
 
 export function TimesheetWeekGrid({
@@ -35,15 +36,18 @@ export function TimesheetWeekGrid({
   selectableTasks,
   selectableLeaveTypes,
   isAdmin,
+  isReadOnly = false,
 }: TimesheetWeekGridProps) {
   const navigate = useNavigate();
   const router = useRouter();
 
   const status = initialData?.status ?? 'Draft';
   const isDraft = status === 'Draft';
+  // canEdit: user can modify bookings only when not in read-only mode and week is Draft
+  const canEdit = !isReadOnly && isDraft;
   const days = initialData?.days ?? [];
 
-  const bookings = useWeekBookings(initialData, isDraft);
+  const bookings = useWeekBookings(initialData, canEdit);
   const { flush, isFlushing, flushError } = useWeekFlush({
     userId,
     year,
@@ -98,9 +102,15 @@ export function TimesheetWeekGrid({
   const availableLeaveToAdd = selectableLeaveTypes.filter((lt) => !addableLeaveIds.has(lt.id));
 
   const navigateToWeek = async (y: number, w: number) => {
-    const saved = await flush();
-    if (!saved) return;
-    await navigate({ to: '/time-entry/week/$year/$week', params: { year: String(y), week: String(w) } });
+    if (!isReadOnly) {
+      const saved = await flush();
+      if (!saved) return;
+    }
+    await navigate({
+      to: '/time-entry/week/$year/$week',
+      params: { year: String(y), week: String(w) },
+      search: (prev) => prev,
+    });
   };
 
   const handleSubmit = async () => {
@@ -149,6 +159,7 @@ export function TimesheetWeekGrid({
         status={status}
         isDraft={isDraft}
         isAdmin={isAdmin}
+        isReadOnly={isReadOnly}
         isDirty={bookings.isDirty}
         isFlushing={isFlushing}
         isLifecycleLoading={isLifecycleLoading}
@@ -160,7 +171,7 @@ export function TimesheetWeekGrid({
         onApprove={() => void handleApprove()}
         onReopen={() => void handleReopen()}
         navExtras={
-          isDraft ? (
+          canEdit ? (
             <>
               <AddRowPopover
                 triggerLabel="Add task"
@@ -229,7 +240,7 @@ export function TimesheetWeekGrid({
         leaveBookings={bookings.leaveBookings}
         dayTotals={dayTotals}
         weekTotal={weekTotal}
-        isDraft={isDraft}
+        canEdit={canEdit}
         status={status}
         cellInputs={cellInputs}
         setCellInputs={setCellInputs}

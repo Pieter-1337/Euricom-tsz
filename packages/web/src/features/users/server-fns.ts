@@ -48,6 +48,10 @@ export const submitCreateUser = createServerFn({ method: 'POST' })
     }
   });
 
+export const fetchUserById = createServerFn({ method: 'GET' })
+  .inputValidator(userIdSchema)
+  .handler(async ({ data: id }): Promise<User | null> => getUserById(id));
+
 export const fetchUserAndLeaves = createServerFn({ method: 'GET' })
   .inputValidator(userIdSchema)
   .handler(async ({ data: id }) => {
