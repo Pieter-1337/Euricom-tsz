@@ -2,6 +2,15 @@
 
 ## 2026-05-28
 
+### fix: use loaderDeps to pass userId search param into week loader
+
+TanStack Router's LoaderFnContext does not expose `search` directly.
+Project `search.userId` into loader deps via `loaderDeps` and access
+it as `deps.userId` inside the loader.
+
+Also ran `vp check --fix` to clear formatting issues in the same file,
+plus DESIGN.md and schema.ts.
+
 ### fix: type month and week endpoints, restore TimesheetMonth schemas
 
 Type the month and week (GET, PUT bookings) timesheet endpoint lambdas
