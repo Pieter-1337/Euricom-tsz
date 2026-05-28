@@ -1,0 +1,66 @@
+packages/api/Modules/Users/Tsz.Modules.Users/Endpoints/UserEndpoints.cs
+  s_ecab5c762d3e9f::t_5b7ec133ddb15d 74-77,80,83,89,92,99,102,105,111
+  s_ecab5c762d3e9f::t_65e98b203af5ce 8
+  s_ecab5c762d3e9f::t_27cdb3f7b321b8 19-21,24
+packages/web/src/features/timesheets/components/week-grid/use-week-flush.ts
+  s_e01e693a0a820d::t_13d0e470ddd7fe 41-43,46-57,59-63,65-74,77-93,95-100,102,104
+  s_e01e693a0a820d::t_770d0c7c756d18 1
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_ecab5c762d3e9f::t_3d899bb20ed6be 55,65
+packages/web/src/routes/_protected/_authenticated/time-entry/week/$year/$week.tsx
+  s_e01e693a0a820d::t_5450c7c50af8e7 20-29,31-32,34,36-41,43-54
+packages/api/Modules/Customers/Tsz.Modules.Customers/Endpoints/CustomerEndpoints.cs
+  s_ecab5c762d3e9f::t_af38fced5004f8 70,76
+  s_ecab5c762d3e9f::t_4978c9f6cc477c 57,64,67
+  s_ecab5c762d3e9f::t_f751a0526a7963 48,54
+  s_ecab5c762d3e9f::t_572d2a6525cfb5 39-42,45
+  s_ecab5c762d3e9f::t_2629ec903f666b 1,7
+docs/agents/conventions-csharp.md
+  s_ecab5c762d3e9f::t_cb6986aca40e50 13
+packages/web/package.json
+  s_ecab5c762d3e9f::t_f1533d469fee6f 20
+  s_ecab5c762d3e9f::t_eae969d826a394 63
+CHANGELOG.md
+  s_ecab5c762d3e9f::t_f7c410d339b30a 36-48
+  s_70df6e089955d2::t_8ce4118ff22121 64-74
+packages/api/Modules/Contracts/Tsz.Modules.Contracts/Endpoints/ContractEndpoints.cs
+  s_ecab5c762d3e9f::t_df181368d8a583 56,63,66,69,75
+  s_ecab5c762d3e9f::t_16333509e9b6db 38-41,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "29c94dd85ea205801b8f38a8a41c0407a3f8fcab",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_70df6e089955d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42553646-000a-48de-b10a-a187419b7825",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_e01e693a0a820d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da1e920c-76c1-42a7-a1df-52cf599470fe",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    },
+    "s_ecab5c762d3e9f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea2c38cb-e82e-45d2-9e27-33fbc47435f4",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
