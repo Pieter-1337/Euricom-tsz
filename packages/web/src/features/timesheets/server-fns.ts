@@ -9,6 +9,7 @@ import {
   approveTimesheetWeek,
   reopenTimesheetWeek,
   getTimesheetMonth,
+  getPendingApprovals,
 } from '#/api/timesheets.server';
 import { throwApiError } from '#/lib/server-error';
 import type { ApplyBookingsRequest } from '#/api/timesheets';
@@ -101,3 +102,7 @@ const monthParamsSchema = z.object({
 export const fetchTimesheetMonth = createServerFn({ method: 'GET' })
   .inputValidator(monthParamsSchema)
   .handler(async ({ data }) => getTimesheetMonth(data.userId, data.year, data.month));
+
+export const fetchPendingApprovals = createServerFn({ method: 'GET' }).handler(async () =>
+  getPendingApprovals(),
+);

@@ -16,6 +16,7 @@ import { Route as ProtectedAuthenticatedRouteImport } from './routes/_protected/
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedAuthenticatedTimesheetsRouteImport } from './routes/_protected/_authenticated/timesheets'
 import { Route as ProtectedAuthenticatedTimeEntryRouteImport } from './routes/_protected/_authenticated/time-entry'
+import { Route as ProtectedAuthenticatedMyTasksRouteImport } from './routes/_protected/_authenticated/my-tasks'
 import { Route as ProtectedAuthenticatedCustomersRouteImport } from './routes/_protected/_authenticated/customers'
 import { Route as ProtectedAuthenticatedContractsRouteImport } from './routes/_protected/_authenticated/contracts'
 import { Route as ProtectedAuthenticatedAdminRouteImport } from './routes/_protected/_authenticated/admin'
@@ -72,6 +73,12 @@ const ProtectedAuthenticatedTimeEntryRoute =
   ProtectedAuthenticatedTimeEntryRouteImport.update({
     id: '/time-entry',
     path: '/time-entry',
+    getParentRoute: () => ProtectedAuthenticatedRoute,
+  } as any)
+const ProtectedAuthenticatedMyTasksRoute =
+  ProtectedAuthenticatedMyTasksRouteImport.update({
+    id: '/my-tasks',
+    path: '/my-tasks',
     getParentRoute: () => ProtectedAuthenticatedRoute,
   } as any)
 const ProtectedAuthenticatedCustomersRoute =
@@ -213,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
   '/contracts': typeof ProtectedAuthenticatedContractsRouteWithChildren
   '/customers': typeof ProtectedAuthenticatedCustomersRouteWithChildren
+  '/my-tasks': typeof ProtectedAuthenticatedMyTasksRoute
   '/time-entry': typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   '/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -240,6 +248,7 @@ export interface FileRoutesByTo {
   '/no-access': typeof NoAccessRoute
   '/': typeof ProtectedIndexRoute
   '/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
+  '/my-tasks': typeof ProtectedAuthenticatedMyTasksRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/contracts/$contractId': typeof ProtectedAuthenticatedContractsContractIdRoute
   '/contracts/new': typeof ProtectedAuthenticatedContractsNewRoute
@@ -269,6 +278,7 @@ export interface FileRoutesById {
   '/_protected/_authenticated/admin': typeof ProtectedAuthenticatedAdminRouteWithChildren
   '/_protected/_authenticated/contracts': typeof ProtectedAuthenticatedContractsRouteWithChildren
   '/_protected/_authenticated/customers': typeof ProtectedAuthenticatedCustomersRouteWithChildren
+  '/_protected/_authenticated/my-tasks': typeof ProtectedAuthenticatedMyTasksRoute
   '/_protected/_authenticated/time-entry': typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   '/_protected/_authenticated/timesheets': typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contracts'
     | '/customers'
+    | '/my-tasks'
     | '/time-entry'
     | '/timesheets'
     | '/api/auth/$'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/'
     | '/admin'
+    | '/my-tasks'
     | '/api/auth/$'
     | '/contracts/$contractId'
     | '/contracts/new'
@@ -355,6 +367,7 @@ export interface FileRouteTypes {
     | '/_protected/_authenticated/admin'
     | '/_protected/_authenticated/contracts'
     | '/_protected/_authenticated/customers'
+    | '/_protected/_authenticated/my-tasks'
     | '/_protected/_authenticated/time-entry'
     | '/_protected/_authenticated/timesheets'
     | '/api/auth/$'
@@ -434,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/time-entry'
       fullPath: '/time-entry'
       preLoaderRoute: typeof ProtectedAuthenticatedTimeEntryRouteImport
+      parentRoute: typeof ProtectedAuthenticatedRoute
+    }
+    '/_protected/_authenticated/my-tasks': {
+      id: '/_protected/_authenticated/my-tasks'
+      path: '/my-tasks'
+      fullPath: '/my-tasks'
+      preLoaderRoute: typeof ProtectedAuthenticatedMyTasksRouteImport
       parentRoute: typeof ProtectedAuthenticatedRoute
     }
     '/_protected/_authenticated/customers': {
@@ -720,6 +740,7 @@ interface ProtectedAuthenticatedRouteChildren {
   ProtectedAuthenticatedAdminRoute: typeof ProtectedAuthenticatedAdminRouteWithChildren
   ProtectedAuthenticatedContractsRoute: typeof ProtectedAuthenticatedContractsRouteWithChildren
   ProtectedAuthenticatedCustomersRoute: typeof ProtectedAuthenticatedCustomersRouteWithChildren
+  ProtectedAuthenticatedMyTasksRoute: typeof ProtectedAuthenticatedMyTasksRoute
   ProtectedAuthenticatedTimeEntryRoute: typeof ProtectedAuthenticatedTimeEntryRouteWithChildren
   ProtectedAuthenticatedTimesheetsRoute: typeof ProtectedAuthenticatedTimesheetsRouteWithChildren
   ProtectedAuthenticatedLeavesYearRoute: typeof ProtectedAuthenticatedLeavesYearRoute
@@ -734,6 +755,7 @@ const ProtectedAuthenticatedRouteChildren: ProtectedAuthenticatedRouteChildren =
       ProtectedAuthenticatedContractsRouteWithChildren,
     ProtectedAuthenticatedCustomersRoute:
       ProtectedAuthenticatedCustomersRouteWithChildren,
+    ProtectedAuthenticatedMyTasksRoute: ProtectedAuthenticatedMyTasksRoute,
     ProtectedAuthenticatedTimeEntryRoute:
       ProtectedAuthenticatedTimeEntryRouteWithChildren,
     ProtectedAuthenticatedTimesheetsRoute:

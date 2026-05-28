@@ -16,3 +16,4 @@ export type TimesheetMonthTimeEntry = components['schemas']['TimesheetMonthTimeE
 export type TimesheetMonthLeaveBooking = components['schemas']['TimesheetMonthLeaveBookingDto'];
 export type TimesheetMonthPerTaskSummary = components['schemas']['TimesheetMonthPerTaskSummaryDto'];
 export type TimesheetMonthPerLeaveTypeSummary = components['schemas']['TimesheetMonthPerLeaveTypeSummaryDto'];
+export type PendingApproval = components['schemas']['PendingApprovalDto'];
