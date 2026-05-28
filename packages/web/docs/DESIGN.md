@@ -102,6 +102,7 @@ icon represents the active/primary state of the screen.
 | Theme toggle                  | `packages/web/src/components/theme-toggle.tsx`                                      | Toggles `.dark` on `<html>`, writes `theme` to `localStorage`. Reused inside the dark header.                                                                     |
 | Brand assets                  | `packages/web/public/`                                                              | `brandmark.svg`, `grid-pattern.svg`. Brandmark at 22px in the header; grid as low-opacity background on the workspace.                                            |
 | Admin read-only week header   | `packages/web/src/routes/_protected/_authenticated/time-entry/week/$year/$week.tsx` | Bold name + muted "Week N, YYYY — read only" subline rendered above the grid when `?userId` resolves to another user. Only shown in read-only mode.               |
+| My Tasks (approval inbox)     | `packages/web/src/routes/_protected/_authenticated/my-tasks.tsx`                    | Admin-only page listing all `Submitted` weeks pending approval. shadcn `Table` with one row per week; `Inbox` lucide icon for the empty state; `ListChecks` NavLink icon in the sidebar. |
 
 **Add a row to this table whenever you style a new piece of chrome or a
 reusable component.**

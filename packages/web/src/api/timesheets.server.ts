@@ -5,6 +5,7 @@ import type {
   SelectableContractTask,
   SelectableLeaveType,
   ApplyBookingsRequest,
+  PendingApproval,
 } from '#/api/timesheets';
 
 export const getTimesheetWeek = async (userId: string, year: number, week: number): Promise<TimesheetWeek | null> => {
@@ -72,4 +73,9 @@ export const getTimesheetMonth = async (
     params: { path: { userId, year, month } },
   });
   return resp.data ?? null;
+};
+
+export const getPendingApprovals = async (): Promise<PendingApproval[]> => {
+  const resp = await client.GET('/api/timesheet-weeks/pending-approvals');
+  return resp.data ?? [];
 };

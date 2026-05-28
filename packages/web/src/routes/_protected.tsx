@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Clock,
   FileText,
+  ListChecks,
   User as UserIcon,
   Users as UsersIcon,
 } from 'lucide-react';
@@ -187,6 +188,7 @@ function Sidebar({
           <NavLink to="/timesheets" icon={CalendarDays} label="Timesheets" collapsed={collapsed} />
           <NavLink to="/time-entry" icon={Clock} label="Time Entry" collapsed={collapsed} />
           <NavLink to="/leaves" icon={CalendarRange} label="Leave overview" collapsed={collapsed} />
+          {isAdmin && <NavLink to="/my-tasks" icon={ListChecks} label="My Tasks" collapsed={collapsed} />}
           {isAdmin && <NavLink to="/admin/users" icon={UsersIcon} label="Users" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/customers" icon={Building2} label="Customers" collapsed={collapsed} />}
           {canManageClients && <NavLink to="/contracts" icon={FileText} label="Contracts" collapsed={collapsed} />}
