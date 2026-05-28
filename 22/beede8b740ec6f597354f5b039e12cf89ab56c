@@ -1,0 +1,81 @@
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Endpoints/TimesheetEndpoints.cs
+  s_cc33296005503e::t_1031c95e33b546 105-106,112
+  s_cc33296005503e::t_5608fec2566ff1 96,98-103,107-111,113-114
+  s_cc33296005503e::t_3bad7c7213d658 5
+  s_cc33296005503e::t_6ab05de5803a7b 104
+packages/web/docs/DESIGN.md
+  s_cc33296005503e::t_49855c56e57154 97-104
+packages/api/Tsz.Api.Tests.Integration/PendingApprovalsEndpointsTests.cs
+  s_cc33296005503e::t_e5b511ba8c9f0e 4,106,113,115-116,129,131-137,153,155-177,215-230
+  s_cc33296005503e::t_19026df259b665 195,199,203-205
+  s_cc33296005503e::t_c1216522d9b260 178-194,196-198,200-202,206-214
+packages/web/src/api/timesheets.server.ts
+  s_cc33296005503e::t_5b2d79ae3aae1d 81
+  s_cc33296005503e::t_99b73cd360739e 11
+  s_cc33296005503e::t_358809665b7d29 10
+  s_cc33296005503e::t_6abe4f0a4895bd 92-93
+  s_cc33296005503e::t_8d7ae5f6634e25 80,82-91,94-97
+packages/web/src/features/contracts/components/contracts-list.tsx
+  s_cc33296005503e::t_8a876ffb715d7c 175-176
+packages/web/src/features/my-tasks/schemas.ts
+  s_cc33296005503e::t_dacb18d8ff4cef 6-7,17-18
+  s_cc33296005503e::t_23bbaec04099e7 1-4,10-16,19
+  s_cc33296005503e::t_2468605fe7f783 5,8-9
+packages/web/src/api/schema.ts
+  s_cc33296005503e::t_7184e04cd9f69c 864-873,886,1175-1180
+packages/api/Tsz.Api.Tests/Modules/Timesheets/Features/GetPendingApprovalsHandlerTests.cs
+  s_cc33296005503e::t_1f8b01d74a124e 227-241,243-263,265-286,288-293,295,297-298,301-310,312,314,317-322,324,373-379,382-383
+  s_cc33296005503e::t_7d6e66470e51cd 9
+  s_cc33296005503e::t_2c61f738e91027 149,172,197,219,242,264,287
+  s_cc33296005503e::t_af24bd67dc1f0e 294,296,299-300,311,313,315-316,323,325-372,380-381
+  s_cc33296005503e::t_8fccf72251f52e 199-200
+  s_cc33296005503e::t_b2481440dc3c57 4,44,50-52,66-70,87-88,102,106,126-148,150-171,173-181,183-185,187-196,198,201-218,220-226,404-406
+  s_cc33296005503e::t_e745fe7dca6558 182,186
+packages/web/src/routes/_protected/_authenticated/my-tasks.tsx
+  s_cc33296005503e::t_d8ba0737c92cac 1,3,11
+packages/web/src/components/ui/date-picker.tsx
+  s_cc33296005503e::t_294e2b01987f31 49-50,53-81,83-87
+  s_cc33296005503e::t_3815273f97df11 5
+  s_cc33296005503e::t_9a2d090be78fea 82
+packages/web/src/features/timesheets/server-fns.ts
+  s_cc33296005503e::t_0084470dd4e62d 17-21
+  s_cc33296005503e::t_5426ac6a8c1901 15-16
+  s_cc33296005503e::t_40c4e5e47895e1 116
+  s_cc33296005503e::t_f7b0ab6a560962 112-115,117
+packages/web/src/features/my-tasks/components/my-tasks-list.tsx
+  s_cc33296005503e::t_a2cf76cdefa4c9 74-75,78-82,92-97,99
+  s_cc33296005503e::t_c5c1c245e341ce 4,7-8,16,76-77,83-85,89,91,98,100-101,103,107,109-110,127-129,131-133,136-137,143-144,160-163,166,168-172,174
+  s_cc33296005503e::t_71f7877c9c5923 1-3,5-6,9-15,17-73,86-88,90,102,104-106,108,111-126,130,164-165,167,173,175-179
+  s_cc33296005503e::t_309ff5d96f416f 134-135,138-142,145-159
+packages/web/src/components/ui/combobox.tsx
+  s_cc33296005503e::t_3a90c9ed883822 26-29,39-40
+  s_cc33296005503e::t_bf25a59a427059 81-93
+packages/api/Modules/Timesheets/Tsz.Modules.Timesheets/Features/GetPendingApprovals.cs
+  s_cc33296005503e::t_109c6e77d303d0 18-19,23
+  s_cc33296005503e::t_40bc7cadc8180f 120-122,126-128
+  s_cc33296005503e::t_68fa9bf30f001b 88
+  s_cc33296005503e::t_a981718f32bbec 1,17,85,89,91-92,97-119,123-125
+  s_cc33296005503e::t_1aae77fa235335 2,4,11-16,20-22,24,33-58,60,62,70,75-84,86-87,93-96,129-148
+  s_cc33296005503e::t_f83c69da0dd93e 90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "22beede8b740ec6f597354f5b039e12cf89ab56c",
+  "prompts": {},
+  "humans": {
+    "h_9ef4f126c6bd1c": {
+      "author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  },
+  "sessions": {
+    "s_cc33296005503e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "561104cc-cd14-43d5-925a-e4c14cffe268",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Pieter Bracke <pieter.bracke@euri.com>"
+    }
+  }
+}
