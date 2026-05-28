@@ -38,8 +38,6 @@ describe('useLeaveSummary', () => {
         defaultAllowed: 'Limited',
         year: YEAR,
         totalDays: 20,
-        takenDays: null,
-        balanceDays: null,
       },
     ];
     const bookings: LeaveBookingForYear[] = [
