@@ -1,6 +1,6 @@
 ---
 name: app-do-work
-description: Execute a unit of work for one issue end-to-end: plan, implement, validate with typecheck and tests, optional reviewer pass, then commit and open a PR. When re-launched on an issue that already has an open PR, enters iterate mode and pushes follow-up commits to that branch instead of starting fresh. Use when user wants to do work, build a feature, fix a bug, or implement a phase from a plan.
+description: 'Execute a unit of work for one issue end-to-end: plan, implement, validate with typecheck and tests, optional reviewer pass, then commit and open a PR. When re-launched on an issue that already has an open PR, enters iterate mode and pushes follow-up commits to that branch instead of starting fresh. Use when user wants to do work, build a feature, fix a bug, or implement a phase from a plan.'
 argument-hint: '<issue> [--reviewer=true] [--agent=auto] — `<issue>` is a tracker reference (e.g. `#42` or a full issue URL) or a path to a local issue markdown file.'
 disable-model-invocation: true
 ---
@@ -84,6 +84,17 @@ Once static analysis and tests pass cleanly:
 
 Before pushing, sanity-check the working tree: `git status` should show only the files you intended to change. If you see hundreds of unrelated files (typically a line-ending mass-rewrite from a misconfigured worktree), **stop and report** — do not commit the noise.
 
+**Pre-push validation gate** — re-run the full §3 validation suite one final time after commit, before push. If the §5 reviewer pass produced fixes after §3, those fixes were never re-validated against the full suite. Run:
+
+```bash
+bun run check --fix
+bun run test:web
+bun run test:api
+bun run test:integration   # only if the slice touched packages/api
+```
+
+If red: one more attempt to fix locally. If still red after that attempt: push anyway and call it out in the PR body under a "Known failures" section — do not silently ship a red branch, but also do not block the PR (CI will surface it and `/app-do-prd` will trigger iterate mode).
+
 - Push the branch to the remote.
 - Open a PR with `gh pr create --base master --title "<derived from issue title>" --body "Fixes #<issue-num>\n\n<short summary>"`.
 - If the §5 reviewer pass produced findings you chose not to address, include them in the PR body under a "Reviewer notes" section so they don't get lost.
@@ -114,11 +125,11 @@ Write a list of items the user should manually verify before merge. Include any 
 
 ## Parameters
 
-| Parameter | Type | Default | Meaning |
-|---|---|---|---|
-| `<issue>` | tracker ref / URL / file path | **required** | The single issue to implement (or iterate on) |
-| `--reviewer` | bool | `true` | Run the §5 reviewer sub-agent pass before commit |
-| `--agent` | enum | _no-op when invoked directly_ | Honoured when called from `/app-do-prd` (which sets the spawned worker's subagent_type); ignored in direct invocation since the agent type is already determined by who's running this skill |
+| Parameter    | Type                          | Default                       | Meaning                                                                                                                                                                                      |
+| ------------ | ----------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<issue>`    | tracker ref / URL / file path | **required**                  | The single issue to implement (or iterate on)                                                                                                                                                |
+| `--reviewer` | bool                          | `true`                        | Run the §5 reviewer sub-agent pass before commit                                                                                                                                             |
+| `--agent`    | enum                          | _no-op when invoked directly_ | Honoured when called from `/app-do-prd` (which sets the spawned worker's subagent_type); ignored in direct invocation since the agent type is already determined by who's running this skill |
 
 ## See also
 

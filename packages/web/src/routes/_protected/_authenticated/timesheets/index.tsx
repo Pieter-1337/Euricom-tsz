@@ -10,7 +10,14 @@ import { cn } from '#/lib/utils';
 import { getLeaveColor } from '#/features/leaves/use-leave-colors';
 import { fetchTimesheetMonth } from '#/features/timesheets/server-fns';
 import { fetchHolidaysForYear } from '#/features/leaves/server-fns';
-import { formatIsoDate, formatMonthLabel, nextMonth, prevMonth, todayMonth } from '#/features/timesheets/iso-week';
+import {
+  dateToIsoWeek,
+  formatIsoDate,
+  formatMonthLabel,
+  nextMonth,
+  prevMonth,
+  todayMonth,
+} from '#/features/timesheets/iso-week';
 import type { TimesheetMonth, TimesheetMonthDay, TimesheetMonthWeek } from '#/api/timesheets';
 import type { HolidayDto } from '#/api/leaves';
 import type { CurrentUser } from '#/server/current-user';
@@ -182,12 +189,18 @@ function DayCell({ cell, holidayName }: { cell: CalendarCellData; holidayName: s
   const approved = cell.weekStatus === 'Approved';
   const showAsterisk = cell.weekStatus !== null && cell.weekStatus !== 'Approved';
   const resolvedHolidayName = cell.day?.holidayName ?? holidayName;
+  const { year: weekYear, week } = dateToIsoWeek(new Date(cell.isoDate + 'T00:00:00'));
 
   return (
-    <div
+    <Link
+      to="/time-entry/week/$year/$week"
+      params={{ year: String(weekYear), week: String(week) }}
+      aria-label={`Open week ${week} of ${weekYear}`}
       className={cn(
         'flex min-h-[78px] flex-col gap-1 border-r border-b border-black/[0.06] px-1.5 py-1.5 dark:border-white/[0.06]',
         '[&:nth-child(7n)]:border-r-0',
+        'cursor-pointer transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.04]',
+        'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#00FF00]',
         cell.outside && 'opacity-30',
       )}
     >
@@ -229,7 +242,7 @@ function DayCell({ cell, holidayName }: { cell: CalendarCellData; holidayName: s
           )}
         </div>
       )}
-    </div>
+    </Link>
   );
 }
 

@@ -80,8 +80,42 @@ while any issue in {pending, in-flight}:
     # 4a-verify. After a worker returns, before treating it as in-flight,
     #            confirm the PR exists:
     #     gh pr list --repo <repo> --search "<issue-ref> in:body" --state open --json url
-    # If no PR is found, treat the return as an §7 failure (worker terminated
-    # prematurely). Do NOT advance dependents until the worker has shipped a PR.
+    # If a PR is found: record the URL, mark in-flight, continue the loop.
+    # If no PR is found: enter the §4a-finisher deterministic node below.
+    # Do NOT advance dependents until the worker has shipped a PR.
+
+    # 4a-finisher. Workers reliably bail after the reviewer pass without committing /
+    #              pushing / opening a PR (see memory:appdoprd-worker-handoff). Prompt
+    #              tweaks don't change this. So the orchestrator finishes the slice
+    #              itself — a deterministic node, not another agent spawn.
+    #
+    #     1. cd <worker-worktree>
+    #     2. git status
+    #          - clean tree AND HEAD == master → worker did nothing → §7 failure (real).
+    #          - otherwise: there's work to ship; proceed.
+    #     3. Run validation deterministically (NOT through an agent):
+    #          bun run check --fix
+    #          bun run test:web
+    #          bun run test:api
+    #          bun run test:integration   # only if the slice touched packages/api
+    #        If any suite is red:
+    #          - re-spawn the worker ONCE with prompt:
+    #            "Validation failed in this worktree. Output: <pasted>. Fix only the
+    #             failures, then return — orchestrator will commit + push + open PR.
+    #             Do NOT open a PR yourself."
+    #          - then re-run step 3. If still red after one attempt → §7 failure
+    #            with the validation output preserved.
+    #     4. If CHANGELOG.md was not updated by the worker, add a one-line entry
+    #        under today's date using the issue title.
+    #     5. Commit uncommitted changes via Skill('commit') (conventional commits +
+    #        signed co-author footer per repo convention).
+    #     6. Push the branch and `gh pr create --base master --title <issue title>
+    #        --body "Fixes #<n>\n\n<short summary>"`.
+    #     7. Verify with `gh pr view <num>` — record URL, mark in-flight.
+    #
+    # The finisher consumes ~no agent tokens for the happy path (validation green
+    # + commit + push + PR are all shell). Tokens only spent when validation is
+    # red and a single agent re-spawn is needed to fix it.
 
     # 4b. React to events
     wait for the next of:
@@ -163,7 +197,7 @@ Edge cases:
 
 ### 7. Autonomous failure recovery
 
-When a worker halts with an unrecoverable failure (NOT a one-attempt iterate-mode blocker — that's §5):
+When a worker halts with an unrecoverable failure (NOT a one-attempt iterate-mode blocker — that's §5; NOT a missing-PR worker bail — that's §4a-finisher, which the orchestrator runs deterministically before falling through to here):
 
 1. **One diagnostic re-spawn.** Re-launch the same worker against the same issue, passing the previous attempt's last error / "stuck" summary explicitly in the prompt. Often a second attempt with diagnostic context succeeds where the first didn't.
 2. **If still failing**, branch on `--on-failure`:
@@ -195,7 +229,7 @@ When the loop ends, emit a structured report:
 
 - It does not auto-merge PRs by default. Human review stays in the loop on every slice unless `--auto-merge=true` is passed (see §6), in which case the orchestrator merges each PR itself once CI is green, all review threads are resolved, and no reviewer-pass findings sit unaddressed.
 - It does not file new issues. It only runs against pre-existing tracker issues created by `/matt-to-prd` + `/matt-to-issues`.
-- It does not edit `CONTEXT.md` / ADRs / `CHANGELOG.md` directly — those changes come only via individual workers acting on their assigned slices.
+- It does not edit `CONTEXT.md` or ADRs directly — those changes come only via individual workers acting on their assigned slices. (The §4a-finisher node may add a missing `CHANGELOG.md` entry on a worker's behalf as part of finishing a slice the worker failed to commit.)
 - It does not decompose a single issue across multiple parallel workers. If an issue is too big for one worker, that's a signal to re-slice via `/matt-to-issues`, not to bolt on intra-issue swarms.
 
 ## See also
