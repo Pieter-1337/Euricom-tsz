@@ -48,6 +48,19 @@ PUT bookings) that were stale in origin/master.
 Remove phantom takenDays/balanceDays fields from test fixtures — never
 existed on C# UserLeaveDto, FE computes them locally.
 
+### chore: ignore unknown CSS at-rules in VS Code linter
+
+VS Code's built-in CSS validator flags Tailwind 4 directives
+(@theme, @custom-variant, @apply, @layer) as unknown. Ignore them
+to reduce spurious Problems panel warnings.
+
+### feat: admins land on My Tasks, add timesheet calendar click-through
+
+Admins now land on /my-tasks (approval queue) instead of /timesheets.
+Non-admins continue to /timesheets. Also make each day cell in the
+timesheet overview calendar clickable to navigate to its week, matching
+the existing leave-overview pattern.
+
 ## 2026-05-27
 
 ### feat: admin read-only week view via ?userId search param (#54)
