@@ -1,6 +1,6 @@
 # Timesheet Zone (Tsz)
 
-A consulting-services timesheet platform. Consultants (Users) book time against client Contracts and consume per-year leave allowances; client managers and admins approve weekly submissions and review monthly summaries.
+A consulting-services timesheet platform. Consultants (Users) book time against client Contracts and consume per-year leave allowances; admins approve weekly submissions and review monthly summaries.
 
 ## Language
 
@@ -60,6 +60,15 @@ _Avoid_: MonthSheet, MonthlyReport
 The year-level read view shown in the FE for one User — calendar grid of LeaveBookings + public Holidays, plus a balance panel of UserLeave allowances. NOT a persisted entity AND NOT a backend module — composed FE-side from three independent endpoints owned by `LeaveTypes` (allowance), `Timesheets` (bookings), and `Workdays` (holidays). Sibling to Timesheet in being a view-only domain term.
 _Avoid_: LeaveCalendar, LeaveDashboard, YearSheet
 
+### Admin surfaces
+
+**My Tasks**:
+An admin-facing FE to-do view listing actions an admin needs to take. NOT a persisted entity and NOT a backend module — it is a read view over work that needs doing. v1 contains exactly one task type: **Approval Tasks** (TimesheetWeeks in `Submitted` status awaiting an approve/reopen decision). Intentionally hardcoded to approvals — no generic task table or task-type infrastructure until a second task type actually arrives.
+_Avoid_: Inbox, Approvals (as the page name), Todos. Note "Tasks" here is the admin's to-do items and is distinct from **ContractTask** (a billable contract line).
+
+**Approval Task**:
+One row in **My Tasks**: a single `Submitted` **TimesheetWeek** that an admin can Approve or Reopen. Derived live from week Status; not stored.
+
 ### Leave catalog
 
 **LeaveType**:
@@ -88,6 +97,8 @@ _Avoid_: DefaultDayHours (implementation name), DailyBudget, DayTotalCap, MaxWor
 
 - *"time entry" vs "timesheet"* — colloquially overlap. Resolution: **TimeEntry** is one row of booked work; **TimesheetWeek** is the persisted week-level container with a Status; **Timesheet** is the month-level *view* (not persisted). Never persist a "Timesheet" row.
 - *"WeekApproval"* — there is no separate WeekApproval entity. Approval state is a `Status` field on **TimesheetWeek**.
+- *"who approves?"* — v1: **Admin** only. Approve/Reopen are `RequireAdmin`. ClientManager approval is **deferred**: it needs a ClientManager→Customer ownership model (which consultants' weeks a CM may approve) that does not exist yet — `RequireAdminOrAnyClientManager` is unscoped and `DataScopeAccessor` only does owner-equals for non-admins. Revisit when CM scoping lands.
+- *"can an admin edit another User's bookings directly?"* — No. An admin acting on another User's **TimesheetWeek** may **View, Approve, and Reopen** only (week-Status powers). Editing TimeEntries/LeaveBookings stays self-only (booking writes are `caller == userId`). The blessed way for an admin to correct someone's entries is **Impersonation** (see ADR-0004), which provides the full edit→Submit loop with the documented attribution rules. Reason: direct admin-edit would duplicate Impersonation and produces a stuck-in-Draft half-flow (admin can edit a reopened Draft but cannot Submit or Approve it).
 - *"leave"* alone is ambiguous (catalog vs allowance vs consumption). Use **LeaveType** (catalog), **UserLeave** (allowance), **LeaveBooking** (consumption).
 - *"who did this?"* under **Impersonation** — v1 decision: actions an **Impersonator** performs are attributed **solely** to the **Impersonated User** with no persisted trace of the Impersonator, including the `TimesheetWeek` Status transitions (Submit/Approve/Reopen). Capability-transparency was chosen over attestation-traceability. Revisit if accountability requirements arrive.
 - *"Feestdag"* — refers to a public **Workdays.Holiday**, NOT a LeaveType. The seed has no `Feestdag` LeaveType (Verlof, ADV dagen, Anciënniteit, Ziekte only). The "Feestdagen" row in the Leave Overview balance panel is FE-synthesized from Holiday counts.

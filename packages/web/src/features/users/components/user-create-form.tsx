@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
-import { USER_ROLES, UserRole } from '#/api/users';
+import { SELECTABLE_ROLES, UserRole } from '#/api/users';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
 import { createUserSchema } from '#/features/users/schemas';
@@ -13,13 +13,15 @@ export function UserCreateForm() {
       firstName: '',
       lastName: '',
       email: '',
-      roles: [UserRole.User] as UserRole[],
+      roles: [] as UserRole[],
     },
     validators: { onChange: createUserSchema },
     onSubmit: async ({ value }) => {
       clearServerErrors();
       try {
-        const created = await submitCreateUser({ data: value });
+        const created = await submitCreateUser({
+          data: { ...value, roles: [UserRole.User, ...value.roles] },
+        });
         await router.invalidate();
         if (created) router.navigate({ to: '/admin/users/$id', params: { id: created.id } });
       } catch (e) {
@@ -55,7 +57,7 @@ export function UserCreateForm() {
           <form.AppField name="email">{(field) => <field.TextField label="Email" type="email" />}</form.AppField>
 
           <form.AppField name="roles">
-            {(field) => <field.MultiSelectField label="Roles" options={USER_ROLES} />}
+            {(field) => <field.MultiSelectField label="Roles" options={SELECTABLE_ROLES} />}
           </form.AppField>
 
           <form.FormActions saveLabel="Create user" savePendingLabel="Creating…" />

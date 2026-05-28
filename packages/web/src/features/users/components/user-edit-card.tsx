@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
-import { USER_ROLES, UserRole, type User } from '#/api/users';
+import { SELECTABLE_ROLES, UserRole, type User } from '#/api/users';
 import { useAppForm } from '#/components/form/form-context';
 import { useFormServerErrors } from '#/hooks/use-form-server-errors';
 import { Button } from '#/components/ui/button';
@@ -14,13 +14,15 @@ export function UserEditCard({ user }: { user: User }) {
     defaultValues: {
       firstName: user.firstName,
       lastName: user.lastName,
-      roles: user.roles as UserRole[],
+      roles: user.roles.filter((r) => r !== UserRole.User) as UserRole[],
     },
     validators: { onChange: updateUserSchema },
     onSubmit: async ({ value }) => {
       clearServerErrors();
       try {
-        await saveUser({ data: { id: user.id, user: value } });
+        await saveUser({
+          data: { id: user.id, user: { ...value, roles: [UserRole.User, ...value.roles] } },
+        });
         await router.invalidate();
         form.reset(value);
       } catch (e) {
@@ -78,7 +80,7 @@ export function UserEditCard({ user }: { user: User }) {
             <form.AppField name="lastName">{(field) => <field.TextField label="Last name" />}</form.AppField>
 
             <form.AppField name="roles">
-              {(field) => <field.MultiSelectField label="Roles" options={USER_ROLES} />}
+              {(field) => <field.MultiSelectField label="Roles" options={SELECTABLE_ROLES} />}
             </form.AppField>
 
             <form.FormActions cancel />

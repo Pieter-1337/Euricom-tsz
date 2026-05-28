@@ -11,3 +11,6 @@ export const UserRole = {
 } as const satisfies Record<string, components['schemas']['UserRole']>;
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 export const USER_ROLES = [UserRole.User, UserRole.Admin, UserRole.ClientManager] as const;
+
+// User is an implicit baseline every account carries; only elevated roles are pickable in the UI.
+export const SELECTABLE_ROLES = [UserRole.Admin, UserRole.ClientManager] as const;

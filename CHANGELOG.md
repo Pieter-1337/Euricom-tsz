@@ -2,6 +2,21 @@
 
 ## 2026-05-28
 
+### feat: hide User role in picker and inject it on submit
+
+The "User" role is the implicit baseline every account carries; exposing
+it in the role picker invites users to deselect it, which the API does
+not allow. Hide it: only Admin and ClientManager are pickable, and the
+User baseline is added on submit (and stripped on display in the edit
+form). Drop the "at least one role required" min validation since the
+picker can now legitimately be empty (User is injected).
+
+Also document the admin My Tasks PRD decisions in CONTEXT.md: add the
+My Tasks / Approval Task terms, record who-approves (Admin-only in v1
+with ClientManager deferred), and capture the admin-can-View/Approve/
+Reopen-but-not-edit rule (on-behalf edits go through Impersonation
+per ADR-0004).
+
 ### fix: use loaderDeps to pass userId search param into week loader
 
 TanStack Router's LoaderFnContext does not expose `search` directly.

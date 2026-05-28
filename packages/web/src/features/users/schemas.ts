@@ -9,13 +9,14 @@ export const createUserSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
-  roles: z.array(z.enum(USER_ROLES)).min(1, 'At least one role is required'),
+  // Only elevated roles are picked here; the User baseline is injected on submit.
+  roles: z.array(z.enum(USER_ROLES)),
 });
 
 export const updateUserSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  roles: z.array(z.enum(USER_ROLES)).min(1, 'At least one role is required'),
+  roles: z.array(z.enum(USER_ROLES)),
 });
 
 export const saveUserInputSchema = z.object({
