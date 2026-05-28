@@ -16,16 +16,15 @@ const weekSearchSchema = z.object({
 
 export const Route = createFileRoute('/_protected/_authenticated/time-entry/week/$year/$week')({
   validateSearch: weekSearchSchema,
-  loader: async ({ params, context, search }) => {
+  loaderDeps: ({ search }) => ({ userId: search.userId }),
+  loader: async ({ params, context, deps }) => {
     const { currentUser } = context as { currentUser: CurrentUser };
     const isAdmin = currentUser.roles.includes(UserRole.Admin);
     const year = Number(params.year);
     const week = Number(params.week);
 
     // Only honour the userId search param for admins; everyone else loads their own week.
-    const targetUserId = isAdmin && search.userId && search.userId !== currentUser.id
-      ? search.userId
-      : currentUser.id;
+    const targetUserId = isAdmin && deps.userId && deps.userId !== currentUser.id ? deps.userId : currentUser.id;
 
     const isViewingOther = targetUserId !== currentUser.id;
 
@@ -45,9 +44,7 @@ export const Route = createFileRoute('/_protected/_authenticated/time-entry/week
       selectableLeaveTypes,
       isAdmin,
       isReadOnly: isViewingOther,
-      targetUserName: isViewingOther && targetUser
-        ? `${targetUser.firstName} ${targetUser.lastName}`.trim()
-        : null,
+      targetUserName: isViewingOther && targetUser ? `${targetUser.firstName} ${targetUser.lastName}`.trim() : null,
     };
   },
   component: TimesheetWeekPage,
@@ -61,9 +58,7 @@ function TimesheetWeekPage() {
     <main>
       {isReadOnly && targetUserName ? (
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#3A4651] dark:text-white">
-            {targetUserName}
-          </h1>
+          <h1 className="text-2xl font-bold text-[#3A4651] dark:text-white">{targetUserName}</h1>
           <p className="mt-0.5 text-sm text-[#6B7682] dark:text-white/40">
             Week {week}, {year} — read only
           </p>

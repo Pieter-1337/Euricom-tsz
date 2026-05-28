@@ -4,1460 +4,1460 @@
  */
 
 export interface paths {
-    "/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AnonymousTypeOfstringAndstring"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  '/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/users/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AnonymousTypeOfstringAndstring'];
+          };
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    role?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserDto"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateUserCommand"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/users/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/users/paged": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        get: {
-            parameters: {
-                query?: {
-                    search?: string;
-                    sortBy?: string;
-                    sortDir?: string;
-                    pageSize?: number;
-                    cursor?: string;
-                    deletedOnly?: boolean;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["KeysetPageOfUserDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/users/impersonation-targets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    search?: string;
-                    sortBy?: string;
-                    sortDir?: string;
-                    pageSize?: number;
-                    cursor?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["KeysetPageOfUserDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/users/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: {
+          role?: string;
         };
-        get: operations["GetUserById"];
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateUserCommand"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserDto'][];
+          };
         };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/customers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateUserCommand'];
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["CustomerDto"][];
-                    };
-                };
-            };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateCustomerCommand"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/customers/paged": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    search?: string;
-                    sortBy?: string;
-                    sortDir?: string;
-                    pageSize?: number;
-                    cursor?: string;
-                    deletedOnly?: boolean;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["KeysetPageOfCustomerDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/users/paged': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/customers/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
+          deletedOnly?: boolean;
         };
-        get: operations["GetCustomerById"];
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateCustomerCommand"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['KeysetPageOfUserDto'];
+          };
         };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/contracts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    search?: string;
-                    sortBy?: string;
-                    sortDir?: string;
-                    pageSize?: number;
-                    cursor?: string;
-                    deletedOnly?: boolean;
-                    activeOnDate?: string;
-                    customerId?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["KeysetPageOfContractSummaryDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateContractCommand"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ContractDto"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/users/impersonation-targets': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/contracts/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
         };
-        get: operations["GetContractById"];
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateContractCommand"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['KeysetPageOfUserDto'];
+          };
         };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/users/{userId}/leaves": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    year?: number;
-                };
-                header?: never;
-                path: {
-                    userId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserLeaveDto"][];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateUserLeavesBody"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["UserLeaveDto"][];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/users/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/timesheet-weeks/{userId}/{year}/{week}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: operations['GetUserById'];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    week: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TimesheetWeekDto"];
-                    };
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateUserCommand'];
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/api/timesheet-weeks/{userId}/{year}/{week}/bookings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
         };
-        get?: never;
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    week: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ApplyBookingsRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TimesheetWeekDto"];
-                    };
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/timesheet-weeks/{userId}/{year}/{week}/submit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    week: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/customers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/timesheet-weeks/{userId}/leave-bookings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CustomerDto'][];
+          };
         };
-        get: {
-            parameters: {
-                query: {
-                    year: number;
-                };
-                header?: never;
-                path: {
-                    userId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["LeaveBookingForYearDto"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/timesheet-weeks/{userId}/{year}/{week}/approve": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateCustomerCommand'];
         };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    week: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TimesheetWeekDto"];
-                    };
-                };
-            };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/timesheet-weeks/{userId}/{year}/{week}/reopen": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    week: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TimesheetWeekDto"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/customers/paged': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/timesheet-weeks/pending-approvals": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
+          deletedOnly?: boolean;
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PendingApprovalDto"][];
-                    };
-                };
-            };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['KeysetPageOfCustomerDto'];
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/timesheets/{userId}/{year}/{month}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    month: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TimesheetMonthDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/customers/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/timesheet-selectable-tasks/{userId}/{year}/{week}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    get: operations['GetCustomerById'];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                    year: number;
-                    week: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SelectableContractTaskDto"][];
-                    };
-                };
-            };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateCustomerCommand'];
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
     };
-    "/api/timesheet-selectable-leave-types/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
         };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SelectableLeaveTypeDto"][];
-                    };
-                };
-            };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/api/workdays/holidays": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    year: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["HolidayDto"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/contracts': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+          sortBy?: string;
+          sortDir?: string;
+          pageSize?: number;
+          cursor?: string;
+          deletedOnly?: boolean;
+          activeOnDate?: string;
+          customerId?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['KeysetPageOfContractSummaryDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['CreateContractCommand'];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ContractDto'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/contracts/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['GetContractById'];
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateContractCommand'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/users/{userId}/leaves': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          year?: number;
+        };
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserLeaveDto'][];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['UpdateUserLeavesBody'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserLeaveDto'][];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['TimesheetWeekDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}/bookings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          'application/json': components['schemas']['ApplyBookingsRequest'];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['TimesheetWeekDto'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}/submit': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/leave-bookings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query: {
+          year: number;
+        };
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['LeaveBookingForYearDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}/approve': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['TimesheetWeekDto'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/{userId}/{year}/{week}/reopen': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['TimesheetWeekDto'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-weeks/pending-approvals': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PendingApprovalDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheets/{userId}/{year}/{month}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          month: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['TimesheetMonthDto'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-selectable-tasks/{userId}/{year}/{week}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+          year: number;
+          week: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SelectableContractTaskDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/timesheet-selectable-leave-types/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SelectableLeaveTypeDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/workdays/holidays': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query: {
+          year: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['HolidayDto'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        AddressDto: {
-            street: null | string;
-            zip: null | string;
-            city: null | string;
-            country: null | string;
-        };
-        AnonymousTypeOfstringAndstring: {
-            name: null | string;
-            version: null | string;
-        };
-        ApplyBookingsRequest: {
-            timeEntries: components["schemas"]["TimeEntryInputDto"][];
-            leaveBookings: components["schemas"]["LeaveBookingInputDto"][];
-        };
-        ContactPersonDto: {
-            name: null | string;
-            email: string;
-        };
-        ContractDto: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int32 */
-            number: number;
-            subject: string;
-            /** Format: uuid */
-            customerId: string;
-            /** Format: uuid */
-            clientManagerId: null | string;
-            /** Format: date */
-            start: string;
-            /** Format: date */
-            end: null | string;
-            tasks: components["schemas"]["ContractTaskDto"][];
-            consultantIds: string[];
-        };
-        ContractSummaryDto: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int32 */
-            number: number;
-            subject: string;
-            /** Format: uuid */
-            customerId: string;
-            /** Format: date */
-            start: string;
-            /** Format: date */
-            end: null | string;
-            /** Format: int32 */
-            activeTaskCount: number;
-            /** Format: int32 */
-            consultantCount: number;
-        };
-        ContractTaskDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** Format: double */
-            rate: number;
-            /** Format: date-time */
-            deletedAt: null | string;
-        };
-        CreateContractCommand: {
-            subject: string;
-            /** Format: uuid */
-            customerId: string;
-            /** Format: date */
-            start: string;
-            /** Format: date */
-            end: null | string;
-        };
-        CreateCustomerCommand: {
-            name: string;
-            contactPerson: components["schemas"]["ContactPersonDto"];
-            address: null | components["schemas"]["AddressDto"];
-            /** Format: uuid */
-            clientManagerId: null | string;
-        };
-        CreateUserCommand: {
-            firstName: string;
-            lastName: string;
-            email: string;
-            roles: components["schemas"]["UserRole"][];
-        };
-        CustomerDto: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int32 */
-            number: number;
-            name: string;
-            address: components["schemas"]["AddressDto"];
-            contactPerson: components["schemas"]["ContactPersonDto"];
-            /** Format: uuid */
-            clientManagerId: null | string;
-        };
-        DayInfoDto: {
-            /** Format: date */
-            date: string;
-            isBusinessDay: boolean;
-            holidayName?: null | string;
-        };
-        HolidayDto: {
-            /** Format: date */
-            date: string;
-            name: string;
-            type: components["schemas"]["HolidayType"];
-        };
-        /** @enum {unknown} */
-        HolidayType: "Public" | "Bank";
-        KeysetPageOfContractSummaryDto: {
-            items: components["schemas"]["ContractSummaryDto"][];
-            nextCursor: null | string;
-            /** Format: int32 */
-            total: number;
-        };
-        KeysetPageOfCustomerDto: {
-            items: components["schemas"]["CustomerDto"][];
-            nextCursor: null | string;
-            /** Format: int32 */
-            total: number;
-        };
-        KeysetPageOfUserDto: {
-            items: components["schemas"]["UserDto"][];
-            nextCursor: null | string;
-            /** Format: int32 */
-            total: number;
-        };
-        /** @enum {unknown} */
-        LeaveAllowed: "NotAllowed" | "Limited" | "Unlimited";
-        LeaveBookingEntryDto: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            leaveTypeId: string;
-            leaveTypeName: string;
-            /** Format: date */
-            date: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        LeaveBookingForYearDto: {
-            /** Format: date */
-            date: string;
-            /** Format: uuid */
-            leaveTypeId: string;
-            leaveTypeName: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        LeaveBookingInputDto: {
-            /** Format: uuid */
-            leaveTypeId: string;
-            /** Format: date */
-            date: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        PendingApprovalDto: {
-            /** Format: uuid */
-            userId: string;
-            userName: string;
-            /** Format: int32 */
-            isoYear: number;
-            /** Format: int32 */
-            isoWeek: number;
-            /** Format: double */
-            totalHours: number;
-        };
-        SelectableContractTaskDto: {
-            /** Format: uuid */
-            contractTaskId: string;
-            taskName: string;
-            /** Format: uuid */
-            contractId: string;
-            contractSubject: string;
-            /** Format: uuid */
-            customerId: string;
-        };
-        SelectableLeaveTypeDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-        };
-        TimeEntryDto: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            contractTaskId: string;
-            taskName: string;
-            /** Format: uuid */
-            contractId: string;
-            contractSubject: string;
-            /** Format: uuid */
-            customerId: string;
-            customerName: string;
-            /** Format: date */
-            date: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        TimeEntryInputDto: {
-            /** Format: uuid */
-            contractTaskId: string;
-            /** Format: date */
-            date: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        TimesheetMonthDayDto: {
-            /** Format: date */
-            date: string;
-            isBusinessDay: boolean;
-            holidayName: null | string;
-            timeEntries: components["schemas"]["TimesheetMonthTimeEntryDto"][];
-            leaveBookings: components["schemas"]["TimesheetMonthLeaveBookingDto"][];
-            /** Format: double */
-            totalHours: number;
-        };
-        TimesheetMonthDto: {
-            /** Format: uuid */
-            userId: string;
-            /** Format: int32 */
-            year: number;
-            /** Format: int32 */
-            month: number;
-            weeks: components["schemas"]["TimesheetMonthWeekDto"][];
-            /** Format: double */
-            monthTotalHours: number;
-        };
-        TimesheetMonthLeaveBookingDto: {
-            /** Format: uuid */
-            leaveTypeId: string;
-            leaveTypeName: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        TimesheetMonthPerLeaveTypeSummaryDto: {
-            leaveTypeName: string;
-            /** Format: double */
-            totalHours: number;
-        };
-        TimesheetMonthPerTaskSummaryDto: {
-            contractName: string;
-            taskName: string;
-            /** Format: double */
-            totalHours: number;
-        };
-        TimesheetMonthTimeEntryDto: {
-            /** Format: uuid */
-            taskId: string;
-            taskName: string;
-            contractName: string;
-            customerName: string;
-            /** Format: double */
-            durationHours: number;
-        };
-        TimesheetMonthWeekDto: {
-            /** Format: int32 */
-            isoYear: number;
-            /** Format: int32 */
-            isoWeek: number;
-            status: string;
-            days: components["schemas"]["TimesheetMonthDayDto"][];
-            perTaskSummary: components["schemas"]["TimesheetMonthPerTaskSummaryDto"][];
-            perLeaveTypeSummary: components["schemas"]["TimesheetMonthPerLeaveTypeSummaryDto"][];
-        };
-        TimesheetWeekDto: {
-            /** Format: uuid */
-            id: null | string;
-            /** Format: uuid */
-            userId: string;
-            /** Format: int32 */
-            isoYear: number;
-            /** Format: int32 */
-            isoWeek: number;
-            status: string;
-            days: components["schemas"]["DayInfoDto"][];
-            timeEntries: components["schemas"]["TimeEntryDto"][];
-            leaveBookings: components["schemas"]["LeaveBookingEntryDto"][];
-        };
-        UpdateContractCommand: {
-            /** Format: uuid */
-            id: string;
-            subject: string;
-            /** Format: uuid */
-            clientManagerId: null | string;
-            /** Format: date */
-            start: string;
-            /** Format: date */
-            end: null | string;
-            consultantIds: string[];
-            tasks?: null | components["schemas"]["UpdateContractTaskDto"][];
-        };
-        UpdateContractTaskDto: {
-            /** Format: uuid */
-            id: null | string;
-            name: string;
-            /** Format: double */
-            rate: number;
-        };
-        UpdateCustomerCommand: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            contactPerson: components["schemas"]["ContactPersonDto"];
-            address: null | components["schemas"]["AddressDto"];
-            /** Format: uuid */
-            clientManagerId: null | string;
-        };
-        UpdateUserCommand: {
-            /** Format: uuid */
-            id: string;
-            firstName: string;
-            lastName: string;
-            roles: components["schemas"]["UserRole"][];
-        };
-        UpdateUserLeavesBody: {
-            /** Format: int32 */
-            year: number;
-            items: components["schemas"]["UpdateUserLeavesItem"][];
-        };
-        UpdateUserLeavesItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: double */
-            totalDays: null | number;
-        };
-        UserDto: {
-            /** Format: uuid */
-            id: string;
-            email: string;
-            firstName: string;
-            lastName: string;
-            roles: components["schemas"]["UserRole"][];
-        };
-        UserLeaveDto: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            leaveTypeId: string;
-            leaveTypeName: string;
-            defaultAllowed: components["schemas"]["LeaveAllowed"];
-            /** Format: int32 */
-            year: number;
-            /** Format: double */
-            totalDays: null | number;
-        };
-        /** @enum {unknown} */
-        UserRole: "User" | "Admin" | "ClientManager";
+  schemas: {
+    AddressDto: {
+      street: null | string;
+      zip: null | string;
+      city: null | string;
+      country: null | string;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    AnonymousTypeOfstringAndstring: {
+      name: null | string;
+      version: null | string;
+    };
+    ApplyBookingsRequest: {
+      timeEntries: components['schemas']['TimeEntryInputDto'][];
+      leaveBookings: components['schemas']['LeaveBookingInputDto'][];
+    };
+    ContactPersonDto: {
+      name: null | string;
+      email: string;
+    };
+    ContractDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int32 */
+      number: number;
+      subject: string;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: uuid */
+      clientManagerId: null | string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+      tasks: components['schemas']['ContractTaskDto'][];
+      consultantIds: string[];
+    };
+    ContractSummaryDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int32 */
+      number: number;
+      subject: string;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+      /** Format: int32 */
+      activeTaskCount: number;
+      /** Format: int32 */
+      consultantCount: number;
+    };
+    ContractTaskDto: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: double */
+      rate: number;
+      /** Format: date-time */
+      deletedAt: null | string;
+    };
+    CreateContractCommand: {
+      subject: string;
+      /** Format: uuid */
+      customerId: string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+    };
+    CreateCustomerCommand: {
+      name: string;
+      contactPerson: components['schemas']['ContactPersonDto'];
+      address: null | components['schemas']['AddressDto'];
+      /** Format: uuid */
+      clientManagerId: null | string;
+    };
+    CreateUserCommand: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      roles: components['schemas']['UserRole'][];
+    };
+    CustomerDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int32 */
+      number: number;
+      name: string;
+      address: components['schemas']['AddressDto'];
+      contactPerson: components['schemas']['ContactPersonDto'];
+      /** Format: uuid */
+      clientManagerId: null | string;
+    };
+    DayInfoDto: {
+      /** Format: date */
+      date: string;
+      isBusinessDay: boolean;
+      holidayName?: null | string;
+    };
+    HolidayDto: {
+      /** Format: date */
+      date: string;
+      name: string;
+      type: components['schemas']['HolidayType'];
+    };
+    /** @enum {unknown} */
+    HolidayType: 'Public' | 'Bank';
+    KeysetPageOfContractSummaryDto: {
+      items: components['schemas']['ContractSummaryDto'][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
+    };
+    KeysetPageOfCustomerDto: {
+      items: components['schemas']['CustomerDto'][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
+    };
+    KeysetPageOfUserDto: {
+      items: components['schemas']['UserDto'][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
+    };
+    /** @enum {unknown} */
+    LeaveAllowed: 'NotAllowed' | 'Limited' | 'Unlimited';
+    LeaveBookingEntryDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      leaveTypeId: string;
+      leaveTypeName: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    LeaveBookingForYearDto: {
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      leaveTypeId: string;
+      leaveTypeName: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    LeaveBookingInputDto: {
+      /** Format: uuid */
+      leaveTypeId: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    PendingApprovalDto: {
+      /** Format: uuid */
+      userId: string;
+      userName: string;
+      /** Format: int32 */
+      isoYear: number;
+      /** Format: int32 */
+      isoWeek: number;
+      /** Format: double */
+      totalHours: number;
+    };
+    SelectableContractTaskDto: {
+      /** Format: uuid */
+      contractTaskId: string;
+      taskName: string;
+      /** Format: uuid */
+      contractId: string;
+      contractSubject: string;
+      /** Format: uuid */
+      customerId: string;
+    };
+    SelectableLeaveTypeDto: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+    };
+    TimeEntryDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      contractTaskId: string;
+      taskName: string;
+      /** Format: uuid */
+      contractId: string;
+      contractSubject: string;
+      /** Format: uuid */
+      customerId: string;
+      customerName: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimeEntryInputDto: {
+      /** Format: uuid */
+      contractTaskId: string;
+      /** Format: date */
+      date: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimesheetMonthDayDto: {
+      /** Format: date */
+      date: string;
+      isBusinessDay: boolean;
+      holidayName: null | string;
+      timeEntries: components['schemas']['TimesheetMonthTimeEntryDto'][];
+      leaveBookings: components['schemas']['TimesheetMonthLeaveBookingDto'][];
+      /** Format: double */
+      totalHours: number;
+    };
+    TimesheetMonthDto: {
+      /** Format: uuid */
+      userId: string;
+      /** Format: int32 */
+      year: number;
+      /** Format: int32 */
+      month: number;
+      weeks: components['schemas']['TimesheetMonthWeekDto'][];
+      /** Format: double */
+      monthTotalHours: number;
+    };
+    TimesheetMonthLeaveBookingDto: {
+      /** Format: uuid */
+      leaveTypeId: string;
+      leaveTypeName: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimesheetMonthPerLeaveTypeSummaryDto: {
+      leaveTypeName: string;
+      /** Format: double */
+      totalHours: number;
+    };
+    TimesheetMonthPerTaskSummaryDto: {
+      contractName: string;
+      taskName: string;
+      /** Format: double */
+      totalHours: number;
+    };
+    TimesheetMonthTimeEntryDto: {
+      /** Format: uuid */
+      taskId: string;
+      taskName: string;
+      contractName: string;
+      customerName: string;
+      /** Format: double */
+      durationHours: number;
+    };
+    TimesheetMonthWeekDto: {
+      /** Format: int32 */
+      isoYear: number;
+      /** Format: int32 */
+      isoWeek: number;
+      status: string;
+      days: components['schemas']['TimesheetMonthDayDto'][];
+      perTaskSummary: components['schemas']['TimesheetMonthPerTaskSummaryDto'][];
+      perLeaveTypeSummary: components['schemas']['TimesheetMonthPerLeaveTypeSummaryDto'][];
+    };
+    TimesheetWeekDto: {
+      /** Format: uuid */
+      id: null | string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: int32 */
+      isoYear: number;
+      /** Format: int32 */
+      isoWeek: number;
+      status: string;
+      days: components['schemas']['DayInfoDto'][];
+      timeEntries: components['schemas']['TimeEntryDto'][];
+      leaveBookings: components['schemas']['LeaveBookingEntryDto'][];
+    };
+    UpdateContractCommand: {
+      /** Format: uuid */
+      id: string;
+      subject: string;
+      /** Format: uuid */
+      clientManagerId: null | string;
+      /** Format: date */
+      start: string;
+      /** Format: date */
+      end: null | string;
+      consultantIds: string[];
+      tasks?: null | components['schemas']['UpdateContractTaskDto'][];
+    };
+    UpdateContractTaskDto: {
+      /** Format: uuid */
+      id: null | string;
+      name: string;
+      /** Format: double */
+      rate: number;
+    };
+    UpdateCustomerCommand: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      contactPerson: components['schemas']['ContactPersonDto'];
+      address: null | components['schemas']['AddressDto'];
+      /** Format: uuid */
+      clientManagerId: null | string;
+    };
+    UpdateUserCommand: {
+      /** Format: uuid */
+      id: string;
+      firstName: string;
+      lastName: string;
+      roles: components['schemas']['UserRole'][];
+    };
+    UpdateUserLeavesBody: {
+      /** Format: int32 */
+      year: number;
+      items: components['schemas']['UpdateUserLeavesItem'][];
+    };
+    UpdateUserLeavesItem: {
+      /** Format: uuid */
+      id: string;
+      /** Format: double */
+      totalDays: null | number;
+    };
+    UserDto: {
+      /** Format: uuid */
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      roles: components['schemas']['UserRole'][];
+    };
+    UserLeaveDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      leaveTypeId: string;
+      leaveTypeName: string;
+      defaultAllowed: components['schemas']['LeaveAllowed'];
+      /** Format: int32 */
+      year: number;
+      /** Format: double */
+      totalDays: null | number;
+    };
+    /** @enum {unknown} */
+    UserRole: 'User' | 'Admin' | 'ClientManager';
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    GetUserById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  GetUserById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
     };
-    GetCustomerById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+        content?: never;
+      };
     };
-    GetContractById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
+  };
+  GetCustomerById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
     };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  GetContractById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
 }
