@@ -2,6 +2,13 @@
 
 ## 2026-05-28
 
+### feat: show holidays by default on calendar, move My Tasks to navbar top
+
+Display holiday tiles on the calendar regardless of timesheet submission
+status, using the holidays API. Reorder navbar navigation so My Tasks
+appears at the top for admins. Simplify collapse button to show only
+the chevron icon.
+
 ### feat: hide User role in picker and inject it on submit
 
 The "User" role is the implicit baseline every account carries; exposing
