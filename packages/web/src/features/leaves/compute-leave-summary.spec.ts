@@ -9,8 +9,6 @@ const makeLeave = (
   overrides: Partial<UserLeave> & Pick<UserLeave, 'id' | 'leaveTypeId' | 'leaveTypeName' | 'defaultAllowed' | 'year'>,
 ): UserLeave => ({
   totalDays: null,
-  takenDays: null,
-  balanceDays: null,
   ...overrides,
 });
 

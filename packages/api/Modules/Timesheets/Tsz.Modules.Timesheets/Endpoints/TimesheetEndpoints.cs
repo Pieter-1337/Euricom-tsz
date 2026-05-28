@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Tsz.Infrastructure.Auth;
 using Tsz.Infrastructure.Cqrs;
@@ -15,7 +16,7 @@ public static class TimesheetEndpoints
         var group = app.MapApiGroup("timesheet-weeks")
             .RequireAuthorization();
 
-        group.MapGet("/{userId:guid}/{year:int}/{week:int}", async (
+        group.MapGet("/{userId:guid}/{year:int}/{week:int}", async Task<Results<ForbidHttpResult, Ok<TimesheetWeekDto>>> (
             Guid userId,
             int year,
             int week,
@@ -25,13 +26,13 @@ public static class TimesheetEndpoints
         {
             var caller = await currentUserResolver.ResolveAsync(ct);
             if (caller is null || (caller.Id != userId && !caller.HasRole(AuthorizationPolicies.AdminRoleName)))
-                return Results.Forbid();
+                return TypedResults.Forbid();
 
             var dto = await dispatcher.SendAsync(new GetTimesheetWeekQuery(userId, year, week), ct);
             return TypedResults.Ok(dto);
         });
 
-        group.MapPut("/{userId:guid}/{year:int}/{week:int}/bookings", async (
+        group.MapPut("/{userId:guid}/{year:int}/{week:int}/bookings", async Task<Results<ForbidHttpResult, Ok<TimesheetWeekDto>>> (
             Guid userId,
             int year,
             int week,
@@ -42,7 +43,7 @@ public static class TimesheetEndpoints
         {
             var caller = await currentUserResolver.ResolveAsync(ct);
             if (caller is null || caller.Id != userId)
-                return Results.Forbid();
+                return TypedResults.Forbid();
 
             var command = new ApplyTimesheetWeekBookingsCommand(
                 userId, year, week, body.TimeEntries, body.LeaveBookings);
@@ -99,7 +100,7 @@ public static class TimesheetEndpoints
         var monthGroup = app.MapApiGroup("timesheets")
             .RequireAuthorization();
 
-        monthGroup.MapGet("/{userId:guid}/{year:int}/{month:int}", async (
+        monthGroup.MapGet("/{userId:guid}/{year:int}/{month:int}", async Task<Results<ForbidHttpResult, Ok<TimesheetMonthDto>>> (
             Guid userId,
             int year,
             int month,
@@ -109,7 +110,7 @@ public static class TimesheetEndpoints
         {
             var caller = await currentUserResolver.ResolveAsync(ct);
             if (caller is null || (caller.Id != userId && !caller.HasRole(AuthorizationPolicies.AdminRoleName)))
-                return Results.Forbid();
+                return TypedResults.Forbid();
 
             var dto = await dispatcher.SendAsync(new GetTimesheetMonthQuery(userId, year, month), ct);
             return TypedResults.Ok(dto);

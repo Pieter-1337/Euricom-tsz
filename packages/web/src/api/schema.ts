@@ -912,7 +912,9 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["TimesheetMonthDto"];
+                    };
                 };
             };
         };
@@ -1247,6 +1249,64 @@ export interface components {
             date: string;
             /** Format: double */
             durationHours: number;
+        };
+        TimesheetMonthDayDto: {
+            /** Format: date */
+            date: string;
+            isBusinessDay: boolean;
+            holidayName: null | string;
+            timeEntries: components["schemas"]["TimesheetMonthTimeEntryDto"][];
+            leaveBookings: components["schemas"]["TimesheetMonthLeaveBookingDto"][];
+            /** Format: double */
+            totalHours: number;
+        };
+        TimesheetMonthDto: {
+            /** Format: uuid */
+            userId: string;
+            /** Format: int32 */
+            year: number;
+            /** Format: int32 */
+            month: number;
+            weeks: components["schemas"]["TimesheetMonthWeekDto"][];
+            /** Format: double */
+            monthTotalHours: number;
+        };
+        TimesheetMonthLeaveBookingDto: {
+            /** Format: uuid */
+            leaveTypeId: string;
+            leaveTypeName: string;
+            /** Format: double */
+            durationHours: number;
+        };
+        TimesheetMonthPerLeaveTypeSummaryDto: {
+            leaveTypeName: string;
+            /** Format: double */
+            totalHours: number;
+        };
+        TimesheetMonthPerTaskSummaryDto: {
+            contractName: string;
+            taskName: string;
+            /** Format: double */
+            totalHours: number;
+        };
+        TimesheetMonthTimeEntryDto: {
+            /** Format: uuid */
+            taskId: string;
+            taskName: string;
+            contractName: string;
+            customerName: string;
+            /** Format: double */
+            durationHours: number;
+        };
+        TimesheetMonthWeekDto: {
+            /** Format: int32 */
+            isoYear: number;
+            /** Format: int32 */
+            isoWeek: number;
+            status: string;
+            days: components["schemas"]["TimesheetMonthDayDto"][];
+            perTaskSummary: components["schemas"]["TimesheetMonthPerTaskSummaryDto"][];
+            perLeaveTypeSummary: components["schemas"]["TimesheetMonthPerLeaveTypeSummaryDto"][];
         };
         TimesheetWeekDto: {
             /** Format: uuid */

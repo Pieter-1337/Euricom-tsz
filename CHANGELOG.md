@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-05-28
+
+### fix: type month and week endpoints, restore TimesheetMonth schemas
+
+Type the month and week (GET, PUT bookings) timesheet endpoint lambdas
+with explicit return types (Task<Results<ForbidHttpResult, Ok<Dto>>>)
+so ASP.NET Core OpenAPI can infer response DTOs. The untyped Forbid+Ok
+pattern prevented schema inference, making TimesheetMonthDto and its
+nested types invisible to the openapi doc.
+
+Regenerate schema via gen:api. Restore 7 TimesheetMonth* DTOs that PR
+#56 inadvertently broke. Also restore week endpoint references (GET and
+PUT bookings) that were stale in origin/master.
+
+Remove phantom takenDays/balanceDays fields from test fixtures — never
+existed on C# UserLeaveDto, FE computes them locally.
+
 ## 2026-05-27
 
 ### docs: add AI-Empowered Development presentation
